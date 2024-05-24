@@ -34,6 +34,7 @@ public class SatelliteBiomeChanger extends SatelliteBase {
         radius = 4;
         toChangeList = new LinkedList<>();
         discoveredBiomes = new HashSet<>();
+        biomeId =  Biome.getBiome(0);
     }
 
     public Biome getBiome() {
