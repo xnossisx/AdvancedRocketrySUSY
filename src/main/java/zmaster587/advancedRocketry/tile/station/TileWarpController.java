@@ -362,8 +362,8 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
                 srcPlanetImg = new ModulePlanetImage(baseX + 10, baseY + 10, sizeX - 20, location);
                 srcPlanetText = new ModuleText(baseX + 4, baseY + 56, "", 0xFFFFFF);
                 srcPlanetText.setAlwaysOnTop(true);
-                warpFuel = new ModuleText(baseX + 100, baseY + sizeY + 25, "", 0x1b1b1b);
-                warpCapacity = new ModuleText(baseX + 100, baseY + sizeY + 35, "", 0x1b1b1b);
+                warpFuel = new ModuleText(baseX + 90, baseY + sizeY + 25, "", 0x1b1b1b);
+                warpCapacity = new ModuleText(baseX + 90, baseY + sizeY + 35, "", 0x1b1b1b);
 
                 //DEST planet
                 baseX = 94;
