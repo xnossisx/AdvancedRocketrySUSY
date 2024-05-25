@@ -89,7 +89,10 @@ import java.util.*;
 
 public class EntityRocket extends EntityRocketBase implements INetworkEntity, IModularInventory, IProgressBar, IButtonInventory, ISelectionNotify, IPlanetDefiner {
 
-    private static final int DESCENT_TIMER = 500;
+    // set to 2 seconds because keyboard event is not sent to server
+    // might be a temporary solution. Better be stuck 2 seconds than 25 seconds.
+    private static final int DESCENT_TIMER = 2*20;
+
     private static final int BUTTON_ID_OFFSET = 25;
     private static final int STATION_LOC_OFFSET = 50;
     private static final int ENGINE_IGNITION_CNT = 100;
@@ -122,7 +125,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     private long lastErrorTime = Long.MIN_VALUE;
     private ModuleText landingPadDisplayText;
     private SatelliteBase satellite;
-    private int autoDescendTimer;
+    private int autoDescendTimer; // Is this value even used?
     //0 to 100, 100 is fully rotated and ready to go, 0 is normal mode
     private int rcs_mode_counter = 0;
     //Used to most of the logic, determining if in RCS mode or not
@@ -136,7 +139,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         infrastructureCoords = new HashSet<>();
 
         lastWorldTickTicked = p_i1582_1_.getTotalWorldTime();
-        autoDescendTimer = 5000;
+        autoDescendTimer = 5000; // Is this value even used?
         landingPadDisplayText = new ModuleText(256, 16, "", 0x00FF00, 2f);
         landingPadDisplayText.setColor(0x00ff00);
 
@@ -153,7 +156,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         initFromBounds();
         isInFlight = false;
         lastWorldTickTicked = world.getTotalWorldTime();
-        autoDescendTimer = 5000;
+        autoDescendTimer = 5000; // Is this value even used?
         landingPadDisplayText = new ModuleText(256, 16, "", 0x00FF00, 2f);
         landingPadDisplayText.setColor(0x00ff00);
     }

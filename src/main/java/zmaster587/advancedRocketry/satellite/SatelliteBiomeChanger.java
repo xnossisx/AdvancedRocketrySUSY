@@ -91,12 +91,18 @@ public class SatelliteBiomeChanger extends SatelliteBase {
 
             for (int i = 0; i < 10; i++) {
                 //TODO: Better imp
+                //Note:
+                // if a biome satellite is supplied with too less
+                // solar panels it will keep resetting it's battery and never work
+                // this was because extractEnergy() resets energy to 0 if less than 120
+                // fixed by "if (battery.getUniversalEnergyStored() > 120){"
                 if (world.getTotalWorldTime() % 1 == 0 && !toChangeList.isEmpty()) {
-                    if (battery.extractEnergy(120, false) == 120) {
-                        HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
+                    if (battery.getUniversalEnergyStored() > 120) {
+                        if (battery.extractEnergy(120, false) == 120) {
+                            HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
 
-                        BiomeHandler.changeBiome(world, biomeId, pos.getBlockPos());
-
+                            BiomeHandler.changeBiome(world, biomeId, pos.getBlockPos());
+                        }
                     } else
                         break;
                 }
