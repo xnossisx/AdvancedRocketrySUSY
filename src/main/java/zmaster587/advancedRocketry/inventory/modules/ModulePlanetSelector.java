@@ -39,7 +39,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
     private ISelectionNotify hostTile;
     private int currentSystem, selectedSystem;
     private double zoom;
-    private boolean currentSystemChanged = true;
+    private boolean currentSystemChanged = false;
     //If the current view is a starmap
     private boolean stellarView;
     private List<ModuleButton> planetList;
