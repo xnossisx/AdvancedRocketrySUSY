@@ -39,7 +39,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
     private ISelectionNotify hostTile;
     private int currentSystem, selectedSystem;
     private double zoom;
-    private boolean currentSystemChanged = false;
+    private boolean currentSystemChanged = true;
     //If the current view is a starmap
     private boolean stellarView;
     private List<ModuleButton> planetList;
@@ -106,12 +106,19 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 
     @Override
     public void onScroll(int dwheel) {
-        //TODO
-        //zoom = Math.min(Math.max(zoom + dwheel/1000.0, 0.36), 2.0);
-        //redrawSystem();
+        //TODO (no - derCodeKoenig did it)
+        //removed list scroll because it was bugged
+        //completed/fixed planet map scroll implementation
 
+        zoom = Math.min(Math.max(zoom + dwheel / 1000.0, 0.36), 3.0);
+        redrawSystem();
+
+
+        /*
         if (clickablePlanetList != null)
             clickablePlanetList.onScroll(dwheel);
+        */
+
     }
 
     public void setAllowStarSelection(boolean allow) {
@@ -226,11 +233,11 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
     @SideOnly(Side.CLIENT)
     private void renderPlanetarySystem(DimensionProperties planet, int posX, int posY, float distanceZoomMultiplier, float planetSizeMultiplier) {
 
-        int displaySize = Math.max((int) (planetSizeMultiplier * planet.gravitationalMultiplier / .02f), 7);
+        int displaySize = Math.max((int) (planetSizeMultiplier * planet.gravitationalMultiplier / .02f), 1);
+        //displaySize *= distanceZoomMultiplier;
 
-        int offsetX = (int) (distanceZoomMultiplier * posX) - displaySize / 2;
-        int offsetY = (int) (distanceZoomMultiplier * posY) - displaySize / 2;
-        displaySize *= distanceZoomMultiplier;
+        int offsetX = (int) (1 * posX) - displaySize / 2;
+        int offsetY = (int) (1 * posY) - displaySize / 2;
 
         ModuleButton button;
         planetList.add(button = new ModuleButtonPlanet(offsetX, offsetY, planet.getId(), "", this, planet, planet.getName(), displaySize, displaySize));
@@ -255,7 +262,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
     @SideOnly(Side.CLIENT)
     private void renderPlanets(DimensionProperties planet, int parentOffsetX, int parentOffsetY, int parentRadius, float distanceMultiplier, float planetSizeMultiplier) {
 
-        int displaySize = Math.max((int) (planetSizeMultiplier * planet.gravitationalMultiplier / .02f), 7);
+        int displaySize = Math.max((int) (planetSizeMultiplier * planet.gravitationalMultiplier / .02f), 1);
 
         int offsetX = parentOffsetX + (int) (Math.cos(planet.orbitTheta) * ((planet.orbitalDist * distanceMultiplier) + parentRadius)) - displaySize / 2;
         int offsetY = parentOffsetY + (int) (Math.sin(planet.orbitTheta) * ((planet.orbitalDist * distanceMultiplier) + parentRadius)) - displaySize / 2;
@@ -285,7 +292,12 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
         this.screenSizeX = Minecraft.getMinecraft().displayWidth;
         this.screenSizeY = Minecraft.getMinecraft().displayHeight;
 
-        setOffset2(internalOffsetX - Minecraft.getMinecraft().displayWidth / 4, internalOffsetY - Minecraft.getMinecraft().displayHeight / 4);
+        //setOffset2(internalOffsetX - Minecraft.getMinecraft().displayWidth / 4, internalOffsetY - Minecraft.getMinecraft().displayHeight / 4);
+        float w_by_h = (float) Minecraft.getMinecraft().displayWidth /  Minecraft.getMinecraft().displayHeight;
+        float offset_to_center_x = 250; // this is a value that seems to work well on most screens
+        float offset_to_center_y = offset_to_center_x / w_by_h;
+        setOffset2((int) (internalOffsetX-offset_to_center_x), (int) (internalOffsetY-offset_to_center_y));
+
 
         List<GuiButton> list = super.addButtons(x, y);
 
@@ -313,11 +325,12 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
         if (!stellarView) {
             if (currentSystem < Constants.STAR_ID_OFFSET) {
                 DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(currentSystem);
-                renderPlanetarySystem(properties, size / 2, size / 2, 1f, 3f * properties.getPathLengthToStar());
+                renderPlanetarySystem(properties, size / 2, size / 2, (float) (0.5f*zoom), (float) (zoom*3f * properties.getPathLengthToStar()));
             } else
-                renderStarSystem(DimensionManager.getInstance().getStar(currentSystem - Constants.STAR_ID_OFFSET), size / 2, size / 2, (float) zoom, (float) zoom * .5f);
+                renderStarSystem(DimensionManager.getInstance().getStar(currentSystem - Constants.STAR_ID_OFFSET), size / 2, size / 2, (float) ((float) zoom), (float) zoom * .5f);
         } else
-            renderGalaxyMap(DimensionManager.getInstance(), size / 2, size / 2, (float) zoom, (float) zoom * .25f);
+            // zoom on galaxy is not implemented
+            renderGalaxyMap(DimensionManager.getInstance(), size / 2, size / 2, (float) 1, (float) 1 * .25f);
 
 
         int x = currentPosX - size / 2, y = currentPosY - size / 2;
@@ -326,7 +339,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
         this.screenSizeY = Minecraft.getMinecraft().displayHeight;
         for (ModuleBase module : this.planetList) {
             for (GuiButton module2 : module.addButtons(currentPosX, currentPosY)) {
-                if (module2.x > 128 + offsetX || clickablePlanetList == null || !clickablePlanetList.isEnabled())
+                //if (module2.x > 128 + offsetX || clickablePlanetList == null || !clickablePlanetList.isEnabled())
                     buttonList.add(module2);
             }
         }
@@ -348,9 +361,28 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
             currentPosX = 0;
             currentPosY = 0;
             zoom = 1;
+            //internalOffsetX = size/2;
+            //internalOffsetY = size/2;
+
+
+            //This does not work with planet view because the gui scales itself based on display size
+            //setOffset2(internalOffsetX - Minecraft.getMinecraft().displayWidth / 6, internalOffsetY - Minecraft.getMinecraft().displayHeight / 6);
+
+            if (stellarView){
+                setOffset2(internalOffsetX - Minecraft.getMinecraft().displayWidth / 4, internalOffsetY - Minecraft.getMinecraft().displayHeight / 4);
+            }else{
+                // When viewing a star or planet move the camera a little to make the planet/star
+                // not out of screen when selecting
+                // this makes it easier for the player to navigate the map
+                float w_by_h = (float) Minecraft.getMinecraft().displayWidth /  Minecraft.getMinecraft().displayHeight;
+                float offset_to_center_x = 250; // this is a value that seems to work well on most screens
+                float offset_to_center_y = offset_to_center_x / w_by_h;
+                setOffset2((int) (internalOffsetX-offset_to_center_x), (int) (internalOffsetY-offset_to_center_y));
+            }
+
+
+
             redrawSystem();
-            setOffset2(internalOffsetX - Minecraft.getMinecraft().displayWidth / 4, internalOffsetY - Minecraft.getMinecraft().displayHeight / 4);
-            //redrawSystem();
 
             //selectedSystem = Constants.INVALID_PLANET;
 
@@ -537,7 +569,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                     if (planetDefiner != null && !planetDefiner.isPlanetKnown(properties))
                         continue;
 
-                    ModuleButton button = new ModuleButton(0, i * 18, properties.getId(), properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 18);
+                    ModuleButton button = new ModuleButton(0, i * 12, properties.getId(), properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 12);
                     list2.add(button);
 
                     if (properties.getId() == selectedPlanet)
@@ -555,7 +587,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                         continue;
 
                     if (!properties.isMoon() && properties.getId() != ARConfiguration.getCurrentConfig().spaceDimId) {
-                        ModuleButton button = new ModuleButton(0, i * 18, properties.getId(), properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 18);
+                        ModuleButton button = new ModuleButton(0, i * 12, properties.getId(), properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 12);
                         list2.add(button);
 
                         if (properties.getId() == selectedPlanet)
@@ -571,7 +603,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                 if (planetDefiner != null && !planetDefiner.isStarKnown(properties))
                     continue;
 
-                ModuleButton button = new ModuleButton(0, i * 18, properties.getId() + Constants.STAR_ID_OFFSET, properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 18);
+                ModuleButton button = new ModuleButton(0, i * 12, properties.getId() + Constants.STAR_ID_OFFSET, properties.getName(), this, zmaster587.advancedRocketry.inventory.TextureResources.buttonGeneric, 128, 12);
                 list2.add(button);
 
                 if (properties.getId() + Constants.STAR_ID_OFFSET == selectedPlanet)
@@ -590,7 +622,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
             offY = clickablePlanetList.getScrollY();
         }
 
-        clickablePlanetList = new ModuleContainerPan(0, 128, list2, new LinkedList<>(), null, 512, 256, 0, 0, 258, 8192);
+        clickablePlanetList = new ModuleContainerPan(0, 128, list2, new LinkedList<>(), null, 512, 1024, 0, 0, 512, 1024);
         staticModuleList.add(clickablePlanetList);
         clickablePlanetList.addButtons(0, 0);
 
