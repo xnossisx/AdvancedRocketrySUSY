@@ -340,6 +340,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
             default:
                 super.onInventoryButtonPressed(buttonId);
         }
+        openGui(Minecraft.getMinecraft().player);
     }
 
 
