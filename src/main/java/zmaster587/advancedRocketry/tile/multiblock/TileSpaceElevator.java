@@ -97,11 +97,7 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
     public void deconstructMultiBlock(World world, BlockPos destroyedPos, boolean blockBroken, IBlockState state) {
         super.deconstructMultiBlock(world, destroyedPos, blockBroken, state);
 
-        Entity entity = getCapsuleOnLine();
 
-        if (entity != null) {
-            entity.setDead();
-        }
 
         World otherPlanet;
         if ((otherPlanet = DimensionManager.getWorld(dimBlockPos.dimid)) == null) {
@@ -213,7 +209,7 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
         double capsulePosX = getLandingLocationX();
         double capsulePosZ = getLandingLocationZ();
         for (EntityElevatorCapsule e : world.getEntitiesWithinAABB(EntityElevatorCapsule.class, new AxisAlignedBB(capsulePosX - 3, 0, capsulePosZ - 3, capsulePosX + 3, EntityElevatorCapsule.MAX_HEIGHT, capsulePosZ + 3))) {
-            if (!e.isInMotion() && !e.isDead) {
+            if (!e.isDead) {
                 capsule = e;
                 break;
             }
@@ -250,9 +246,27 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
     }
 
     public void summonCapsule() {
-        //Don't spawn a new capsule if one exists
-        if (getCapsuleOnLine() != null || !isTetherConnected())
+
+        if (!isTetherConnected())
             return;
+        // If a capsule exists, delete the existing one and create a new one
+        while (getCapsuleOnLine() != null){
+            getCapsuleOnLine().setDead();
+        }
+        // also check for the other elevator if there is a capsule
+        World otherPlanet;
+        if ((otherPlanet = DimensionManager.getWorld(dimBlockPos.dimid)) == null) {
+            DimensionManager.initDimension(dimBlockPos.dimid);
+            otherPlanet = DimensionManager.getWorld(dimBlockPos.dimid);
+        }
+
+        if (otherPlanet != null) {
+            TileEntity tile = otherPlanet.getTileEntity(dimBlockPos.pos.getBlockPos());
+            if (tile instanceof TileSpaceElevator) {
+                if (((TileSpaceElevator) tile).getCapsuleOnLine() != null) {((TileSpaceElevator) tile).getCapsuleOnLine().setDead();}
+            }
+        }
+
 
         capsule = new EntityElevatorCapsule(world);
         rotateCapsule();
@@ -352,6 +366,17 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
             }
             SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()).setIsAnchored(dimensionBlockPosition != null);
         }
+        if (dimensionBlockPosition == null){
+            isTetherConnected = false;
+            Entity entity = getCapsuleOnLine();
+
+            if (entity != null) {
+                entity.setDead();
+            }
+        }
+        else
+            isTetherConnected = true;
+
         dimBlockPos = dimensionBlockPosition;
     }
 
@@ -375,6 +400,7 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
             nbt.setInteger("dstDimId", dimBlockPos.dimid);
             nbt.setIntArray("dstPos", new int[]{dimBlockPos.pos.x, dimBlockPos.pos.y, dimBlockPos.pos.z});
             nbt.setBoolean("tether", isTetherConnected);
+            super.writeNetworkData(nbt);
         } else
 
             super.writeNetworkData(nbt);

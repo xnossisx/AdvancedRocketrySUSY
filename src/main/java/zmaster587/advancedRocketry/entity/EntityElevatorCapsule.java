@@ -222,9 +222,9 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
         if (isAscending()) {
 
             if (this.posY > 255)
-                this.motionY = 2.85;
+                this.motionY = 5.85;
             else
-                this.motionY = 0.85;
+                this.motionY = 1.85;
 
             if (!world.isRemote) {
                 List<EntityPlayer> list = world.getEntitiesWithinAABB(EntityPlayer.class, getEntityBoundingBox());
@@ -300,9 +300,9 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
             this.onGround = false;
 
             if (this.posY > 255)
-                this.motionY = -2.85;
+                this.motionY = -5.85;
             else
-                this.motionY = -0.85;
+                this.motionY = -1.85;
 
             if (!world.isRemote) {
 
@@ -314,6 +314,8 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                 for (Entity ent : list) {
                     if (this.getRidingEntity() == null)
                         ent.startRiding(this);
+                    this.fallDistance = 0; // I have no idea what I am doing I just copied this from
+                    ent.fallDistance = 0;   // entityRocket.java to prevent fall damage
                 }
 
                 if (this.posY <= dstTilePos.pos.y + 1 && world.provider.getDimension() != ARConfiguration.getCurrentConfig().spaceDimId) {
