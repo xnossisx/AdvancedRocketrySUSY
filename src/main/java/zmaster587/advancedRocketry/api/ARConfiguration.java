@@ -470,8 +470,8 @@ public class ARConfiguration {
         arConfig.IridiumClumpSize = config.get(WORLDGEN, "IridiumPerClump", 16).getInt();
         arConfig.IridiumPerChunk = config.get(WORLDGEN, "IridiumPerChunk", 1).getInt();
         //Orbital laser
-        arConfig.laserDrillOresBlackList = config.get(WORLDGEN, "laserDrillOres_blacklist", false, "True if the ores in laserDrillOres should be a blacklist, false for whitelist").getBoolean();
-        orbitalLaserOres = config.get(WORLDGEN, "laserDrillOres", new String[]{"oreIron", "oreGold", "oreCopper", "oreTin", "oreRedstone", "oreDiamond"}, "List of oredictionary names of ores allowed to be mined by the laser drill if surface drilling is disabled.  Ores can be specified by just the oreName:<size> or by <modname>:<blockname>:<meta>:<size> where size is optional").getStringList();
+        arConfig.laserDrillOresBlackList = config.get(WORLDGEN, "laserDrillOres_blacklist", true, "True if the ores in laserDrillOres should be a blacklist, false for whitelist. if set to false in combination with empty ore list it will crash the game").getBoolean();
+        orbitalLaserOres = config.get(WORLDGEN, "laserDrillOres", new String[]{}, "List of oredictionary names of ores allowed to be mined by the laser drill if surface drilling is disabled.  Ores can be specified by just the oreName:<size> or by <modname>:<blockname>:<meta>:<size> where size is optional").getStringList();
         //Geode
         arConfig.geodeOresBlackList = config.get(WORLDGEN, "geodeOres_blacklist", false, "True if the ores in geodeOres should be a blacklist, false for whitelist").getBoolean();
         arConfig.generateGeodes = config.get(WORLDGEN, "generateGeodes", true, "If true then ore-containing geodes are generated on high pressure planets").getBoolean();

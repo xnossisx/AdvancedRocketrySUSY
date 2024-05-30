@@ -56,12 +56,6 @@ public class BlockOrbitalLaserDrill extends BlockMultiblockMachine {
                            Random rand) {
         super.updateTick(worldIn, pos, state, rand);
 
-        TileOrbitalLaserDrill tile = (TileOrbitalLaserDrill) worldIn.getTileEntity(pos);
 
-        if (tile.isJammed())
-            tile.attemptUnjam();
-        else if (!tile.isRunning() && !tile.isFinished()) {
-            tile.checkCanRun();
-        }
     }
 }
