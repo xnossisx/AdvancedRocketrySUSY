@@ -105,6 +105,8 @@ public class PlanetaryTravelHelper {
      */
     public static boolean isTravelWithinGeostationaryOrbit(SpaceStationObject spaceStation, int planetID) {
         //Returns true if the planet and the dimension (can be any!) are the same parent and if station is 36300 > x > 35500 km
-        return spaceStation.getOrbitingPlanetId() == planetID && (spaceStation.getOrbitalDistance() >= 177.0f && 181.0f >= spaceStation.getOrbitalDistance());
+        //  && 181.0f >= spaceStation.getOrbitalDistance()
+        // upper limit removed because it causes players to not know how it works
+        return spaceStation.getOrbitingPlanetId() == planetID && (spaceStation.getOrbitalDistance() >= 177.0f);
     }
 }

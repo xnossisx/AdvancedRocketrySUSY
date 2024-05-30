@@ -198,7 +198,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
         else if (id == 13 && !isRunning())
             this.mode = MODE.values()[nbt.getInteger("mode")];
         else if (id == 14)
-            this.attemptUnjam();
+            this.checkjam();
 
         markDirty();
     }
@@ -277,29 +277,29 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
         if (!this.world.isRemote) {
             tickSinceLastOperation++;
 
-            if (unableToRun()) {
-                this.drill.deactivate();
-                this.setFinished(true);
-                this.setRunning(false);
-            } else if (this.hasPowerForOperation() && this.isReadyForOperation() && !this.isJammed) {
 
-                if (this.drill.needsRestart()) {
-                    this.setRunning(false);
-                    return;
+                checkjam();
+                checkCanRun();
+                if (this.hasPowerForOperation() && this.isReadyForOperation() && this.isRunning) {
+
+                    if (this.drill.needsRestart()) {
+                        this.setRunning(false);
+                        return;
+                    }
+
+                    ItemStack[] stacks = this.drill.performOperation();
+                    ZUtils.mergeInventory(stacks, this.inv);
+
+                    if (!ZUtils.isInvEmpty(stacks)) {
+                        //TODO: drop extra items
+                        this.drill.deactivate();
+                        this.isJammed = true;
+                    }
+
+                    this.batteries.setEnergyStored(this.batteries.getUniversalEnergyStored() - POWER_PER_OPERATION);
+                    this.tickSinceLastOperation = 0;
                 }
 
-                ItemStack[] stacks = this.drill.performOperation();
-                ZUtils.mergeInventory(stacks, this.inv);
-
-                if (!ZUtils.isInvEmpty(stacks)) {
-                    //TODO: drop extra items
-                    this.drill.deactivate();
-                    this.isJammed = true;
-                }
-
-                this.batteries.setEnergyStored(this.batteries.getUniversalEnergyStored() - POWER_PER_OPERATION);
-                this.tickSinceLastOperation = 0;
-            }
         }
 
         if (this.drill.isFinished()) {
@@ -336,8 +336,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
                         this.laserZ += 3 * prevDir.getFrontOffsetZ();
                     }
                 }
-                //TODO: unneeded?
-                checkCanRun();
             }
         }
     }
@@ -431,25 +429,23 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
     /**
      * Take items from internal inventory
      */
-    public void attemptUnjam() {
-        if (!this.isJammed)
-            return;
+    public void checkjam() {
 
-        if (this.hatchesAreEmpty()) {
+
+        if (this.one_hatch_empty()) {
             this.isJammed = false;
+        }else{
+            this.isJammed = true;
         }
-        finished = false;
-
-        checkCanRun();
     }
 
-    private boolean hatchesAreEmpty() {
+    private boolean one_hatch_empty() {
         for (int i = 1; i < this.inv.getSizeInventory(); ++i) {
-            if (!this.inv.getStackInSlot(i).isEmpty()) {
-                return false;
+            if (this.inv.getStackInSlot(i).isEmpty()) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private boolean canMachineSeeEarth() {
@@ -466,11 +462,17 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
      */
     public void checkCanRun() {
         //Laser requires lense, redstone power, not be jammed, and be in orbit and energy to function
-        if (world.isBlockIndirectlyGettingPowered(getPos()) == 0 || unableToRun()) {
-            drill.deactivate();
-
-            setRunning(false);
-        } else if (!this.finished && !this.isJammed && world.isBlockIndirectlyGettingPowered(getPos()) > 0) {
+        if (this.finished || this.isJammed || world.isBlockIndirectlyGettingPowered(getPos()) == 0 || unableToRun()) {
+            if (isRunning) {
+                drill.deactivate();
+                setRunning(false);
+                if (!this.world.isRemote) {
+                    PacketHandler.sendToNearby(new PacketMachine(this, (byte) 12), 128, pos, this.world.provider.getDimension());
+                    IBlockState state = world.getBlockState(getPos());
+                    world.notifyBlockUpdate(pos, state, state, 2);
+                }
+            }
+        } else if (world.isBlockIndirectlyGettingPowered(getPos()) > 0) {
 
             //Laser will be on at this point
             int orbitDimId = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId();
@@ -491,12 +493,17 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
                 if (ticket != null)
                     ForgeChunkManager.forceChunk(ticket, new ChunkPos(getPos().getX() / 16 - (getPos().getX() < 0 ? 1 : 0), getPos().getZ() / 16 - (getPos().getZ() < 0 ? 1 : 0)));
             }
-
-            setRunning(drill.activate(orbitWorld, laserX, laserZ));
+            if (!isRunning) {
+                setRunning(drill.activate(orbitWorld, laserX, laserZ));
+                if (!this.world.isRemote) {
+                    PacketHandler.sendToNearby(new PacketMachine(this, (byte) 12), 128, pos, this.world.provider.getDimension());
+                    IBlockState state = world.getBlockState(getPos());
+                    world.notifyBlockUpdate(pos, state, state, 2);
+                }
+            }
         }
 
-        if (!this.world.isRemote)
-            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 12), 128, pos, this.world.provider.getDimension());
+
     }
 
     public int getEnergyPercentScaled(int max) {

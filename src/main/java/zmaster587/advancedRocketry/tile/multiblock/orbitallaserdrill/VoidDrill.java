@@ -44,7 +44,7 @@ class VoidDrill extends AbstractDrill {
                 List<ItemStack> globalOres = OreDictionary.getOres(args[0]);
 
                 if (globalOres != null && !globalOres.isEmpty()) {
-                    int amt = 5;
+                    int amt = 1;
                     if (args.length > 1) {
                         try {
                             amt = Integer.parseInt(args[1]);
@@ -106,7 +106,7 @@ class VoidDrill extends AbstractDrill {
             ItemStack newStack = item.copy();
             items.add(newStack);
         } else
-            items.add(new ItemStack(Blocks.COBBLESTONE, 5));
+            items.add(new ItemStack(Blocks.COBBLESTONE, 1));
 
         ItemStack[] stacks = new ItemStack[items.size()];
 
@@ -117,11 +117,13 @@ class VoidDrill extends AbstractDrill {
 
     boolean activate(World world, int x, int z) {
         // Ideally, this should be done in the constructor, but the world provider is null there for reasons unknown, so this gets delayed until first activation
-        if (!this.planetOresInitialized) {
-            DimensionProperties dimProperties = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension());
-            ores.addAll(dimProperties.laserDrillOres.stream().filter(s -> !ores.contains(s)).collect(Collectors.toSet()));
-            this.planetOresInitialized = true;
-        }
+        this.ores = null;
+        this.planetOresInitialized = false;
+        loadGlobalOres();
+        DimensionProperties dimProperties = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension());
+        ores.addAll(dimProperties.laserDrillOres.stream().filter(s -> !ores.contains(s)).collect(Collectors.toSet()));
+        this.planetOresInitialized = true;
+
         return true;
     }
 
