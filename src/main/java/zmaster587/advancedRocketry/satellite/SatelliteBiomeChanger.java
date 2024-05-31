@@ -100,12 +100,14 @@ public class SatelliteBiomeChanger extends SatelliteBase {
                     if (battery.getUniversalEnergyStored() > 120) {
                         if (battery.extractEnergy(120, false) == 120) {
                             HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
+                            //HashedBlockPosition pos = toChangeList.remove(toChangeList.size()-1);
 
                             BiomeHandler.changeBiome(world, biomeId, pos.getBlockPos());
                         }
                     } else
                         break;
-                }
+                } else
+                    break;
             }
         }
         super.tickEntity();
@@ -122,7 +124,7 @@ public class SatelliteBiomeChanger extends SatelliteBase {
             return false;
         Set<Chunk> set = new HashSet<>();
         radius = 16;
-        MAX_SIZE = 1024;
+        MAX_SIZE = 4096;
         for (int xx = -radius + pos.getX(); xx < radius + pos.getX(); xx++) {
             for (int zz = -radius + pos.getZ(); zz < radius + pos.getZ(); zz++) {
 
@@ -171,7 +173,7 @@ public class SatelliteBiomeChanger extends SatelliteBase {
 
         int[] array = new int[toChangeList.size() * 3];
         Iterator<HashedBlockPosition> itr = toChangeList.iterator();
-        for (int i = 0; i < toChangeList.size(); i += 3) {
+        for (int i = 0; i < toChangeList.size()*3; i += 3) {
             HashedBlockPosition pos = itr.next();
             array[i] = pos.x;
             array[i + 1] = pos.y;
