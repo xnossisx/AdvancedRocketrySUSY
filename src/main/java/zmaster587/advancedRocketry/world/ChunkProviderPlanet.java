@@ -552,6 +552,8 @@ public class ChunkProviderPlanet implements IChunkGenerator {
 
 
         //If a planet is terraformed chenge upper blocks
+        // NO - because it causes mega-lag!
+        /*
         if (zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming && worldObj.provider.getClass() == WorldProviderPlanet.class) {
 
             if (DimensionManager.getInstance().getDimensionProperties(worldObj.provider.getDimension()).isTerraformed()) {
@@ -559,7 +561,7 @@ public class ChunkProviderPlanet implements IChunkGenerator {
                 PlanetEventHandler.modifyChunk(worldObj, (WorldProviderPlanet) worldObj.provider, chunk);
             }
         }
-
+        */
         net.minecraftforge.event.ForgeEventFactory.onChunkPopulate(false, this, this.worldObj, this.rand, x, z, flag);
 
         OreGenProperties oreGenProperties = DimensionManager.getInstance().getDimensionProperties(this.worldObj.provider.getDimension()).getOreGenProperties(this.worldObj);

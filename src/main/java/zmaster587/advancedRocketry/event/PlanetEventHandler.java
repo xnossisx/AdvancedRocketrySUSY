@@ -500,13 +500,15 @@ public class PlanetEventHandler {
 
     @SubscribeEvent
     public void chunkLoadEvent(PopulateChunkEvent.Post event) {
+        //Do not modify all at once, this causes !!!EXTREME!!! lag
+        /*
         if (zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming && event.getWorld().provider.getClass() == WorldProviderPlanet.class) {
-
             if (DimensionManager.getInstance().getDimensionProperties(event.getWorld().provider.getDimension()).isTerraformed()) {
                 Chunk chunk = event.getWorld().getChunkFromChunkCoords(event.getChunkX(), event.getChunkZ());
                 modifyChunk(event.getWorld(), (WorldProviderPlanet) event.getWorld().provider, chunk);
             }
         }
+         */
     }
 
     @SubscribeEvent
