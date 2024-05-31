@@ -272,6 +272,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     private boolean outOfFluid;
     private int last_mode;
     private boolean hadPowerLastTick;
+    private int updateticker;
     public TileAtmosphereTerraformer() {
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
         buttonIncrease = new ModuleToggleSwitch(40, 20, 1, LibVulpes.proxy.getLocalizedString("msg.terraformer.atminc"), this, TextureResources.buttonScan, 80, 16, true);
@@ -287,6 +288,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         outOfFluid = false;
         last_mode = radioButton.getOptionSelected();
         hadPowerLastTick = false;
+        updateticker = 0;
     }
 
     private int getCompletionTime() {
@@ -350,6 +352,16 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     public void update() {
+
+        //this should send a update package to the players every 10 seconds to notify them if the terraformer is running or not
+        if (!world.isRemote) {
+            updateticker++;
+            if (updateticker >= 200) {
+                this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
+                updateticker = 0;
+            }
+        }
+
         if (this.timeAlive == 0) {
             if (!this.world.isRemote) {
                 if (this.isComplete()) {
@@ -368,7 +380,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         if (!this.world.isRemote && this.world.getTotalWorldTime() % 1000L == 0L && !this.isComplete()) {
             this.attemptCompleteStructure(this.world.getBlockState(this.pos));
             this.markDirty();
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
         }
 
         if (this.isRunning()) {
@@ -378,7 +390,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                     if (!this.hadPowerLastTick) {
                         this.hadPowerLastTick = true;
                         this.markDirty();
-                        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
+                        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
                     }
 
                     this.useEnergy(this.usedPowerPerTick());
@@ -386,7 +398,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
             } else if (!this.world.isRemote && this.hadPowerLastTick) {
                 this.hadPowerLastTick = false;
                 this.markDirty();
-                this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
+                this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
             }
         }
 
