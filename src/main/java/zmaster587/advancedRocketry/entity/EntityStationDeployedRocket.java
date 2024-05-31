@@ -302,7 +302,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
         }
         modules.add(new ModuleButton(170, 114, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonLeft, 5, 8));
         modules.add(atmText);
-        modules.add(new ModuleButton(240, 114, 2, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight, 5, 8));
+        //modules.add(new ModuleButton(240, 114, 2, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight, 5, 8));
 
         return modules;
     }
@@ -340,6 +340,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
             default:
                 super.onInventoryButtonPressed(buttonId);
         }
+        openGui(Minecraft.getMinecraft().player);
     }
 
 
