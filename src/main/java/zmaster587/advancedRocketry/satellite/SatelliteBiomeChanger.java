@@ -28,13 +28,14 @@ public class SatelliteBiomeChanger extends SatelliteBase {
     //Note: we really don't care about order, in fact, lack of order is better
     private List<HashedBlockPosition> toChangeList;
     private Set<Byte> discoveredBiomes;
-
+private int noise_val;
     public SatelliteBiomeChanger() {
         super();
         radius = 4;
         toChangeList = new LinkedList<>();
         discoveredBiomes = new HashSet<>();
         biomeId =  Biome.getBiome(0);
+        noise_val = 6;
     }
 
     public Biome getBiome() {
@@ -122,39 +123,52 @@ public class SatelliteBiomeChanger extends SatelliteBase {
     public boolean performAction(EntityPlayer player, World world, BlockPos pos) {
         if (world.isRemote)
             return false;
-        Set<Chunk> set = new HashSet<>();
-        radius = 16;
-        MAX_SIZE = 4096;
-        for (int xx = -radius + pos.getX(); xx < radius + pos.getX(); xx++) {
-            for (int zz = -radius + pos.getZ(); zz < radius + pos.getZ(); zz++) {
+
+        radius = 12;
+        noise_val = 6;
+        MAX_SIZE = 8000;
+        for (int xx = -radius; xx < radius; xx++) {
+            for (int zz = -radius; zz < radius; zz++) {
+
+                int nx = xx + pos.getX();
+                int nz = zz + pos.getZ();
 
 
-                addBlockToList(new HashedBlockPosition(xx, 0, zz));
-				/*BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
-				BiomeGenBase biomeTo = BiomeGenBase.getBiome(biomeId);
-				if(biome.topBlock != biomeTo.topBlock) {
-					int yy = world.getHeightValue(xx, zz);
-					if(world.getBlock(xx, yy - 1, zz) == biome.topBlock)
-						world.setBlock(xx, yy-1, zz, biomeTo.topBlock);
-				}*/
-
+                //addBlockToList(new HashedBlockPosition(nx, 0, nz));
             }
         }
 
-        //Some kind of compiler optimization is breaking if we assign block and biome in the same loop
-        //Causing execution order to vary from source
-		/*for(int xx = -radius + x; xx < radius + x; xx++) {
-			for(int zz = -radius + z; zz < radius + z; zz++) {
-				set.add(world.getChunkFromBlockCoords(xx, zz));
-				byte[] biomeArr = world.getChunkFromBlockCoords(xx, zz).getBiomeArray();
-				biomeArr[(xx % 16)+ (zz % 16)*16] = (byte)biomeId;
-			}
-		}*/
+        // make it less square by adding noise to the edges
 
-		/*for(Chunk chunk : set) {
-			PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world), world.provider.dimensionId, x, y, z, 64);
-		}*/
+        for (int xx = -radius-noise_val; xx < radius+noise_val; xx++) {
+            for (int zz = -radius-noise_val; zz < radius+noise_val; zz++) {
+
+                int nx = xx + pos.getX();
+                int nz = zz + pos.getZ();
+
+                if (isAdd(xx, zz)) {
+                    addBlockToList(new HashedBlockPosition(nx, 0, nz));
+                }
+            }
+        }
+
         return false;
+    }
+
+    private boolean isAdd(int xx, int zz) {
+
+        if (xx > radius || xx < -radius || zz > radius || zz < -radius) {
+            Random r = new Random();
+            // less probability if it gets further away from max radius
+            int dx = Math.abs(xx) - radius;
+            int dz = Math.abs(zz) - radius;
+            int d = Math.max(dx, dz);
+            d = Math.max(d + 1, 1);
+            if (r.nextInt(d) == 0)
+                return true;
+            return false;
+
+        } else return true;
     }
 
     @Override
