@@ -87,7 +87,7 @@ private int noise_val;
     public void tickEntity() {
         //This is hacky..
         World world = net.minecraftforge.common.DimensionManager.getWorld(getDimensionId());
-
+        int powerrequired = 30;
         if (world != null) {
 
             for (int i = 0; i < 10; i++) {
@@ -98,8 +98,8 @@ private int noise_val;
                 // this was because extractEnergy() resets energy to 0 if less than 120
                 // fixed by "if (battery.getUniversalEnergyStored() > 120){"
                 if (world.getTotalWorldTime() % 1 == 0 && !toChangeList.isEmpty()) {
-                    if (battery.getUniversalEnergyStored() > 120) {
-                        if (battery.extractEnergy(120, false) == 120) {
+                    if (battery.getUniversalEnergyStored() > powerrequired) {
+                        if (battery.extractEnergy(powerrequired, false) == powerrequired) {
                             HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
                             //HashedBlockPosition pos = toChangeList.remove(toChangeList.size()-1);
 
@@ -125,18 +125,8 @@ private int noise_val;
             return false;
 
         radius = 12;
-        noise_val = 6;
+        noise_val = 12;
         MAX_SIZE = 8000;
-        for (int xx = -radius; xx < radius; xx++) {
-            for (int zz = -radius; zz < radius; zz++) {
-
-                int nx = xx + pos.getX();
-                int nz = zz + pos.getZ();
-
-
-                //addBlockToList(new HashedBlockPosition(nx, 0, nz));
-            }
-        }
 
         // make it less square by adding noise to the edges
 
@@ -163,7 +153,7 @@ private int noise_val;
             int dx = Math.abs(xx) - radius;
             int dz = Math.abs(zz) - radius;
             int d = Math.max(dx, dz);
-            d = Math.max(d + 1, 1);
+            d = Math.max((d + 1)/2, 1);
             if (r.nextInt(d) == 0)
                 return true;
             return false;
