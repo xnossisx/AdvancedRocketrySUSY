@@ -27,6 +27,7 @@ import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
 import zmaster587.advancedRocketry.network.PacketBiomeIDChange;
 import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
 import zmaster587.advancedRocketry.util.AudioRegistry;
+import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
 import zmaster587.advancedRocketry.world.provider.WorldProviderPlanet;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
@@ -273,6 +274,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     private int last_mode;
     private boolean hadPowerLastTick;
     private int updateticker;
+    private boolean had_linker_last_tick;
     public TileAtmosphereTerraformer() {
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
         buttonIncrease = new ModuleToggleSwitch(40, 20, 1, LibVulpes.proxy.getLocalizedString("msg.terraformer.atminc"), this, TextureResources.buttonScan, 80, 16, true);
@@ -289,6 +291,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         last_mode = radioButton.getOptionSelected();
         hadPowerLastTick = false;
         updateticker = 0;
+        had_linker_last_tick = false;
     }
 
     private int getCompletionTime() {
@@ -329,8 +332,8 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         ItemStack biomeChanger = inv.getStackInSlot(0);
         if (isRunning())
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.running");
-        else if (!hasValidBiomeChanger())
-            statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.missingbiome");
+        //else if (!hasValidBiomeChanger())
+            //statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.missingbiome");
         else if (outOfFluid)
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.outofgas");
         else
@@ -359,6 +362,22 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
             if (updateticker >= 200) {
                 this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
                 updateticker = 0;
+            }
+
+            // as long as there is a biome changer it can terraform
+            // if it is taken out it should stop terraform
+            boolean has_biome_changer = hasValidBiomeChanger();
+            if (has_biome_changer) {
+                DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).set_terraformed();
+                if (!had_linker_last_tick) { // as soon as a linker is placed the terraforming will start
+                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getAverageTemp();
+                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).setTerraformedBiomes(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getViableBiomes());
+                    ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(world.provider.getDimension())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
+                }
+                had_linker_last_tick = true;
+            } else if (had_linker_last_tick) {
+                had_linker_last_tick = false;
+                DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).set_not_terraformed();
             }
         }
 
@@ -468,11 +487,13 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                     markDirty();
                 }
             }
+            /*
             if (!hasValidBiomeChanger()) {
                 this.setMachineEnabled(false);
                 this.setMachineRunning(false);
                 markDirty();
             }
+             */
         }
     }
 
@@ -600,14 +621,14 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
-        if (hasValidBiomeChanger()) {
+        //if (hasValidBiomeChanger()) {
             super.onInventoryButtonPressed(buttonId);
             outOfFluid = false;
             if (buttonId == 1 || buttonId == 2) {
                 PacketHandler.sendToServer(new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()));
             }
             setText();
-        }
+        //}
     }
 
     @Override
