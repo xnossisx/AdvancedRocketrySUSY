@@ -9,6 +9,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.TempCategory;
 import net.minecraftforge.common.BiomeDictionary;
@@ -620,6 +621,18 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public boolean isTerraformed() {
         return isTerraformed;
     }
+    /**
+     * set terraformed to false
+     */
+    public void set_not_terraformed() {
+        isTerraformed = false;
+    }
+    /**
+     * set terraformed to true
+     */
+    public void set_terraformed() {
+        isTerraformed = true;
+    }
 
     public int getAtmosphereDensity() {
         return atmosphereDensity;
@@ -636,7 +649,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             setTerraformedBiomes(getViableBiomes());
             isTerraformed = true;
 
-            ((ChunkManagerPlanet) ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(getId())).chunkMgrTerraformed).resetCache();
+            WorldServer world = net.minecraftforge.common.DimensionManager.getWorld(getId());
+            ( (WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(getId())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
 
         }
 
@@ -964,7 +978,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         Random random = new Random(System.nanoTime());
         List<Biome> viableBiomes = new ArrayList<>();
 
-        if (atmosphereDensity > AtmosphereTypes.LOW.value && random.nextInt(3) == 0) {
+        if (atmosphereDensity > AtmosphereTypes.LOW.value && random.nextInt(3) == 0 && !isTerraformed()) {
             List<Biome> list = new LinkedList<>(AdvancedRocketryBiomes.instance.getSingleBiome());
 
             while (list.size() > 1) {
