@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.world;
 
+import com.google.common.collect.Lists;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
@@ -35,8 +36,7 @@ public class ChunkManagerPlanet extends BiomeProvider {
     private GenLayer genBiomes;
     private List<BiomeEntry> biomes;
 
-    public ChunkManagerPlanet(long seed, WorldType default1, String str, DimensionProperties properties) {
-
+    private void setup(long seed, WorldType default1, String str, DimensionProperties properties){
         this.biomeCache = new BiomeCache(this);//new BiomeCacheExtended(this);
         //TODO: more biomes
         //TODO: remove rivers
@@ -53,6 +53,20 @@ public class ChunkManagerPlanet extends BiomeProvider {
 
         fBiomeCacheMap = ReflectionHelper.findField(BiomeCache.class, "cacheMap", "field_76843_c");
         fBiomeCacheMap.setAccessible(true);
+    }
+
+    long seed;
+    WorldType default1;
+    String str;
+    DimensionProperties properties;
+
+    public ChunkManagerPlanet(long seed, WorldType default1, String str, DimensionProperties properties) {
+        this.seed = seed;
+        this.default1 = default1;
+        this.str = str;
+        this.properties = properties;
+
+        this.setup(seed, default1, str, properties);
     }
 
 
@@ -180,10 +194,11 @@ public class ChunkManagerPlanet extends BiomeProvider {
 
         try {
             fBiomeCacheMap.set(this.biomeCache, new Long2ObjectOpenHashMap(4096));
-            ((List) fBiomeCache.get(this.biomeCache)).clear();
+            fBiomeCache.set(this.biomeCache, Lists.newArrayList());
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @Nonnull
