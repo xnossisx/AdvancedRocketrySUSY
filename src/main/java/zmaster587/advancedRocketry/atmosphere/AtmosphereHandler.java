@@ -154,11 +154,13 @@ public class AtmosphereHandler {
                 }
             }
             //Water blocks should also vaporize and disappear
+            /* yes but not like this because it crashes the game
             if (handler.getAtmosphereType(bpos) == AtmosphereType.SUPERHEATED || handler.getAtmosphereType(bpos) == AtmosphereType.SUPERHEATEDNOO2 || handler.getAtmosphereType(bpos) == AtmosphereType.VERYHOT || handler.getAtmosphereType(bpos) == AtmosphereType.VERYHOTNOO2) {
                 if (world.getBlockState(bpos).getMaterial() == Material.WATER) {
                     world.setBlockToAir(bpos);
                 }
             }
+             */
 
 
             List<AreaBlob> nearbyBlobs = handler.getBlobWithinRadius(pos, MAX_BLOB_RADIUS);
