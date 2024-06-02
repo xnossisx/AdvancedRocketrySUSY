@@ -2,6 +2,7 @@ package zmaster587.advancedRocketry.dimension;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
@@ -135,6 +136,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private IBlockState fillerBlock;
     private int seaLevel;
     private int generatorType;
+    //public boolean water_can_exist;
     public DimensionProperties(int id) {
         name = "Temp";
         resetProperties();
@@ -182,7 +184,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         spawnableEntities = new LinkedList<>();
         beaconLocations = new HashSet<>();
         seaLevel = 63;
-        generatorType = 0;
+        generatorType =0;
+        //water_can_exist = true;
     }
     public DimensionProperties(int id, String name) {
         this(id);
@@ -645,14 +648,16 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         int prevAtm = this.atmosphereDensity;
         this.atmosphereDensity = atmosphereDensity;
 
-        if (AtmosphereTypes.getAtmosphereTypeFromValue(prevAtm) != AtmosphereTypes.getAtmosphereTypeFromValue(this.atmosphereDensity)) {
+        getAverageTemp();
+
+
             setTerraformedBiomes(getViableBiomes());
             isTerraformed = true;
 
             WorldServer world = net.minecraftforge.common.DimensionManager.getWorld(getId());
-            ( (WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(getId())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
+            ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(getId())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
 
-        }
+
 
         PacketHandler.sendToAll(new PacketDimInfo(getId(), this));
     }
@@ -1003,6 +1008,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             viableBiomes.add(AdvancedRocketryBiomes.hotDryBiome);
             viableBiomes.add(AdvancedRocketryBiomes.volcanic);
             viableBiomes.add(AdvancedRocketryBiomes.volcanicBarren);
+//            viableBiomes.add(Biomes.HELL);
         } else if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.HOT)) {
 
             for (Biome biome : Biome.REGISTRY) {
@@ -1692,6 +1698,19 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     @Override
     public int getAverageTemp() {
         averageTemperature = AstronomicalBodyHelper.getAverageTemperature(this.getStar(), this.getSolarOrbitalDistance(), this.getAtmosphereDensity());
+
+        /*
+        int temp = averageTemperature;
+        float pressure = (float) (atmosphereDensity + 1) / (float) 100;
+        pressure = (float) Math.max(0.01, pressure);
+        float water_can_exist_value = 400;
+        float planetvalue = temp / pressure;
+
+        if (planetvalue < water_can_exist_value) {
+            water_can_exist = true;
+        } else water_can_exist = false;
+        */
+
         return averageTemperature;
     }
 
@@ -1918,7 +1937,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         }
 
         public boolean hotterThan(Temps type) {
-            return this.compareTo(type) < 0;
+            return this.compareTo(type) <= 0;
         }
 
         public boolean colderThan(Temps type) {
