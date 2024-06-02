@@ -470,20 +470,29 @@ public class PlanetEventHandler {
         }
     }
 
+
+    int last_block = 0;
     @SubscribeEvent
     public void serverTickEvent(TickEvent.WorldTickEvent event) {
         if (ARConfiguration.getCurrentConfig().enableTerraforming && event.world.provider.getClass() == WorldProviderPlanet.class) {
 
             if (DimensionManager.getInstance().getDimensionProperties(event.world.provider.getDimension()).isTerraformed()) {
                 Collection<Chunk> list = ((WorldServer) event.world).getChunkProvider().getLoadedChunks();
+                int tfspeed = ARConfiguration.getCurrentConfig().terraformingBlockSpeed;
                 if (list.size() > 0) {
                     try {
                         int listSize = list.size();
 
+                                this.last_block += 1;
+                                if (this.last_block >= 256) {
+                                    this.last_block = 0;
+                                }
+
                         for (Chunk chunk : list) {
 
-                            if (ARConfiguration.getCurrentConfig().terraformingBlockSpeed > listSize || event.world.rand.nextFloat() < ARConfiguration.getCurrentConfig().terraformingBlockSpeed / (float) listSize) {
-                                int coord = event.world.rand.nextInt(256);
+                            if (tfspeed > listSize || event.world.rand.nextFloat() < tfspeed / (float) listSize) {
+                                //int coord = event.world.rand.nextInt(256);
+                                int coord = last_block;
                                 int x = (coord & 0xF) + chunk.x * 16;
                                 int z = (coord >> 4) + chunk.z * 16;
 
@@ -500,6 +509,8 @@ public class PlanetEventHandler {
 
     @SubscribeEvent
     public void chunkLoadEvent(PopulateChunkEvent.Post event) {
+
+
         //Do not modify all at once, this causes !!!EXTREME!!! lag
         /*
         if (zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming && event.getWorld().provider.getClass() == WorldProviderPlanet.class) {
