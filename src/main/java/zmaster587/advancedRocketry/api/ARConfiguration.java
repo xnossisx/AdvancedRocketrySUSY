@@ -412,7 +412,7 @@ public class ARConfiguration {
         arConfig.canPlayerRespawnInSpace = config.get(PLANET, "allowPlanetRespawn", false, "If true players will respawn near beds on planets IF the spawn location is in a breathable atmosphere").getBoolean();
         arConfig.forcePlayerRespawnInSpace = config.get(PLANET, "forcePlanetRespawn", false, "If true players will respawn near beds on planets REGARDLESS of the spawn location being in a non-breathable atmosphere. Requires 'allowPlanetRespawn' being true.").getBoolean();
         arConfig.blackListAllVanillaBiomes = config.getBoolean("blackListVanillaBiomes", PLANET, false, "Prevents any vanilla biomes from spawning on planets");
-        arConfig.maxBiomesPerPlanet = config.get(PLANET, "maxBiomesPerPlanet", 5, "Maximum unique biomes per planet, -1 to disable").getInt();
+        arConfig.maxBiomesPerPlanet = config.get(PLANET, "maxBiomesPerPlanet", 99, "Maximum unique biomes per planet").getInt();
 
         //Client
         arConfig.stationSkyOverride = config.get(CLIENT, "StationSkyOverride", true, "If true, AR will use a custom skybox on space stations").getBoolean();
