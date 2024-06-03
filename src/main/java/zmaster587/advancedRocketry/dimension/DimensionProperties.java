@@ -110,7 +110,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private LinkedList<BiomeEntry> craterBiomeWeights;
     private boolean isRegistered = false;
     //private boolean isTerraformed = false;
-    private int num_terraforming_satellites_registered;
     //Planet Heirachy
     private HashSet<Integer> childPlanets;
     private int parentPlanet;
@@ -187,7 +186,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         seaLevel = 63;
         generatorType =0;
         //water_can_exist = true;
-        num_terraforming_satellites_registered = 0;
     }
     public DimensionProperties(int id, String name) {
         this(id);
@@ -228,7 +226,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
     public void copyTerraformedBiomes(DimensionProperties props) {
         this.terraformedBiomes = props.terraformedBiomes;
-        this.num_terraforming_satellites_registered = props.num_terraforming_satellites_registered;
     }
 
     @Override
@@ -629,25 +626,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return true if terraformed
      */
     public boolean isTerraformed() {
-        return num_terraforming_satellites_registered > 0;
+        return false;
     }
-    /**
-     * set terraformed to false
-     */
-    public void unregister_terraforming_satellite() {
-        num_terraforming_satellites_registered -= 1;
-        num_terraforming_satellites_registered = Math.max(0,num_terraforming_satellites_registered);
-    }
-    /**
-     * set terraformed to true
-     */
-    public void register_terraforming_satellite() {
-        num_terraforming_satellites_registered += 1;
-    }
-    public int getNum_terraforming_satellites_registered(){
-        return num_terraforming_satellites_registered;
-    }
-
     public int getAtmosphereDensity() {
         return atmosphereDensity;
     }
@@ -1249,7 +1229,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
 
     private void readFromTechnicalNBT(NBTTagCompound nbt) {
-        num_terraforming_satellites_registered = nbt.getInteger("num_terraforming_satellites_registered");
         NBTTagList list;
         if (nbt.hasKey("beaconLocations")) {
             list = nbt.getTagList("beaconLocations", NBT.TAG_INT_ARRAY);
@@ -1507,7 +1486,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     private void writeTechnicalNBT(NBTTagCompound nbt) {
-        nbt.setInteger("num_terraforming_satellites_registered", num_terraforming_satellites_registered);
         NBTTagList list;
         if (!beaconLocations.isEmpty()) {
             list = new NBTTagList();

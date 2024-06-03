@@ -273,7 +273,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     private boolean outOfFluid;
     private int last_mode;
     private boolean hadPowerLastTick;
-    private int updateticker;
     //private boolean had_linker_last_tick;
     public TileAtmosphereTerraformer() {
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
@@ -290,7 +289,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         outOfFluid = false;
         last_mode = radioButton.getOptionSelected();
         hadPowerLastTick = false;
-        updateticker = 0;
         //had_linker_last_tick = false;
     }
 
@@ -357,10 +355,8 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
 
         //this should send a update package to the players every 10 seconds to notify them if the terraformer is running or not
         if (!world.isRemote) {
-            updateticker++;
-            if (updateticker >= 200) {
+            if (world.getTotalWorldTime() % 20 == 0) {
                 this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
-                updateticker = 0;
             }
         }
 

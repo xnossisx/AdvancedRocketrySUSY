@@ -82,8 +82,6 @@ public class ARConfiguration {
     @ConfigProperty
     public double fuelCapacityMultiplier;
     @ConfigProperty
-    public int maxBiomes = 512;
-    @ConfigProperty
     public boolean rocketRequireFuel = true;
     @ConfigProperty
     public boolean canBeFueledByHand = true;
@@ -137,10 +135,6 @@ public class ARConfiguration {
     @ConfigProperty
     public boolean scrubberRequiresCartrige;
     @ConfigProperty
-    public float EUMult;
-    @ConfigProperty
-    public float RFMult;
-    @ConfigProperty
     public boolean overrideGCAir;
     @ConfigProperty
     public int fuelPointsPerDilithium;
@@ -168,8 +162,6 @@ public class ARConfiguration {
     public boolean enableTerraforming;
     @ConfigProperty
     public double gasCollectionMult;
-    @ConfigProperty
-    public int terraformingBlockSpeed;
     @ConfigProperty
     public double terraformSpeed;
     @ConfigProperty
@@ -358,7 +350,6 @@ public class ARConfiguration {
         arConfig.laserDrillPlanet = config.get(Configuration.CATEGORY_GENERAL, "laserDrillPlanet", false, "If true the orbital laser will actually mine blocks on the planet below (currently not working)").getBoolean();
         String[] str = config.getStringList("spaceLaserDimIdBlackList", Configuration.CATEGORY_GENERAL, new String[]{}, "Laser drill will not mine these dimension");
         arConfig.enableTerraforming = config.get(Configuration.CATEGORY_GENERAL, "EnableTerraforming", true, "Enables terraforming items and blocks").getBoolean();
-        arConfig.terraformingBlockSpeed = config.get(Configuration.CATEGORY_GENERAL, "biomeUpdateSpeed", 1, "How many blocks have the biome changed per tick.  Large numbers can slow the server down", Integer.MAX_VALUE, 1).getInt();
         arConfig.terraformSpeed = config.get(Configuration.CATEGORY_GENERAL, "terraformMult", 1f, "Multplier for atmosphere change speed").getDouble();
         //arConfig.terraformPlanetSpeed = config.get(Configuration.CATEGORY_GENERAL, "terraformBlockPerTick", 1, "Max number of blocks allowed to be changed per tick").getInt();
         arConfig.terraformRequiresFluid = config.get(Configuration.CATEGORY_GENERAL, "TerraformerRequiresFluids", true, "Whether the Terraformer should consume fluids at all, independent of rate").getBoolean();

@@ -474,39 +474,7 @@ public class PlanetEventHandler {
     int last_block = 0;
     @SubscribeEvent
     public void serverTickEvent(TickEvent.WorldTickEvent event) {
-        if (ARConfiguration.getCurrentConfig().enableTerraforming && event.world.provider.getClass() == WorldProviderPlanet.class) {
 
-            if (DimensionManager.getInstance().getDimensionProperties(event.world.provider.getDimension()).isTerraformed()) {
-                Collection<Chunk> list = ((WorldServer) event.world).getChunkProvider().getLoadedChunks();
-                int tfspeed = ARConfiguration.getCurrentConfig().terraformingBlockSpeed;
-                int num_satellites = DimensionManager.getInstance().getDimensionProperties(event.world.provider.getDimension()).getNum_terraforming_satellites_registered();
-                tfspeed = tfspeed * num_satellites;
-                if (list.size() > 0) {
-                    try {
-                        int listSize = list.size();
-
-                                this.last_block += 1;
-                                if (this.last_block >= 256) {
-                                    this.last_block = 0;
-                                }
-
-                        for (Chunk chunk : list) {
-
-                            if (tfspeed > listSize || event.world.rand.nextFloat() < tfspeed / (float) listSize) {
-                                //int coord = event.world.rand.nextInt(256);
-                                int coord = last_block;
-                                int x = (coord & 0xF) + chunk.x * 16;
-                                int z = (coord >> 4) + chunk.z * 16;
-
-                                BiomeHandler.changeBiome(event.world, ((ChunkManagerPlanet) ((WorldProviderPlanet) event.world.provider).chunkMgrTerraformed).getBiomeGenAt(x, z), new BlockPos(x, 0, z));
-                            }
-                        }
-                    } catch (NullPointerException e) {
-                        //Ghost
-                    }
-                }
-            }
-        }
     }
 
     @SubscribeEvent

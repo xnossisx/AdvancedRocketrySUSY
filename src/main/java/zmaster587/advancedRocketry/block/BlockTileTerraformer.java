@@ -103,11 +103,6 @@ public class BlockTileTerraformer extends RotatableBlock {
     public void breakBlock(World world, BlockPos pos, IBlockState state) {
         TileEntity tile = world.getTileEntity(pos);
 
-        //unregister satellite when breaking machine
-        if (((TileTerraformingTerminal) tile).was_enabled_last_tick){
-            DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).unregister_terraforming_satellite();
-        }
-
 
         if (!world.isRemote && tile instanceof IInventory) {
             IInventory inventory = (IInventory)tile;
