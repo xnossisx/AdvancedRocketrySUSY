@@ -136,6 +136,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private IBlockState fillerBlock;
     private int seaLevel;
     private int generatorType;
+    public int target_sea_level;
     //public boolean water_can_exist;
     public DimensionProperties(int id) {
         name = "Temp";
@@ -185,6 +186,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         beaconLocations = new HashSet<>();
         seaLevel = 63;
         generatorType =0;
+        target_sea_level = seaLevel;
         //water_can_exist = true;
     }
     public DimensionProperties(int id, String name) {
@@ -1217,7 +1219,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     public void initDefaultAttributes() {
-        if (Temps.getTempFromValue(averageTemperature).hotterThan(DimensionProperties.Temps.HOT))
+        if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.TOOHOT))
             setOceanBlock(Blocks.LAVA.getDefaultState());
 
         //Add planet Properties
@@ -1423,6 +1425,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         isGasGiant = nbt.getBoolean("isGasGiant");
         hasRings = nbt.getBoolean("hasRings");
         seaLevel = nbt.getInteger("sealevel");
+        target_sea_level = nbt.getInteger("target_sea_level");
         generatorType = nbt.getInteger("genType");
         canGenerateCraters = nbt.getBoolean("canGenerateCraters");
         canGenerateGeodes = nbt.getBoolean("canGenerateGeodes");
@@ -1638,6 +1641,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         nbt.setBoolean("isGasGiant", isGasGiant);
         nbt.setBoolean("hasRings", hasRings);
         nbt.setInteger("sealevel", seaLevel);
+        nbt.setInteger("target_sea_level", target_sea_level);
         nbt.setInteger("genType", generatorType);
         nbt.setBoolean("canGenerateCraters", canGenerateCraters);
         nbt.setBoolean("canGenerateGeodes", canGenerateGeodes);
