@@ -104,7 +104,7 @@ public class BlockTileTerraformer extends RotatableBlock {
         TileEntity tile = world.getTileEntity(pos);
 
         //unregister satellite when breaking machine
-        if (((TileTerraformingTerminal) tile).hasValidBiomeChanger()){
+        if (((TileTerraformingTerminal) tile).was_enabled_last_tick){
             DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).unregister_terraforming_satellite();
         }
 

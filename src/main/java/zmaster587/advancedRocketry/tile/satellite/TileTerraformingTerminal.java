@@ -14,7 +14,6 @@ import zmaster587.advancedRocketry.api.DataStorage.DataType;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
-import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.inventory.modules.ModuleData;
 import zmaster587.advancedRocketry.inventory.modules.ModuleSatellite;
 import zmaster587.advancedRocketry.item.ItemBiomeChanger;
@@ -27,6 +26,7 @@ import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;
 import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
 import zmaster587.advancedRocketry.world.provider.WorldProviderPlanet;
 import zmaster587.libVulpes.LibVulpes;
+import zmaster587.libVulpes.inventory.TextureResources;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
@@ -46,7 +46,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
     private ModuleText moduleText;
 
-    private boolean was_enabled_last_tick;
+    public boolean was_enabled_last_tick;
 
 
     private ModuleButton buttonstopall;
@@ -55,7 +55,15 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public TileTerraformingTerminal() {
         super(1, 1);
 
-        buttonstopall = new ModuleButton(40, 50, 1, "stop all",this, zmaster587.libVulpes.inventory.TextureResources.buttonScan,"stop all terminals\nremotes will need to be re-inserted\nto start the process again");
+        buttonstopall = new ModuleButton(40, 60, 1, "stop all",this, TextureResources.buttonSquare,
+                "- emergency stop all terminals -\n" +
+                        "When resetting your satellites\n" +
+                        "you need to turn all terminals off\n" +
+                        "before you start turning them on\n" +
+                        "again or they will interfere with\n" +
+                        "each other\n\n" +
+                        "recommended to use only\n" +
+                        "in emergency situations");
 
         was_enabled_last_tick = false;
 
@@ -126,6 +134,10 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
     @Override
     public void update() {
+        if (world.isRemote){
+            if (world.getTotalWorldTime()%20 == 0)
+                updateInventoryInfo();
+        }
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
         if (!world.isRemote) {
@@ -162,6 +174,9 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
             else{
                 moduleText.setText("place a biome remote here\nto make the satellite terraform\nthe entire planet");
             }
+            int num_regs = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getNum_terraforming_satellites_registered();
+            moduleText.setText(moduleText.getText()+"\nTotal satellites working: "+num_regs);
+
         }
     }
 
