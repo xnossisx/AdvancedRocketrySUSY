@@ -100,6 +100,7 @@ import zmaster587.advancedRocketry.tile.multiblock.machine.*;
 import zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill.TileOrbitalLaserDrill;
 import zmaster587.advancedRocketry.tile.satellite.TileSatelliteBuilder;
 import zmaster587.advancedRocketry.tile.satellite.TileSatelliteTerminal;
+import zmaster587.advancedRocketry.tile.satellite.TileTerraformingTerminal;
 import zmaster587.advancedRocketry.tile.station.*;
 import zmaster587.advancedRocketry.util.*;
 import zmaster587.advancedRocketry.world.biome.*;
@@ -362,6 +363,7 @@ public class AdvancedRocketry {
         GameRegistry.registerTileEntity(TileGuidanceComputerAccessHatch.class, "ARguidanceComputerHatch");
         GameRegistry.registerTileEntity(TileSatelliteBuilder.class, "ARsatelliteBuilder");
         GameRegistry.registerTileEntity(TileSatelliteTerminal.class, "ARTileEntitySatelliteControlCenter");
+        GameRegistry.registerTileEntity(TileTerraformingTerminal.class, "ARTileEntityTerraformingTerminal");
         GameRegistry.registerTileEntity(TileAstrobodyDataProcessor.class, "ARplanetAnalyser");
         GameRegistry.registerTileEntity(TileGuidanceComputer.class, "ARguidanceComputer");
         GameRegistry.registerTileEntity(TileElectricArcFurnace.class, "ARelectricArcFurnace");
@@ -667,6 +669,8 @@ public class AdvancedRocketry {
         AdvancedRocketryBlocks.blockFuelingStation = new BlockTileRedstoneEmitter(TileFuelingStation.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("fuelStation").setCreativeTab(tabAdvRocketry).setHardness(3f);
         AdvancedRocketryBlocks.blockMonitoringStation = new BlockTileNeighborUpdate(TileRocketMonitoringStation.class, GuiHandler.guiId.MODULARNOINV.ordinal()).setCreativeTab(tabAdvRocketry).setHardness(3f).setUnlocalizedName("monitoringstation");
         AdvancedRocketryBlocks.blockSatelliteControlCenter = new BlockTile(TileSatelliteTerminal.class, GuiHandler.guiId.MODULAR.ordinal()).setCreativeTab(tabAdvRocketry).setHardness(3f).setUnlocalizedName("satelliteMonitor");
+        AdvancedRocketryBlocks.blockTerraformingTerminal = new BlockTileTerraformer(TileTerraformingTerminal.class, GuiHandler.guiId.MODULAR.ordinal()).setCreativeTab(tabAdvRocketry).setHardness(3f).setUnlocalizedName("terraformingTerminal");
+
         //Station machines
         AdvancedRocketryBlocks.blockWarpShipMonitor = new BlockWarpController(TileWarpController.class, GuiHandler.guiId.MODULARNOINV.ordinal()).setCreativeTab(tabAdvRocketry).setHardness(3f).setUnlocalizedName("stationmonitor");
         AdvancedRocketryBlocks.blockOrientationController = new BlockTile(TileStationOrientationController.class, GuiHandler.guiId.MODULAR.ordinal()).setCreativeTab(tabAdvRocketry).setUnlocalizedName("orientationControl").setHardness(3f);
@@ -835,6 +839,7 @@ public class AdvancedRocketry {
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockFuelingStation.setRegistryName("fuelingStation"));
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockMonitoringStation.setRegistryName("monitoringStation"));
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockSatelliteControlCenter.setRegistryName("satelliteControlCenter"));
+        LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockTerraformingTerminal.setRegistryName("terraformingTerminal"));
         //Station machines
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockWarpShipMonitor.setRegistryName("warpMonitor"));
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockOrientationController.setRegistryName("orientationController"));
@@ -928,7 +933,22 @@ public class AdvancedRocketry {
 
         //Biomes --------------------------------------------------------------------------------------
 
-        String[] biomeBlackList = config.getStringList("BlacklistedBiomes", "Planet", new String[]{Biomes.SKY.getRegistryName().toString(), Biomes.HELL.getRegistryName().toString(), Biomes.VOID.getRegistryName().toString(), AdvancedRocketryBiomes.alienForest.getRegistryName().toString()}, "List of Biomes to be blacklisted from spawning as BiomeIds, default is: sky, hell, void, alienForest");
+        String[] biomeBlackList = config.getStringList("BlacklistedBiomes", "Planet",
+                new String[]{
+                        Biomes.RIVER.getRegistryName().toString(),
+                        Biomes.OCEAN.getRegistryName().toString(),
+                        Biomes.DEEP_OCEAN.getRegistryName().toString(),
+                        Biomes.FROZEN_OCEAN.getRegistryName().toString(),
+                        Biomes.BEACH.getRegistryName().toString(),
+                        Biomes.STONE_BEACH.getRegistryName().toString(),
+                        Biomes.COLD_BEACH.getRegistryName().toString(),
+                        Biomes.FROZEN_RIVER.getRegistryName().toString(),
+                        Biomes.MUSHROOM_ISLAND_SHORE.getRegistryName().toString(),
+                        Biomes.SKY.getRegistryName().toString(),
+                        Biomes.HELL.getRegistryName().toString(),
+                        Biomes.VOID.getRegistryName().toString(),
+                },
+                "List of Biomes to be blacklisted from spawning as BiomeIds during terraforming - this is important to have only biomes that can not create water sources otherwise water evaporation will fail!!!, use all infinite fluid biomes listed in the water control config");
         String[] biomeHighPressure = config.getStringList("HighPressureBiomes", "Planet", new String[]{AdvancedRocketryBiomes.swampDeepBiome.getRegistryName().toString(), AdvancedRocketryBiomes.stormLandsBiome.getRegistryName().toString()}, "Biomes that only spawn on worlds with pressures over 125, will override blacklist.  Defaults: StormLands, DeepSwamp");
         String[] biomeSingle = config.getStringList("SingleBiomes", "Planet", new String[]{AdvancedRocketryBiomes.volcanicBarren.getRegistryName().toString(), AdvancedRocketryBiomes.swampDeepBiome.getRegistryName().toString(), AdvancedRocketryBiomes.crystalChasms.getRegistryName().toString(), AdvancedRocketryBiomes.alienForest.getRegistryName().toString(), Biomes.DESERT_HILLS.getRegistryName().toString(),
                 Biomes.MUSHROOM_ISLAND.getRegistryName().toString(), Biomes.EXTREME_HILLS.getRegistryName().toString(), Biomes.ICE_PLAINS.getRegistryName().toString()}, "Some worlds have a chance of spawning single biomes contained in this list.  Defaults: deepSwamp, crystalChasms, alienForest, desert hills, mushroom island, extreme hills, ice plains");

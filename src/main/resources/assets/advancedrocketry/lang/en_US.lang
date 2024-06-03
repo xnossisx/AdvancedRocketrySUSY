@@ -48,6 +48,7 @@ tile.nuclearfueltank.name=Nuclear Thermal Working Fluid Tank
 tile.nuclearcore.name=Nuclear Thermal Fission Core
 tile.monitoringstation.name=Rocket Monitoring Station
 tile.satelliteMonitor.name=Satellite Terminal
+tile.terraformingTerminal.name=Terraforming Terminal
 tile.lightwoodlog.name=Lightwood Wood
 tile.lightwoodsapling.name=Lightwood Sapling
 tile.lightwoodleaves.name=Lightwood Leaves

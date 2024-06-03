@@ -109,7 +109,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private LinkedList<BiomeEntry> terraformedBiomes;
     private LinkedList<BiomeEntry> craterBiomeWeights;
     private boolean isRegistered = false;
-    private boolean isTerraformed = false;
+    //private boolean isTerraformed = false;
+    private int num_terraforming_satellites_registered;
     //Planet Heirachy
     private HashSet<Integer> childPlanets;
     private int parentPlanet;
@@ -186,6 +187,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         seaLevel = 63;
         generatorType =0;
         //water_can_exist = true;
+        num_terraforming_satellites_registered = 0;
     }
     public DimensionProperties(int id, String name) {
         this(id);
@@ -226,7 +228,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
     public void copyTerraformedBiomes(DimensionProperties props) {
         this.terraformedBiomes = props.terraformedBiomes;
-        this.isTerraformed = props.isTerraformed;
+        this.num_terraforming_satellites_registered = props.num_terraforming_satellites_registered;
     }
 
     @Override
@@ -309,8 +311,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return the host star for this planet
      */
     public StellarBody getStar() {
-        if (isStar())
-            return getStarData();
+        if (isStar()) {
+            star = getStarData();
+        }
         if (star == null)
             star = DimensionManager.getInstance().getStar(starId);
         return star;
@@ -562,9 +565,13 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return if a planet, the same as getParentOrbitalDistance(), if a moon, the moon's distance from the host star
      */
     public int getSolarOrbitalDistance() {
+        if (this.isStar()){
+            return 1;
+        }
         if (parentPlanet != Constants.INVALID_PLANET)
             return getParentProperties().getSolarOrbitalDistance();
         return orbitalDist;
+
     }
 
     public double getSolarTheta() {
@@ -622,19 +629,23 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return true if terraformed
      */
     public boolean isTerraformed() {
-        return isTerraformed;
+        return num_terraforming_satellites_registered > 0;
     }
     /**
      * set terraformed to false
      */
-    public void set_not_terraformed() {
-        isTerraformed = false;
+    public void unregister_terraforming_satellite() {
+        num_terraforming_satellites_registered -= 1;
+        num_terraforming_satellites_registered = Math.max(0,num_terraforming_satellites_registered);
     }
     /**
      * set terraformed to true
      */
-    public void set_terraformed() {
-        isTerraformed = true;
+    public void register_terraforming_satellite() {
+        num_terraforming_satellites_registered += 1;
+    }
+    public int getNum_terraforming_satellites_registered(){
+        return num_terraforming_satellites_registered;
     }
 
     public int getAtmosphereDensity() {
@@ -652,7 +663,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
 
             setTerraformedBiomes(getViableBiomes());
-            isTerraformed = true;
 
             WorldServer world = net.minecraftforge.common.DimensionManager.getWorld(getId());
             ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(getId())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
@@ -728,7 +738,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      */
     public double getPeakInsolationMultiplierWithoutAtmosphere() {
         //Set peak insolation multiplier without atmosphere --  we do this here because I've had problems with it in the past in the XML loader, and people keep asking to change it
-        peakInsolationMultiplierWithoutAtmosphere = AstronomicalBodyHelper.getStellarBrightness(star, getSolarOrbitalDistance()) * 1.308d;
+        peakInsolationMultiplierWithoutAtmosphere = AstronomicalBodyHelper.getStellarBrightness(getStar(), getSolarOrbitalDistance()) * 1.308d;
         return peakInsolationMultiplierWithoutAtmosphere;
     }
 
@@ -973,6 +983,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return true if the biome is not allowed to spawn on any Dimension
      */
     public boolean isBiomeblackListed(Biome biome) {
+        //use blacklist only when terraforming
+        if (!isTerraformed()) return false;
+
         return AdvancedRocketryBiomes.instance.getBlackListedBiomes().contains(Biome.getIdForBiome(biome));
     }
 
@@ -1236,7 +1249,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
 
     private void readFromTechnicalNBT(NBTTagCompound nbt) {
-        isTerraformed = nbt.getBoolean("terraformed");
+        num_terraforming_satellites_registered = nbt.getInteger("num_terraforming_satellites_registered");
         NBTTagList list;
         if (nbt.hasKey("beaconLocations")) {
             list = nbt.getTagList("beaconLocations", NBT.TAG_INT_ARRAY);
@@ -1494,7 +1507,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     private void writeTechnicalNBT(NBTTagCompound nbt) {
-        nbt.setBoolean("terraformed", isTerraformed);
+        nbt.setInteger("num_terraforming_satellites_registered", num_terraforming_satellites_registered);
         NBTTagList list;
         if (!beaconLocations.isEmpty()) {
             list = new NBTTagList();

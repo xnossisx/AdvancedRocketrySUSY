@@ -1017,6 +1017,8 @@ public class XMLPlanetLoader {
                     star.setTemperature(Integer.parseInt(nameNode.getNodeValue()));
                 } catch (NumberFormatException e) {
                     AdvancedRocketry.logger.warn("Error Reading star " + star.getName());
+                    AdvancedRocketry.logger.warn("using temp value of 100 now");
+                    star.setTemperature(100);
                 }
             }
 

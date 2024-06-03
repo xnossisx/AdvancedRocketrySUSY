@@ -48,7 +48,7 @@ import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
 
-public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements IInventory {
+public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
 
     private static final Object[][][] structure = new Object[][][]{
             {{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
@@ -269,12 +269,12 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     private ModuleToggleSwitch buttonIncrease, buttonDecrease;
     private ModuleRadioButton radioButton;
     private ModuleText text;
-    private EmbeddedInventory inv;
+    //private EmbeddedInventory inv;
     private boolean outOfFluid;
     private int last_mode;
     private boolean hadPowerLastTick;
     private int updateticker;
-    private boolean had_linker_last_tick;
+    //private boolean had_linker_last_tick;
     public TileAtmosphereTerraformer() {
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
         buttonIncrease = new ModuleToggleSwitch(40, 20, 1, LibVulpes.proxy.getLocalizedString("msg.terraformer.atminc"), this, TextureResources.buttonScan, 80, 16, true);
@@ -286,12 +286,12 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         buttons.add(buttonIncrease);
         buttons.add(buttonDecrease);
         radioButton = new ModuleRadioButton(this, buttons);
-        inv = new EmbeddedInventory(1);
+        //inv = new EmbeddedInventory(1);
         outOfFluid = false;
         last_mode = radioButton.getOptionSelected();
         hadPowerLastTick = false;
         updateticker = 0;
-        had_linker_last_tick = false;
+        //had_linker_last_tick = false;
     }
 
     private int getCompletionTime() {
@@ -315,7 +315,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
         setText();
 
-        modules.add(new ModuleLimitedSlotArray(150, 114, this, 0, 1));
         int i = 0;
         modules.add(new ModuleText(180, 10, "Gas Status", 0x282828));
         for (IFluidHandler tile : fluidInPorts) {
@@ -329,7 +328,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     private void setText() {
 
         String statusText;
-        ItemStack biomeChanger = inv.getStackInSlot(0);
+        //ItemStack biomeChanger = inv.getStackInSlot(0);
         if (isRunning())
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.running");
         //else if (!hasValidBiomeChanger())
@@ -362,22 +361,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
             if (updateticker >= 200) {
                 this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
                 updateticker = 0;
-            }
-
-            // as long as there is a biome changer it can terraform
-            // if it is taken out it should stop terraform
-            boolean has_biome_changer = hasValidBiomeChanger();
-            if (has_biome_changer) {
-                DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).set_terraformed();
-                if (!had_linker_last_tick) { // as soon as a linker is placed the terraforming will start
-                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getAverageTemp();
-                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).setTerraformedBiomes(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getViableBiomes());
-                    ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(world.provider.getDimension())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
-                }
-                had_linker_last_tick = true;
-            } else if (had_linker_last_tick) {
-                had_linker_last_tick = false;
-                DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).set_not_terraformed();
             }
         }
 
@@ -506,15 +489,19 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         return 80;
     }
 
+    //moved to new machine: TerraformingTerminal
+/*
     private boolean hasValidBiomeChanger() {
         ItemStack biomeChanger = inv.getStackInSlot(0);
         SatelliteBase satellite;
 
-        return !biomeChanger.isEmpty() && (biomeChanger.getItem() instanceof ItemBiomeChanger) && SatelliteRegistry.getSatellite(biomeChanger) != null &&
+        return !biomeChanger.isEmpty() &&
+                (biomeChanger.getItem() instanceof ItemBiomeChanger) &&
+                SatelliteRegistry.getSatellite(biomeChanger) != null &&
                 (satellite = ((ItemSatelliteIdentificationChip) AdvancedRocketryItems.itemBiomeChanger).getSatellite(biomeChanger)).getDimensionId() == world.provider.getDimension() &&
                 satellite instanceof SatelliteBiomeChanger;
     }
-
+*/
     @Override
     protected void playMachineSound(SoundEvent event) {
         world.playSound(getPos().getX(), getPos().getY() + 7, getPos().getZ(), event, SoundCategory.BLOCKS, Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.BLOCKS), 0.975f + world.rand.nextFloat() * 0.05f, false);
@@ -636,7 +623,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         super.writeToNBT(nbt);
 
         nbt.setInteger("selected", radioButton.getOptionSelected());
-        inv.writeToNBT(nbt);
 
         nbt.setBoolean("oofluid", outOfFluid);
 
@@ -649,7 +635,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         super.readFromNBT(nbt);
 
         radioButton.setOptionSelected(nbt.getInteger("selected"));
-        inv.readFromNBT(nbt);
         outOfFluid = nbt.getBoolean("oofluid");
 
     }
@@ -657,93 +642,5 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     @Override
     public String getMachineName() {
         return AdvancedRocketryBlocks.blockAtmosphereTerraformer.getLocalizedName();
-    }
-
-    @Override
-    public String getName() {
-        return getMachineName();
-    }
-
-    @Override
-    public boolean hasCustomName() {
-        return false;
-    }
-
-    @Override
-    public int getSizeInventory() {
-        return inv.getSizeInventory();
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack getStackInSlot(int index) {
-        return inv.getStackInSlot(index);
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack decrStackSize(int index, int count) {
-        return inv.decrStackSize(index, count);
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack removeStackFromSlot(int index) {
-        ItemStack stack = inv.removeStackFromSlot(index);
-        if (world.isRemote)
-            setText();
-        return stack;
-    }
-
-    @Override
-    public void setInventorySlotContents(int index, @Nonnull ItemStack stack) {
-        inv.setInventorySlotContents(index, stack);
-        if (world.isRemote)
-            setText();
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 1;
-    }
-
-    @Override
-    public void openInventory(EntityPlayer player) {
-
-    }
-
-    @Override
-    public void closeInventory(EntityPlayer player) {
-
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
-        return inv.isItemValidForSlot(index, stack);
-    }
-
-    @Override
-    public int getField(int id) {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
-    public void clear() {
-        inv.clear();
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return inv.isEmpty();
     }
 }

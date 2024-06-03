@@ -479,6 +479,8 @@ public class PlanetEventHandler {
             if (DimensionManager.getInstance().getDimensionProperties(event.world.provider.getDimension()).isTerraformed()) {
                 Collection<Chunk> list = ((WorldServer) event.world).getChunkProvider().getLoadedChunks();
                 int tfspeed = ARConfiguration.getCurrentConfig().terraformingBlockSpeed;
+                int num_satellites = DimensionManager.getInstance().getDimensionProperties(event.world.provider.getDimension()).getNum_terraforming_satellites_registered();
+                tfspeed = tfspeed * num_satellites;
                 if (list.size() > 0) {
                     try {
                         int listSize = list.size();
