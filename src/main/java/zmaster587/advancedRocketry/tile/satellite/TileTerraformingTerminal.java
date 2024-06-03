@@ -46,7 +46,8 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
     private ModuleText moduleText;
 
-    private boolean had_biomechanger_last_tick;
+    private boolean was_enabled_last_tick;
+
 
     private ModuleButton buttonstopall;
 
@@ -56,7 +57,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
         buttonstopall = new ModuleButton(40, 50, 1, "stop all",this, zmaster587.libVulpes.inventory.TextureResources.buttonScan,"stop all terminals\nremotes will need to be re-inserted\nto start the process again");
 
-        had_biomechanger_last_tick = false;
+        was_enabled_last_tick = false;
 
     }
 
@@ -126,34 +127,39 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     @Override
     public void update() {
         super.update();
+        boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
         if (!world.isRemote) {
-            if (hasValidBiomeChanger()) {
-                if (!had_biomechanger_last_tick) {
-                    had_biomechanger_last_tick = true;
+            if (hasValidBiomeChanger() && has_redstone) {
+                if (!was_enabled_last_tick) {
+                    was_enabled_last_tick = true;
                     DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getAverageTemp();
                     DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).setTerraformedBiomes(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getViableBiomes());
                     ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(world.provider.getDimension())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
                     DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).register_terraforming_satellite();
                     this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
                     this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 1);
+                    this.markDirty();
                 }
             }
-            if (!hasValidBiomeChanger()) {
-                if (had_biomechanger_last_tick) {
-                    had_biomechanger_last_tick = false;
+            else {
+                if (was_enabled_last_tick) {
+                    was_enabled_last_tick = false;
                     DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).unregister_terraforming_satellite();
                     this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
                     this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 1);
+                    this.markDirty();
                 }
             }
         }
     }
     public void updateInventoryInfo() {
         if (moduleText != null) {
-            if (hasValidBiomeChanger()){
+            if (hasValidBiomeChanger() && world.isBlockIndirectlyGettingPowered(getPos()) != 0){
                 moduleText.setText("terraforming planet...");
+            }else if (hasValidBiomeChanger()){
+                moduleText.setText("provide redstone signal\nto start the process");
             }
-            if (!hasValidBiomeChanger()){
+            else{
                 moduleText.setText("place a biome remote here\nto make the satellite terraform\nthe entire planet");
             }
         }
@@ -194,14 +200,14 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        nbt.setBoolean("had_remote_last_tick", had_biomechanger_last_tick);
+        nbt.setBoolean("was_enabled_last_tick", was_enabled_last_tick);
         return nbt;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        had_biomechanger_last_tick = nbt.getBoolean("had_remote_last_tick");
+        was_enabled_last_tick = nbt.getBoolean("was_enabled_last_tick");
     }
 
 

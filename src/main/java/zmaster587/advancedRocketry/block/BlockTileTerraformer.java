@@ -90,7 +90,6 @@ public class BlockTileTerraformer extends RotatableBlock {
         if (tile instanceof IAdjBlockUpdate) {
             ((IAdjBlockUpdate)tile).onAdjacentBlockUpdated();
         }
-
     }
 
     public boolean isBlockNormalCube(IBlockState state) {
