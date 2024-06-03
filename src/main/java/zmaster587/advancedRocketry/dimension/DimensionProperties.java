@@ -2,6 +2,7 @@ package zmaster587.advancedRocketry.dimension;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
@@ -9,6 +10,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.TempCategory;
 import net.minecraftforge.common.BiomeDictionary;
@@ -107,7 +109,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private LinkedList<BiomeEntry> terraformedBiomes;
     private LinkedList<BiomeEntry> craterBiomeWeights;
     private boolean isRegistered = false;
-    private boolean isTerraformed = false;
+    //private boolean isTerraformed = false;
     //Planet Heirachy
     private HashSet<Integer> childPlanets;
     private int parentPlanet;
@@ -134,6 +136,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private IBlockState fillerBlock;
     private int seaLevel;
     private int generatorType;
+    //public boolean water_can_exist;
     public DimensionProperties(int id) {
         name = "Temp";
         resetProperties();
@@ -181,7 +184,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         spawnableEntities = new LinkedList<>();
         beaconLocations = new HashSet<>();
         seaLevel = 63;
-        generatorType = 0;
+        generatorType =0;
+        //water_can_exist = true;
     }
     public DimensionProperties(int id, String name) {
         this(id);
@@ -222,7 +226,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
     public void copyTerraformedBiomes(DimensionProperties props) {
         this.terraformedBiomes = props.terraformedBiomes;
-        this.isTerraformed = props.isTerraformed;
     }
 
     @Override
@@ -305,8 +308,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return the host star for this planet
      */
     public StellarBody getStar() {
-        if (isStar())
-            return getStarData();
+        if (isStar()) {
+            star = getStarData();
+        }
         if (star == null)
             star = DimensionManager.getInstance().getStar(starId);
         return star;
@@ -558,9 +562,13 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return if a planet, the same as getParentOrbitalDistance(), if a moon, the moon's distance from the host star
      */
     public int getSolarOrbitalDistance() {
+        if (this.isStar()){
+            return 1;
+        }
         if (parentPlanet != Constants.INVALID_PLANET)
             return getParentProperties().getSolarOrbitalDistance();
         return orbitalDist;
+
     }
 
     public double getSolarTheta() {
@@ -618,9 +626,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return true if terraformed
      */
     public boolean isTerraformed() {
-        return isTerraformed;
+        return false;
     }
-
     public int getAtmosphereDensity() {
         return atmosphereDensity;
     }
@@ -632,13 +639,15 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         int prevAtm = this.atmosphereDensity;
         this.atmosphereDensity = atmosphereDensity;
 
-        if (AtmosphereTypes.getAtmosphereTypeFromValue(prevAtm) != AtmosphereTypes.getAtmosphereTypeFromValue(this.atmosphereDensity)) {
+        getAverageTemp();
+
+
             setTerraformedBiomes(getViableBiomes());
-            isTerraformed = true;
 
-            ((ChunkManagerPlanet) ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(getId())).chunkMgrTerraformed).resetCache();
+            WorldServer world = net.minecraftforge.common.DimensionManager.getWorld(getId());
+            ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(getId())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
 
-        }
+
 
         PacketHandler.sendToAll(new PacketDimInfo(getId(), this));
     }
@@ -709,7 +718,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      */
     public double getPeakInsolationMultiplierWithoutAtmosphere() {
         //Set peak insolation multiplier without atmosphere --  we do this here because I've had problems with it in the past in the XML loader, and people keep asking to change it
-        peakInsolationMultiplierWithoutAtmosphere = AstronomicalBodyHelper.getStellarBrightness(star, getSolarOrbitalDistance()) * 1.308d;
+        peakInsolationMultiplierWithoutAtmosphere = AstronomicalBodyHelper.getStellarBrightness(getStar(), getSolarOrbitalDistance()) * 1.308d;
         return peakInsolationMultiplierWithoutAtmosphere;
     }
 
@@ -954,6 +963,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return true if the biome is not allowed to spawn on any Dimension
      */
     public boolean isBiomeblackListed(Biome biome) {
+        //use blacklist only when terraforming
+        if (!isTerraformed()) return false;
+
         return AdvancedRocketryBiomes.instance.getBlackListedBiomes().contains(Biome.getIdForBiome(biome));
     }
 
@@ -964,7 +976,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         Random random = new Random(System.nanoTime());
         List<Biome> viableBiomes = new ArrayList<>();
 
-        if (atmosphereDensity > AtmosphereTypes.LOW.value && random.nextInt(3) == 0) {
+        if (atmosphereDensity > AtmosphereTypes.LOW.value && random.nextInt(3) == 0 && !isTerraformed()) {
             List<Biome> list = new LinkedList<>(AdvancedRocketryBiomes.instance.getSingleBiome());
 
             while (list.size() > 1) {
@@ -989,6 +1001,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             viableBiomes.add(AdvancedRocketryBiomes.hotDryBiome);
             viableBiomes.add(AdvancedRocketryBiomes.volcanic);
             viableBiomes.add(AdvancedRocketryBiomes.volcanicBarren);
+//            viableBiomes.add(Biomes.HELL);
         } else if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.HOT)) {
 
             for (Biome biome : Biome.REGISTRY) {
@@ -1216,7 +1229,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
 
     private void readFromTechnicalNBT(NBTTagCompound nbt) {
-        isTerraformed = nbt.getBoolean("terraformed");
         NBTTagList list;
         if (nbt.hasKey("beaconLocations")) {
             list = nbt.getTagList("beaconLocations", NBT.TAG_INT_ARRAY);
@@ -1474,7 +1486,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     private void writeTechnicalNBT(NBTTagCompound nbt) {
-        nbt.setBoolean("terraformed", isTerraformed);
         NBTTagList list;
         if (!beaconLocations.isEmpty()) {
             list = new NBTTagList();
@@ -1678,6 +1689,19 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     @Override
     public int getAverageTemp() {
         averageTemperature = AstronomicalBodyHelper.getAverageTemperature(this.getStar(), this.getSolarOrbitalDistance(), this.getAtmosphereDensity());
+
+        /*
+        int temp = averageTemperature;
+        float pressure = (float) (atmosphereDensity + 1) / (float) 100;
+        pressure = (float) Math.max(0.01, pressure);
+        float water_can_exist_value = 400;
+        float planetvalue = temp / pressure;
+
+        if (planetvalue < water_can_exist_value) {
+            water_can_exist = true;
+        } else water_can_exist = false;
+        */
+
         return averageTemperature;
     }
 
@@ -1904,7 +1928,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         }
 
         public boolean hotterThan(Temps type) {
-            return this.compareTo(type) < 0;
+            return this.compareTo(type) <= 0;
         }
 
         public boolean colderThan(Temps type) {

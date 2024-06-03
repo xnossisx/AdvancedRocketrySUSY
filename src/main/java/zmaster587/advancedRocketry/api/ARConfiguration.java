@@ -82,8 +82,6 @@ public class ARConfiguration {
     @ConfigProperty
     public double fuelCapacityMultiplier;
     @ConfigProperty
-    public int maxBiomes = 512;
-    @ConfigProperty
     public boolean rocketRequireFuel = true;
     @ConfigProperty
     public boolean canBeFueledByHand = true;
@@ -137,10 +135,6 @@ public class ARConfiguration {
     @ConfigProperty
     public boolean scrubberRequiresCartrige;
     @ConfigProperty
-    public float EUMult;
-    @ConfigProperty
-    public float RFMult;
-    @ConfigProperty
     public boolean overrideGCAir;
     @ConfigProperty
     public int fuelPointsPerDilithium;
@@ -168,8 +162,6 @@ public class ARConfiguration {
     public boolean enableTerraforming;
     @ConfigProperty
     public double gasCollectionMult;
-    @ConfigProperty
-    public int terraformingBlockSpeed;
     @ConfigProperty
     public double terraformSpeed;
     @ConfigProperty
@@ -358,9 +350,8 @@ public class ARConfiguration {
         arConfig.laserDrillPlanet = config.get(Configuration.CATEGORY_GENERAL, "laserDrillPlanet", false, "If true the orbital laser will actually mine blocks on the planet below (currently not working)").getBoolean();
         String[] str = config.getStringList("spaceLaserDimIdBlackList", Configuration.CATEGORY_GENERAL, new String[]{}, "Laser drill will not mine these dimension");
         arConfig.enableTerraforming = config.get(Configuration.CATEGORY_GENERAL, "EnableTerraforming", true, "Enables terraforming items and blocks").getBoolean();
-        arConfig.terraformingBlockSpeed = config.get(Configuration.CATEGORY_GENERAL, "biomeUpdateSpeed", 1, "How many blocks have the biome changed per tick.  Large numbers can slow the server down", Integer.MAX_VALUE, 1).getInt();
         arConfig.terraformSpeed = config.get(Configuration.CATEGORY_GENERAL, "terraformMult", 1f, "Multplier for atmosphere change speed").getDouble();
-        arConfig.terraformPlanetSpeed = config.get(Configuration.CATEGORY_GENERAL, "terraformBlockPerTick", 1, "Max number of blocks allowed to be changed per tick").getInt();
+        //arConfig.terraformPlanetSpeed = config.get(Configuration.CATEGORY_GENERAL, "terraformBlockPerTick", 1, "Max number of blocks allowed to be changed per tick").getInt();
         arConfig.terraformRequiresFluid = config.get(Configuration.CATEGORY_GENERAL, "TerraformerRequiresFluids", true, "Whether the Terraformer should consume fluids at all, independent of rate").getBoolean();
         arConfig.terraformliquidRate = config.get(Configuration.CATEGORY_GENERAL, "TerraformerFluidConsumeRate", 40, "how many millibuckets/t are required to keep the terraformer running").getInt();
         arConfig.allowTerraformNonAR = config.get(Configuration.CATEGORY_GENERAL, "allowTerraformingNonARWorlds", false, "If true dimensions not added by AR can be terraformed, including the overworld").getBoolean();
@@ -412,7 +403,7 @@ public class ARConfiguration {
         arConfig.canPlayerRespawnInSpace = config.get(PLANET, "allowPlanetRespawn", false, "If true players will respawn near beds on planets IF the spawn location is in a breathable atmosphere").getBoolean();
         arConfig.forcePlayerRespawnInSpace = config.get(PLANET, "forcePlanetRespawn", false, "If true players will respawn near beds on planets REGARDLESS of the spawn location being in a non-breathable atmosphere. Requires 'allowPlanetRespawn' being true.").getBoolean();
         arConfig.blackListAllVanillaBiomes = config.getBoolean("blackListVanillaBiomes", PLANET, false, "Prevents any vanilla biomes from spawning on planets");
-        arConfig.maxBiomesPerPlanet = config.get(PLANET, "maxBiomesPerPlanet", 5, "Maximum unique biomes per planet, -1 to disable").getInt();
+        arConfig.maxBiomesPerPlanet = config.get(PLANET, "maxBiomesPerPlanet", 99, "Maximum unique biomes per planet").getInt();
 
         //Client
         arConfig.stationSkyOverride = config.get(CLIENT, "StationSkyOverride", true, "If true, AR will use a custom skybox on space stations").getBoolean();

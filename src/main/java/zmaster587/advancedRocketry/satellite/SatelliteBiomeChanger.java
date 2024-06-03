@@ -28,13 +28,14 @@ public class SatelliteBiomeChanger extends SatelliteBase {
     //Note: we really don't care about order, in fact, lack of order is better
     private List<HashedBlockPosition> toChangeList;
     private Set<Byte> discoveredBiomes;
-
+private int noise_val;
     public SatelliteBiomeChanger() {
         super();
         radius = 4;
         toChangeList = new LinkedList<>();
         discoveredBiomes = new HashSet<>();
         biomeId =  Biome.getBiome(0);
+        noise_val = 6;
     }
 
     public Biome getBiome() {
@@ -86,7 +87,7 @@ public class SatelliteBiomeChanger extends SatelliteBase {
     public void tickEntity() {
         //This is hacky..
         World world = net.minecraftforge.common.DimensionManager.getWorld(getDimensionId());
-
+        int powerrequired = 30;
         if (world != null) {
 
             for (int i = 0; i < 10; i++) {
@@ -97,15 +98,17 @@ public class SatelliteBiomeChanger extends SatelliteBase {
                 // this was because extractEnergy() resets energy to 0 if less than 120
                 // fixed by "if (battery.getUniversalEnergyStored() > 120){"
                 if (world.getTotalWorldTime() % 1 == 0 && !toChangeList.isEmpty()) {
-                    if (battery.getUniversalEnergyStored() > 120) {
-                        if (battery.extractEnergy(120, false) == 120) {
+                    if (battery.getUniversalEnergyStored() > powerrequired) {
+                        if (battery.extractEnergy(powerrequired, false) == powerrequired) {
                             HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
+                            //HashedBlockPosition pos = toChangeList.remove(toChangeList.size()-1);
 
                             BiomeHandler.changeBiome(world, biomeId, pos.getBlockPos());
                         }
                     } else
                         break;
-                }
+                } else
+                    break;
             }
         }
         super.tickEntity();
@@ -120,39 +123,42 @@ public class SatelliteBiomeChanger extends SatelliteBase {
     public boolean performAction(EntityPlayer player, World world, BlockPos pos) {
         if (world.isRemote)
             return false;
-        Set<Chunk> set = new HashSet<>();
-        radius = 16;
-        MAX_SIZE = 1024;
-        for (int xx = -radius + pos.getX(); xx < radius + pos.getX(); xx++) {
-            for (int zz = -radius + pos.getZ(); zz < radius + pos.getZ(); zz++) {
 
+        radius = 12;
+        noise_val = 12;
+        MAX_SIZE = 8000;
 
-                addBlockToList(new HashedBlockPosition(xx, 0, zz));
-				/*BiomeGenBase biome = world.getBiomeGenForCoords(x, z);
-				BiomeGenBase biomeTo = BiomeGenBase.getBiome(biomeId);
-				if(biome.topBlock != biomeTo.topBlock) {
-					int yy = world.getHeightValue(xx, zz);
-					if(world.getBlock(xx, yy - 1, zz) == biome.topBlock)
-						world.setBlock(xx, yy-1, zz, biomeTo.topBlock);
-				}*/
+        // make it less square by adding noise to the edges
 
+        for (int xx = -radius-noise_val; xx < radius+noise_val; xx++) {
+            for (int zz = -radius-noise_val; zz < radius+noise_val; zz++) {
+
+                int nx = xx + pos.getX();
+                int nz = zz + pos.getZ();
+
+                if (isAdd(xx, zz)) {
+                    addBlockToList(new HashedBlockPosition(nx, 0, nz));
+                }
             }
         }
 
-        //Some kind of compiler optimization is breaking if we assign block and biome in the same loop
-        //Causing execution order to vary from source
-		/*for(int xx = -radius + x; xx < radius + x; xx++) {
-			for(int zz = -radius + z; zz < radius + z; zz++) {
-				set.add(world.getChunkFromBlockCoords(xx, zz));
-				byte[] biomeArr = world.getChunkFromBlockCoords(xx, zz).getBiomeArray();
-				biomeArr[(xx % 16)+ (zz % 16)*16] = (byte)biomeId;
-			}
-		}*/
-
-		/*for(Chunk chunk : set) {
-			PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world), world.provider.dimensionId, x, y, z, 64);
-		}*/
         return false;
+    }
+
+    private boolean isAdd(int xx, int zz) {
+
+        if (xx > radius || xx < -radius || zz > radius || zz < -radius) {
+            Random r = new Random();
+            // less probability if it gets further away from max radius
+            int dx = Math.abs(xx) - radius;
+            int dz = Math.abs(zz) - radius;
+            int d = Math.max(dx, dz);
+            d = Math.max((d + 1)/2, 1);
+            if (r.nextInt(d) == 0)
+                return true;
+            return false;
+
+        } else return true;
     }
 
     @Override
@@ -171,7 +177,7 @@ public class SatelliteBiomeChanger extends SatelliteBase {
 
         int[] array = new int[toChangeList.size() * 3];
         Iterator<HashedBlockPosition> itr = toChangeList.iterator();
-        for (int i = 0; i < toChangeList.size(); i += 3) {
+        for (int i = 0; i < toChangeList.size()*3; i += 3) {
             HashedBlockPosition pos = itr.next();
             array[i] = pos.x;
             array[i + 1] = pos.y;

@@ -470,43 +470,26 @@ public class PlanetEventHandler {
         }
     }
 
+
+    int last_block = 0;
     @SubscribeEvent
     public void serverTickEvent(TickEvent.WorldTickEvent event) {
-        if (ARConfiguration.getCurrentConfig().enableTerraforming && event.world.provider.getClass() == WorldProviderPlanet.class) {
 
-            if (DimensionManager.getInstance().getDimensionProperties(event.world.provider.getDimension()).isTerraformed()) {
-                Collection<Chunk> list = ((WorldServer) event.world).getChunkProvider().getLoadedChunks();
-                if (list.size() > 0) {
-                    try {
-                        int listSize = list.size();
-
-                        for (Chunk chunk : list) {
-
-                            if (ARConfiguration.getCurrentConfig().terraformingBlockSpeed > listSize || event.world.rand.nextFloat() < ARConfiguration.getCurrentConfig().terraformingBlockSpeed / (float) listSize) {
-                                int coord = event.world.rand.nextInt(256);
-                                int x = (coord & 0xF) + chunk.x * 16;
-                                int z = (coord >> 4) + chunk.z * 16;
-
-                                BiomeHandler.changeBiome(event.world, ((ChunkManagerPlanet) ((WorldProviderPlanet) event.world.provider).chunkMgrTerraformed).getBiomeGenAt(x, z), new BlockPos(x, 0, z));
-                            }
-                        }
-                    } catch (NullPointerException e) {
-                        //Ghost
-                    }
-                }
-            }
-        }
     }
 
     @SubscribeEvent
     public void chunkLoadEvent(PopulateChunkEvent.Post event) {
-        if (zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming && event.getWorld().provider.getClass() == WorldProviderPlanet.class) {
 
+
+        //Do not modify all at once, this causes !!!EXTREME!!! lag
+        /*
+        if (zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming && event.getWorld().provider.getClass() == WorldProviderPlanet.class) {
             if (DimensionManager.getInstance().getDimensionProperties(event.getWorld().provider.getDimension()).isTerraformed()) {
                 Chunk chunk = event.getWorld().getChunkFromChunkCoords(event.getChunkX(), event.getChunkZ());
                 modifyChunk(event.getWorld(), (WorldProviderPlanet) event.getWorld().provider, chunk);
             }
         }
+         */
     }
 
     @SubscribeEvent
