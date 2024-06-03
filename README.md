@@ -3,11 +3,12 @@ This is a fork of Advanced Rocketry where I fix all the bugs of the mod because 
 
 You can download the new mod from curseforge: https://www.curseforge.com/minecraft/mc-mods/advanced-rocketry-2
 
-Check out my modpack: https://www.curseforge.com/minecraft/modpacks/towardsrocketscience
+Check out Towards Rocket Science - the modpack all about Advanced Rocketry and Immersive Engineering: https://www.curseforge.com/minecraft/modpacks/towardsrocketscience
+(Quests, Tech, Beginner-friendly)
 
 original github repo: https://github.com/Advanced-Rocketry/AdvancedRocketry
 
-documentation: http://arwiki.dmodoomsirius.me/
+old documentation: http://arwiki.dmodoomsirius.me/
 
 
 Current bugfixes:
@@ -21,3 +22,10 @@ Current bugfixes:
 - space elevator fixed
 - void miner fixed (void miner does not actually break blocks on planet)
 - gas mining: gas selection not updating fixed
+- solar panels crash near stars fixed
+
+Improvements:
+
+- Terraforming update #1:
+  - You will use a new block called Terraforming Terminal to program your biome changer satellite to transform the entire planet.
+  - You can use multiple terminals / satellites to speed up the process!
