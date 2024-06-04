@@ -4,8 +4,10 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -13,6 +15,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.TempCategory;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
 import net.minecraftforge.common.BiomeManager.BiomeEntry;
@@ -28,8 +31,11 @@ import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.inventory.TextureResources;
+import zmaster587.advancedRocketry.item.ItemBiomeChanger;
+import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
 import zmaster587.advancedRocketry.network.PacketDimInfo;
 import zmaster587.advancedRocketry.network.PacketSatellite;
+import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.advancedRocketry.util.OreGenProperties;
@@ -37,6 +43,7 @@ import zmaster587.advancedRocketry.util.SpacePosition;
 import zmaster587.advancedRocketry.util.SpawnListEntryNBT;
 import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
 import zmaster587.advancedRocketry.world.provider.WorldProviderPlanet;
+import zmaster587.libVulpes.api.IUniversalEnergy;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.VulpineMath;
@@ -44,6 +51,8 @@ import zmaster587.libVulpes.util.ZUtils;
 
 import java.util.*;
 import java.util.Map.Entry;
+
+import static org.apache.commons.lang3.RandomUtils.nextInt;
 
 public class DimensionProperties implements Cloneable, IDimensionProperties {
 
@@ -137,6 +146,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private int seaLevel;
     private int generatorType;
     public int target_sea_level;
+    boolean status_terraforming;
+    public List<HashedBlockPosition> terraformingChangeList;
+    public List<Chunk> terraformingChunkListCurrentCycle;
     //public boolean water_can_exist;
     public DimensionProperties(int id) {
         name = "Temp";
@@ -185,9 +197,46 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         spawnableEntities = new LinkedList<>();
         beaconLocations = new HashSet<>();
         seaLevel = 63;
-        generatorType =0;
+        generatorType = 0;
+
         target_sea_level = seaLevel;
+        terraformingChangeList = new LinkedList<>();
+        terraformingChunkListCurrentCycle = new LinkedList<>();
+        status_terraforming = false;
         //water_can_exist = true;
+    }
+
+    public void add_chunk_to_terraforming_list(Chunk chunk) {
+        boolean is_there = false;
+        for (Chunk i : terraformingChunkListCurrentCycle) {
+            if (i.x == chunk.x && i.z == chunk.z) {
+                is_there = true;
+            }
+        }
+        if (!is_there) {
+            for (int i = 0; i < 256; i++) {
+                int coord = i;
+                int x = (coord & 0xF) + chunk.x * 16;
+                int z = (coord >> 4) + chunk.z * 16;
+                terraformingChangeList.add(new HashedBlockPosition(x, 0, z));
+            }
+        }
+    }
+    private void reset_terraforming_chunk_positions(){
+        terraformingChangeList.clear();
+        Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(getId())).getChunkProvider().getLoadedChunks();
+        if (list.size() > 0) {
+            for (Chunk chunk:list){
+                add_chunk_to_terraforming_list(chunk);
+            }
+        }
+    }
+    public HashedBlockPosition get_next_terraforming_block() {
+        if (terraformingChangeList.size() == 0) {
+           reset_terraforming_chunk_positions();
+        }
+        if (terraformingChangeList.size() == 0) return null; // this should never happen. Yes it would crash the game, but if it does, my code is wrong and needs to be fixed anyway
+        return terraformingChangeList.remove(nextInt(0,terraformingChangeList.size()));
     }
     public DimensionProperties(int id, String name) {
         this(id);
@@ -625,10 +674,13 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     /**
-     * @return true if terraformed
+     * @return true if currently terraformed
      */
     public boolean isTerraformed() {
-        return false;
+        return status_terraforming;
+    }
+    public void setIsTerraformed(boolean b) {
+        status_terraforming = b;
     }
     public int getAtmosphereDensity() {
         return atmosphereDensity;
@@ -709,7 +761,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         //Set peak insolation multiplier --  we do this here because I've had problems with it in the past in the XML loader, and people keep asking to change it
         //Assumes that a 16 atmosphere is 16x the partial pressure but not thicker, because I don't want to deal with that and this is fairly simple right now
         //Get what it would be relative to LEO, this gives ~0.76 for Earth at the surface
-        double insolationRelativeToLEO = AstronomicalBodyHelper.getStellarBrightness(star, getSolarOrbitalDistance()) * Math.pow(Math.E, -(0.0026899d * getAtmosphereDensity()));
+        double insolationRelativeToLEO = AstronomicalBodyHelper.getStellarBrightness(getStar(), getSolarOrbitalDistance()) * Math.pow(Math.E, -(0.0026899d * getAtmosphereDensity()));
         //Multiply by Earth LEO/Earth Surface for ratio relative to Earth surface (1360/1040)
         peakInsolationMultiplier = insolationRelativeToLEO * 1.308d;
         return peakInsolationMultiplier;

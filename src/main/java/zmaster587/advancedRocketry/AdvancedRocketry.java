@@ -332,6 +332,7 @@ public class AdvancedRocketry {
         SatelliteRegistry.registerSatellite("solarEnergy", SatelliteMicrowaveEnergy.class);
         SatelliteRegistry.registerSatellite("oreScanner", SatelliteOreMapping.class);
         SatelliteRegistry.registerSatellite("biomeChanger", SatelliteBiomeChanger.class);
+        SatelliteRegistry.registerSatellite("weatherController", SatelliteWeatherController.class);
 
 
         //Entity Registration ---------------------------------------------------------------------------------------------
@@ -491,6 +492,7 @@ public class AdvancedRocketry {
         AdvancedRocketryItems.itemSatelliteIdChip = new ItemSatelliteIdentificationChip().setUnlocalizedName("satelliteIdChip").setCreativeTab(tabAdvRocketry);
         AdvancedRocketryItems.itemPlanetIdChip = new ItemPlanetIdentificationChip().setUnlocalizedName("planetIdChip").setCreativeTab(tabAdvRocketry);
         AdvancedRocketryItems.itemBiomeChanger = new ItemBiomeChanger().setUnlocalizedName("biomeChanger").setCreativeTab(tabAdvRocketry);
+        AdvancedRocketryItems.itemWeatherController = new ItemWeatherController().setUnlocalizedName("weatherController").setCreativeTab(tabAdvRocketry);
         AdvancedRocketryItems.itemBasicLaserGun = new ItemBasicLaserGun().setUnlocalizedName("basicLaserGun").setCreativeTab(tabAdvRocketry);
         AdvancedRocketryItems.itemHovercraft = new ItemHovercraft().setUnlocalizedName("hovercraft").setCreativeTab(tabAdvRocketry);
 
@@ -520,6 +522,7 @@ public class AdvancedRocketry {
         SatelliteRegistry.registerSatelliteProperty(new ItemStack(AdvancedRocketryItems.itemSatellitePrimaryFunction, 1, 3), new SatelliteProperties().setSatelliteType(SatelliteRegistry.getKey(SatelliteMicrowaveEnergy.class)));
         SatelliteRegistry.registerSatelliteProperty(new ItemStack(AdvancedRocketryItems.itemSatellitePrimaryFunction, 1, 4), new SatelliteProperties().setSatelliteType(SatelliteRegistry.getKey(SatelliteOreMapping.class)));
         SatelliteRegistry.registerSatelliteProperty(new ItemStack(AdvancedRocketryItems.itemSatellitePrimaryFunction, 1, 5), new SatelliteProperties().setSatelliteType(SatelliteRegistry.getKey(SatelliteBiomeChanger.class)));
+        SatelliteRegistry.registerSatelliteProperty(new ItemStack(AdvancedRocketryItems.itemSatellitePrimaryFunction, 1, 6), new SatelliteProperties().setSatelliteType(SatelliteRegistry.getKey(SatelliteWeatherController.class)));
         SatelliteRegistry.registerSatelliteProperty(new ItemStack(AdvancedRocketryItems.itemSatellitePowerSource, 1, 0), new SatelliteProperties().setPowerGeneration(4));
         SatelliteRegistry.registerSatelliteProperty(new ItemStack(AdvancedRocketryItems.itemSatellitePowerSource, 1, 1), new SatelliteProperties().setPowerGeneration(40));
         SatelliteRegistry.registerSatelliteProperty(new ItemStack(LibVulpesItems.itemBattery, 1, 0), new SatelliteProperties().setPowerStorage(10000));
@@ -557,8 +560,10 @@ public class AdvancedRocketry {
         LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemAtmAnalyser.setRegistryName("atmAnalyser"));
         LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemSealDetector.setRegistryName("sealDetector"));
         LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemOreScanner.setRegistryName("oreScanner"));
-        if (zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming)
+        if (zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming){
             LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemBiomeChanger.setRegistryName("biomeChanger"));
+            LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemWeatherController.setRegistryName("weatherController"));
+        }
         LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemJackhammer.setRegistryName("jackHammer"));
         LibVulpesBlocks.registerItem(AdvancedRocketryItems.itemBasicLaserGun.setRegistryName("basicLaserGun"));
         //Misc

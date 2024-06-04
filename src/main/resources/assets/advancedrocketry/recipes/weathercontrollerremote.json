@@ -23,14 +23,13 @@
             "ore": "plateTin"
         },
 	{
-            "type": "forge:ore_dict",
-            "ore": "dustRedstone"
+            "item": "minecraft:stone_button"
         }
     ],
     "time": 1000,
     "energy": 1,
     "itemresults":
     {
-	"item": "advancedrocketry:biomechanger"
+	"item": "advancedrocketry:weathercontroller"
     }
 }

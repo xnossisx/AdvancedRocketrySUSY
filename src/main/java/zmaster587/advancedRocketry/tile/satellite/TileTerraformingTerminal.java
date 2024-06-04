@@ -17,6 +17,7 @@ import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.DataStorage.DataType;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.inventory.modules.ModuleData;
 import zmaster587.advancedRocketry.inventory.modules.ModuleSatellite;
 import zmaster587.advancedRocketry.item.ItemBiomeChanger;
@@ -145,12 +146,13 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
         if (!world.isRemote) {
 
-            if (world.getTotalWorldTime() %20 == 0)
+            if (world.getTotalWorldTime() % 20 == 0)
                 world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
 
             if (hasValidBiomeChanger() && has_redstone) {
                 if (!was_enabled_last_tick) {
                     was_enabled_last_tick = true;
+                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).setIsTerraformed(true);
                     DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getAverageTemp();
                     DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).setTerraformedBiomes(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getViableBiomes());
                     ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(world.provider.getDimension())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
@@ -174,44 +176,28 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
         if (!world.isRemote && was_enabled_last_tick) {
             if (ARConfiguration.getCurrentConfig().enableTerraforming && world.provider.getClass() == WorldProviderPlanet.class) {
+                Item biomeChanger = getStackInSlot(0).getItem();
+                if (biomeChanger instanceof ItemBiomeChanger) {
+                    SatelliteBiomeChanger sat = (SatelliteBiomeChanger) ItemSatelliteIdentificationChip.getSatellite(getStackInSlot(0));
+                    IUniversalEnergy battery = sat.getBattery();
 
-                //if (false && DimensionManager.getInstance().getDimensionProperties(event.world.provider.getDimension()).isTerraformed()) {
-                Collection<Chunk> list = ((WorldServer) world).getChunkProvider().getLoadedChunks();
-                if (list.size() > 0) {
-                    Item biomeChanger = getStackInSlot(0).getItem();
-                    if (biomeChanger instanceof ItemBiomeChanger) {
-                        SatelliteBiomeChanger sat = (SatelliteBiomeChanger) ItemSatelliteIdentificationChip.getSatellite(getStackInSlot(0));
-                        IUniversalEnergy battery = sat.getBattery();
+                    for (int i = 0; i < 10; i++) {
+                        //TODO: Better imp
 
-                        for (int i = 0; i < 10; i++) {
-                            //TODO: Better imp
-                            //Note:
-                            // if a biome satellite is supplied with too less
-                            // solar panels it will keep resetting it's battery and never work
-                            // this was because extractEnergy() resets energy to 0 if less than 120
-                            // fixed by "if (battery.getUniversalEnergyStored() > 120){"
+                        if (battery.getUniversalEnergyStored() > powerrequired) {
+                            if (battery.extractEnergy(powerrequired, false) == powerrequired) {
+                                try {
 
-                            if (battery.getUniversalEnergyStored() > powerrequired) {
-                                if (battery.extractEnergy(powerrequired, false) == powerrequired) {
-                                    try {
-                                        int listSize = list.size();
-                                        Chunk chunk = list.stream().skip(world.rand.nextInt(listSize)).findFirst().get();
-
-                                        int coord = world.rand.nextInt(256);
-
-                                        int x = (coord & 0xF) + chunk.x * 16;
-                                        int z = (coord >> 4) + chunk.z * 16;
-
-                                        BiomeHandler.changeBiome(world, ((ChunkManagerPlanet) ((WorldProviderPlanet) world.provider).chunkMgrTerraformed).getBiomeGenAt(x, z), new BlockPos(x, 0, z));
+                                    HashedBlockPosition next_block = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).get_next_terraforming_block();
+                                    BiomeHandler.changeBiome(world, ((ChunkManagerPlanet) ((WorldProviderPlanet) world.provider).chunkMgrTerraformed).getBiomeGenAt(next_block.x, next_block.z), new BlockPos(next_block.x, 0, next_block.z));
 
 
-                                    } catch (NullPointerException e) {
-                                        //Ghost
-                                    }
+                                } catch (NullPointerException e) {
+                                    //Ghost
                                 }
-                            } else
-                                break;
-                        }
+                            }
+                        } else
+                            break;
                     }
                 }
             }
