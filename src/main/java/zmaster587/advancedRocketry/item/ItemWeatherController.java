@@ -41,7 +41,7 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
             list.add(new ModuleImage(24, 14, zmaster587.advancedRocketry.inventory.TextureResources.earthCandyIcon));
         }
 
-        list.add(new ModuleButton(32, 16 + 24 * (1), 1, "clear", this, TextureResources.buttonBuild));
+        list.add(new ModuleButton(32, 16 + 24 * (1), 1, "dry", this, TextureResources.buttonBuild));
         list.add(new ModuleButton(32, 16 + 24 * (2), 0, "rain", this, TextureResources.buttonBuild));
 
         list.add(new ModulePower(16, 48, sat.getBattery()));
@@ -64,7 +64,10 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
             list.add(LibVulpes.proxy.getLocalizedString("msg.biomechanger.nosat"));
         else if (mapping.getDimensionId() == player.provider.getDimension()) {
             list.add(LibVulpes.proxy.getLocalizedString("msg.connected"));
-            list.add(String.valueOf(mapping.mode_id));
+            if (mapping.mode_id == 0)
+                list.add("mode: rain");
+            if (mapping.mode_id == 1)
+                list.add("mode: dry");
         } else
             list.add(LibVulpes.proxy.getLocalizedString("msg.notconnected"));
 

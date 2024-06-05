@@ -610,9 +610,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
             setMachineRunning(isRunning());
         }
 
-        // Create a new text component with your message
-        ITextComponent chatMessage = new TextComponentString("packet update:"+this.waspoweredlasttick);
-        AdvancedRocketry.logger.warn(chatMessage);
+
     }
 
     @Override
