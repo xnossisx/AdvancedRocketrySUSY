@@ -186,12 +186,12 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         peakInsolationMultiplierWithoutAtmosphere = -1;
         isGasGiant = false;
         hasRings = false;
-        canGenerateCraters = false;
-        canGenerateGeodes = false;
-        canGenerateStructures = false;
-        canGenerateVolcanoes = false;
+        canGenerateCraters = true;
+        canGenerateGeodes = true;
+        canGenerateStructures = true;
+        canGenerateVolcanoes = true;
         canGenerateCaves = true;
-        hasRivers = false;
+        hasRivers = true;
         craterFrequencyMultiplier = 1f;
         volcanoFrequencyMultiplier = 1f;
         geodeFrequencyMultiplier = 1f;
