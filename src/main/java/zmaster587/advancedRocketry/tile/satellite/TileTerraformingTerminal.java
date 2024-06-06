@@ -144,7 +144,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         }
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
-        if (!world.isRemote) {
+        if (!world.isRemote && world.provider instanceof IPlanetaryProvider) {
 
             if (world.getTotalWorldTime() % 20 == 0)
                 world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
@@ -205,6 +205,10 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     }
     public void updateInventoryInfo() {
         if (moduleText != null) {
+
+            if (!(world.provider instanceof IPlanetaryProvider)){
+                moduleText.setText("This planet can not be\nterraformed");
+            }else{
             if (hasValidBiomeChanger() && world.isBlockIndirectlyGettingPowered(getPos()) != 0){
                 BigDecimal bd = new BigDecimal(randomblocks_per_tick);
                 bd = bd.setScale(2, RoundingMode.HALF_UP);
@@ -215,9 +219,9 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
             }else if (hasValidBiomeChanger()){
                 moduleText.setText("provide redstone signal\nto start the process");
             }
-            else{
+            else {
                 moduleText.setText("place a biome remote here\nto make the satellite terraform\nthe entire planet");
-
+            }
             }
 
         }

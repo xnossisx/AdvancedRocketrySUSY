@@ -75,11 +75,11 @@ public class ARConfiguration {
     public int fuelPointsPer10Mb = 10;
     @ConfigProperty(needsSync = true)
     public int stationSize = 1024;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public double rocketThrustMultiplier;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public double nuclearCoreThrustRatio;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public double fuelCapacityMultiplier;
     @ConfigProperty
     public boolean rocketRequireFuel = true;
@@ -160,9 +160,9 @@ public class ARConfiguration {
     public int maxBiomesPerPlanet;
     @ConfigProperty
     public boolean enableTerraforming;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public double gasCollectionMult;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public double terraformSpeed;
     @ConfigProperty
     public boolean terraformRequiresFluid;
@@ -239,6 +239,8 @@ public class ARConfiguration {
     public double oxygenVentPowerMultiplier;
     @ConfigProperty
     public boolean skyOverride;
+    @ConfigProperty
+    public boolean overworldsealevelterraforming;
     @ConfigProperty
     public boolean planetSkyOverride;
     @ConfigProperty
@@ -409,6 +411,7 @@ public class ARConfiguration {
         arConfig.stationSkyOverride = config.get(CLIENT, "StationSkyOverride", true, "If true, AR will use a custom skybox on space stations").getBoolean();
         arConfig.planetSkyOverride = config.get(CLIENT, "PlanetSkyOverride", true, "If true, AR will use a custom skybox on planets").getBoolean();
         arConfig.skyOverride = config.get(CLIENT, "overworldSkyOverride", true).getBoolean();
+       // arConfig.overworldsealevelterraforming = config.get(CLIENT, "overworldSealvlTerraforming", true).getBoolean();
         arConfig.advancedVFX = config.get(CLIENT, "advancedVFX", true, "Advanced visual effects").getBoolean();
         arConfig.enableNausea = config.get(CLIENT, "EnableAtmosphericNausea", true, "If true, allows players to experience nausea on non-standard atmosphere types").getBoolean();
         arConfig.electricPlantsSpawnLightning = config.get(CLIENT, "electricPlantsSpawnLightning", true, "Should Electric Mushrooms be able to spawn lightning").getBoolean();

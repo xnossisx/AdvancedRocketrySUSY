@@ -940,20 +940,11 @@ public class AdvancedRocketry {
 
         String[] biomeBlackList = config.getStringList("BlacklistedBiomes", "Planet",
                 new String[]{
-                        Biomes.RIVER.getRegistryName().toString(),
-                        Biomes.OCEAN.getRegistryName().toString(),
-                        Biomes.DEEP_OCEAN.getRegistryName().toString(),
-                        Biomes.FROZEN_OCEAN.getRegistryName().toString(),
-                        Biomes.BEACH.getRegistryName().toString(),
-                        Biomes.STONE_BEACH.getRegistryName().toString(),
-                        Biomes.COLD_BEACH.getRegistryName().toString(),
-                        Biomes.FROZEN_RIVER.getRegistryName().toString(),
-                        Biomes.MUSHROOM_ISLAND_SHORE.getRegistryName().toString(),
                         Biomes.SKY.getRegistryName().toString(),
                         Biomes.HELL.getRegistryName().toString(),
                         Biomes.VOID.getRegistryName().toString(),
                 },
-                "List of Biomes to be blacklisted from spawning as BiomeIds during terraforming - this is important to have only biomes that can not create water sources otherwise water evaporation will fail!!!, use all infinite fluid biomes listed in the water control config");
+                "List of Biomes to be blacklisted from spawning as BiomeIds during terraforming");
         String[] biomeHighPressure = config.getStringList("HighPressureBiomes", "Planet", new String[]{AdvancedRocketryBiomes.swampDeepBiome.getRegistryName().toString(), AdvancedRocketryBiomes.stormLandsBiome.getRegistryName().toString()}, "Biomes that only spawn on worlds with pressures over 125, will override blacklist.  Defaults: StormLands, DeepSwamp");
         String[] biomeSingle = config.getStringList("SingleBiomes", "Planet", new String[]{AdvancedRocketryBiomes.volcanicBarren.getRegistryName().toString(), AdvancedRocketryBiomes.swampDeepBiome.getRegistryName().toString(), AdvancedRocketryBiomes.crystalChasms.getRegistryName().toString(), AdvancedRocketryBiomes.alienForest.getRegistryName().toString(), Biomes.DESERT_HILLS.getRegistryName().toString(),
                 Biomes.MUSHROOM_ISLAND.getRegistryName().toString(), Biomes.EXTREME_HILLS.getRegistryName().toString(), Biomes.ICE_PLAINS.getRegistryName().toString()}, "Some worlds have a chance of spawning single biomes contained in this list.  Defaults: deepSwamp, crystalChasms, alienForest, desert hills, mushroom island, extreme hills, ice plains");

@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.*;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -36,6 +37,7 @@ import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
 import zmaster587.advancedRocketry.network.PacketDimInfo;
 import zmaster587.advancedRocketry.network.PacketSatellite;
 import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
+import zmaster587.advancedRocketry.satellite.SatelliteWeatherController;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.advancedRocketry.util.OreGenProperties;
@@ -53,6 +55,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import static org.apache.commons.lang3.RandomUtils.nextInt;
+
 
 public class DimensionProperties implements Cloneable, IDimensionProperties {
 
@@ -145,10 +148,12 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private IBlockState fillerBlock;
     private int seaLevel;
     private int generatorType;
-    public int target_sea_level;
+    //public int target_sea_level;
     boolean status_terraforming;
     public List<HashedBlockPosition> terraformingChangeList;
     public List<Chunk> terraformingChunkListCurrentCycle;
+
+    public List<watersourcelocked> water_source_locked_positions;
     //public boolean water_can_exist;
     public DimensionProperties(int id) {
         name = "Temp";
@@ -185,7 +190,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         canGenerateGeodes = false;
         canGenerateStructures = false;
         canGenerateVolcanoes = false;
-        canGenerateCaves = false;
+        canGenerateCaves = true;
         hasRivers = false;
         craterFrequencyMultiplier = 1f;
         volcanoFrequencyMultiplier = 1f;
@@ -199,11 +204,12 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         seaLevel = 63;
         generatorType = 0;
 
-        target_sea_level = seaLevel;
+        //target_sea_level = seaLevel;
         terraformingChangeList = new LinkedList<>();
         terraformingChunkListCurrentCycle = new LinkedList<>();
         status_terraforming = false;
         //water_can_exist = true;
+        water_source_locked_positions = new ArrayList<>();
     }
 
     public void add_chunk_to_terraforming_list(Chunk chunk) {
@@ -963,6 +969,29 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             }
         }
         updateOrbit();
+
+        //remove water source locks over time
+        Iterator<watersourcelocked> iterator_2 = water_source_locked_positions.iterator();
+        while (iterator_2.hasNext()) {
+            watersourcelocked i = iterator_2.next();
+            i.timer -= 1;
+            if (i.timer <= 0) {
+                BlockPos p = i.pos.getBlockPos();
+                iterator_2.remove(); // Safe removal during iteration
+                World world = (net.minecraftforge.common.DimensionManager.getWorld(getId()));
+                world.notifyNeighborsOfStateChange(p,world.getBlockState(p).getBlock(),false);
+            }
+        }
+
+    }
+    public void add_water_locked_pos(HashedBlockPosition pos){
+        for (watersourcelocked i : water_source_locked_positions){
+            if (i.pos.equals(pos)){
+                i.reset_timer();
+                return;
+            }
+        }
+        this.water_source_locked_positions.add(new watersourcelocked(pos));
     }
 
     public void updateOrbit() {
@@ -1051,33 +1080,33 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         if (atmosphereDensity <= AtmosphereTypes.LOW.value) {
             viableBiomes.add(AdvancedRocketryBiomes.moonBiome);
             viableBiomes.add(AdvancedRocketryBiomes.moonBiomeDark);
-        } else if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.TOOHOT)) {
+        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.TOOHOT)) {
             viableBiomes.add(AdvancedRocketryBiomes.hotDryBiome);
             viableBiomes.add(AdvancedRocketryBiomes.volcanic);
             viableBiomes.add(AdvancedRocketryBiomes.volcanicBarren);
 //            viableBiomes.add(Biomes.HELL);
-        } else if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.HOT)) {
+        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.HOT)) {
 
             for (Biome biome : Biome.REGISTRY) {
                 if (biome != null && (BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.HOT) || BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.OCEAN)) && !isBiomeblackListed(biome)) {
                     viableBiomes.add(biome);
                 }
             }
-        } else if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.NORMAL)) {
+        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.NORMAL)) {
             for (Biome biome : Biome.REGISTRY) {
                 if (biome != null && !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.COLD) && !isBiomeblackListed(biome)) {
                     viableBiomes.add(biome);
                 }
             }
             viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
-        } else if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.COLD)) {
+        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.COLD)) {
             for (Biome biome : Biome.REGISTRY) {
                 if (biome != null && !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.HOT) && !isBiomeblackListed(biome)) {
                     viableBiomes.add(biome);
                 }
             }
             viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
-        } else if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.FRIGID)) {
+        } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.FRIGID)) {
 
             for (Biome biome : Biome.REGISTRY) {
                 if (biome != null && BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.COLD) && !isBiomeblackListed(biome)) {
@@ -1271,12 +1300,12 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     public void initDefaultAttributes() {
-        if (Temps.getTempFromValue(averageTemperature).hotterThan(Temps.TOOHOT))
+        if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.TOOHOT))
             setOceanBlock(Blocks.LAVA.getDefaultState());
 
         //Add planet Properties
         setGenerateCraters(AtmosphereTypes.getAtmosphereTypeFromValue(getAtmosphereDensity()).lessDenseThan(AtmosphereTypes.NORMAL));
-        setGenerateVolcanos(Temps.getTempFromValue(averageTemperature).hotterThan(DimensionProperties.Temps.HOT));
+        setGenerateVolcanos(Temps.getTempFromValue(averageTemperature).hotterOrEquals(DimensionProperties.Temps.HOT));
         setGenerateStructures(isHabitable());
         setGenerateGeodes(getAtmosphereDensity() > 125);
     }
@@ -1477,7 +1506,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         isGasGiant = nbt.getBoolean("isGasGiant");
         hasRings = nbt.getBoolean("hasRings");
         seaLevel = nbt.getInteger("sealevel");
-        target_sea_level = nbt.getInteger("target_sea_level");
+        //target_sea_level = nbt.getInteger("target_sea_level");
         generatorType = nbt.getInteger("genType");
         canGenerateCraters = nbt.getBoolean("canGenerateCraters");
         canGenerateGeodes = nbt.getBoolean("canGenerateGeodes");
@@ -1693,7 +1722,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         nbt.setBoolean("isGasGiant", isGasGiant);
         nbt.setBoolean("hasRings", hasRings);
         nbt.setInteger("sealevel", seaLevel);
-        nbt.setInteger("target_sea_level", target_sea_level);
+        //nbt.setInteger("target_sea_level", target_sea_level);
         nbt.setInteger("genType", generatorType);
         nbt.setBoolean("canGenerateCraters", canGenerateCraters);
         nbt.setBoolean("canGenerateGeodes", canGenerateGeodes);
@@ -1838,6 +1867,29 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public void setSeaLevel(int sealevel) {
         this.seaLevel = MathHelper.clamp(sealevel, 0, 255);
     }
+/*
+    public int getTargetSeaLevel() {
+        //check if at least one dimension changing satellite is in orbit
+        boolean weathercontrollerfound = false;
+
+        for (SatelliteBase satellite : tickingSatellites.values()) {
+            if (satellite instanceof SatelliteWeatherController) {
+                weathercontrollerfound = true;
+                break;
+            }
+        }
+        if (!weathercontrollerfound) {
+            target_sea_level = seaLevel;
+        }
+
+        return this.target_sea_level;
+    }
+
+    public void setTargetSeaLevel(int sealevel) {
+        this.target_sea_level = MathHelper.clamp(sealevel, 0, 255);
+    }
+
+ */
 
     public int getGenType() {
         return generatorType;
@@ -1972,7 +2024,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
         public static Temps getTempFromValue(int value) {
             for (Temps type : Temps.values()) {
-                if (value > type.temp)
+                if (value >= type.temp)
                     return type;
             }
             return SNOWBALL;
@@ -1984,6 +2036,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         }
 
         public boolean hotterThan(Temps type) {
+            return this.compareTo(type) < 0;
+        }
+        public boolean hotterOrEquals(Temps type) {
             return this.compareTo(type) <= 0;
         }
 

@@ -107,6 +107,7 @@ public class ItemBiomeChanger extends ItemSatelliteIdentificationChip implements
                 }
             }
         }
+        player.swingArm(hand);
         return super.onItemRightClick(world, player, hand);
     }
 

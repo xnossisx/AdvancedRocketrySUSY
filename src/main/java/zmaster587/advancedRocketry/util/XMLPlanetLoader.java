@@ -78,6 +78,7 @@ public class XMLPlanetLoader {
     private static final String ELEMENT_HASOXYGEN = "hasOxygen";
     private static final String ELEMENT_ATMDENSITY = "atmosphereDensity";
     private static final String ELEMENT_SEALEVEL = "seaLevel";
+    //private static final String ELEMENT_TARGETSEALEVEL = "targetseaLevel";
     private static final String ELEMENT_GENTYPE = "genType";
     private static final String ELEMENT_RIVER_OVERRIDE = "forceRiverGeneration";
     private static final String ELEMENT_OREGEN = "oreGen";
@@ -270,9 +271,9 @@ public class XMLPlanetLoader {
         if (properties.canGenerateGeodes() && !(properties.getGeodeMultiplier() == 1))
             nodePlanet.appendChild(createTextNode(doc, ELEMENT_GEODE_MULTIPLIER, properties.getGeodeMultiplier()));
 
+        nodePlanet.appendChild(createTextNode(doc, ELEMENT_SEALEVEL, properties.getSeaLevel()));
 
-        if (properties.getSeaLevel() != 63)
-            nodePlanet.appendChild(createTextNode(doc, ELEMENT_SEALEVEL, properties.getSeaLevel()));
+//        nodePlanet.appendChild(createTextNode(doc, ELEMENT_TARGETSEALEVEL, properties.getTargetSeaLevel()));
 
         if (properties.getGenType() != 0)
             nodePlanet.appendChild(createTextNode(doc, ELEMENT_GENTYPE, properties.getGenType()));
@@ -626,7 +627,17 @@ public class XMLPlanetLoader {
                 } catch (NumberFormatException e) {
                     AdvancedRocketry.logger.warn("Invalid sealeve specified"); //TODO: more detailed error msg
                 }
-            } else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_RIVER_OVERRIDE))
+            }
+            /*
+            else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_TARGETSEALEVEL)) {
+                try {
+                    properties.setTargetSeaLevel(Integer.parseInt(planetPropertyNode.getTextContent()));
+                } catch (NumberFormatException e) {
+                    AdvancedRocketry.logger.warn("Invalid targetsealeve specified"); //TODO: more detailed error msg
+                }
+            }
+             */
+            else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_RIVER_OVERRIDE))
                 properties.hasRivers = Boolean.parseBoolean(planetPropertyNode.getTextContent());
             else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_BIOMEIDS)) {
 

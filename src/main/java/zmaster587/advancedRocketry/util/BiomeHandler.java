@@ -20,76 +20,10 @@ import static zmaster587.advancedRocketry.util.AstronomicalBodyHelper.getAverage
 
 public class BiomeHandler {
 
-
-    //public static boolean is_watercontrol_loaded = Loader.isModLoaded("watercontrol");
-
     public static void changeBiome(World world, Biome biomeId, BlockPos pos) {
         Chunk chunk = world.getChunkFromBlockCoords(pos);
 
         Biome biome = world.getBiome(pos);
-
-
-        /*
-        // spread and evaporate water - !!only possible if watercontrol is loaded!!
-        if (is_watercontrol_loaded) {
-            if (world.provider instanceof IPlanetaryProvider) {
-
-
-
-                // for ocean/river biomes generate water
-                if (biome == Biome.getBiome(0) ||biome == Biome.getBiome(7)) {
-                    int sealvl = world.getSeaLevel();
-                    BlockPos yy = world.getHeight(pos);
-
-
-                    while ((!world.getBlockState(yy.down()).isOpaqueCube() && yy.getY() > 0)
-                            && !(world.getBlockState(yy.down()).getBlock() == Blocks.WATER)) {
-                        yy = yy.down();
-                    }
-                    if (yy.getY() <= sealvl) {
-                        world.setBlockState(yy, Blocks.WATER.getDefaultState());
-                    }
-                }
-
-
-
-
-
-
-                //spread water
-                if (DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).water_can_exist) {
-
-                    int sealvl = world.getSeaLevel();
-                    BlockPos yy = new BlockPos(pos.getX(), sealvl, pos.getZ());
-
-
-                    while ((!world.getBlockState(yy.down()).isOpaqueCube() && yy.getY() > 0)
-                            && !(world.getBlockState(yy.down()).getBlock() == Blocks.WATER)
-                    ) {
-                        yy = yy.down();
-                        if (
-                                world.getBlockState(yy.east()).getBlock() == Blocks.WATER
-                                        || world.getBlockState(yy.north()).getBlock() == Blocks.WATER
-                                        || world.getBlockState(yy.west()).getBlock() == Blocks.WATER
-                                        || world.getBlockState(yy.south()).getBlock() == Blocks.WATER
-                        )
-                            world.setBlockState(yy, Blocks.WATER.getDefaultState());
-
-                    }
-
-                }
-                //evaporate water
-                else {
-                    // replace top water block with air
-                    BlockPos top_block = world.getHeight(pos).down();
-                    if (world.getBlockState(top_block).getBlock() == Blocks.WATER || world.getBlockState(top_block).getBlock() == Blocks.FLOWING_WATER) {
-                        world.setBlockState(top_block, Blocks.AIR.getDefaultState());
-
-                    }
-                }
-            }
-        }
-        */
 
         if (biome == biomeId)
             return;

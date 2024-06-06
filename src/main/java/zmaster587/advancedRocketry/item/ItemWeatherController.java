@@ -16,7 +16,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
+import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.network.PacketSatellite;
+import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
 import zmaster587.advancedRocketry.satellite.SatelliteWeatherController;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.GuiHandler;
@@ -32,18 +34,22 @@ import java.util.List;
 
 public class ItemWeatherController extends ItemSatelliteIdentificationChip implements IModularInventory, IButtonInventory, INetworkItem {
 
+    private int floodlevel = 63;
     @Override
     public List<ModuleBase> getModules(int id, EntityPlayer player) {
         List<ModuleBase> list = new LinkedList<>();
 
         SatelliteWeatherController sat = (SatelliteWeatherController) getSatellite(player.getHeldItem(EnumHand.MAIN_HAND));
         if (player.world.isRemote) {
-            list.add(new ModuleImage(24, 14, zmaster587.advancedRocketry.inventory.TextureResources.earthCandyIcon));
+            //list.add(new ModuleImage(24, 14, zmaster587.advancedRocketry.inventory.TextureResources.earthCandyIcon));
         }
 
         list.add(new ModuleButton(32, 16 + 24 * (1), 1, "dry", this, TextureResources.buttonBuild));
         list.add(new ModuleButton(32, 16 + 24 * (2), 0, "rain", this, TextureResources.buttonBuild));
-
+        list.add(new ModuleButton(32, 16 + 24 * (3), 2, "flood", this, TextureResources.buttonBuild));
+        list.add(new ModuleButton(90, 19+24*3, 3, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonLeft, 5, 8));
+        list.add(new ModuleText(100, 19+24*3, "y="+sat.getFloodlevel(),0x2d2d2d));
+        list.add(new ModuleButton(130, 19+24*3, 4, "", this, TextureResources.buttonRight, 5, 8));
         list.add(new ModulePower(16, 48, sat.getBattery()));
 
         return list;
@@ -65,9 +71,11 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
         else if (mapping.getDimensionId() == player.provider.getDimension()) {
             list.add(LibVulpes.proxy.getLocalizedString("msg.connected"));
             if (mapping.mode_id == 0)
-                list.add("mode: rain");
+                list.add("mode: rain - Fills small basins in the terrain with water");
             if (mapping.mode_id == 1)
-                list.add("mode: dry");
+                list.add("mode: dry - Drys all water in a radius of 16");
+            if (mapping.mode_id == 2)
+                list.add("mode: flood - Floods area with a radius of 16 with water");
         } else
             list.add(LibVulpes.proxy.getLocalizedString("msg.notconnected"));
 
@@ -79,13 +87,22 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
     @Nonnull
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
+
+
         if (!world.isRemote) {
             SatelliteBase sat = SatelliteRegistry.getSatellite(stack);
+            if (!(sat instanceof SatelliteWeatherController))
+                return super.onItemRightClick(world, player, hand);
+
             if (sat != null) {
                 if (player.isSneaking()) {
                     if (getSatellite(stack) != null) {
+                        if (!world.isRemote)
+                            ((SatelliteWeatherController) sat).floodlevel = player.getPosition().getY();
+                        PacketHandler.sendToPlayer(new PacketSatellite(getSatellite(stack)), player);
                         player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), world, -1, -1, 0);
                     }
+
                 } else {
                     //Attempt to change weather only if player is in the same dimension
                     if (sat.getDimensionId() == world.provider.getDimension()) {
@@ -94,6 +111,7 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
                 }
             }
         }
+        player.swingArm(hand);
         return super.onItemRightClick(world, player, hand);
     }
 
@@ -115,24 +133,44 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
         ItemStack stack = Minecraft.getMinecraft().player.getHeldItem(EnumHand.MAIN_HAND);
         SatelliteBase sat = getSatellite(stack);
         if (sat instanceof SatelliteWeatherController) {
-            ((SatelliteWeatherController) sat).mode_id = buttonId;
-            PacketHandler.sendToServer(new PacketItemModifcation(this, Minecraft.getMinecraft().player, (byte) (buttonId == -1 ? -1 : 0)));
-            Minecraft.getMinecraft().player.closeScreen();
+            if (buttonId == 0 || buttonId == 1 || buttonId == 2) {
+                ((SatelliteWeatherController) sat).mode_id = buttonId;
+                Minecraft.getMinecraft().player.closeScreen();
+            }
+            if (buttonId == 4)
+                if (((SatelliteWeatherController) sat).floodlevel < 180) {
+                    ((SatelliteWeatherController) sat).floodlevel += 1;
+                    Minecraft.getMinecraft(). player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), net.minecraftforge.common.DimensionManager.getWorld( sat.getDimensionId()), -1, -1, 0);
+                }
+            if (buttonId == 3)
+                if (((SatelliteWeatherController) sat).floodlevel > 1){
+                    ((SatelliteWeatherController) sat).floodlevel-=1;
+                    Minecraft.getMinecraft().player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), net.minecraftforge.common.DimensionManager.getWorld( sat.getDimensionId()), -1, -1, 0);
+                }
+
+            PacketHandler.sendToServer(new PacketItemModifcation(this, Minecraft.getMinecraft().player, (byte) buttonId));
+            //Minecraft.getMinecraft().player.closeScreen();
+            //
         }
     }
 
     @Override
     public void writeDataToNetwork(ByteBuf byteBuf, byte b, @Nonnull ItemStack itemStack) {
-
+        SatelliteWeatherController sat = (SatelliteWeatherController) getSatellite(itemStack);
+        byteBuf.writeInt(sat.mode_id);
+        byteBuf.writeInt(sat.floodlevel);
     }
 
     @Override
     public void readDataFromNetwork(ByteBuf byteBuf, byte b, NBTTagCompound nbtTagCompound, @Nonnull ItemStack itemStack) {
-
+        nbtTagCompound.setInteger("mode_id", byteBuf.readInt());
+        nbtTagCompound.setInteger("floodlevel", byteBuf.readInt());
     }
 
     @Override
     public void useNetworkData(EntityPlayer entityPlayer, Side side, byte b, NBTTagCompound nbtTagCompound, @Nonnull ItemStack itemStack) {
-
+        SatelliteWeatherController sat = (SatelliteWeatherController) getSatellite(itemStack);
+        sat.mode_id = nbtTagCompound.getInteger("mode_id");
+        sat.floodlevel = nbtTagCompound.getInteger("floodlevel");
     }
 }
