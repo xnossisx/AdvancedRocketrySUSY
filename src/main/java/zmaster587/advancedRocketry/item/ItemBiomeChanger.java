@@ -19,6 +19,7 @@ import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.network.PacketSatellite;
 import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
+import zmaster587.advancedRocketry.satellite.SatelliteWeatherController;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.GuiHandler;
 import zmaster587.libVulpes.inventory.TextureResources;
@@ -90,15 +91,18 @@ public class ItemBiomeChanger extends ItemSatelliteIdentificationChip implements
     @Nonnull
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
+
+
         if (!world.isRemote) {
             SatelliteBase sat = SatelliteRegistry.getSatellite(stack);
+            if (!(sat instanceof SatelliteBiomeChanger))
+                return super.onItemRightClick(world, player, hand);
+
             if (sat != null) {
                 if (player.isSneaking()) {
-                    if (getSatellite(stack) != null) {
                         //Make sure to update player so discoveredBiome Ids match
-                        PacketHandler.sendToPlayer(new PacketSatellite(getSatellite(stack)), player);
+                        PacketHandler.sendToPlayer(new PacketSatellite(sat),player);
                         player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), world, -1, -1, 0);
-                    }
                 } else {
                     //Attempt to change biome only if player is in the same dimension
                     if (sat.getDimensionId() == world.provider.getDimension()) {
@@ -143,7 +147,8 @@ public class ItemBiomeChanger extends ItemSatelliteIdentificationChip implements
     public void onInventoryButtonPressed(int buttonId) {
         ItemStack stack = Minecraft.getMinecraft().player.getHeldItem(EnumHand.MAIN_HAND);
         if (!stack.isEmpty() && stack.getItem() == this) {
-            setBiomeId(stack, Biome.getBiomeForId(buttonId));
+            if (buttonId != -1)
+                setBiomeId(stack, Biome.getBiomeForId(buttonId));
             PacketHandler.sendToServer(new PacketItemModifcation(this, Minecraft.getMinecraft().player, (byte) (buttonId == -1 ? -1 : 0)));
         }
     }
