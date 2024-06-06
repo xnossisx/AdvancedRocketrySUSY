@@ -189,7 +189,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                                 try {
 
                                     HashedBlockPosition next_block = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).get_next_terraforming_block();
-                                    BiomeHandler.changeBiome(world, ((ChunkManagerPlanet) ((WorldProviderPlanet) world.provider).chunkMgrTerraformed).getBiomeGenAt(next_block.x, next_block.z), new BlockPos(next_block.x, 0, next_block.z));
+                                    BiomeHandler.changeBiome(world, ((ChunkManagerPlanet) ((WorldProviderPlanet) world.provider).chunkMgrTerraformed).getBiomeGenAt(next_block.x, next_block.z), new BlockPos(next_block.x, 0, next_block.z), false);
 
 
                                 } catch (NullPointerException e) {

@@ -42,7 +42,7 @@ public class SatelliteWeatherController extends SatelliteBase {
 
     public int mode_id;
     //public int timer;
-    private int last_mode_id = 0;
+    public int last_mode_id = 0;
     public int floodlevel = -1;
     private List<BlockPos> viable_positions;
 
@@ -320,6 +320,7 @@ public class SatelliteWeatherController extends SatelliteBase {
     public void writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setInteger("mode_id", mode_id);
+        nbt.setInteger("last_mode_id", last_mode_id);
         nbt.setInteger("floodlevel", floodlevel);
     }
 
@@ -327,6 +328,7 @@ public class SatelliteWeatherController extends SatelliteBase {
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         mode_id = nbt.getInteger("mode_id");
+        last_mode_id = nbt.getInteger("last_mode_id");
         floodlevel = nbt.getInteger("floodlevel");
     }
 }

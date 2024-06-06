@@ -99,7 +99,7 @@ private int noise_val;
                             HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
                             //HashedBlockPosition pos = toChangeList.remove(toChangeList.size()-1);
 
-                            BiomeHandler.changeBiome(world, biomeId, pos.getBlockPos());
+                            BiomeHandler.changeBiome(world, biomeId, pos.getBlockPos(), true);
                         }
                     } else
                         break;

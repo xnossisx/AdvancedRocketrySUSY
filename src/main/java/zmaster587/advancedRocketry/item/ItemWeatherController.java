@@ -96,13 +96,9 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
 
             if (sat != null) {
                 if (player.isSneaking()) {
-                    if (getSatellite(stack) != null) {
-                        if (!world.isRemote)
-                            ((SatelliteWeatherController) sat).floodlevel = player.getPosition().getY();
-                        PacketHandler.sendToPlayer(new PacketSatellite(getSatellite(stack)), player);
+                        ((SatelliteWeatherController) sat).floodlevel = player.getPosition().getY();
+                        PacketHandler.sendToPlayer(new PacketSatellite(sat), player);
                         player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), world, -1, -1, 0);
-                    }
-
                 } else {
                     //Attempt to change weather only if player is in the same dimension
                     if (sat.getDimensionId() == world.provider.getDimension()) {
@@ -159,12 +155,14 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
         SatelliteWeatherController sat = (SatelliteWeatherController) getSatellite(itemStack);
         byteBuf.writeInt(sat.mode_id);
         byteBuf.writeInt(sat.floodlevel);
+        byteBuf.writeInt(sat.last_mode_id);
     }
 
     @Override
     public void readDataFromNetwork(ByteBuf byteBuf, byte b, NBTTagCompound nbtTagCompound, @Nonnull ItemStack itemStack) {
         nbtTagCompound.setInteger("mode_id", byteBuf.readInt());
         nbtTagCompound.setInteger("floodlevel", byteBuf.readInt());
+        nbtTagCompound.setInteger("last_mode_id", byteBuf.readInt());
     }
 
     @Override
@@ -172,5 +170,6 @@ public class ItemWeatherController extends ItemSatelliteIdentificationChip imple
         SatelliteWeatherController sat = (SatelliteWeatherController) getSatellite(itemStack);
         sat.mode_id = nbtTagCompound.getInteger("mode_id");
         sat.floodlevel = nbtTagCompound.getInteger("floodlevel");
+        sat.last_mode_id = nbtTagCompound.getInteger("last_mode_id");
     }
 }

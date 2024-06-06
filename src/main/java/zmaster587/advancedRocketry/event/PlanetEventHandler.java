@@ -103,7 +103,7 @@ public class PlanetEventHandler {
         PlanetEventHandler.endTime = endTime;
         PlanetEventHandler.duration = duration;
     }
-
+/*
     public static void modifyChunk(World world, WorldProviderPlanet provider, Chunk chunk) {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -111,6 +111,8 @@ public class PlanetEventHandler {
             }
         }
     }
+
+ */
 
     @SubscribeEvent
     public void onCrafting(net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent event) {
