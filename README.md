@@ -29,3 +29,7 @@ Improvements:
 - Terraforming update #1:
   - You will use a new block called Terraforming Terminal to program your biome changer satellite to transform the entire planet.
   - You can use multiple terminals / satellites to speed up the process!
+ 
+- Weather Satellite added:
+  - Currently can only place and remove some water in 3 different modes
+  - will later be able to set humidity value for planets
