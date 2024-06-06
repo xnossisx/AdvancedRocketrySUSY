@@ -1,4 +1,4 @@
-# AdvancedRocketry
+# Advanced Rocketry - Reworked
 This is a fork of Advanced Rocketry where we fix all the bugs of the mod because the devs don't do it.
 
 You can download the new mod from curseforge: https://www.curseforge.com/minecraft/mc-mods/advanced-rocketry-2
@@ -29,3 +29,7 @@ Improvements:
 - Terraforming update #1:
   - You will use a new block called Terraforming Terminal to program your biome changer satellite to transform the entire planet.
   - You can use multiple terminals / satellites to speed up the process!
+ 
+- Weather Satellite added:
+  - Currently can only place and remove some water in 3 different modes
+  - will later be able to set humidity value for planets

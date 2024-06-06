@@ -1,5 +1,6 @@
 package zmaster587.advancedRocketry.event;
 
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.BlockTorch;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -19,6 +20,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldProvider;
@@ -33,7 +35,9 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBloc
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.terraingen.OreGenEvent;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.BlockEvent.PlaceEvent;
+import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -55,6 +59,7 @@ import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
 import zmaster587.advancedRocketry.client.render.planet.RenderPlanetarySky;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.dimension.watersourcelocked;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.network.PacketConfigSync;
 import zmaster587.advancedRocketry.network.PacketDimInfo;
@@ -74,10 +79,7 @@ import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
 import javax.annotation.Nonnull;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class PlanetEventHandler {
 
@@ -101,7 +103,7 @@ public class PlanetEventHandler {
         PlanetEventHandler.endTime = endTime;
         PlanetEventHandler.duration = duration;
     }
-
+/*
     public static void modifyChunk(World world, WorldProviderPlanet provider, Chunk chunk) {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
@@ -109,6 +111,8 @@ public class PlanetEventHandler {
             }
         }
     }
+
+ */
 
     @SubscribeEvent
     public void onCrafting(net.minecraftforge.fml.common.gameevent.PlayerEvent.ItemCraftedEvent event) {
@@ -470,17 +474,62 @@ public class PlanetEventHandler {
         }
     }
 
-
-    int last_block = 0;
     @SubscribeEvent
-    public void serverTickEvent(TickEvent.WorldTickEvent event) {
+    public void handleSourcePlacement(BlockEvent.CreateFluidSourceEvent event) {
+        List<watersourcelocked> source_lock_list = DimensionManager.getInstance().getDimensionProperties(event.getWorld().provider.getDimension()).water_source_locked_positions;
+        HashedBlockPosition hp = new HashedBlockPosition(event.getPos().getX(),event.getPos().getY(),event.getPos().getZ());
 
+        for (watersourcelocked i:source_lock_list){
+            if (i.pos.equals(hp))
+                event.setResult(Result.DENY);
+        }
+        /*
+        int target_sea_lvl = DimensionManager.getInstance().getDimensionProperties(event.getWorld().provider.getDimension()).getTargetSeaLevel();
+        IBlockState state = event.getState();
+        if (event.getPos().getY() >= target_sea_lvl)
+            event.setResult(Result.DENY);
+
+         */
     }
 
     @SubscribeEvent
-    public void chunkLoadEvent(PopulateChunkEvent.Post event) {
+    public void serverTickEvent(TickEvent.WorldTickEvent event) {
+
+        /*
+        World world = event.world;
+        int target_sea_lvl = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTargetSeaLevel();
+
+        if (world.provider instanceof IPlanetaryProvider) {
+
+            Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(world.provider.getDimension())).getChunkProvider().getLoadedChunks();
+
+            for (Chunk chunk : list) {
+                int randomx = world.rand.nextInt(16) + chunk.x*16;
+                int randomz = world.rand.nextInt(16) + chunk.z*16;
+                BlockPos topblock = world.getHeight(new BlockPos(randomx, 0, randomz)).down();
+                if (topblock.getY() >= target_sea_lvl && (world.getBlockState(topblock).getBlock() == Blocks.WATER ||world.getBlockState(topblock).getBlock() == Blocks.FLOWING_WATER)) {
+
+                    if (!(world.getBlockState(topblock).getValue(BlockLiquid.LEVEL).intValue() == 0))
+                        continue;
+
+                        world.setBlockState(topblock, Blocks.AIR.getDefaultState());
+                        //world.notifyBlockUpdate(topblock, world.getBlockState(topblock), world.getBlockState(topblock), 3);
+
+                }
+
+            }
+        }
+
+         */
+    }
 
 
+
+
+    @SubscribeEvent
+    public void onChunkLoad(ChunkEvent.Load event) {
+
+        DimensionManager.getInstance().getDimensionProperties(event.getWorld().provider.getDimension()).add_chunk_to_terraforming_list(event.getChunk());
         //Do not modify all at once, this causes !!!EXTREME!!! lag
         /*
         if (zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming && event.getWorld().provider.getClass() == WorldProviderPlanet.class) {

@@ -168,6 +168,7 @@ public class ClientProxy extends CommonProxy {
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemSatellitePrimaryFunction, 3, new ModelResourceLocation("advancedrocketry:microwaveTransmitter", "inventory"));
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemSatellitePrimaryFunction, 4, new ModelResourceLocation("advancedrocketry:oreMapper", "inventory"));
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemSatellitePrimaryFunction, 5, new ModelResourceLocation("advancedrocketry:biomeChangerSat", "inventory"));
+        ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemSatellitePrimaryFunction, 6, new ModelResourceLocation("advancedrocketry:weatherControllerSat", "inventory"));
 
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemIC, 0, new ModelResourceLocation("advancedrocketry:basicCircuit", "inventory"));
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemIC, 1, new ModelResourceLocation("advancedrocketry:trackingCircuit", "inventory"));
@@ -219,6 +220,7 @@ public class ClientProxy extends CommonProxy {
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemJetpack, 0, new ModelResourceLocation("advancedrocketry:jetPack", "inventory"));
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemAtmAnalyser, 0, new ModelResourceLocation("advancedrocketry:atmAnalyser", "inventory"));
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemBiomeChanger, 0, new ModelResourceLocation("advancedrocketry:biomeChanger", "inventory"));
+        ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemWeatherController, 0, new ModelResourceLocation("advancedrocketry:weatherController", "inventory"));
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemSmallAirlockDoor, 0, new ModelResourceLocation("advancedrocketry:smallAirlockDoor", "inventory"));
 
         ModelLoader.setCustomModelResourceLocation(AdvancedRocketryItems.itemCircuitPlate, 0, new ModelResourceLocation("advancedrocketry:basicCircuitPlate", "inventory"));

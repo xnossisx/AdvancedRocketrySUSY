@@ -92,18 +92,14 @@ private int noise_val;
 
             for (int i = 0; i < 10; i++) {
                 //TODO: Better imp
-                //Note:
-                // if a biome satellite is supplied with too less
-                // solar panels it will keep resetting it's battery and never work
-                // this was because extractEnergy() resets energy to 0 if less than 120
-                // fixed by "if (battery.getUniversalEnergyStored() > 120){"
+
                 if (world.getTotalWorldTime() % 1 == 0 && !toChangeList.isEmpty()) {
                     if (battery.getUniversalEnergyStored() > powerrequired) {
                         if (battery.extractEnergy(powerrequired, false) == powerrequired) {
                             HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
                             //HashedBlockPosition pos = toChangeList.remove(toChangeList.size()-1);
 
-                            BiomeHandler.changeBiome(world, biomeId, pos.getBlockPos());
+                            BiomeHandler.changeBiome(world, biomeId, pos.getBlockPos(), true);
                         }
                     } else
                         break;

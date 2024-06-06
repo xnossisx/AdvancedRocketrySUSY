@@ -2,18 +2,23 @@ package zmaster587.advancedRocketry.tile.multiblock;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
@@ -22,7 +27,6 @@ import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.advancedRocketry.item.ItemBiomeChanger;
 import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
 import zmaster587.advancedRocketry.network.PacketBiomeIDChange;
 import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
@@ -47,6 +51,7 @@ import zmaster587.libVulpes.util.IconResource;
 import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
 
@@ -272,7 +277,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     //private EmbeddedInventory inv;
     private boolean outOfFluid;
     private int last_mode;
-    private boolean hadPowerLastTick;
+    private boolean waspoweredlasttick;
     //private boolean had_linker_last_tick;
     public TileAtmosphereTerraformer() {
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
@@ -288,7 +293,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         //inv = new EmbeddedInventory(1);
         outOfFluid = false;
         last_mode = radioButton.getOptionSelected();
-        hadPowerLastTick = false;
+        waspoweredlasttick = false;
         //had_linker_last_tick = false;
     }
 
@@ -353,13 +358,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     @Override
     public void update() {
 
-        //this should send a update package to the players every 10 seconds to notify them if the terraformer is running or not
-        if (!world.isRemote) {
-            if (world.getTotalWorldTime() % 20 == 0) {
-                this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 2);
-            }
-        }
-
         if (this.timeAlive == 0) {
             if (!this.world.isRemote) {
                 if (this.isComplete()) {
@@ -382,20 +380,22 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         }
 
         if (this.isRunning()) {
-            if (this.hasEnergy(this.requiredPowerPerTick()) || (this.world.isRemote && this.hadPowerLastTick)) {
+            if ((this.hasEnergy(this.requiredPowerPerTick()) && !this.world.isRemote) || (this.world.isRemote && this.waspoweredlasttick)) {
                 this.onRunningPoweredTick();
                 if (!this.world.isRemote) {
-                    if (!this.hadPowerLastTick) {
-                        this.hadPowerLastTick = true;
+                    if (!this.waspoweredlasttick) {
+                        this.waspoweredlasttick = true;
                         this.markDirty();
+                        PacketHandler.sendToNearby(new PacketMachine(this, (byte)NetworkPackets.POWERERROR.ordinal()), this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
                         this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
                     }
 
                     this.useEnergy(this.usedPowerPerTick());
                 }
-            } else if (!this.world.isRemote && this.hadPowerLastTick) {
-                this.hadPowerLastTick = false;
+            } else if (!this.world.isRemote && this.waspoweredlasttick) {
+                this.waspoweredlasttick = false;
                 this.markDirty();
+                PacketHandler.sendToNearby(new PacketMachine(this, (byte)NetworkPackets.POWERERROR.ordinal()), this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
                 this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
             }
         }
@@ -517,7 +517,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setBoolean("hadpowerlasttick", hadPowerLastTick);
         writeToNBT(nbt);
         return new SPacketUpdateTileEntity(pos, 0, nbt);
     }
@@ -526,7 +525,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         NBTTagCompound nbt = pkt.getNbtCompound();
         readFromNBT(nbt);
-        this.hadPowerLastTick = nbt.getBoolean("hadpowerlasttick");
         setText();
 
     }
@@ -563,21 +561,29 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
                                     NBTTagCompound nbt) {
 
 
+        if (packetId == NetworkPackets.POWERERROR.ordinal()) {
+            nbt.setBoolean("waspoweredlasttick", in.readBoolean());
+        } else if (packetId == NetworkPackets.TOGGLE.ordinal()) {
+            nbt.setBoolean("enabled", in.readBoolean());
+        }
         if (packetId == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
             radioButton.setOptionSelected(in.readByte());
         }
-        super.readDataFromNetwork(in, packetId, nbt);
     }
 
     @Override
     public void writeDataToNetwork(ByteBuf out, byte id) {
+        if (id == NetworkPackets.POWERERROR.ordinal()) {
+            out.writeBoolean(this.waspoweredlasttick);
+        } else if (id == NetworkPackets.TOGGLE.ordinal()) {
+            out.writeBoolean(this.enabled);
+        }
 
         if (id == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
             out.writeByte(radioButton.getOptionSelected());
         }
-        super.writeDataToNetwork(out, id);
-    }
 
+    }
     @Override
     public void setMachineEnabled(boolean enabled) {
         super.setMachineEnabled(enabled);
@@ -596,10 +602,15 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
         super.useNetworkData(player, side, id, nbt);
+        if (id == NetworkPackets.POWERERROR.ordinal()) {
+            this.waspoweredlasttick = nbt.getBoolean("waspoweredlasttick");
+        }
         if (!world.isRemote && id == NetworkPackets.TOGGLE.ordinal()) {
             outOfFluid = false;
             setMachineRunning(isRunning());
         }
+
+
     }
 
     @Override
