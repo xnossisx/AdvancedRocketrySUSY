@@ -350,8 +350,8 @@ public class ARConfiguration {
         arConfig.blockTankCapacity = (float) config.get(Configuration.CATEGORY_GENERAL, "blockTankCapacity", 1.0f, "Multiplier for the pressurized tank's (block) capacity", 0, Float.MAX_VALUE).getDouble();
         //Enriched Lava in the centrifuge
         arConfig.lavaCentrifugeOutputs = config.getStringList("lavaCentrifugeOutputs", Configuration.CATEGORY_GENERAL, new String[]{"nuggetCopper:100", "nuggetIron:100", "nuggetTin:100", "nuggetLead:100", "nuggetSilver:100", "nuggetGold:75", "nuggetDiamond:10", "nuggetUranium:10", "nuggetIridium:1"}, "Outputs and chances of objects from Enriched Lava in the Centrifuge.  Format: <oredictionaryEntry>:<weight>.  Larger weights are more frequent");
-        arConfig.lavaCentrifugePower = config.getInt("lavaCentrifugePower", Configuration.CATEGORY_GENERAL, 10,0,999999,"The power per tick required to process a bucket of enriched lava");
-        arConfig.lavaCentrifugeTime  = config.getInt("lavaCentrifugeTime", Configuration.CATEGORY_GENERAL, 200,0,999999,"The time required to process a bucket of enriched lava");
+        arConfig.lavaCentrifugePower = config.getInt("lavaCentrifugePower", Configuration.CATEGORY_GENERAL, 10,0,999999,"The power per tick required to process enriched lava");
+        arConfig.lavaCentrifugeTime  = config.getInt("lavaCentrifugeTime", Configuration.CATEGORY_GENERAL, 50,0,999999,"The time required to process 250mb of enriched lava");
         arConfig.crystalliserMaximumGravity = (float) config.get(Configuration.CATEGORY_GENERAL, "crystalliserMaximumGravity", 0f, "Maximum gravity the crystalliser will function at. Use 0.0 to disable!").getDouble();
         arConfig.enableLaserDrill = config.get(Configuration.CATEGORY_GENERAL, "EnableLaserDrill", true, "Enables the laser drill machine").getBoolean();
         arConfig.spaceLaserPowerMult = (float) config.get(Configuration.CATEGORY_GENERAL, "LaserDrillPowerMultiplier", 1d, "Power multiplier for the laser drill machine").getDouble();
