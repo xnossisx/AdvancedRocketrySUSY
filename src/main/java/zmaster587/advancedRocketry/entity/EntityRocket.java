@@ -880,11 +880,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                         BlockPos pos = new BlockPos(x, posY, z);
                         pos = getTopBlock(pos);
 
-                        safeLanding = !world.getBlockState(pos).getMaterial().isLiquid() || world.getBlockState(pos).getBlock() == Blocks.WATER || world.getBlockState(pos).getBlock() == AdvancedRocketryBlocks.blockRocketFire;
+                        //water is considered unsafe too from now on
+                        //safeLanding = !world.getBlockState(pos).getMaterial().isLiquid() || world.getBlockState(pos).getBlock() == Blocks.WATER || world.getBlockState(pos).getBlock() == AdvancedRocketryBlocks.blockRocketFire;
+                        safeLanding = !world.getBlockState(pos).getMaterial().isLiquid() || world.getBlockState(pos).getBlock() == AdvancedRocketryBlocks.blockRocketFire;
                     }
                 }
 
-                // If nothing will catch the rocket, and the material isn't water, then create a float
+                // If nothing will catch the rocket, then create a float
                 // If anyone asks, the dev thinks underwater rocket launch platforms are cool and players can swim anyway
                 if (!safeLanding) {
                     for (int x = ((int) posX - rocketSizeX - bufferSize); x < (posX + rocketSizeX + bufferSize); x++) {
