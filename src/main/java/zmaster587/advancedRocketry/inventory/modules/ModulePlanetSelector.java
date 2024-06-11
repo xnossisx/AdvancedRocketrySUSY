@@ -143,8 +143,8 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                 continue;
 
             int displaySize = (int) (planetSizeMultiplier * star.getDisplayRadius());
-            int offsetX = star.getPosX() + posX - displaySize / 2;
-            int offsetY = star.getPosZ() + posY - displaySize / 2;
+            int offsetX = (int) (star.getPosX()*distanceZoomMultiplier + posX - displaySize / 2);
+            int offsetY = (int) (star.getPosZ()*distanceZoomMultiplier + posY - displaySize / 2);
             ModuleButton button;
 
             if (star.getSubStars() != null && !star.getSubStars().isEmpty()) {
@@ -329,8 +329,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
             } else
                 renderStarSystem(DimensionManager.getInstance().getStar(currentSystem - Constants.STAR_ID_OFFSET), size / 2, size / 2, (float) ((float) zoom), (float) zoom * .5f);
         } else
-            // zoom on galaxy is not implemented
-            renderGalaxyMap(DimensionManager.getInstance(), size / 2, size / 2, (float) 1, (float) 1 * .25f);
+            renderGalaxyMap(DimensionManager.getInstance(), size / 2, size / 2, (float) zoom, (float) zoom * .25f);
 
 
         int x = currentPosX - size / 2, y = currentPosY - size / 2;
