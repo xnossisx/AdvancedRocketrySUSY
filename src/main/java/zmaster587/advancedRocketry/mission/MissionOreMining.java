@@ -68,9 +68,12 @@ public class MissionOreMining extends MissionResourceCollection {
                         List<ItemStack> totalStacksList = new LinkedList<>();
                         for (StackEntry entry : stacks2) {
 
+
+                            //TODO lower data should transform some output into cobblestone/stone
                             if (compositionData / (float) maxData >= Math.random())
                                 entry.stack.setCount((int) (entry.stack.getCount() * 1.25f));
 
+                            //TODO lower data should reduce output
                             if (massData / (float) maxData >= Math.random())
                                 entry.stack.setCount((int) (entry.stack.getCount() * 1.25f));
 

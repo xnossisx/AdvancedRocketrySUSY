@@ -120,10 +120,13 @@ repositories {
         name = "mezz.jei"
         url = uri("https://dvs1.progwml6.com/files/maven/")
     }
-    ivy {
-        name = "industrialcraft-2"
-        artifactPattern("http://jenkins.ic2.player.to/job/IC2_111/39/artifact/build/libs/[module]-[revision].[ext]")
+    maven {
+        url = uri("https://cursemaven.com")
     }
+    //ivy {
+    //    name = "industrialcraft-2"
+    //    artifactPattern("http://jenkins.ic2.player.to/job/IC2_111/39/artifact/build/libs/[module]-[revision].[ext]")
+    //}
     maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
@@ -146,7 +149,8 @@ repositories {
 dependencies {
     minecraft(group = "net.minecraftforge", name = "forge", version = "$mcVersion-$forgeVersion")
 
-    compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
+    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
+    //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
     //implementation("zmaster587.libVulpes:LibVulpes:$mcVersion-$libVulpesVersion-$libVulpesBuildNum-deobf")
 
     compileOnly(fg.deobf("dev.galacticraft:galacticraft-legacy:$gcVersion"))

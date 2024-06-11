@@ -9,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -28,6 +29,7 @@ import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerConsumer;
+import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileInputHatch;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileInventoryHatch;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileOutputHatch;
@@ -47,12 +49,13 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
             {{'P', 'I', 'O'},
                     {'D', 'D', 'D'}}
     };
-    private static final int maxResearchTime = 20;
+    private static final int maxResearchTime = 10;
     private TileDataBus[] dataCables;
     private boolean researchingDistance, researchingAtmosphere, researchingMass;
     private int atmosphereProgress, distanceProgress, massProgress;
     private EmbeddedInventory inventory;
     private TileInventoryHatch inputHatch, outputHatch;
+    private boolean waspoweredlasttick;
 
     public TileAstrobodyDataProcessor() {
         dataCables = new TileDataBus[3];
@@ -229,6 +232,54 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
         }
     }
 
+
+    @Override
+    public void update() {
+
+        if (this.timeAlive == 0) {
+            if (!this.world.isRemote) {
+                if (this.isComplete()) {
+                    this.canRender = this.completeStructure = this.completeStructure(this.world.getBlockState(this.pos));
+                }
+            } else {
+                SoundEvent str;
+                if ((str = this.getSound()) != null) {
+                    this.playMachineSound(str);
+                }
+            }
+
+            this.timeAlive = 1;
+        }
+
+        if (!this.world.isRemote && this.world.getTotalWorldTime() % 1000L == 0L && !this.isComplete()) {
+            this.attemptCompleteStructure(this.world.getBlockState(this.pos));
+            this.markDirty();
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+        }
+
+        if (this.isRunning()) {
+            if ((this.hasEnergy(this.requiredPowerPerTick()) && !this.world.isRemote) || (this.world.isRemote && this.waspoweredlasttick)) {
+                this.onRunningPoweredTick();
+                if (!this.world.isRemote) {
+                    if (!this.waspoweredlasttick) {
+                        this.waspoweredlasttick = true;
+                        this.markDirty();
+                        PacketHandler.sendToNearby(new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.POWERERROR.ordinal()), this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
+                        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+                    }
+
+                    this.useEnergy(this.usedPowerPerTick());
+                }
+            } else if (!this.world.isRemote && this.waspoweredlasttick) {
+                this.waspoweredlasttick = false;
+                this.markDirty();
+                PacketHandler.sendToNearby(new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.POWERERROR.ordinal()), this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
+                this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            }
+        }
+
+    }
+    
     @Override
     protected void onRunningPoweredTick() {
         if (completionTime > 0)

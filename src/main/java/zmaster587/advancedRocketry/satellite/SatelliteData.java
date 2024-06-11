@@ -21,7 +21,7 @@ import zmaster587.libVulpes.util.ZUtils;
 import javax.annotation.Nonnull;
 
 public abstract class SatelliteData extends SatelliteBase {
-    DataStorage data;
+    public DataStorage data;
     long lastActionTime, prevLastActionTime;
     int collectionTime;
     int powerConsumption;
@@ -30,7 +30,9 @@ public abstract class SatelliteData extends SatelliteBase {
     public SatelliteData() {
         super();
         //powerConsumption = Math.min(160, getPowerPerTick());
-        collectionTime = (int) (200 / Math.sqrt(0.1 * (powerConsumption - 5)));
+        powerConsumption = getPowerPerTick();
+        collectionTime = (int) (200 / Math.sqrt(0.1 * powerConsumption));
+
     }
 
     @Override
@@ -73,6 +75,7 @@ public abstract class SatelliteData extends SatelliteBase {
         if (collectionTime == 0)
             collectionTime = 200;
 
+        int r=0;
         if (data.getMaxData() > data.getData()) {
 
             // all this below is some grade-A bullshit because if you only have a small solar panel you will never get data
@@ -86,12 +89,15 @@ public abstract class SatelliteData extends SatelliteBase {
             //Actually collect the unit of data
             //if (AdvancedRocketry.proxy.getWorldTimeUniversal(0) % collectionTime == 0 && satelliteProperties.getPowerGeneration() >= 10) {
 
+            //System.out.println(AdvancedRocketry.proxy.getWorldTimeUniversal(0)+" - "+collectionTime);
+
             battery.extractEnergy(powerConsumption, false);
             if (AdvancedRocketry.proxy.getWorldTimeUniversal(0) % collectionTime == 0) {
-                return 1;
+                r++;
+                //System.out.println("add data. now there is "+data.getData());
             }
         }
-        return 0;
+        return r;
     }
 
     @Override
@@ -125,6 +131,10 @@ public abstract class SatelliteData extends SatelliteBase {
         this.data.readFromNBT(nbt.getCompoundTag("data"));
         lastActionTime = nbt.getLong("lastActionTime");
         collectionTime = nbt.getInteger("collectionMultiplier");
+
+
+        powerConsumption = getPowerPerTick();
+        collectionTime = (int) (200 / Math.sqrt(0.1 * powerConsumption));
     }
 
     @Override
