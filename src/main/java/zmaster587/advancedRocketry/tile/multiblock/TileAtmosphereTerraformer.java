@@ -507,7 +507,24 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         }
     }
 
+    @Override
+    public void readDataFromNetwork(ByteBuf in, byte packetId,
+                                    NBTTagCompound nbt) {
+        super.readDataFromNetwork(in,packetId, nbt);
+        if (packetId == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
+            radioButton.setOptionSelected(in.readByte());
+        }
+    }
 
+    @Override
+    public void writeDataToNetwork(ByteBuf out, byte id) {
+        super.writeDataToNetwork(out,id);
+
+        if (id == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
+            out.writeByte(radioButton.getOptionSelected());
+        }
+
+    }
     @Override
     public void setMachineEnabled(boolean enabled) {
         super.setMachineEnabled(enabled);
@@ -522,6 +539,18 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         markDirty();
     }
 
+    @Override
+    public void useNetworkData(EntityPlayer player, Side side, byte id,
+                               NBTTagCompound nbt) {
+        super.useNetworkData(player, side, id, nbt);
+
+        if (!world.isRemote && id == NetworkPackets.TOGGLE.ordinal()) {
+            outOfFluid = false;
+            setMachineRunning(isRunning());
+        }
+
+
+    }
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
