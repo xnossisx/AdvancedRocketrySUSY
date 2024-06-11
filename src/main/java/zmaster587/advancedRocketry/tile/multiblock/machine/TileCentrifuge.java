@@ -1,15 +1,18 @@
 package zmaster587.advancedRocketry.tile.multiblock.machine;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.oredict.OreDictionary;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
@@ -19,8 +22,11 @@ import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
 import zmaster587.libVulpes.block.BlockMeta;
+import zmaster587.libVulpes.interfaces.IRecipe;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.inventory.modules.ModuleProgress;
+import zmaster587.libVulpes.network.PacketHandler;
+import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.recipe.RecipesMachine;
 import zmaster587.libVulpes.recipe.RecipesMachine.ChanceFluidStack;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
@@ -38,23 +44,44 @@ public class TileCentrifuge extends TileMultiblockMachine {
 
             {{Blocks.AIR, new BlockMeta(LibVulpesBlocks.blockStructureBlock), 'l'},
                     {"casingCentrifuge", "casingCentrifuge", new BlockMeta(LibVulpesBlocks.blockStructureBlock)},
-                    {"casingCentrifuge", "casingCentrifuge", 'l'}},
+                    {"casingCentrifuge", "casingCentrifuge", 'O'}},
 
             {{'c', new BlockMeta(LibVulpesBlocks.blockStructureBlock), 'l'},
                     {"casingCentrifuge", "casingCentrifuge", new BlockMeta(LibVulpesBlocks.blockStructureBlock)},
-                    {"casingCentrifuge", "casingCentrifuge", 'l'}},
+                    {"casingCentrifuge", "casingCentrifuge", 'O'}},
 
             {{'P', 'L', 'l'},
-                    {LibVulpesBlocks.motors, 'O', new BlockMeta(LibVulpesBlocks.blockStructureBlock)},
-                    {new BlockMeta(LibVulpesBlocks.blockStructureBlock), new BlockMeta(LibVulpesBlocks.blockStructureBlock), 'l'}},
+                    {LibVulpesBlocks.motors, new BlockMeta(LibVulpesBlocks.blockStructureBlock), new BlockMeta(LibVulpesBlocks.blockStructureBlock)},
+                    {new BlockMeta(LibVulpesBlocks.blockStructureBlock), new BlockMeta(LibVulpesBlocks.blockStructureBlock), 'O'}},
 
     };
-
     @Override
     public Object[][][] getStructure() {
         return structure;
     }
 
+    @Override
+    public void update() {
+
+      super.update();
+
+        /*
+        if (stuck){
+            IRecipe recipe;
+            if (this.enabled && (recipe = this.getRecipe(this.getMachineRecipeList())) != null && this.canProcessRecipe(recipe)) {
+                stuck = false;
+                super.onInventoryUpdated();
+            }else{
+            }
+        }
+
+         */
+    }
+
+    @Override
+    protected void processComplete() {
+        super.processComplete();
+    }
 
     @Override
     public boolean shouldHideBlock(World world, BlockPos pos2, IBlockState tile) {
@@ -99,7 +126,7 @@ public class TileCentrifuge extends TileMultiblockMachine {
         inputFluid.add(new FluidStack(AdvancedRocketryFluids.fluidEnrichedLava, 1000));
         List<ChanceFluidStack> outputFluid = new LinkedList<>();
         outputFluid.add(new ChanceFluidStack(new FluidStack(FluidRegistry.getFluid("lava"), 1000), 1.0f));
-        RecipesMachine.Recipe rec = new RecipesMachine.Recipe(nuggetList, inputItems, outputFluid, inputFluid, 200, 10, new HashMap<>());
+        RecipesMachine.Recipe rec = new RecipesMachine.Recipe(nuggetList, inputItems, outputFluid, inputFluid, ARConfiguration.getCurrentConfig().lavaCentrifugeTime, ARConfiguration.getCurrentConfig().lavaCentrifugePower, new HashMap<>());
         rec.setMaxOutputSize(4);
         RecipesMachine.getInstance().getRecipes(TileCentrifuge.class).add(rec);
     }

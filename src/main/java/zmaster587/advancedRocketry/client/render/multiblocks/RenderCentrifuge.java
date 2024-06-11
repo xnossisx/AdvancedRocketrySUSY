@@ -15,6 +15,7 @@ public class RenderCentrifuge extends TileEntitySpecialRenderer {
     WavefrontObject model;
 
     ResourceLocation texture = new ResourceLocation("advancedrocketry:textures/models/centrifuge.png");
+    private float angle = 0;
 
     public RenderCentrifuge() {
         try {
@@ -47,14 +48,16 @@ public class RenderCentrifuge extends TileEntitySpecialRenderer {
         model.renderOnly("Hull");
 
 
-        if (multiBlockTile.isRunning()) {
+        if (multiBlockTile.hadPowerLastTick && multiBlockTile.isRunning()) {
             GL11.glPushMatrix();
-            GL11.glRotated(multiBlockTile.getWorld().getTotalWorldTime() * -100f, 0, 1, 0);
+            this.angle = multiBlockTile.getWorld().getTotalWorldTime() * -8f;
+            GL11.glRotated(angle, 0, 1, 0);
             model.renderOnly("Cylinder");
             GL11.glPopMatrix();
 
         } else {
             GL11.glPushMatrix();
+            GL11.glRotated(angle, 0, 1, 0);
             model.renderOnly("Cylinder");
             GL11.glPopMatrix();
         }

@@ -24,7 +24,6 @@ val modVersion: String by project
 val archiveBase: String by project
 
 val libVulpesVersion: String by project
-val libVulpesBuildNum: String by project
 val jeiVersion: String by project
 val icVersion: String by project
 val gcVersion: String by project
@@ -181,22 +180,6 @@ tasks.processResources {
     }
 
     exclude("**/*.sh")
-}
-
-tasks.register("cloneLibVulpes") {
-    group = "build setup"
-    doLast {
-        val libVulpesRepo: String by project
-        val libVulpesBranch: String? by project
-
-        val repo = Grgit.clone {
-            dir = "$projectDir/libVulpes"
-            uri = libVulpesRepo
-            if(libVulpesBranch != null)
-                refToCheckout = libVulpesBranch
-        }
-        println("Cloned libVulpes repository from $libVulpesRepo (current branch: ${repo.branch.current().name})")
-    }
 }
 
 val currentJvm: String = Jvm.current().toString()

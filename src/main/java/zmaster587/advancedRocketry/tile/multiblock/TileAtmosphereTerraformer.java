@@ -277,7 +277,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     //private EmbeddedInventory inv;
     private boolean outOfFluid;
     private int last_mode;
-    private boolean waspoweredlasttick;
     //private boolean had_linker_last_tick;
     public TileAtmosphereTerraformer() {
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
@@ -293,7 +292,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         //inv = new EmbeddedInventory(1);
         outOfFluid = false;
         last_mode = radioButton.getOptionSelected();
-        waspoweredlasttick = false;
         //had_linker_last_tick = false;
     }
 
@@ -353,53 +351,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
         return new AxisAlignedBB(pos.add(-15, -15, -15), pos.add(15, 15, 15));
-    }
-
-    @Override
-    public void update() {
-
-        if (this.timeAlive == 0) {
-            if (!this.world.isRemote) {
-                if (this.isComplete()) {
-                    this.canRender = this.completeStructure = this.completeStructure(this.world.getBlockState(this.pos));
-                }
-            } else {
-                SoundEvent str;
-                if ((str = this.getSound()) != null) {
-                    this.playMachineSound(str);
-                }
-            }
-
-            this.timeAlive = 1;
-        }
-
-        if (!this.world.isRemote && this.world.getTotalWorldTime() % 1000L == 0L && !this.isComplete()) {
-            this.attemptCompleteStructure(this.world.getBlockState(this.pos));
-            this.markDirty();
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-        }
-
-        if (this.isRunning()) {
-            if ((this.hasEnergy(this.requiredPowerPerTick()) && !this.world.isRemote) || (this.world.isRemote && this.waspoweredlasttick)) {
-                this.onRunningPoweredTick();
-                if (!this.world.isRemote) {
-                    if (!this.waspoweredlasttick) {
-                        this.waspoweredlasttick = true;
-                        this.markDirty();
-                        PacketHandler.sendToNearby(new PacketMachine(this, (byte)NetworkPackets.POWERERROR.ordinal()), this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
-                        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-                    }
-
-                    this.useEnergy(this.usedPowerPerTick());
-                }
-            } else if (!this.world.isRemote && this.waspoweredlasttick) {
-                this.waspoweredlasttick = false;
-                this.markDirty();
-                PacketHandler.sendToNearby(new PacketMachine(this, (byte)NetworkPackets.POWERERROR.ordinal()), this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
-                this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-            }
-        }
-
     }
 
     @Override
@@ -556,34 +507,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         }
     }
 
-    @Override
-    public void readDataFromNetwork(ByteBuf in, byte packetId,
-                                    NBTTagCompound nbt) {
 
-
-        if (packetId == NetworkPackets.POWERERROR.ordinal()) {
-            nbt.setBoolean("waspoweredlasttick", in.readBoolean());
-        } else if (packetId == NetworkPackets.TOGGLE.ordinal()) {
-            nbt.setBoolean("enabled", in.readBoolean());
-        }
-        if (packetId == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
-            radioButton.setOptionSelected(in.readByte());
-        }
-    }
-
-    @Override
-    public void writeDataToNetwork(ByteBuf out, byte id) {
-        if (id == NetworkPackets.POWERERROR.ordinal()) {
-            out.writeBoolean(this.waspoweredlasttick);
-        } else if (id == NetworkPackets.TOGGLE.ordinal()) {
-            out.writeBoolean(this.enabled);
-        }
-
-        if (id == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
-            out.writeByte(radioButton.getOptionSelected());
-        }
-
-    }
     @Override
     public void setMachineEnabled(boolean enabled) {
         super.setMachineEnabled(enabled);
@@ -598,20 +522,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         markDirty();
     }
 
-    @Override
-    public void useNetworkData(EntityPlayer player, Side side, byte id,
-                               NBTTagCompound nbt) {
-        super.useNetworkData(player, side, id, nbt);
-        if (id == NetworkPackets.POWERERROR.ordinal()) {
-            this.waspoweredlasttick = nbt.getBoolean("waspoweredlasttick");
-        }
-        if (!world.isRemote && id == NetworkPackets.TOGGLE.ordinal()) {
-            outOfFluid = false;
-            setMachineRunning(isRunning());
-        }
-
-
-    }
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
