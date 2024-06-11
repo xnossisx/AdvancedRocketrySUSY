@@ -76,7 +76,7 @@ public abstract class SatelliteData extends SatelliteBase {
             collectionTime = 200;
 
         int r=0;
-        if (data.getMaxData() > data.getData()) {
+        if (data.getMaxData() >= data.getData()) {
 
             // all this below is some grade-A bullshit because if you only have a small solar panel you will never get data
 

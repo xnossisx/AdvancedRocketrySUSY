@@ -154,7 +154,7 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
                         moduleText.setText(satellite.getName() + "\n\n" + LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.toofar"));
                     } else if (status == 3) {
                         moduleText.setText(satellite.getName() + "\n\n" + LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.info") + "\n" +
-                                "Power Generation: "+nbt.getInteger("ppt")+"\n"+
+                                "Power gen.: "+nbt.getInteger("ppt")+"\n"+
                                 "Data: "+nbt.getInteger("data") +"/"+nbt.getInteger("maxdata"));
                     }
                 } else
