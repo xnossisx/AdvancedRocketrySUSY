@@ -40,6 +40,7 @@ public class TileStationAltitudeController extends TileEntity implements IModula
         maxGravBuildSpeed = new ModuleText(6, 25, LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.maxaltrate"), 0xaa2020);
         targetGrav = new ModuleText(6, 35, LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.tgtalt"), 0x202020);
         redstoneControl = new ModuleRedstoneOutputButton(174, 4, -1, "", this);
+        redstoneControl.setRedstoneState(RedstoneState.OFF);
     }
 
     @Override
@@ -112,7 +113,7 @@ public class TileStationAltitudeController extends TileEntity implements IModula
 
                     double targetGravity = ((SpaceStationObject) spaceObject).targetOrbitalDistance;
                     double angVel = spaceObject.getOrbitalDistance();
-                    double acc = 0.1 * (getTotalProgress(0) - angVel + 1) / (float) getTotalProgress(0);
+                    double acc = 0.1;//0.1 * (getTotalProgress(0) - angVel + 1) / (float) getTotalProgress(0);
 
                     double difference = targetGravity - angVel;
 
