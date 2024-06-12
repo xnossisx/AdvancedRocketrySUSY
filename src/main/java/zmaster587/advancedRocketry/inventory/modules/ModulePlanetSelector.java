@@ -262,7 +262,14 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
     @SideOnly(Side.CLIENT)
     private void renderPlanets(DimensionProperties planet, int parentOffsetX, int parentOffsetY, int parentRadius, float distanceMultiplier, float planetSizeMultiplier) {
 
-        int displaySize = Math.max((int) (planetSizeMultiplier * planet.gravitationalMultiplier / .02f), 1);
+        int displaySize = 0;
+        if (Objects.equals(planet.customIcon, "void")){
+
+        }else{
+         displaySize = Math.max((int) (planetSizeMultiplier * planet.gravitationalMultiplier / .02f), 1);
+        }
+
+
 
         int offsetX = parentOffsetX + (int) (Math.cos(planet.orbitTheta) * ((planet.orbitalDist * distanceMultiplier) + parentRadius)) - displaySize / 2;
         int offsetY = parentOffsetY + (int) (Math.sin(planet.orbitTheta) * ((planet.orbitalDist * distanceMultiplier) + parentRadius)) - displaySize / 2;

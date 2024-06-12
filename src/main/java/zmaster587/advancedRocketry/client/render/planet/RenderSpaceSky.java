@@ -19,6 +19,8 @@ import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.libVulpes.render.RenderHelper;
 import zmaster587.libVulpes.util.Vector3F;
 
+import java.util.Objects;
+
 public class RenderSpaceSky extends RenderPlanetarySky {
 
     Minecraft mc = Minecraft.getMinecraft();
@@ -139,14 +141,20 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 float f10 = properties.getStar().getSize() * 15f * AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance);
                 //multiplier = 2;
-                buffer.pos(-f10, 100.0D, -f10).tex(0.0D, 0.0D).endVertex();
-                buffer.pos(f10, 100.0D, -f10).tex(1.0D, 0.0D).endVertex();
-                buffer.pos(f10, 100.0D, f10).tex(1.0D, 1.0D).endVertex();
-                buffer.pos(-f10, 100.0D, f10).tex(0.0D, 1.0D).endVertex();
+                GL11.glPushMatrix();
+                GL11.glRotatef(60, -60, 0, 1);
+                GL11.glTranslatef(0, 20, 0);
+                buffer.pos(-f10, 0, -f10).tex(0.0D, 0.0D).endVertex();
+                buffer.pos(f10, 0, -f10).tex(1.0D, 0.0D).endVertex();
+                buffer.pos(f10, 0, f10).tex(1.0D, 1.0D).endVertex();
+                buffer.pos(-f10, 0, f10).tex(0.0D, 1.0D).endVertex();
                 Tessellator.getInstance().draw();
+                GL11.glPopMatrix();
             }
             return;
         }
+        if (Objects.equals(properties.customIcon, "void"))
+            return;
 
 
         float[] atmColor = properties.skyColor;

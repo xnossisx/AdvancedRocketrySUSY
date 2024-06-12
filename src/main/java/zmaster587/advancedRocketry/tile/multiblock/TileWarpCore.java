@@ -65,24 +65,25 @@ public class TileWarpCore extends TileMultiBlock {
         if (getSpaceObject() == null || (getSpaceObject().getMaxFuelAmount() - getSpaceObject().getFuelAmount()) < ARConfiguration.getCurrentConfig().fuelPointsPerDilithium)
             return;
         for (IInventory inv : itemInPorts) {
-            for (int i = 0; i < inv.getSizeInventory(); i++) {
-                ItemStack stack = inv.getStackInSlot(i).copy();
-                stack.setCount(1);
-                int amt = 0;
-                if (!stack.isEmpty() && ZUtils.isItemInOreDict(stack, "gemDilithium")) {
-                    if (!world.isRemote)
-                        amt = getSpaceObject().addFuel(ARConfiguration.getCurrentConfig().fuelPointsPerDilithium);
-                    inv.decrStackSize(i, amt / ARConfiguration.getCurrentConfig().fuelPointsPerDilithium);
-                    inv.markDirty();
+            for (int p = 0; p < 64; p++) { // add multiple dilithium if possible until full
+                for (int i = 0; i < inv.getSizeInventory(); i++) {
+                    ItemStack stack = inv.getStackInSlot(i).copy();
+                    stack.setCount(1);
+                    int amt = 0;
+                    if (!stack.isEmpty() && ZUtils.isItemInOreDict(stack, "gemDilithium")) {
+                        if (!world.isRemote)
+                            amt = getSpaceObject().addFuel(ARConfiguration.getCurrentConfig().fuelPointsPerDilithium);
+                        inv.decrStackSize(i, amt / ARConfiguration.getCurrentConfig().fuelPointsPerDilithium);
+                        inv.markDirty();
 
-                    //If full
-                    if (getSpaceObject().getMaxFuelAmount() - getSpaceObject().getFuelAmount() < ARConfiguration.getCurrentConfig().fuelPointsPerDilithium)
-                        return;
+                        //If full
+                        if (getSpaceObject().getMaxFuelAmount() - getSpaceObject().getFuelAmount() < ARConfiguration.getCurrentConfig().fuelPointsPerDilithium)
+                            return;
+                    }
                 }
             }
         }
     }
-
     @Override
     public String getMachineName() {
         return AdvancedRocketryBlocks.blockWarpCore.getLocalizedName();

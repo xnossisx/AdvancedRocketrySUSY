@@ -36,7 +36,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 public class SpaceStationObject implements ISpaceObject, IPlanetDefiner {
-    private final int MAX_FUEL = 1000;
+    private final int MAX_FUEL = 10000;
     public boolean hasWarpCores = false;
     public int targetOrbitalDistance;
     public int targetGravity;

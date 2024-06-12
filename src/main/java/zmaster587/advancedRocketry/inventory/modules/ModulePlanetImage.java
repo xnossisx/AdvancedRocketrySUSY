@@ -10,6 +10,8 @@ import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 
+import java.util.Objects;
+
 public class ModulePlanetImage extends ModuleBase {
 
     DimensionProperties properties;
@@ -32,8 +34,9 @@ public class ModulePlanetImage extends ModuleBase {
         GL11.glRotated(90, -1, 0, 0);
         //GL11.glTranslatef(xPosition, 100 + this.zLevel, yPosition);
         float newWidth = width / 2f;
-
-        RenderPlanetarySky.renderPlanetPubHelper(vertexbuffer, (properties.isStar()) ? TextureResources.locationSunPng : properties.getPlanetIcon(), (int) (x + this.offsetX + newWidth), (int) (y + this.offsetY + newWidth), -0.1, newWidth, 1f, properties.getSolarTheta(), properties.hasAtmosphere(), properties.skyColor, properties.ringColor, properties.isGasGiant(), properties.hasRings(), properties.hasDecorators(), new float[]{0, 0, 0}, 1f);
+        if (!Objects.equals(properties.customIcon, "void")) {
+            RenderPlanetarySky.renderPlanetPubHelper(vertexbuffer, (properties.isStar()) ? TextureResources.locationSunPng : properties.getPlanetIcon(), (int) (x + this.offsetX + newWidth), (int) (y + this.offsetY + newWidth), -0.1, newWidth, 1f, properties.getSolarTheta(), properties.hasAtmosphere(), properties.skyColor, properties.ringColor, properties.isGasGiant(), properties.hasRings(), properties.hasDecorators(), new float[]{0, 0, 0}, 1f);
+        }
         GL11.glPopMatrix();
     }
 
