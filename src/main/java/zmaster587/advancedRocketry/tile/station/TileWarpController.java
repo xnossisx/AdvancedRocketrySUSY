@@ -99,7 +99,7 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
                 return Integer.MAX_VALUE;
 
             if (destProperties.getStar() != properties.getStar())
-                return 5000;
+                return 1000;
 
             while (destProperties.getParentProperties() != null && destProperties.isMoon())
                 destProperties = destProperties.getParentProperties();
@@ -478,7 +478,7 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
             final SpaceStationObject station = getSpaceObject();
 
             if (station != null && !station.isAnchored() && station.hasUsableWarpCore() && meetsArtifactReq(DimensionManager.getInstance().getDimensionProperties(station.getDestOrbitingBody())) && station.useFuel(getTravelCost()) != 0) {
-                SpaceObjectManager.getSpaceManager().moveStationToBody(station, station.getDestOrbitingBody(), Math.max(Math.min(getTravelCost() * 5, 5000), 0));
+                SpaceObjectManager.getSpaceManager().moveStationToBody(station, station.getDestOrbitingBody(), Math.max(Math.min(getTravelCost() * 1, 1000), 0));
 
                 for (EntityPlayer player2 : world.getPlayers(EntityPlayer.class, input -> SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(input.getPosition()) == station)) {
                     ARAdvancements.ALL_SHE_GOT.trigger((EntityPlayerMP) player2);
