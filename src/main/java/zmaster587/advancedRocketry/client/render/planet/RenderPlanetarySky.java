@@ -27,6 +27,7 @@ import zmaster587.libVulpes.util.Vector3F;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 
 public class RenderPlanetarySky extends IRenderHandler {
@@ -332,7 +333,8 @@ public class RenderPlanetarySky extends IRenderHandler {
                     travelDirection = station.getForwardDirection();
                 }
             }
-        } else if (DimensionManager.getInstance().isDimensionCreated(mc.world.provider.getDimension())) {
+        }
+        else if (DimensionManager.getInstance().isDimensionCreated(mc.world.provider.getDimension())) {
 
             properties = DimensionManager.getInstance().getDimensionProperties(mc.world.provider.getDimension());
 
@@ -378,7 +380,8 @@ public class RenderPlanetarySky extends IRenderHandler {
                     travelDirection = station.getForwardDirection();
                 }
             }
-        } else {
+        }
+        else {
             children = new LinkedList<>();
             isMoon = false;
             atmosphere = DimensionManager.overworldProperties.getAtmosphereDensityAtHeight(mc.getRenderViewEntity().posY);
@@ -561,7 +564,9 @@ public class RenderPlanetarySky extends IRenderHandler {
                     GL11.glPopMatrix();
                 }
                 //GL11.glTranslated(((System.currentTimeMillis()/10) + 50) % 100, 0, 0);
+
             } else {
+
                 GL11.glCallList(this.starGLCallList);
                 //Extra stars for low ATM
                 if (atmosphere < 0.5) {
@@ -579,6 +584,7 @@ public class RenderPlanetarySky extends IRenderHandler {
                     GL11.glPopMatrix();
                 }
                 GlStateManager.color(f18, f18, f18, f18);
+
             }
             GL11.glPopMatrix();
         }
@@ -586,9 +592,7 @@ public class RenderPlanetarySky extends IRenderHandler {
 
         //--------------------------- Draw the suns --------------------
         if (!isWarp) {
-            //Set sun color and distance
             drawStarAndSubStars(buffer, primaryStar, properties, solarOrbitalDistance, sunSize, sunColor, multiplier);
-
         }
 
         //Useful celestial angle for the next renders
@@ -679,7 +683,7 @@ public class RenderPlanetarySky extends IRenderHandler {
                     shadowColorMultiplier = afloat;
                     shadowColorMultiplier = new float[]{shadowColorMultiplier[0] * (1 - multiplier) + f1 * multiplier, shadowColorMultiplier[1] * (1 - multiplier) + f2 * multiplier, shadowColorMultiplier[2] * (1 - multiplier) + f3 * multiplier};
                 }
-
+                //System.out.println("draw moon (renderplanet");
                 renderPlanet(buffer, parentProperties, planetOrbitalDistance, multiplier, rotation, false, false, (float) Math.pow(parentProperties.getGravitationalMultiplier(), 0.4), shadowColorMultiplier, alpha2);
                 GL11.glPopMatrix();
             }
@@ -714,7 +718,6 @@ public class RenderPlanetarySky extends IRenderHandler {
                     shadowColorMultiplier = afloat;
                     shadowColorMultiplier = new float[]{shadowColorMultiplier[0] * (1 - multiplier) + f1 * multiplier, shadowColorMultiplier[1] * (1 - multiplier) + f2 * multiplier, shadowColorMultiplier[2] * (1 - multiplier) + f3 * multiplier};
                 }
-
                 renderPlanet(buffer, moons, moons.getParentOrbitalDistance(), multiplier, rotation, moons.hasAtmosphere(), moons.hasRings, (float) Math.pow(moons.gravitationalMultiplier, 0.4), shadowColorMultiplier, alpha2);
                 GL11.glPopMatrix();
             }
@@ -846,21 +849,55 @@ public class RenderPlanetarySky extends IRenderHandler {
             GlStateManager.depthMask(true);
             GlStateManager.enableAlpha();
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01f);
-            mc.renderEngine.bindTexture(TextureResources.locationBlackHole);
+            float f10;
+            GL11.glDisable(GL11.GL_BLEND);
 
             GL11.glPushMatrix();
+            mc.renderEngine.bindTexture(TextureResources.locationBlackHole);
             GL11.glTranslatef(0, 100, 0);
-            float phase = -(System.currentTimeMillis() % 3600) / 3600f;
-            float scale = 1 + (float) Math.sin(phase * 3.14) * 0.1f;
-            phase *= 360f;
+            float phase =  -((float)System.currentTimeMillis()/(float)3000.0);
+            float scale = 1 ;
+            phase *= 36f;
             GL11.glRotatef(phase, 0, 1, 0);
 
+            GL11.glScaled(scale, scale, scale);
+
+
+            //Set sun color and distance
+            GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            f10 = sunSize * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
+
+            //multiplier = 2;
+            buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
+            buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
+            buffer.pos(f10, 0.0D, f10).tex(1.0D, 1.0D).endVertex();
+            buffer.pos(-f10, 0.0D, f10).tex(0.0D, 1.0D).endVertex();
+
+
+
+
+            Tessellator.getInstance().draw();
+            GL11.glPopMatrix();
+
+
+            GL11.glEnable(GL11.GL_BLEND);
+            GL11.glDepthMask(false);
+
+            GL11.glPushMatrix();
+            mc.renderEngine.bindTexture(TextureResources.locationBlackHoleBorder);
+            GL11.glTranslatef( 0, 99.8F, 0);
+
+            GL11.glRotatef(phase, 0, 1, 0);
+
+            scale *= 1.1;
             GL11.glScaled(scale, scale, scale);
 
             //Set sun color and distance
             GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-            float f10 = sunSize * 2.5f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
+            f10 = sunSize * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
+            //multiplier = 2;
             buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
             buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
             buffer.pos(f10, 0.0D, f10).tex(1.0D, 1.0D).endVertex();
@@ -873,7 +910,7 @@ public class RenderPlanetarySky extends IRenderHandler {
             mc.renderEngine.bindTexture(TextureResources.locationAccretionDisk);
             GlStateManager.depthMask(false);
             for (int i = 0; i < 3; i++) {
-                float speedMult = (i) * 1.01f + 1;
+                float speedMult = ((i) * 1.01f + 1)/0.1F;
                 GL11.glPushMatrix();
                 GL11.glTranslatef(0, 100, 0);
                 GL11.glRotatef(80, -1, 1, 0);
@@ -881,7 +918,7 @@ public class RenderPlanetarySky extends IRenderHandler {
 
                 GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                f10 = sunSize * 20f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
+                f10 = sunSize * 40f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
                 buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
                 buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
                 buffer.pos(f10, 0.0D, f10).tex(1.0D, 1.0D).endVertex();
@@ -897,7 +934,7 @@ public class RenderPlanetarySky extends IRenderHandler {
 
                 GlStateManager.color((float) 0.8, (float) .7, (float) .4, 1f);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                f10 = sunSize * 15f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
+                f10 = sunSize * 30f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
                 //multiplier = 2;
                 buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
                 buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
@@ -914,7 +951,7 @@ public class RenderPlanetarySky extends IRenderHandler {
 
                 GlStateManager.color((float) 0.2, (float) .4, (float) 1, 1f);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                f10 = sunSize * 7.5f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
+                f10 = sunSize * 15f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
                 //multiplier = 2;
                 buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
                 buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
