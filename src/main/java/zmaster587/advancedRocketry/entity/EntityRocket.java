@@ -1879,6 +1879,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     @Override
     public void readDataFromNetwork(ByteBuf in, byte packetId,
                                     NBTTagCompound nbt) {
+        //System.out.println("rocket read from network");
+
         if (packetId == PacketType.RECIEVENBT.ordinal()) {
             storage = new StorageChunk();
             storage.setEntity(this);
