@@ -123,6 +123,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         rocket.launchDirection = EnumFacing.DOWN;
 
         //Change engine direction
+        //Maybe also change fluid tank direction?
         for (int x = 0; x < storageChunk.getSizeX(); x++) {
             for (int y = 0; y < storageChunk.getSizeY(); y++) {
                 for (int z = 0; z < storageChunk.getSizeZ(); z++) {
@@ -131,6 +132,9 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                     if (storageChunk.getBlockState(pos3).getBlock() instanceof BlockRocketMotor) {
                         storageChunk.setBlockState(pos3, storageChunk.getBlockState(pos3).withProperty(BlockFullyRotatable.FACING, rocket.forwardDirection));
                     }
+                    //if (storageChunk.getBlockState(pos3).getBlock() instanceof BlockFuelTank) {
+                    //    storageChunk.setBlockState(pos3, storageChunk.getBlockState(pos3).withProperty(BlockFullyRotatable.FACING, rocket.forwardDirection));
+                    //}
                 }
             }
         }

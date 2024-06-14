@@ -135,7 +135,9 @@ public class TileFuelingStation extends TileInventoriedRFConsumerTank implements
 
     @Override
     public boolean canPerformFunction() {
-        return linkedRocket != null && (tank.getFluid() != null && tank.getFluidAmount() > 9 && canRocketFitFluid(tank.getFluid().getFluid()));
+        boolean v = linkedRocket != null && (tank.getFluid() != null && tank.getFluidAmount() > 9 && canRocketFitFluid(tank.getFluid().getFluid()));
+        //System.out.println(v);
+        return v;
     }
 
     @Override
