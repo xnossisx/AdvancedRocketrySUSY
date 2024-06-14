@@ -44,7 +44,7 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
     ModuleText missionText;
     RedstoneState state;
     ModuleRedstoneOutputButton redstoneControl;
-
+    boolean was_powered = false;
     int rocketHeight;
     int velocity;
     int fuelLevel, maxFuelLevel;
@@ -83,9 +83,7 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
 
     @Override
     public void onAdjacentBlockUpdated() {
-        if (!world.isRemote && getEquivalentPower() && linkedRocket != null) {
-            linkedRocket.prepareLaunch();
-        }
+
     }
 
     @Override
@@ -100,6 +98,16 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
                 if ((int) (15 * ((EntityRocket) linkedRocket).getRelativeHeightFraction()) != (int) (15 * ((EntityRocket) linkedRocket).getPreviousRelativeHeightFraction())) {
                     markDirty();
                 }
+                if (getEquivalentPower() && linkedRocket != null) {
+                    if (!was_powered) {
+                        linkedRocket.prepareLaunch();
+                        //System.out.println("launching...");
+                        was_powered = true;
+                    }
+                }
+            }
+            if(!getEquivalentPower()){
+                was_powered = false; //
             }
         }
     }
@@ -156,7 +164,7 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
 
         state = RedstoneState.values()[nbt.getByte("redstoneState")];
         redstoneControl.setRedstoneState(state);
-
+        was_powered = nbt.getBoolean("was_powered");
 
         if (nbt.hasKey("missionID")) {
             long id = nbt.getLong("missionID");
@@ -173,6 +181,7 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setByte("redstoneState", (byte) state.ordinal());
+        nbt.setBoolean("was_powered", was_powered);
         if (mission != null) {
             nbt.setLong("missionID", mission.getMissionId());
             nbt.setInteger("missionDimId", mission.getOriginatingDimension());
