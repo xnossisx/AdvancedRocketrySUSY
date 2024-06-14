@@ -966,6 +966,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             if (satellite.isDead()) {
                 iterator.remove();
                 satellites.remove(satellite.getId());
+                break;//avoid  java.util.ConcurrentModificationException
             }
         }
         updateOrbit();
