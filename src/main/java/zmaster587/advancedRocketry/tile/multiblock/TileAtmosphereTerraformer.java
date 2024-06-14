@@ -46,6 +46,7 @@ import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine.NetworkPackets;
 import zmaster587.libVulpes.util.EmbeddedInventory;
 import zmaster587.libVulpes.util.HashedBlockPosition;
+import zmaster587.libVulpes.util.INetworkMachine;
 import zmaster587.libVulpes.util.IconResource;
 
 import javax.annotation.Nonnull;
@@ -53,7 +54,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
-public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
+public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements INetworkMachine {
 
     private static final Object[][][] structure = new Object[][][]{
             {{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
@@ -276,7 +277,9 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     private ModuleText text;
     //private EmbeddedInventory inv;
     private boolean outOfFluid;
+    private boolean was_outOfFluid_last_tick;
     private int last_mode;
+    int requiredN2 = 0, requiredO2 = 0;
     //private boolean had_linker_last_tick;
     public TileAtmosphereTerraformer() {
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
@@ -291,8 +294,8 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         radioButton = new ModuleRadioButton(this, buttons);
         //inv = new EmbeddedInventory(1);
         outOfFluid = false;
+        was_outOfFluid_last_tick = false;
         last_mode = radioButton.getOptionSelected();
-        //had_linker_last_tick = false;
     }
 
     private int getCompletionTime() {
@@ -329,13 +332,12 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
     private void setText() {
 
         String statusText;
-        //ItemStack biomeChanger = inv.getStackInSlot(0);
-        if (isRunning())
-            statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.running");
-        //else if (!hasValidBiomeChanger())
-            //statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.missingbiome");
-        else if (outOfFluid)
+
+        if (outOfFluid)
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.outofgas");
+
+        else if (isRunning())
+            statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.running");
         else
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.notrunning");
 
@@ -355,11 +357,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
 
     @Override
     protected void onRunningPoweredTick() {
-        super.onRunningPoweredTick();
 
 
 
-        if (world.isRemote) {
+        if (world.isRemote && !outOfFluid) {
             if (Minecraft.getMinecraft().gameSettings.particleSetting < 2) {
                 EnumFacing dir = RotatableBlock.getFront(world.getBlockState(pos)).getOpposite();
 
@@ -390,12 +391,16 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
             return;
 
         if (!world.isRemote) {
-            if (last_mode != radioButton.getOptionSelected()){
+            if (last_mode != radioButton.getOptionSelected()) {
                 last_mode = radioButton.getOptionSelected();
-                this.setProgress(0,0);
+                this.setProgress(0, 0);
             }
             if (radioButton.getOptionSelected() == 0) {
-                int requiredN2 = ARConfiguration.getCurrentConfig().terraformliquidRate, requiredO2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
+
+                if (requiredN2 == 0)
+                    requiredN2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
+                if (requiredO2 == 0)
+                    requiredO2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
 
                 for (IFluidHandler handler : fluidInPorts) {
                     FluidStack fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidNitrogen, requiredN2), true);
@@ -412,21 +417,43 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
 
                 if (requiredN2 != 0 || requiredO2 != 0) {
                     outOfFluid = true;
-                    this.setMachineEnabled(false);
-                    this.setMachineRunning(false);
-                    markDirty();
+                    if (!was_outOfFluid_last_tick){
+                        was_outOfFluid_last_tick = true;
+                        PacketHandler.sendToNearby(new PacketMachine(this, (byte)23),world.provider.getDimension(),pos,256.0);
+                    }
+
+                    //this.setMachineEnabled(false);
+                    //this.setMachineRunning(false);
+                    //markDirty();
+                } else {
+                    outOfFluid = false;
+                    if (was_outOfFluid_last_tick){
+                        was_outOfFluid_last_tick = false;
+                        PacketHandler.sendToNearby(new PacketMachine(this, (byte)23),world.provider.getDimension(),pos,256.0);
+                    }
                 }
             }
-            /*
-            if (!hasValidBiomeChanger()) {
-                this.setMachineEnabled(false);
-                this.setMachineRunning(false);
-                markDirty();
+            else{
+                outOfFluid = false;
+                if (was_outOfFluid_last_tick){
+                    was_outOfFluid_last_tick = false;
+                    PacketHandler.sendToNearby(new PacketMachine(this, (byte)23),world.provider.getDimension(),pos,256.0);
+                }
             }
-             */
+        }
+
+        if (!outOfFluid) {
+            /////////from the super method
+            if (!world.isRemote)
+                useEnergy(powerPerTick);
+            //Increment for both client and server
+            currentTime++;
+
+            if (currentTime == completionTime)
+                processComplete();
+            /////////from the super method
         }
     }
-
     public SoundEvent getSound() {
         return AudioRegistry.machineLarge;
     }
@@ -514,6 +541,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
         if (packetId == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
             radioButton.setOptionSelected(in.readByte());
         }
+
+        if (packetId == (byte) 23){
+            nbt.setBoolean("outOfFluid", in.readBoolean());
+        }
     }
 
     @Override
@@ -522,6 +553,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
 
         if (id == (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()) {
             out.writeByte(radioButton.getOptionSelected());
+        }
+
+        if (id == (byte) 23){
+            out.writeBoolean(outOfFluid);
         }
 
     }
@@ -549,6 +584,9 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer {
             setMachineRunning(isRunning());
         }
 
+        if(world.isRemote && id == (byte) 23) {
+           this.outOfFluid = nbt.getBoolean("outOfFluid");
+        }
 
     }
 
