@@ -193,7 +193,12 @@ public class DimensionManager implements IGalaxy {
         for (int i : DimensionManager.getInstance().getLoadedDimensions()) {
             DimensionProperties prop = DimensionManager.getInstance().getDimensionProperties(i);
             prop.tick();
-            PacketHandler.sendToAll(new PacketSatellitesUpdate(i, prop));
+
+            //THIS CODE NEEDS TO BE MADE MORE EFFICIENT FOR MINING ROCKETS!!!!!
+            if (net.minecraftforge.common.DimensionManager.getWorld(0).getTotalWorldTime() % 100 == 0)
+                PacketHandler.sendToAll(new PacketSatellitesUpdate(i, prop));
+
+
         }
     }
 
