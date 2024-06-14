@@ -32,6 +32,7 @@ import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.mission.MissionGasCollection;
 import zmaster587.advancedRocketry.network.PacketSatellite;
+import zmaster587.advancedRocketry.network.PacketSatellitesUpdate;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.util.AudioRegistry;
 import zmaster587.advancedRocketry.util.StorageChunk;
@@ -103,9 +104,12 @@ public class EntityStationDeployedRocket extends EntityRocket {
     @Override
     public void launch() {
 
-        if (isInFlight())
-            return;
+        if (world.isRemote) return;
 
+        if (isInFlight()) {
+            //System.out.println("error in flight");
+            return;
+        }
 
         if (isInOrbit()) {
             setInFlight(true);
@@ -115,7 +119,9 @@ public class EntityStationDeployedRocket extends EntityRocket {
             return;
 
         ISpaceObject spaceObj;
-        if (world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId && (spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(getPosition())) != null && spaceObj.getProperties().getParentProperties().isGasGiant()) { //Abort if destination is invalid
+        if (world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId &&
+                (spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(getPosition())) != null &&
+                spaceObj.getProperties().getParentProperties().isGasGiant()) { //Abort if destination is invalid
 
 
             setInFlight(true);
@@ -221,7 +227,9 @@ public class EntityStationDeployedRocket extends EntityRocket {
 
                 }
 
-                if (this.posY > launchLocation.y) {
+                // what if the rocket touches the top structure towers? it would stay in flight forever
+
+                if (this.posY + 0.1 >= launchLocation.y) {
                     if (!world.isRemote) {
                         this.setInFlight(false);
                         this.setInOrbit(false);
@@ -302,7 +310,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
         }
         modules.add(new ModuleButton(170, 114, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonLeft, 5, 8));
         modules.add(atmText);
-        //modules.add(new ModuleButton(240, 114, 2, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight, 5, 8));
+        modules.add(new ModuleButton(240, 114, 2, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight, 5, 8));
 
         return modules;
     }
@@ -340,7 +348,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
             default:
                 super.onInventoryButtonPressed(buttonId);
         }
-        openGui(Minecraft.getMinecraft().player);
+        //openGui(Minecraft.getMinecraft().player);
     }
 
 
@@ -349,6 +357,8 @@ public class EntityStationDeployedRocket extends EntityRocket {
      */
     public void onOrbitReached() {
         //make it 30 minutes with one drill
+
+        if (world.isRemote)System.out.println("this code should not run on client side!");
 
         if (this.isDead)
             return;
@@ -380,9 +390,9 @@ public class EntityStationDeployedRocket extends EntityRocket {
         miningMission.setDimensionId(properties.getId());
         properties.addSatellite(miningMission);
 
-        if (!world.isRemote)
+        if (!world.isRemote) {
             PacketHandler.sendToAll(new PacketSatellite(miningMission));
-
+        }
         for (IInfrastructure i : connectedInfrastructure) {
             i.linkMission(miningMission);
         }
@@ -442,8 +452,8 @@ public class EntityStationDeployedRocket extends EntityRocket {
 
                 if (!world.isRemote)
                     PacketHandler.sendToNearby(new PacketEntity(this, (byte) PacketType.MENU_CHANGE.ordinal()), world.provider.getDimension(), (int) posX, (int) posY, (int) posZ, 64d);
-                else
-                    atmText.setText(props.getHarvestableGasses().get(gasId).getLocalizedName(new FluidStack(AtmosphereRegister.getInstance().getHarvestableGasses().get(gasId), 1)));
+                else//index out of bounds somewhere here
+                    atmText.setText(props.getHarvestableGasses().get(gasId).getLocalizedName(new FluidStack(props.getHarvestableGasses().get(gasId), 1)));
             }
         } else
             super.useNetworkData(player, side, id, nbt);
