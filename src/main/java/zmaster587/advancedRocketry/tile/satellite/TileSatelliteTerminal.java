@@ -122,9 +122,11 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
     public void update() {
         super.update();
 
-        //update satellite for players nearby
-        if ((world.getTotalWorldTime() % 20) == 0) {
-            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 22),world.provider.getDimension(),pos,16);
+        if (!world.isRemote) {
+            //update satellite for players nearby
+            if ((world.getTotalWorldTime() % 20) == 0) {
+                PacketHandler.sendToNearby(new PacketMachine(this, (byte) 22), world.provider.getDimension(), pos, 16);
+            }
         }
     }
 
