@@ -94,7 +94,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             return null;
         }
 
-        return new AxisAlignedBB(xMin, yCurrent, zMin, xMax, yCurrent + yMax - 1, zMax);
+        return new AxisAlignedBB(xMin-1, yCurrent-1, zMin-1, xMax+1, yCurrent + yMax - 1+1, zMax+1); // numerical effects when comparing with rocketposition? increase box by 1 on each side
     }
 
     public void assembleRocket() {
