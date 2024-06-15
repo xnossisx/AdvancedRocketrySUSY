@@ -94,7 +94,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             return null;
         }
 
-        return new AxisAlignedBB(xMin-1, yCurrent-1, zMin-1, xMax+1, yCurrent + yMax - 1+1, zMax+1); // numerical effects when comparing with rocketposition? increase box by 1 on each side
+        return new AxisAlignedBB(xMin, yCurrent, zMin, xMax, yCurrent + yMax - 1, zMax);
     }
 
     public void assembleRocket() {
@@ -230,7 +230,9 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                                     monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
                                     thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currPos);
                                 }
-                                stats.addEngineLocation(xCurr - actualMinX - ((actualMaxX - actualMinX) / 2f), yCurr - actualMinY, zCurr - actualMinZ - ((actualMaxZ - actualMinZ) / 2f));
+
+                                stats.addEngineLocation(xCurr - actualMinX - ((float)(actualMaxX - actualMinX) / 2f), yCurr - actualMinY, zCurr - actualMinZ - ((float)(actualMaxZ - actualMinZ) / 2f));
+                                //stats.addEngineLocation(xCurr - actualMinX, yCurr - actualMinY, zCurr - actualMinZ);
                             }
 
                             if (block instanceof IFuelTank) {

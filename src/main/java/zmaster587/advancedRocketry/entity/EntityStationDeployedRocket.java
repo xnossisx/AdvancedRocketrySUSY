@@ -10,6 +10,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
@@ -54,6 +55,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
     public EnumFacing launchDirection;
     public EnumFacing forwardDirection;
     public HashedBlockPosition launchLocation;
+    public Vec3d actualLaunchLocation;
     boolean coastMode;
     private ModuleText atmText;
     private short gasId;
@@ -63,6 +65,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
         super(world);
         launchDirection = EnumFacing.DOWN;
         launchLocation = new HashedBlockPosition(0, 0, 0);
+        actualLaunchLocation = new Vec3d(0, 0, 0);
         atmText = new ModuleText(182, 114, "", 0x2d2d2d);
         gasId = 0;
         ticket = null;
@@ -70,6 +73,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
 
     public EntityStationDeployedRocket(World world, StorageChunk storage, StatsRocket stats, double x, double y, double z) {
         super(world, storage, stats, x, y, z);
+        actualLaunchLocation = new Vec3d(x, y, z);
         launchLocation = new HashedBlockPosition((int) x, (int) y, (int) z);
         launchDirection = EnumFacing.DOWN;
         stats.setSeatLocation(-1, -1, -1); //No seats
@@ -164,7 +168,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
 
             boolean burningFuel = isBurningFuel();
 
-            if (launchLocation == null || storage == null)
+            if (launchLocation == null || storage == null ||actualLaunchLocation == null)
                 return;
 
             //Grab a ticket when we take off
@@ -177,7 +181,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
                 }
             }
 
-            boolean isCoasting = Math.abs(this.posX - launchLocation.x) < 4 * storage.getSizeX() && Math.abs(this.posY - launchLocation.y) < 4 * storage.getSizeY() && Math.abs(this.posZ - launchLocation.z) < 4 * storage.getSizeZ();
+            boolean isCoasting = Math.abs(this.posX - actualLaunchLocation.x) < 4 * storage.getSizeX() && Math.abs(this.posY - actualLaunchLocation.y) < 4 * storage.getSizeY() && Math.abs(this.posZ - actualLaunchLocation.z) < 4 * storage.getSizeZ();
 
             if (!isCoasting) {
                 //Burn the rocket fuel
@@ -186,15 +190,28 @@ public class EntityStationDeployedRocket extends EntityRocket {
                 if (world.isRemote && Minecraft.getMinecraft().gameSettings.particleSetting < 2) {
                     for (Vector3F<Float> vec : stats.getEngineLocations()) {
 
-                        float xMult = Math.abs(forwardDirection.getFrontOffsetX());
-                        float zMult = Math.abs(forwardDirection.getFrontOffsetZ());
+                        float xMult = forwardDirection.getFrontOffsetX();
+                        float zMult = forwardDirection.getFrontOffsetZ();
                         float xVel, zVel;
 
                         for (int i = 0; i < 4; i++) {
-                            xVel = (1 - xMult) * ((this.rand.nextFloat() - 0.5f) / 8f) + xMult * -.15f;
-                            zVel = (1 - zMult) * ((this.rand.nextFloat() - 0.5f) / 8f) + zMult * -.15f;
+                            xVel = (1 - Math.abs(xMult)) * ((this.rand.nextFloat() - 0.5f) / 8f) + xMult * -.15f;
+                            zVel = (1 - Math.abs(zMult)) * ((this.rand.nextFloat() - 0.5f) / 8f) + zMult * -.15f;
 
-                            AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x + motionX, this.posY + vec.y, this.posZ + vec.z, xVel, (this.rand.nextFloat() - 0.5f) / 8f, zVel + motionZ);
+
+                            //TODO offset particles by 0.5 if rocket is not centered on one block
+                            //double ox = (storage.getSizeX() % 2 == 0 ? 0.5 : 0);
+                            //double oz = (storage.getSizeZ() % 2 == 0 ? 0.5 : 0);
+                            double ox = 0;
+                            double oz = 0;
+                            double oy = 0.5;
+                            //System.out.println(vec.x+":"+vec.z);
+
+                            if (isInOrbit())
+                                AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x - xMult+ox, this.posY + vec.y+oy, this.posZ + vec.z- zMult+oz, xVel+xMult*0.5, (this.rand.nextFloat() - 0.5f) / 8f, zVel+zMult*0.5);
+                            else
+                                AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x - xMult+ox, this.posY + vec.y+oy, this.posZ + vec.z - zMult+oz, xVel, (this.rand.nextFloat() - 0.5f) / 8f, zVel);
+
 
                         }
                     }
@@ -208,28 +225,29 @@ public class EntityStationDeployedRocket extends EntityRocket {
             //Returning
             if (isInOrbit()) { //For unmanned rockets
                 EnumFacing dir;
-                isCoasting = Math.abs(this.posX - launchLocation.x - (storage.getSizeX() % 2 == 0 ? 0 : 0.5f)) < 0.01 && Math.abs(this.posZ - launchLocation.z - (storage.getSizeZ() % 2 == 0 ? 0 : 0.5f)) < .01;
+                isCoasting = Math.abs(this.posX - actualLaunchLocation.x) < 0.01 && Math.abs(this.posZ - actualLaunchLocation.z) < 0.01;
 
                 if (isCoasting) {
                     dir = launchDirection.getOpposite();
-                    float speed = 0.075f;
+                    float speed = 0.02f;
                     motionX = speed * dir.getFrontOffsetX();
                     motionY = speed * dir.getFrontOffsetY();
                     motionZ = speed * dir.getFrontOffsetZ();
                 } else {
                     dir = forwardDirection.getOpposite();
 
-                    float acc = 0.01f;
+                    float acc = 0.005f;
 
-                    motionX = acc * (launchLocation.x - this.posX + (storage.getSizeX() % 2 == 0 ? 0 : 0.5f)) + 0.01 * dir.getFrontOffsetX();
+                    motionX = acc * (actualLaunchLocation.x - this.posX) + 0.005 * dir.getFrontOffsetX();
                     motionY = 0;//acc*(launchLocation.y - this.posY) + 0.01*dir.offsetY;
-                    motionZ = acc * (launchLocation.z - this.posZ + (storage.getSizeZ() % 2 == 0 ? 0 : 0.5f)) + 0.01 * dir.getFrontOffsetZ();
+                    motionZ = acc * (actualLaunchLocation.z - this.posZ) + 0.005 * dir.getFrontOffsetZ();
 
+                    //setFuelAmount(getRocketFuelType(), getFuelAmount(getRocketFuelType()) - 1);
                 }
 
                 // what if the rocket touches the top structure towers? it would stay in flight forever
 
-                if (this.posY + 0.1 >= launchLocation.y) {
+                if (this.posY + 0.1 >= actualLaunchLocation.y) {
                     if (!world.isRemote) {
                         this.setInFlight(false);
                         this.setInOrbit(false);
@@ -246,24 +264,24 @@ public class EntityStationDeployedRocket extends EntityRocket {
                     }
 
                     this.motionY = 0;
-                    this.setPosition(launchLocation.x + (storage.getSizeX() % 2 == 0 ? 0 : 0.5f), launchLocation.y, launchLocation.z + (storage.getSizeZ() % 2 == 0 ? 0 : 0.5f));
+                    this.setPosition(actualLaunchLocation.x, actualLaunchLocation.y, actualLaunchLocation.z);
                 }
             } else {
                 //Move out 4x the size of the rocket
                 //Coast away from the station
                 if (isCoasting) {
-                    float speed = 0.01f;//(float)Math.min(0.2f, Math.abs(motionY) + 0.0001f);
-                    motionX = speed * launchDirection.getFrontOffsetX() * (2.1 * storage.getSizeX() - Math.abs(2 * storage.getSizeX() - Math.abs(this.posX - launchLocation.x)) + 0.05);
-                    motionY = speed * launchDirection.getFrontOffsetY() * (2.1 * storage.getSizeY() - Math.abs(2 * storage.getSizeY() - Math.abs(this.posY - launchLocation.y)) + 0.05);
-                    motionZ = speed * launchDirection.getFrontOffsetZ() * (2.1 * storage.getSizeZ() - Math.abs(2 * storage.getSizeZ() - Math.abs(this.posZ - launchLocation.z)) + 0.05);
+                    float speed = 0.02F;//(float)Math.min(0.2f, Math.abs(motionY) + 0.0001f);
+                    motionX = speed * launchDirection.getFrontOffsetX() * (2.1 * storage.getSizeX() - Math.abs(2 * storage.getSizeX() - Math.abs(this.posX - actualLaunchLocation.x)) + 0.05);
+                    motionY = speed * launchDirection.getFrontOffsetY() * (2.1 * storage.getSizeY() - Math.abs(2 * storage.getSizeY() - Math.abs(this.posY - actualLaunchLocation.y)) + 0.05);
+                    motionZ = speed * launchDirection.getFrontOffsetZ() * (2.1 * storage.getSizeZ() - Math.abs(2 * storage.getSizeZ() - Math.abs(this.posZ - actualLaunchLocation.z)) + 0.05);
                 } else {
-                    float acc = 0.01f;
+                    float acc = 0.005f;
                     motionX += acc * forwardDirection.getFrontOffsetX();
                     motionY += acc * forwardDirection.getFrontOffsetY();
                     motionZ += acc * forwardDirection.getFrontOffsetZ();
-
+                    setFuelAmount(getRocketFuelType(), getFuelAmount(getRocketFuelType()) - 1);
                 }
-                if (!world.isRemote && this.getDistance(launchLocation.x, launchLocation.y, launchLocation.z) > 128) {
+                if (!world.isRemote && this.getDistance(actualLaunchLocation.x, actualLaunchLocation.y, actualLaunchLocation.z) > 128) {
 
 
                     //Release ticket on landing
@@ -367,7 +385,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
         ISpaceObject spaceObj;
         setInOrbit(true);
         if (world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId && ((spaceObj = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.getPosition())) != null && spaceObj.getProperties().getParentProperties().isGasGiant())) { //Abort if destination is invalid
-            this.setPosition(forwardDirection.getFrontOffsetX() * 64d + this.launchLocation.x + (storage.getSizeX() % 2 == 0 ? 0 : 0.5d), posY, forwardDirection.getFrontOffsetZ() * 64d + this.launchLocation.z + (storage.getSizeZ() % 2 == 0 ? 0 : 0.5d));
+            this.setPosition(forwardDirection.getFrontOffsetX() * 64d + this.actualLaunchLocation.x, posY, forwardDirection.getFrontOffsetZ() * 64d + this.actualLaunchLocation.z);
         } else {
             setInOrbit(true);
             return;
@@ -469,6 +487,11 @@ public class EntityStationDeployedRocket extends EntityRocket {
         nbt.setInteger("launchY", launchLocation.y);
         nbt.setInteger("launchZ", launchLocation.z);
 
+        nbt.setDouble("AlaunchX", actualLaunchLocation.x);
+        nbt.setDouble("AlaunchY", actualLaunchLocation.y);
+        nbt.setDouble("AlaunchZ", actualLaunchLocation.z);
+
+
         nbt.setShort("gas", gasId);
     }
 
@@ -480,6 +503,12 @@ public class EntityStationDeployedRocket extends EntityRocket {
         launchLocation.x = nbt.getInteger("launchX");
         launchLocation.y = (short) nbt.getInteger("launchY");
         launchLocation.z = nbt.getInteger("launchZ");
+
+        double ax = nbt.getDouble("AlaunchX");
+        double ay = nbt.getDouble("AlaunchY");
+        double az = nbt.getDouble("AlaunchZ");
+        actualLaunchLocation = new Vec3d(ax, ay, az);
+
         gasId = nbt.getShort("gas");
     }
 }
