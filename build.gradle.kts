@@ -36,6 +36,7 @@ setProperty("archivesBaseName", archiveBase)
 val buildNumber: String by lazy { System.getenv("BUILD_NUMBER") ?: getDate() }
 
 fun getDate(): String {
+    return "1"
     val format = SimpleDateFormat("HH-mm-dd-MM-yyyy")
     format.timeZone = TimeZone.getTimeZone("UTC")
     return format.format(Date())
