@@ -592,7 +592,8 @@ public class RenderPlanetarySky extends IRenderHandler {
 
         //--------------------------- Draw the suns --------------------
         if (!isWarp) {
-            drawStarAndSubStars(buffer, primaryStar, properties, solarOrbitalDistance, sunSize, sunColor, multiplier);
+            if (parentProperties == null || !parentProperties.isStar())
+                drawStarAndSubStars(buffer, primaryStar, properties, solarOrbitalDistance, sunSize, sunColor, multiplier);
         }
 
         //Useful celestial angle for the next renders
@@ -852,18 +853,16 @@ public class RenderPlanetarySky extends IRenderHandler {
             float f10;
             GL11.glDisable(GL11.GL_BLEND);
 
+
+            //float phase =  -((float)System.currentTimeMillis()/(float)3000.0);
+            //phase *= 36f;
+
             GL11.glPushMatrix();
             mc.renderEngine.bindTexture(TextureResources.locationBlackHole);
             GL11.glTranslatef(0, 100, 0);
-            float phase =  -((float)System.currentTimeMillis()/(float)3000.0);
-            float scale = 1 ;
-            phase *= 36f;
-            GL11.glRotatef(phase, 0, 1, 0);
-
-            GL11.glScaled(scale, scale, scale);
-
-
-            //Set sun color and distance
+            //float scale = 1 ;
+            //GL11.glRotatef(phase, 0, 1, 0);
+            //GL11.glScaled(scale, scale, scale);
             GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             f10 = sunSize * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
@@ -873,10 +872,6 @@ public class RenderPlanetarySky extends IRenderHandler {
             buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
             buffer.pos(f10, 0.0D, f10).tex(1.0D, 1.0D).endVertex();
             buffer.pos(-f10, 0.0D, f10).tex(0.0D, 1.0D).endVertex();
-
-
-
-
             Tessellator.getInstance().draw();
             GL11.glPopMatrix();
 
@@ -884,16 +879,13 @@ public class RenderPlanetarySky extends IRenderHandler {
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glDepthMask(false);
 
+
             GL11.glPushMatrix();
             mc.renderEngine.bindTexture(TextureResources.locationBlackHoleBorder);
             GL11.glTranslatef( 0, 99.8F, 0);
-
-            GL11.glRotatef(phase, 0, 1, 0);
-
-            scale *= 1.1;
+            //GL11.glRotatef(phase, 0, 1, 0);
+            float scale = 1.1F;
             GL11.glScaled(scale, scale, scale);
-
-            //Set sun color and distance
             GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             f10 = sunSize * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
