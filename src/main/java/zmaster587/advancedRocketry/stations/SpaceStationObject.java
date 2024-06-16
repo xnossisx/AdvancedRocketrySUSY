@@ -62,8 +62,8 @@ public class SpaceStationObject implements ISpaceObject, IPlanetDefiner {
 
     public SpaceStationObject() {
         properties = (DimensionProperties) zmaster587.advancedRocketry.dimension.DimensionManager.defaultSpaceDimensionProperties.clone();
-        orbitalDistance = 4.0f;
-        targetOrbitalDistance = 4;
+        orbitalDistance = 50.0f;
+        targetOrbitalDistance = 50;
         targetRotationsPerHour = new int[]{0, 0, 0};
         targetGravity = 10;
         spawnLocations = new LinkedList<>();

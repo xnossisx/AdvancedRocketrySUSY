@@ -37,7 +37,7 @@ public class TileStationAltitudeController extends TileEntity implements IModula
     public TileStationAltitudeController() {
         moduleGrav = new ModuleText(6, 15, "Altitude: ", 0xaa2020);
         //numGravPylons = new ModuleText(10, 25, "Number Of Thrusters: ", 0xaa2020);
-        maxGravBuildSpeed = new ModuleText(6, 25, LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.maxaltrate"), 0xaa2020);
+        //maxGravBuildSpeed = new ModuleText(6, 25, LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.maxaltrate"), 0xaa2020);
         targetGrav = new ModuleText(6, 35, LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.tgtalt"), 0x202020);
         redstoneControl = new ModuleRedstoneOutputButton(174, 4, -1, "", this);
         redstoneControl.setRedstoneState(RedstoneState.OFF);
@@ -48,7 +48,7 @@ public class TileStationAltitudeController extends TileEntity implements IModula
         List<ModuleBase> modules = new LinkedList<>();
         modules.add(moduleGrav);
         //modules.add(numThrusters);
-        modules.add(maxGravBuildSpeed);
+        //modules.add(maxGravBuildSpeed);
 
         modules.add(targetGrav);
         modules.add(new ModuleSlider(6, 60, 0, TextureResources.doubleWarningSideBarIndicator, this));
@@ -88,7 +88,7 @@ public class TileStationAltitudeController extends TileEntity implements IModula
             ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
             if (spaceObject != null) {
                 moduleGrav.setText(String.format("%s %.0fKm", LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.alt"), spaceObject.getOrbitalDistance() * 200 + 100));
-                maxGravBuildSpeed.setText(String.format("%s%.1f", LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.maxaltrate"), 7200D * spaceObject.getMaxRotationalAcceleration()));
+                //maxGravBuildSpeed.setText(String.format("%s%.1f", LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.maxaltrate"), 7200D * spaceObject.getMaxRotationalAcceleration()));
                 targetGrav.setText(String.format("%s %d", LibVulpes.proxy.getLocalizedString("msg.stationaltctrl.tgtalt"), ((SpaceStationObject) spaceObject).targetOrbitalDistance * 200 + 100));
             }
 
@@ -113,7 +113,7 @@ public class TileStationAltitudeController extends TileEntity implements IModula
 
                     double targetGravity = ((SpaceStationObject) spaceObject).targetOrbitalDistance;
                     double angVel = spaceObject.getOrbitalDistance();
-                    double acc = 0.1;//0.1 * (getTotalProgress(0) - angVel + 1) / (float) getTotalProgress(0);
+                    double acc = 0.02;//0.1 * (getTotalProgress(0) - angVel + 1) / (float) getTotalProgress(0);
 
                     double difference = targetGravity - angVel;
 
