@@ -63,10 +63,11 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 GL11.glPushMatrix();
                 mc.renderEngine.bindTexture(TextureResources.locationBlackHole);
                 GL11.glTranslatef(0, 100, 0);
-                float phase =  -((float)System.currentTimeMillis()/(float)3000.0);
+                //float phase =  -((float)System.currentTimeMillis()/(float)3000.0);
+                //phase *= 36f;
+
                 float scale = 1 ;
-                phase *= 36f;
-                GL11.glRotatef(phase, 0, 1, 0);
+                //GL11.glRotatef(phase, 0, 1, 0);
 
                 GL11.glScaled(scale, scale, scale);
 
@@ -96,7 +97,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 mc.renderEngine.bindTexture(TextureResources.locationBlackHoleBorder);
                 GL11.glTranslatef( 0, 99.8F, 0);
 
-                GL11.glRotatef(phase, 0, 1, 0);
+                //GL11.glRotatef(phase, 0, 1, 0);
 
                 scale *= 1.1;
                 GL11.glScaled(scale, scale, scale);
