@@ -48,6 +48,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
     private HashMap<Integer, PlanetRenderProperties> renderPropertiesMap;
     private PlanetRenderProperties currentlySelectedPlanet;
     private IPlanetDefiner planetDefiner;
+    private int currentlySelectedPlanetID = -1;
     public ModulePlanetSelector(int planetId, ResourceLocation backdrop, ISelectionNotify tile, boolean star) {
         this(planetId, backdrop, tile, null, star);
     }
@@ -104,20 +105,22 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
 
     }
 
+
     @Override
     public void onScroll(int dwheel) {
-        //TODO (no - derCodeKoenig did it)
-        //removed list scroll because it was bugged
-        //completed/fixed planet map scroll implementation
-
-        zoom = Math.min(Math.max(zoom + dwheel / 1000.0, 0.36), 3.0);
-        redrawSystem();
-
-
-        /*
-        if (clickablePlanetList != null)
+        if (clickablePlanetList != null && clickablePlanetList.isEnabled()) {
             clickablePlanetList.onScroll(dwheel);
-        */
+        }
+        else{
+            zoom = Math.min(Math.max(zoom + dwheel / 1000.0, 0.36), 4.0);
+            redrawSystem();
+            if (currentlySelectedPlanetID != -1) {
+                currentlySelectedPlanet = renderPropertiesMap.get(currentlySelectedPlanetID);
+                hostTile.onSystemFocusChanged(this);
+                refreshSideBar(true, selectedSystem);
+            }
+        }
+
 
     }
 
@@ -530,10 +533,10 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
         //Confirm selection
         else if (buttonId == Constants.INVALID_PLANET + 1) {
             DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(selectedSystem);
-            if (selectedSystem < Constants.STAR_ID_OFFSET || (this.allowStarSelection && properties.getStar().isBlackHole())) {
+            //if (selectedSystem < Constants.STAR_ID_OFFSET || (this.allowStarSelection && properties.getStar().isBlackHole())) {
                 hostTile.onSelectionConfirmed(this);
                 Minecraft.getMinecraft().player.closeScreen();
-            }
+            //}
         } else if (buttonId == Constants.INVALID_PLANET + 2) {
             if (clickablePlanetList != null) {
                 boolean flag = !clickablePlanetList.isEnabled();
@@ -552,6 +555,7 @@ public class ModulePlanetSelector extends ModuleContainerPan implements IButtonI
                 //Make clicked planet selected
                 selectedSystem = buttonId;
                 currentlySelectedPlanet = renderPropertiesMap.get(buttonId);
+                currentlySelectedPlanetID = buttonId;
                 hostTile.onSelected(this);
                 refreshSideBar(currentSystemChanged, selectedSystem);
             }
