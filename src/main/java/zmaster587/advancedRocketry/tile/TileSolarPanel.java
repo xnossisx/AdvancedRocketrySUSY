@@ -61,7 +61,7 @@ public class TileSolarPanel extends TileInventoriedForgePowerMachine {
         //Slight adjustment to make Earth 0.9995 into a 1.0
         //Then multiplied by two for 520W = 1 RF/t becoming 2 RF/t @ 100% efficiency
         //Makes solar panels not return 0 everywhere
-        return (int) Math.min((1.0005d * 2d * ARConfiguration.getCurrentConfig().solarGeneratorMult * insolationMultiplier), 100);
+        return (int) Math.min((1.0005d * 2d * ARConfiguration.getCurrentConfig().solarGeneratorMult * insolationMultiplier), 10);
     }
 
     @Override
