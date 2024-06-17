@@ -470,6 +470,7 @@ public Block[][][] getblocks(){
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
+
         sizeX = nbt.getInteger("xSize");
         sizeY = nbt.getInteger("ySize");
         sizeZ = nbt.getInteger("zSize");

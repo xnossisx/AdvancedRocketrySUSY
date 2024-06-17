@@ -1,12 +1,16 @@
 package zmaster587.advancedRocketry.tile.infrastructure;
 
+import micdoodle8.mods.galacticraft.core.network.PacketEntityUpdate;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import zmaster587.advancedRocketry.api.IInfrastructure;
+import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.libVulpes.inventory.modules.IButtonInventory;
+import zmaster587.libVulpes.network.PacketEntity;
+import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.INetworkMachine;
 import zmaster587.libVulpes.util.ZUtils.RedstoneState;
 
@@ -55,8 +59,10 @@ public class TileRocketFluidUnloader extends TileRocketFluidLoader implements II
                     else
                         shouldOperate = getFluidTank().fill(handler.drain(getFluidTank().getCapacity(), false), false) > 0;
 
-                    if (shouldOperate)
+                    if (shouldOperate) {
                         getFluidTank().fill(handler.drain(getFluidTank().getCapacity() - getFluidTank().getFluidAmount(), true), true);
+                        PacketHandler.sendToNearby(new PacketEntity(rocket, (byte) EntityRocket.PacketType.RECIEVENBT.ordinal()), world.provider.getDimension(), getPos(), 128);
+                    }
                 }
             }
 

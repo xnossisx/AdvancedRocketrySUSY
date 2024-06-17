@@ -27,6 +27,7 @@ import zmaster587.advancedRocketry.tile.TileRocketAssemblingMachine;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.items.ItemLinker;
+import zmaster587.libVulpes.network.PacketEntity;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileFluidHatch;
@@ -120,8 +121,10 @@ public class TileRocketFluidLoader extends TileFluidHatch implements IInfrastruc
 
                 if (isAllowToOperate) {
                     rocketFluid = fluidTank.drain(fluidTank.getCapacity(), false);
-                    if (rocketFluid != null && rocketFluid.amount > 0)
+                    if (rocketFluid != null && rocketFluid.amount > 0) {
                         fluidTank.drain(handler.fill(rocketFluid, true), true);
+                        PacketHandler.sendToNearby(new PacketEntity(rocket, (byte) EntityRocket.PacketType.RECIEVENBT.ordinal()), world.provider.getDimension(), getPos(), 128);
+                    }
                 }
             }
 

@@ -17,7 +17,7 @@ import java.util.List;
 public class StatsRocket {
 
     private static final String TAGNAME = "rocketStats";
-    private static final int INVALID_SEAT = Integer.MIN_VALUE;
+    public static final int INVALID_SEAT = Integer.MIN_VALUE;
     private final List<HashedBlockPosition> passengerSeats = new ArrayList<>();
     //Used for orbital height calculations
     public int orbitHeight;
