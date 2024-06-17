@@ -52,8 +52,6 @@ import java.math.BigDecimal;
 
 public class TileTerraformingTerminal extends TileInventoriedRFConsumer implements INetworkMachine, IModularInventory, IButtonInventory {
 
-    private int powerrequired = 30;
-
     private ModuleText moduleText;
 
     public boolean was_enabled_last_tick;
@@ -151,6 +149,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void update() {
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
+        int powerrequired = 120;
         if (!world.isRemote && world.provider instanceof IPlanetaryProvider) {
 
             if (world.getTotalWorldTime() % 20 == 0)
