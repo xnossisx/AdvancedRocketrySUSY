@@ -50,6 +50,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import static zmaster587.advancedRocketry.api.StatsRocket.INVALID_SEAT;
+
 public class EntityStationDeployedRocket extends EntityRocket {
 
     public EnumFacing launchDirection;
@@ -76,7 +78,7 @@ public class EntityStationDeployedRocket extends EntityRocket {
         actualLaunchLocation = new Vec3d(x, y, z);
         launchLocation = new HashedBlockPosition((int) x, (int) y, (int) z);
         launchDirection = EnumFacing.DOWN;
-        stats.setSeatLocation(-1, -1, -1); //No seats
+        stats.setSeatLocation(INVALID_SEAT, -1, -1); //No seats
         atmText = new ModuleText(182, 114, "", 0x2d2d2d);
         gasId = 0;
     }
