@@ -24,7 +24,6 @@ val modVersion: String by project
 val archiveBase: String by project
 
 val libVulpesVersion: String by project
-val libVulpesBuildNum: String by project
 val jeiVersion: String by project
 val icVersion: String by project
 val gcVersion: String by project
@@ -37,6 +36,7 @@ setProperty("archivesBaseName", archiveBase)
 val buildNumber: String by lazy { System.getenv("BUILD_NUMBER") ?: getDate() }
 
 fun getDate(): String {
+    return "1"
     val format = SimpleDateFormat("HH-mm-dd-MM-yyyy")
     format.timeZone = TimeZone.getTimeZone("UTC")
     return format.format(Date())
@@ -120,10 +120,13 @@ repositories {
         name = "mezz.jei"
         url = uri("https://dvs1.progwml6.com/files/maven/")
     }
-    ivy {
-        name = "industrialcraft-2"
-        artifactPattern("http://jenkins.ic2.player.to/job/IC2_111/39/artifact/build/libs/[module]-[revision].[ext]")
+    maven {
+        url = uri("https://cursemaven.com")
     }
+    //ivy {
+    //    name = "industrialcraft-2"
+    //    artifactPattern("http://jenkins.ic2.player.to/job/IC2_111/39/artifact/build/libs/[module]-[revision].[ext]")
+    //}
     maven {
         // location of a maven mirror for JEI files, as a fallback
         name = "ModMaven"
@@ -146,7 +149,8 @@ repositories {
 dependencies {
     minecraft(group = "net.minecraftforge", name = "forge", version = "$mcVersion-$forgeVersion")
 
-    compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
+    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
+    //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
     //implementation("zmaster587.libVulpes:LibVulpes:$mcVersion-$libVulpesVersion-$libVulpesBuildNum-deobf")
 
     compileOnly(fg.deobf("dev.galacticraft:galacticraft-legacy:$gcVersion"))
@@ -177,22 +181,6 @@ tasks.processResources {
     }
 
     exclude("**/*.sh")
-}
-
-tasks.register("cloneLibVulpes") {
-    group = "build setup"
-    doLast {
-        val libVulpesRepo: String by project
-        val libVulpesBranch: String? by project
-
-        val repo = Grgit.clone {
-            dir = "$projectDir/libVulpes"
-            uri = libVulpesRepo
-            if(libVulpesBranch != null)
-                refToCheckout = libVulpesBranch
-        }
-        println("Cloned libVulpes repository from $libVulpesRepo (current branch: ${repo.branch.current().name})")
-    }
 }
 
 val currentJvm: String = Jvm.current().toString()

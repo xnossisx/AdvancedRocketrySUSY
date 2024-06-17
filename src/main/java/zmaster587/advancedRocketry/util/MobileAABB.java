@@ -207,7 +207,7 @@ public class MobileAABB extends AxisAlignedBB {
 
                                 //Screw 1.10.2
                                 int offset = isRemote ? 0 : 1;
-                                AxisAlignedBB aabb = chunk.blocks[deltaX][(int) (aabbIn.maxY - this.minY) - 1][deltaZ].getDefaultState().getCollisionBoundingBox(this.chunk.world, new BlockPos(deltaX, (int) (aabbIn.maxY - this.minY), deltaZ));
+                                AxisAlignedBB aabb = chunk.getblocks()[deltaX][(int) (aabbIn.maxY - this.minY) - 1][deltaZ].getDefaultState().getCollisionBoundingBox(this.chunk.world, new BlockPos(deltaX, (int) (aabbIn.maxY - this.minY), deltaZ));
 
                                 if (aabb != null) {
                                     double checkVar = aabb.minY + Math.floor(aabbIn.minY - this.minY) + minY - aabbIn.minY - 0.05 + offset;
@@ -238,7 +238,7 @@ public class MobileAABB extends AxisAlignedBB {
 
                                 //Screw 1.10.2
                                 int offset = isRemote ? 0 : 1;
-                                AxisAlignedBB aabb = chunk.blocks[deltaX][(int) (aabbIn.minY - this.minY - offset)][deltaZ].getDefaultState().getCollisionBoundingBox(this.chunk.world, new BlockPos(deltaX, (int) (aabbIn.minY - this.minY - offset), deltaZ));
+                                AxisAlignedBB aabb = chunk.getblocks()[deltaX][(int) (aabbIn.minY - this.minY - offset)][deltaZ].getDefaultState().getCollisionBoundingBox(this.chunk.world, new BlockPos(deltaX, (int) (aabbIn.minY - this.minY - offset), deltaZ));
 
                                 if (aabb != null) {
                                     float offset2 = 1;
@@ -272,10 +272,10 @@ public class MobileAABB extends AxisAlignedBB {
         double diffZ = 0;//((this.maxX - this.minX) - chunk.sizeX)/2f;
 
         out:
-        for (int x = 0; x < chunk.blocks.length; x++) {
-            for (int y = 0; y < chunk.blocks[0].length; y++) {
-                for (int z = 0; z < chunk.blocks[0][0].length; z++) {
-                    Block block = chunk.blocks[x][y][z];
+        for (int x = 0; x < chunk.getblocks().length; x++) {
+            for (int y = 0; y < chunk.getblocks()[0].length; y++) {
+                for (int z = 0; z < chunk.getblocks()[0][0].length; z++) {
+                    Block block = chunk.getblocks()[x][y][z];
 
                     if (!block.getDefaultState().getMaterial().isSolid())
                         continue;

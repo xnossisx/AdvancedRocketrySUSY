@@ -997,7 +997,9 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         }
 
         if (getBBCache() != null) {
-            List<EntityRocketBase> rockets = world.getEntitiesWithinAABB(EntityRocketBase.class, bbCache);
+            double buffer = 0.0001;
+            AxisAlignedBB bufferedBB = bbCache.grow(buffer, buffer, buffer);
+            List<EntityRocketBase> rockets = world.getEntitiesWithinAABB(EntityRocketBase.class, bufferedBB);
 
             if (rockets.contains(rocket)) {
                 lastRocketID = rocket.getEntityId();

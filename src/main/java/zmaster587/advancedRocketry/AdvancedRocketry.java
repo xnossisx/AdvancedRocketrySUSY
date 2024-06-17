@@ -269,7 +269,8 @@ public class AdvancedRocketry {
         );
         BiomeDictionary.addTypes(AdvancedRocketryBiomes.crystalChasms,
                 BiomeDictionary.Type.SNOWY,
-                BiomeDictionary.Type.WASTELAND
+                BiomeDictionary.Type.WASTELAND,
+                BiomeDictionary.Type.COLD
         );
     }
 

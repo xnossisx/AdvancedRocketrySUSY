@@ -52,8 +52,6 @@ import java.math.BigDecimal;
 
 public class TileTerraformingTerminal extends TileInventoriedRFConsumer implements INetworkMachine, IModularInventory, IButtonInventory {
 
-    private int powerrequired = 30;
-
     private ModuleText moduleText;
 
     public boolean was_enabled_last_tick;
@@ -116,17 +114,28 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
     @Override
     public void writeDataToNetwork(ByteBuf out, byte packetId) {
+        if (packetId == (byte) 22){
+            out.writeInt(sat_power_per_tick);
+            out.writeFloat(randomblocks_per_tick);
+        }
     }
 
     @Override
     public void readDataFromNetwork(ByteBuf in, byte packetId,
                                     NBTTagCompound nbt) {
-
+        if (packetId == (byte) 22){
+            nbt.setInteger("powergen", in.readInt());
+            nbt.setFloat("blockpertick", in.readFloat());
+        }
     }
 
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id, NBTTagCompound nbt) {
-
+        if (id == (byte) 22){
+            this.sat_power_per_tick = nbt.getInteger("powergen");
+            this.randomblocks_per_tick=  nbt.getFloat("blockpertick");
+            this.updateInventoryInfo();
+        }
     }
 
     @Override
@@ -138,16 +147,14 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
     @Override
     public void update() {
-        if (world.isRemote) {
-            if (world.getTotalWorldTime() % 20 == 0)
-                updateInventoryInfo();
-        }
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
+        int powerrequired = 120;
         if (!world.isRemote && world.provider instanceof IPlanetaryProvider) {
 
             if (world.getTotalWorldTime() % 20 == 0)
-                world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+                //world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
+                PacketHandler.sendToNearby(new PacketMachine(this,(byte) 22),world.provider.getDimension(),pos,16);
 
             if (hasValidBiomeChanger() && has_redstone) {
                 if (!was_enabled_last_tick) {
@@ -206,24 +213,23 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void updateInventoryInfo() {
         if (moduleText != null) {
 
-            if (!(world.provider instanceof IPlanetaryProvider)){
+            if (!(world.provider instanceof IPlanetaryProvider)) {
                 moduleText.setText("This planet can not be\nterraformed");
-            }else{
-            if (hasValidBiomeChanger() && world.isBlockIndirectlyGettingPowered(getPos()) != 0){
-                BigDecimal bd = new BigDecimal(randomblocks_per_tick);
-                bd = bd.setScale(2, RoundingMode.HALF_UP);
+            } else {
+                if (hasValidBiomeChanger() && world.isBlockIndirectlyGettingPowered(getPos()) != 0) {
+                    BigDecimal bd = new BigDecimal(randomblocks_per_tick);
+                    bd = bd.setScale(2, RoundingMode.HALF_UP);
 
-                moduleText.setText("terraforming planet...\n" +
-                        "\nPower generation:"+ sat_power_per_tick+
-                        "\nBlocks per tick:"+ bd);
-            }else if (hasValidBiomeChanger()){
-                moduleText.setText("provide redstone signal\nto start the process");
-            }
-            else {
-                moduleText.setText("place a biome remote here\nto make the satellite terraform\nthe entire planet");
-            }
-            }
+                    moduleText.setText("terraforming planet...\n" +
+                            "\nPower generation:" + sat_power_per_tick +
+                            "\nBlocks per tick:" + bd);
 
+                } else if (hasValidBiomeChanger()) {
+                    moduleText.setText("provide redstone signal\nto start the process");
+                } else {
+                    moduleText.setText("place a biome remote here\nto make the satellite terraform\nthe entire planet");
+                }
+            }
         }
     }
 
@@ -254,17 +260,19 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         return modules;
     }
 
+
     @Override
     public void onInventoryButtonPressed(int buttonId) {
             PacketHandler.sendToServer(new PacketMachine(this, (byte) (buttonId)));
     }
 
+
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setBoolean("was_enabled_last_tick", was_enabled_last_tick);
-        nbt.setInteger("sat_power_per_tick", sat_power_per_tick);
-        nbt.setFloat("randomblocks_per_tick", randomblocks_per_tick);
+        //nbt.setInteger("sat_power_per_tick", sat_power_per_tick);
+        //nbt.setFloat("randomblocks_per_tick", randomblocks_per_tick);
         return nbt;
     }
 
@@ -272,10 +280,12 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         was_enabled_last_tick = nbt.getBoolean("was_enabled_last_tick");
-        sat_power_per_tick = nbt.getInteger("sat_power_per_tick");
-        randomblocks_per_tick = nbt.getFloat("randomblocks_per_tick");
+        //sat_power_per_tick = nbt.getInteger("sat_power_per_tick");
+        //randomblocks_per_tick = nbt.getFloat("randomblocks_per_tick");
     }
 
+    //has been replaced with custom network package
+    /*
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
         NBTTagCompound nbt = new NBTTagCompound();
@@ -288,6 +298,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         NBTTagCompound nbt = pkt.getNbtCompound();
         readFromNBT(nbt);
     }
+    */
 
 
     @Override

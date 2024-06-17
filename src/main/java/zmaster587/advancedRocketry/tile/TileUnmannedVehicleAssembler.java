@@ -230,7 +230,9 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                                     monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
                                     thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currPos);
                                 }
-                                stats.addEngineLocation(xCurr - actualMinX - ((actualMaxX - actualMinX) / 2f), yCurr - actualMinY, zCurr - actualMinZ - ((actualMaxZ - actualMinZ) / 2f));
+
+                                stats.addEngineLocation(xCurr - actualMinX - ((float)(actualMaxX - actualMinX) / 2f), yCurr - actualMinY, zCurr - actualMinZ - ((float)(actualMaxZ - actualMinZ) / 2f));
+                                //stats.addEngineLocation(xCurr - actualMinX, yCurr - actualMinY, zCurr - actualMinZ);
                             }
 
                             if (block instanceof IFuelTank) {

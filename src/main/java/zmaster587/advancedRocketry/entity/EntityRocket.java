@@ -633,7 +633,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 }
             }
         }
-
+        
         //If player is holding shift open GUI
         if (player.isSneaking() || (!stats.hasSeat() && !isHoldingFluidItemOrLinker)) {
             openGui(player);
@@ -880,11 +880,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                         BlockPos pos = new BlockPos(x, posY, z);
                         pos = getTopBlock(pos);
 
-                        safeLanding = !world.getBlockState(pos).getMaterial().isLiquid() || world.getBlockState(pos).getBlock() == Blocks.WATER || world.getBlockState(pos).getBlock() == AdvancedRocketryBlocks.blockRocketFire;
+                        //water is considered unsafe too from now on
+                        //safeLanding = !world.getBlockState(pos).getMaterial().isLiquid() || world.getBlockState(pos).getBlock() == Blocks.WATER || world.getBlockState(pos).getBlock() == AdvancedRocketryBlocks.blockRocketFire;
+                        safeLanding = !world.getBlockState(pos).getMaterial().isLiquid() || world.getBlockState(pos).getBlock() == AdvancedRocketryBlocks.blockRocketFire;
                     }
                 }
 
-                // If nothing will catch the rocket, and the material isn't water, then create a float
+                // If nothing will catch the rocket, then create a float
                 // If anyone asks, the dev thinks underwater rocket launch platforms are cool and players can swim anyway
                 if (!safeLanding) {
                     for (int x = ((int) posX - rocketSizeX - bufferSize); x < (posX + rocketSizeX + bufferSize); x++) {
@@ -1877,6 +1879,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     @Override
     public void readDataFromNetwork(ByteBuf in, byte packetId,
                                     NBTTagCompound nbt) {
+        //System.out.println("rocket read from network");
+
         if (packetId == PacketType.RECIEVENBT.ordinal()) {
             storage = new StorageChunk();
             storage.setEntity(this);

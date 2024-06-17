@@ -87,7 +87,7 @@ private int noise_val;
     public void tickEntity() {
         //This is hacky..
         World world = net.minecraftforge.common.DimensionManager.getWorld(getDimensionId());
-        int powerrequired = 30;
+        int powerrequired = 120;
         if (world != null) {
 
             for (int i = 0; i < 10; i++) {

@@ -78,6 +78,10 @@ public class BiomeHandler {
     }
 
     private static void spawn_decoration_block(World world, BlockPos pos, IBlockState state, int p){
+        if (p < 0){
+            System.out.println("p should not be negative!!");
+            return;
+        }
         if (world.rand.nextInt(p) == 0) {
             if (world.isAirBlock(pos) && state.getBlock().canPlaceBlockAt(world, pos)) {
                 world.setBlockState(pos, state);
@@ -127,12 +131,12 @@ public class BiomeHandler {
         if (decorator.mushroomsPerChunk > 0) {
             IBlockState mushroom_b = Blocks.BROWN_MUSHROOM.getDefaultState();
             IBlockState mushroom_r = Blocks.RED_MUSHROOM.getDefaultState();
-            spawn_decoration_block(world, pos, mushroom_b, decorator.mushroomsPerChunk / 2);
-            spawn_decoration_block(world, pos, mushroom_r, decorator.mushroomsPerChunk / 2);
+            spawn_decoration_block(world, pos, mushroom_b, chunksize / decorator.mushroomsPerChunk / 2);
+            spawn_decoration_block(world, pos, mushroom_r, chunksize / decorator.mushroomsPerChunk / 2);
         }
         if (decorator.cactiPerChunk > 0) {
             IBlockState cactus = Blocks.CACTUS.getDefaultState();
-            spawn_decoration_block(world, pos, cactus, decorator.cactiPerChunk);
+            spawn_decoration_block(world, pos, cactus, chunksize / decorator.cactiPerChunk);
         }
     }
 

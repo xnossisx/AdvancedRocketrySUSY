@@ -27,6 +27,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -54,14 +55,18 @@ public class StorageChunk implements IBlockAccess, IStorageChunk {
     public Chunk chunk;
     public WorldDummy world;
     public boolean finalized = false; // Make sure we are ready to render
-    Block[][][] blocks;
-    int sizeX, sizeY, sizeZ;
+    private Block[][][] blocks;
+    public int sizeX, sizeY, sizeZ;
     private short[][][] metas;
     private ArrayList<TileEntity> tileEntities;
     //To store inventories (All inventories)
     private ArrayList<TileEntity> inventoryTiles;
     private ArrayList<TileEntity> liquidTiles;
     private Entity entity;
+
+public Block[][][] getblocks(){
+    return blocks;
+}
 
     public StorageChunk() {
         sizeX = 0;
@@ -266,12 +271,16 @@ public class StorageChunk implements IBlockAccess, IStorageChunk {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        if (x < 0 || x >= sizeX || y < 0 || y >= sizeY || z < 0 || z >= sizeZ || blocks[x][y][z] == null)
+        if (x < 0 || x >= sizeX || y < 0 || y >= sizeY || z < 0 || z >= sizeZ || blocks[x][y][z] == null) {
             return Blocks.AIR.getDefaultState();
+        }
         return blocks[x][y][z].getStateFromMeta(metas[x][y][z]);
     }
 
     public void setBlockState(BlockPos pos, IBlockState state) {
+
+        System.out.println("Block "+pos.getX()+":"+pos.getY()+":"+pos.getZ()+" set to "+state.getBlock().getUnlocalizedName());
+
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
@@ -282,6 +291,9 @@ public class StorageChunk implements IBlockAccess, IStorageChunk {
 
     //TODO: optimize the F*** out of this
     public void writeToNBT(NBTTagCompound nbt) {
+
+        if (world.isRemote) return; //client has no business writing here
+
         nbt.setInteger("xSize", sizeX);
         nbt.setInteger("ySize", sizeY);
         nbt.setInteger("zSize", sizeZ);
@@ -458,6 +470,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk {
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
+
         sizeX = nbt.getInteger("xSize");
         sizeY = nbt.getInteger("ySize");
         sizeZ = nbt.getInteger("zSize");
@@ -473,6 +486,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk {
         int[] blockId = nbt.getIntArray("idList");
         int[] metasId = nbt.getIntArray("metaList");
 
+
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
                 for (int z = 0; z < sizeZ; z++) {
@@ -483,6 +497,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk {
                 }
             }
         }
+
 
         NBTTagList tileList = nbt.getTagList("tiles", NBT.TAG_COMPOUND);
 
@@ -710,6 +725,9 @@ public class StorageChunk implements IBlockAccess, IStorageChunk {
     }
 
     public void writeToNetwork(ByteBuf out) {
+
+        if (DimensionManager.getWorld(0).isRemote)System.out.println("This should have never been called!");
+
         PacketBuffer buffer = new PacketBuffer(out);
 
         buffer.writeByte(this.sizeX);

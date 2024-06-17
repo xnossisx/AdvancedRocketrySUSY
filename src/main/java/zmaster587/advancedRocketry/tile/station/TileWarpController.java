@@ -99,7 +99,7 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
                 return Integer.MAX_VALUE;
 
             if (destProperties.getStar() != properties.getStar())
-                return 500;
+                return 1000;
 
             while (destProperties.getParentProperties() != null && destProperties.isMoon())
                 destProperties = destProperties.getParentProperties();
@@ -362,8 +362,8 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
                 srcPlanetImg = new ModulePlanetImage(baseX + 10, baseY + 10, sizeX - 20, location);
                 srcPlanetText = new ModuleText(baseX + 4, baseY + 56, "", 0xFFFFFF);
                 srcPlanetText.setAlwaysOnTop(true);
-                warpFuel = new ModuleText(baseX + 90, baseY + sizeY + 25, "", 0x1b1b1b);
-                warpCapacity = new ModuleText(baseX + 90, baseY + sizeY + 35, "", 0x1b1b1b);
+                warpFuel = new ModuleText(baseX + 80, baseY + sizeY + 25, "", 0x1b1b1b);
+                warpCapacity = new ModuleText(baseX + 80, baseY + sizeY + 35, "", 0x1b1b1b);
 
                 //DEST planet
                 baseX = 94;
@@ -477,8 +477,8 @@ public class TileWarpController extends TileEntity implements ITickable, IModula
         } else if (id == 2) {
             final SpaceStationObject station = getSpaceObject();
 
-            if (station != null && !station.isAnchored() && station.hasUsableWarpCore() && station.useFuel(getTravelCost()) != 0 && meetsArtifactReq(DimensionManager.getInstance().getDimensionProperties(station.getDestOrbitingBody()))) {
-                SpaceObjectManager.getSpaceManager().moveStationToBody(station, station.getDestOrbitingBody(), Math.max(Math.min(getTravelCost() * 5, 5000), 0));
+            if (station != null && !station.isAnchored() && station.hasUsableWarpCore() && meetsArtifactReq(DimensionManager.getInstance().getDimensionProperties(station.getDestOrbitingBody())) && station.useFuel(getTravelCost()) != 0) {
+                SpaceObjectManager.getSpaceManager().moveStationToBody(station, station.getDestOrbitingBody(), Math.max(Math.min(getTravelCost() * 1, 1000), 0));
 
                 for (EntityPlayer player2 : world.getPlayers(EntityPlayer.class, input -> SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(input.getPosition()) == station)) {
                     ARAdvancements.ALL_SHE_GOT.trigger((EntityPlayerMP) player2);

@@ -17,7 +17,7 @@ import java.util.List;
 public class StatsRocket {
 
     private static final String TAGNAME = "rocketStats";
-    private static final int INVALID_SEAT = Integer.MIN_VALUE;
+    public static final int INVALID_SEAT = Integer.MIN_VALUE;
     private final List<HashedBlockPosition> passengerSeats = new ArrayList<>();
     //Used for orbital height calculations
     public int orbitHeight;
@@ -202,6 +202,7 @@ public class StatsRocket {
      */
     public void addEngineLocation(float x, float y, float z) {
         //We want to be in the center of the block
+        //System.out.println("ADD engine at "+x+":"+y+":"+z);
         engineLoc.add(new Vector3F<>(x, y, z));
     }
 
@@ -628,13 +629,14 @@ public class StatsRocket {
         stats.setInteger("playerZPos", pilotSeatPos.z);
 
         if (!engineLoc.isEmpty()) {
+            // I make a little hack here to pass double positions by *2 in write and /2 in read method
             int[] locs = new int[engineLoc.size() * 3];
 
             for (int i = 0; (i / 3) < engineLoc.size(); i += 3) {
                 Vector3F<Float> vec = engineLoc.get(i / 3);
-                locs[i] = vec.x.intValue();
-                locs[i + 1] = vec.y.intValue();
-                locs[i + 2] = vec.z.intValue();
+                locs[i] = (int)(vec.x*2);
+                locs[i + 1] = (int)(vec.y*2);
+                locs[i + 2] = (int)(vec.z*2);
             }
             stats.setIntArray("engineLoc", locs);
         }
@@ -722,7 +724,7 @@ public class StatsRocket {
 
                 for (int i = 0; i < locations.length; i += 3) {
 
-                    this.addEngineLocation(locations[i], locations[i + 1], locations[i + 2]);
+                    this.addEngineLocation((float)locations[i]/2, (float)locations[i + 1]/2, (float)locations[i + 2]/2);
                 }
             }
 

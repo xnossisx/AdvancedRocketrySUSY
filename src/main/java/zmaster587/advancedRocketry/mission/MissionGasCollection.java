@@ -42,6 +42,7 @@ public class MissionGasCollection extends MissionResourceCollection {
     @Override
     public void onMissionComplete() {
 
+
         if ((int) rocketStats.getStatTag("intakePower") > 0 && gasFluid != null) {
             Fluid type = gasFluid;//FluidRegistry.getFluid("hydrogen");
             //Fill gas tanks
@@ -59,10 +60,11 @@ public class MissionGasCollection extends MissionResourceCollection {
         EntityStationDeployedRocket rocket = new EntityStationDeployedRocket(world, rocketStorage, rocketStats, x, y, z);
 
         FuelRegistry.FuelType fuelType = rocket.getRocketFuelType();
+        //System.out.println("Fuel:"+ rocketStats.getFuelAmount(fuelType));
         if (fuelType != null) {
-            rocket.setFuelAmount(fuelType, 0);
+            rocket.setFuelAmount(fuelType, Math.max(rocketStats.getFuelAmount(fuelType)-1000,0));
             if (fuelType == FuelRegistry.FuelType.LIQUID_BIPROPELLANT)
-                rocket.setFuelAmount(FuelRegistry.FuelType.LIQUID_OXIDIZER, 0);
+                rocket.setFuelAmount(FuelRegistry.FuelType.LIQUID_OXIDIZER, Math.max(rocketStats.getFuelAmount(FuelRegistry.FuelType.LIQUID_OXIDIZER)-1000,0));
         }
         rocket.readMissionPersistentNBT(missionPersistantNBT);
 

@@ -42,9 +42,9 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
     EntityRocketBase linkedRocket;
     IMission mission;
     ModuleText missionText;
-    RedstoneState state;
-    ModuleRedstoneOutputButton redstoneControl;
-
+    //RedstoneState state;
+    //ModuleRedstoneOutputButton redstoneControl;
+    boolean was_powered = false;
     int rocketHeight;
     int velocity;
     int fuelLevel, maxFuelLevel;
@@ -52,8 +52,8 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
     public TileRocketMonitoringStation() {
         mission = null;
         missionText = new ModuleText(20, 90, LibVulpes.proxy.getLocalizedString("msg.monitoringStation.missionProgressNA"), 0x2b2b2b);
-        redstoneControl = new ModuleRedstoneOutputButton(174, 4, -1, "", this);
-        state = RedstoneState.ON;
+        //redstoneControl = new ModuleRedstoneOutputButton(174, 4, -1, "", this);
+        //state = RedstoneState.ON;
     }
 
     @Override
@@ -71,21 +71,19 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
     }
 
     public boolean getEquivalentPower() {
-        if (state == RedstoneState.OFF)
-            return false;
+        //if (state == RedstoneState.OFF)
+        //    return false;
 
         boolean state2 = world.isBlockIndirectlyGettingPowered(pos) > 0;
 
-        if (state == RedstoneState.INVERTED)
-            state2 = !state2;
+        //if (state == RedstoneState.INVERTED)
+        //    state2 = !state2;
         return state2;
     }
 
     @Override
     public void onAdjacentBlockUpdated() {
-        if (!world.isRemote && getEquivalentPower() && linkedRocket != null) {
-            linkedRocket.prepareLaunch();
-        }
+
     }
 
     @Override
@@ -100,6 +98,17 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
                 if ((int) (15 * ((EntityRocket) linkedRocket).getRelativeHeightFraction()) != (int) (15 * ((EntityRocket) linkedRocket).getPreviousRelativeHeightFraction())) {
                     markDirty();
                 }
+                if (getEquivalentPower() && linkedRocket != null) {
+                    if (!was_powered) {
+                        System.out.println("prepare launch (redstone powered)");
+                        linkedRocket.prepareLaunch();
+                        //System.out.println("launching...");
+                        was_powered = true;
+                    }
+                }
+            }
+            if(!getEquivalentPower()){
+                was_powered = false; //
             }
         }
     }
@@ -154,9 +163,9 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-        state = RedstoneState.values()[nbt.getByte("redstoneState")];
-        redstoneControl.setRedstoneState(state);
-
+        //state = RedstoneState.values()[nbt.getByte("redstoneState")];
+        //redstoneControl.setRedstoneState(state);
+        was_powered = nbt.getBoolean("was_powered");
 
         if (nbt.hasKey("missionID")) {
             long id = nbt.getLong("missionID");
@@ -172,7 +181,8 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        nbt.setByte("redstoneState", (byte) state.ordinal());
+        //nbt.setByte("redstoneState", (byte) state.ordinal());
+        nbt.setBoolean("was_powered", was_powered);
         if (mission != null) {
             nbt.setLong("missionID", mission.getMissionId());
             nbt.setInteger("missionDimId", mission.getOriginatingDimension());
@@ -184,8 +194,8 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
     public void writeDataToNetwork(ByteBuf out, byte id) {
         if (id == 1)
             out.writeLong(mission == null ? -1 : mission.getMissionId());
-        else if (id == 2)
-            out.writeByte(state.ordinal());
+        //else if (id == 2)
+            //out.writeByte(state.ordinal());
     }
 
     @Override
@@ -215,8 +225,8 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
                 }
             }
         } else if (id == 2) {
-            state = RedstoneState.values()[nbt.getByte("state")];
-            redstoneControl.setRedstoneState(state);
+            //state = RedstoneState.values()[nbt.getByte("state")];
+            //redstoneControl.setRedstoneState(state);
         }
         if (id == 100) {
             if (linkedRocket != null)
@@ -234,7 +244,7 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
         modules.add(new ModuleProgress(120, 14, 1, new IndicatorBarImage(2, 95, 12, 71, 17, 0, 6, 6, 1, 0, EnumFacing.UP, TextureResources.rocketHud), this));
         modules.add(new ModuleProgress(142, 14, 2, new ProgressBarImage(2, 173, 12, 71, 17, 6, 3, 69, 1, 1, EnumFacing.UP, TextureResources.rocketHud), this));
 
-        modules.add(redstoneControl);
+        //modules.add(redstoneControl);
         setMissionText();
 
         modules.add(missionText);
@@ -266,7 +276,7 @@ public class TileRocketMonitoringStation extends TileEntity implements IModularI
         if (buttonId != -1)
             PacketHandler.sendToServer(new PacketMachine(this, (byte) (buttonId + 100)));
         else {
-            state = redstoneControl.getState();
+            //state = redstoneControl.getState();
             PacketHandler.sendToServer(new PacketMachine(this, (byte) 2));
         }
     }
