@@ -11,7 +11,7 @@ original github repo: https://github.com/Advanced-Rocketry/AdvancedRocketry
 old documentation: http://arwiki.dmodoomsirius.me/
 
 
-Current bugfixes:
+## Current bugfixes:
 - satellites disconnect on server restart fixed
 - biome remote crash fixed
 - warp fuel displays incorrect fixed
@@ -23,13 +23,10 @@ Current bugfixes:
 - void miner fixed (void miner does not actually break blocks on planet)
 - gas mining: gas selection not updating fixed
 - solar panels crash near stars fixed
+- #### AR had over 200 open issues. I fixed so many of them that I stopped writing them all down because it would be a very long list. Just look at the commit history and you can see all that changed.
+  
 
-Improvements:
+## Improvements:
+- There are many improvements but same as with bugs, I stopped writing them all down because it would be a very long list
 
-- Terraforming update #1:
-  - You will use a new block called Terraforming Terminal to program your biome changer satellite to transform the entire planet.
-  - You can use multiple terminals / satellites to speed up the process!
- 
-- Weather Satellite added:
-  - Currently can only place and remove some water in 3 different modes
-  - will later be able to set humidity value for planets
+  
