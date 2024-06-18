@@ -110,6 +110,7 @@ public class TileRocketFluidLoader extends TileFluidHatch implements IInfrastruc
             List<TileEntity> tiles = rocket.storage.getFluidTiles();
             boolean rocketFluidFull = false;
 
+            boolean doupdate = false;
             //Function returns if something can be moved
             for (TileEntity tile : tiles) {
                 IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
@@ -123,9 +124,12 @@ public class TileRocketFluidLoader extends TileFluidHatch implements IInfrastruc
                     rocketFluid = fluidTank.drain(fluidTank.getCapacity(), false);
                     if (rocketFluid != null && rocketFluid.amount > 0) {
                         fluidTank.drain(handler.fill(rocketFluid, true), true);
-                        PacketHandler.sendToNearby(new PacketEntity(rocket, (byte) EntityRocket.PacketType.RECIEVENBT.ordinal()), world.provider.getDimension(), getPos(), 128);
+                        doupdate = true;
                     }
                 }
+            }
+            if (doupdate) {
+                PacketHandler.sendToNearby(new PacketEntity(rocket, (byte) 9987), world.provider.getDimension(), getPos(), 128);
             }
 
             //Update redstone state

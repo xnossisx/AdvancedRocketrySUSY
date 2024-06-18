@@ -22,6 +22,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldType;
@@ -471,6 +472,8 @@ public Block[][][] getblocks(){
 
     public void readFromNBT(NBTTagCompound nbt) {
 
+        //System.out.println("read from nbt");
+
         sizeX = nbt.getInteger("xSize");
         sizeY = nbt.getInteger("ySize");
         sizeZ = nbt.getInteger("zSize");
@@ -487,6 +490,7 @@ public Block[][][] getblocks(){
         int[] metasId = nbt.getIntArray("metaList");
 
 
+
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
                 for (int z = 0; z < sizeZ; z++) {
@@ -497,7 +501,6 @@ public Block[][][] getblocks(){
                 }
             }
         }
-
 
         NBTTagList tileList = nbt.getTagList("tiles", NBT.TAG_COMPOUND);
 
@@ -724,6 +727,78 @@ public Block[][][] getblocks(){
         }
     }
 
+
+    public void readtiles(ByteBuf in) {
+        PacketBuffer buffer = new PacketBuffer(in);
+        short numTiles = buffer.readShort();
+
+        //tileEntities.clear();
+        //inventoryTiles.clear();
+        //liquidTiles.clear();
+        //this can cause a ConcurrentModificationException in render if the rocket is loaded with fluids and tiles get updated
+        //so we need a hacky fix here and not modify the lists without deleting or adding elements
+
+        for (short i = 0; i < numTiles; i++) {
+            try {
+                NBTTagCompound nbt = buffer.readCompoundTag();
+
+                TileEntity tile = ZUtils.createTile(nbt);
+                BlockPos tilepos = tile.getPos();
+
+                for (int j = 0; j < tileEntities.size(); j++) {
+                    TileEntity t = tileEntities.get(j);
+                    if (t.getPos().equals(tilepos)) {
+                        t.readFromNBT(nbt);
+                    }
+                }
+                if (isInventoryBlock(tile)) {
+                    for (int j = 0; j < inventoryTiles.size(); j++) {
+                        TileEntity t = inventoryTiles.get(j);
+                        if (t.getPos().equals(tilepos)) {
+                            t.readFromNBT(nbt);
+                        }
+                    }
+                }
+                if (isLiquidContainerBlock(tile)) {
+                    for (int j = 0; j < liquidTiles.size(); j++) {
+                        TileEntity t = liquidTiles.get(j);
+                        if (t.getPos().equals(tilepos)) {
+                            t.readFromNBT(nbt);
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    public void writetiles(ByteBuf out){
+        PacketBuffer buffer = new PacketBuffer(out);
+        buffer.writeShort(tileEntities.size());
+        Iterator<TileEntity> tileIterator = tileEntities.iterator();
+
+        while (tileIterator.hasNext()) {
+            TileEntity tile = tileIterator.next();
+
+            NBTTagCompound nbt = new NBTTagCompound();
+
+            try {
+                tile.writeToNBT(nbt);
+
+                try {
+                    buffer.writeCompoundTag(nbt);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            } catch (RuntimeException e) {
+                AdvancedRocketry.logger.warn("A tile entity has thrown an error while writing to network: " + tile.getClass().getCanonicalName());
+                tileIterator.remove();
+            }
+        }
+    }
+
     public void writeToNetwork(ByteBuf out) {
 
         if (DimensionManager.getWorld(0).isRemote)System.out.println("This should have never been called!");
@@ -768,6 +843,10 @@ public Block[][][] getblocks(){
     }
 
     public void readFromNetwork(ByteBuf in) {
+
+        //System.out.println("read from network");
+
+        finalized = false;
         PacketBuffer buffer = new PacketBuffer(in);
 
         this.sizeX = buffer.readByte();
@@ -778,6 +857,8 @@ public Block[][][] getblocks(){
         this.blocks = new Block[sizeX][sizeY][sizeZ];
         this.metas = new short[sizeX][sizeY][sizeZ];
         chunk = new Chunk(world, 0, 0);
+
+
 
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
@@ -805,7 +886,7 @@ public Block[][][] getblocks(){
 
                 if (isLiquidContainerBlock(tile))
                     liquidTiles.add(tile);
-                tile.setWorld(world);
+
 
                 chunk.addTileEntity(tile);
 

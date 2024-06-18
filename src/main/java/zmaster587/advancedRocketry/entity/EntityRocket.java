@@ -1880,7 +1880,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     public void readDataFromNetwork(ByteBuf in, byte packetId,
                                     NBTTagCompound nbt) {
         //System.out.println("rocket read from network");
-
+        if(packetId==(byte)9987){ // update tileentities
+            if (storage != null)
+                storage.readtiles(in);
+        }
         if (packetId == PacketType.RECIEVENBT.ordinal()) {
             storage = new StorageChunk();
             storage.setEntity(this);
@@ -1912,6 +1915,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     @Override
     public void writeDataToNetwork(ByteBuf out, byte id) {
+
+        if(id==(byte)9987){ // update tileentities
+            if (storage != null)
+                storage.writetiles(out);
+        }
 
         if (id == PacketType.RECIEVENBT.ordinal()) {
             storage.writeToNetwork(out);

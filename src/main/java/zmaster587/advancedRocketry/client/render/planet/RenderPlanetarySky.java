@@ -951,7 +951,8 @@ public class RenderPlanetarySky extends IRenderHandler {
             GlStateManager.alphaFunc(GL11.GL_GREATER, 0.01f);
             float f10;
             GL11.glDisable(GL11.GL_BLEND);
-
+            GL11.glPushMatrix();
+            GL11.glTranslatef(0, 100, 0);
 
             //float phase =  -((float)System.currentTimeMillis()/(float)3000.0);
             //phase *= 36f;
@@ -1055,6 +1056,7 @@ public class RenderPlanetarySky extends IRenderHandler {
             GlStateManager.depthMask(true);
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
             GlStateManager.depthMask(false);
+            GL11.glPopMatrix();
 
         } else {
             mc.renderEngine.bindTexture(TextureResources.locationSunPng);
@@ -1063,10 +1065,10 @@ public class RenderPlanetarySky extends IRenderHandler {
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             float f10 = sunSize * 15f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
             //multiplier = 2;
-            buffer.pos(-f10, 100.0D, -f10).tex(0.0D, 0.0D).endVertex();
-            buffer.pos(f10, 100.0D, -f10).tex(1.0D, 0.0D).endVertex();
-            buffer.pos(f10, 100.0D, f10).tex(1.0D, 1.0D).endVertex();
-            buffer.pos(-f10, 100.0D, f10).tex(0.0D, 1.0D).endVertex();
+            buffer.pos(-f10, 150.0D, -f10).tex(0.0D, 0.0D).endVertex();
+            buffer.pos(f10, 150.0D, -f10).tex(1.0D, 0.0D).endVertex();
+            buffer.pos(f10, 150.0D, f10).tex(1.0D, 1.0D).endVertex();
+            buffer.pos(-f10, 150.0D, f10).tex(0.0D, 1.0D).endVertex();
             Tessellator.getInstance().draw();
         }
     }

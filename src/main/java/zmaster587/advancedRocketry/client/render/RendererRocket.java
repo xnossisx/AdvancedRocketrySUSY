@@ -58,8 +58,9 @@ public class RendererRocket extends Render implements IRenderFactory<EntityRocke
 
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
-        if (storage == null || !storage.finalized)
+        if ((storage == null || !storage.finalized))
             return;
+
 
         //Find the halfway point along the XZ plane
         float halfx = storage.getSizeX() / 2f;
@@ -120,6 +121,8 @@ public class RendererRocket extends Render implements IRenderFactory<EntityRocke
             //Render Each block
             net.minecraftforge.client.ForgeHooksClient.setRenderLayer(BlockRenderLayer.SOLID);
             Minecraft.getMinecraft().getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+
+
             for (int xx = 0; xx < storage.getSizeX(); xx++) {
                 for (int zz = 0; zz < storage.getSizeZ(); zz++) {
                     for (int yy = 0; yy < storage.getSizeY(); yy++) {
@@ -140,6 +143,7 @@ public class RendererRocket extends Render implements IRenderFactory<EntityRocke
                     }
                 }
             }
+
             net.minecraftforge.client.ForgeHooksClient.setRenderLayer(null);
 
             net.minecraft.client.renderer.RenderHelper.enableStandardItemLighting();
