@@ -633,7 +633,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 }
             }
         }
-        
+
         //If player is holding shift open GUI
         if (player.isSneaking() || (!stats.hasSeat() && !isHoldingFluidItemOrLinker)) {
             openGui(player);
