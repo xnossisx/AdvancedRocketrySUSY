@@ -221,6 +221,134 @@ public class RenderPlanetarySky extends IRenderHandler {
         GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
+    //this is the old one for the planet selection in warp controller
+    public static void renderPlanetPubHelper_old(BufferBuilder buffer, ResourceLocation icon, int locationX, int locationY, double zLevel, float size, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, float[] skyColor, float[] ringColor, boolean gasGiant, boolean hasRing, boolean hasDecorators, float[] shadowColorMultiplier, float alphaMultiplier2) {
+        GlStateManager.enableBlend();
+
+
+        //GL11.glDepthFunc(GL11.GL_LEQUAL);
+        //int k = mc.theWorld.getMoonPhase();
+        //int l = k % 4;
+        //int i1 = k / 4 % 2;
+
+        //Set planet Orbiting distance; size
+
+        float f14 = 1f;//(float)(l + 0) / 4.0F;
+        float f15 = 0f;//(float)(i1 + 0) / 2.0F;
+
+
+        GL11.glPushMatrix();
+        GL11.glTranslated(locationX, -100, locationY);
+
+        if (hasDecorators) { //ATM Glow
+            GL11.glPushMatrix();
+            GL11.glRotated(90 - shadowAngle * 180 / Math.PI, 0, 1, 0);
+
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.atmGlow);
+
+            GlStateManager.color(1f, 1f, 1f, alphaMultiplier);
+            buffer.pos(-size, 0 + 0.01f, size).tex(f15, f14).endVertex();
+            buffer.pos(size, 0 + 0.01f, size).tex(f14, f14).endVertex();
+            buffer.pos(size, 0 + 0.01f, -size).tex(f14, f15).endVertex();
+            buffer.pos(-size, 0 + 0.01f, -size).tex(f15, f15).endVertex();
+            Tessellator.getInstance().draw();
+            GL11.glPopMatrix();
+        }
+
+        //End ATM glow
+
+        GL11.glDepthMask(true);
+
+        Minecraft.getMinecraft().renderEngine.bindTexture(icon);
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        //TODO: draw sky planets
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+
+        GlStateManager.color(1f, 1f, 1f, alphaMultiplier);
+        buffer.pos(-size, 0, size).tex(f15, f14).endVertex();
+        buffer.pos(size, 0, size).tex(f14, f14).endVertex();
+        buffer.pos(size, 0, -size).tex(f14, f15).endVertex();
+        buffer.pos(-size, 0, -size).tex(f15, f15).endVertex();
+        Tessellator.getInstance().draw();
+        //buffer.finishDrawing();
+
+        //GL11.glEnable(GL11.GL_BLEND);
+
+        GL11.glDepthMask(false);
+        if (hasDecorators) {
+            //Draw atmosphere if applicable
+            if (hasAtmosphere) {
+                GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+                Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.getAtmosphereResource());
+                GlStateManager.color(skyColor[0], skyColor[1], skyColor[2], alphaMultiplier);
+                buffer.pos(-size, 0, size).tex(f15, f14).endVertex();
+                buffer.pos(size, 0, size).tex(f14, f14).endVertex();
+                buffer.pos(size, 0, -size).tex(f14, f15).endVertex();
+                buffer.pos(-size, 0, -size).tex(f15, f15).endVertex();
+                Tessellator.getInstance().draw();
+                //buffer.finishDrawing();
+
+            }
+
+
+            GL11.glRotated(90 - shadowAngle * 180 / Math.PI, 0, 1, 0);
+
+
+            Minecraft.getMinecraft().world.getCelestialAngle(0);
+            //Draw Shadow
+            GlStateManager.clearColor(1f, 1f, 1f, 1f);
+            GlStateManager.color(shadowColorMultiplier[0], shadowColorMultiplier[1], shadowColorMultiplier[2], alphaMultiplier2);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.getShadowResource());
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            buffer.pos(-size * 1.05F, 0 - 0.01f, size * 1.05F).tex(f15, f14).endVertex();
+            buffer.pos(size * 1.05F, 0 - 0.01f, size * 1.05F).tex(f14, f14).endVertex();
+            buffer.pos(size * 1.05F, 0 - 0.01f, -size * 1.05F).tex(f14, f15).endVertex();
+            buffer.pos(-size * 1.05F, 0 - 0.01f, -size * 1.05F).tex(f15, f15).endVertex();
+            Tessellator.getInstance().draw();
+        }
+
+
+        GL11.glDepthMask(true);
+        //Rings
+        if (hasRing) {
+            GL11.glPushMatrix();
+            GL11.glRotatef(90f, 0f, 1f, 0f);
+
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GlStateManager.color(ringColor[0], ringColor[1], ringColor[2], alphaMultiplier * 0.2f);
+            float ringSize = size * 2f;
+            Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRings);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+
+            buffer.pos(-ringSize,  0- 0.00f, ringSize).tex(f15, f14).endVertex();
+            buffer.pos(ringSize, 0 - 0.00f, ringSize).tex(f14, f14).endVertex();
+            buffer.pos(ringSize, 0 - 0.00f, -ringSize).tex(f14, f15).endVertex();
+            buffer.pos(-ringSize, 0 - 0.00f, -ringSize).tex(f15, f15).endVertex();
+            Tessellator.getInstance().draw();
+
+            GlStateManager.color(0f, 0f, 0f, alphaMultiplier);
+            Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRingShadow);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            buffer.pos(-ringSize, 0 - 0.00f, ringSize).tex(f15, f14).endVertex();
+            buffer.pos(ringSize, 0 - 0.00f, ringSize).tex(f14, f14).endVertex();
+            buffer.pos(ringSize, 0 - 0.00f, -ringSize).tex(f14, f15).endVertex();
+            buffer.pos(-ringSize, 0 - 0.00f, -ringSize).tex(f15, f15).endVertex();
+            Tessellator.getInstance().draw();
+            GL11.glPopMatrix();
+        }
+        GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+        GL11.glDepthMask(false);
+        GL11.glPopMatrix();
+
+        GlStateManager.color(1f, 1f, 1f, 1f);
+    }
+
     private void renderStars() {
         Random random = new Random(10842L);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
