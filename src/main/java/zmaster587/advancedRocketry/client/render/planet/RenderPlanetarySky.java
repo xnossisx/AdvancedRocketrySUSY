@@ -899,7 +899,7 @@ public class RenderPlanetarySky extends IRenderHandler {
         boolean hasDecorators = properties.hasDecorators();
         boolean gasGiant = properties.isGasGiant();
         float[] skyColor = properties.skyColor;
-        float[] ringColor = properties.skyColor;
+        float[] ringColor = properties.ringColor;
 
         renderPlanetPubHelper(buffer, icon, 0, 0, -20, size * 0.2f, alphaMultiplier, shadowAngle, hasAtmosphere, skyColor, ringColor, gasGiant, hasRing, hasDecorators, shadowColorMultiplier, alphaMultiplier2);
     }
