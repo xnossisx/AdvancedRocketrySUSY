@@ -26,6 +26,10 @@ public class RendererObservatory extends TileEntitySpecialRenderer {
         }
     }
 
+    @Override
+    public boolean isGlobalRenderer(TileEntity te) {
+        return true;
+    }
 
     @Override
     public void render(TileEntity tile, double x,
