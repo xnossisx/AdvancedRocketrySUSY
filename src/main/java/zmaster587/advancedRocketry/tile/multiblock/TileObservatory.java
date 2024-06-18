@@ -323,14 +323,14 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
                 List<StackEntry> harvestList = asteroidSmol.getHarvest(lastSeed + lastButton, Math.max(1 - ((Math.min(getDataAmt(DataType.COMPOSITION), 2000) + Math.min(getDataAmt(DataType.MASS), 2000)) / 4000f), 0));
                 for (StackEntry entry : harvestList) {
                     //buttonList.add(new ModuleButton((g % 3)*24, 24*(g/3), -2, "",this, TextureResources.tabData, 24, 24));
-                    buttonList.add(new ModuleSlotButton((g % 3) * 24 + 1, 24 * (g / 3) + 1, -2, this, entry.stack, entry.midpoint + " +/-  " + entry.variablility, getWorld()));
-                    buttonList.add(new ModuleText((g % 3) * 24 + 1, 24 * (g / 3) + 1, entry.midpoint + "\n+/- " + entry.variablility, 0xFFFFFF, 0.5f));
+                    buttonList.add(new ModuleSlotButton((g % 2) * 24 + 1, 24 * (g / 2) + 1, -2, this, entry.stack, entry.midpoint + " +/-  " + entry.variablility, getWorld()));
+                    buttonList.add(new ModuleText((g % 2) * 24 + 1, 24 * (g / 2) + 1, entry.midpoint + "\n+/- " + entry.variablility, 0xFFFFFF, 0.5f));
                     g++;
                 }
 
                 float time = asteroidSmol.timeMultiplier;
 
-                buttonList.add(new ModuleText(0, 24 * (1 + (g / 3)), String.format("%s\n%.2fx", LibVulpes.proxy.getLocalizedString("msg.observetory.text.missionTime"), time), 0x2f2f2f));
+                buttonList.add(new ModuleText(0, 24 * (1 + (g / 2)), String.format("%s\n%.2fx", "Time:", time), 0x2f2f2f));
             }
 
 
@@ -361,7 +361,7 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
             for (int i = 0; i < finalList.size(); i++) {
                 Asteroid asteroid = finalList.get(i);
 
-                ModuleButton button = new ModuleButton(0, i * 18, LIST_OFFSET + i, asteroid.getName(), this, TextureResources.buttonAsteroid, 72, 18);
+                ModuleButton button = new ModuleButton(0, i * 18, LIST_OFFSET + i, asteroid.getName(), this, TextureResources.buttonAsteroid, 112, 18);
 
                 if (lastButton - LIST_OFFSET == i) {
                     button.setColor(0xFFFF00);
@@ -375,11 +375,28 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
             modules.add(new ModuleText(10, 18, LibVulpes.proxy.getLocalizedString("msg.observetory.text.asteroids"), 0x2d2d2d));
             modules.add(new ModuleText(105, 18, LibVulpes.proxy.getLocalizedString("msg.observetory.text.composition"), 0x2d2d2d));
 
-            //Add borders for asteroid
-            int baseX = 5;
+
+            //Ore display
+            int baseX = 122;
             int baseY = 32;
-            int sizeX = 72;
+            int sizeX = 52;
             int sizeY = 46;
+            if (world.isRemote) {
+                //Border
+                modules.add(new ModuleScaledImage(baseX - 3, baseY - 3, 3, baseY + sizeY + 6, TextureResources.verticalBar));
+                modules.add(new ModuleScaledImage(baseX + sizeX, baseY - 3, -3, baseY + sizeY + 6, TextureResources.verticalBar));
+                modules.add(new ModuleScaledImage(baseX, baseY - 3, sizeX, 3, TextureResources.horizontalBar));
+                modules.add(new ModuleScaledImage(baseX, 2 * baseY + sizeY, sizeX, -3, TextureResources.horizontalBar));
+            }
+
+            ModuleContainerPanYOnly pan2 = new ModuleContainerPanYOnly(baseX, baseY, buttonList, new LinkedList<>(), null, 40, 48, 0, 0, 0, 72);
+            modules.add(pan2);
+
+            //Add borders for asteroid
+             baseX = 5;
+             baseY = 32;
+             sizeX = 112;
+             sizeY = 46;
             if (world.isRemote) {
                 //Border
                 modules.add(new ModuleScaledImage(baseX - 3, baseY - 3, 3, baseY + sizeY + 6, TextureResources.verticalBar));
@@ -394,18 +411,7 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
                 modules.add(pan);
             }
 
-            //Ore display
-            baseX = 100;
-            if (world.isRemote) {
-                //Border
-                modules.add(new ModuleScaledImage(baseX - 3, baseY - 3, 3, baseY + sizeY + 6, TextureResources.verticalBar));
-                modules.add(new ModuleScaledImage(baseX + sizeX, baseY - 3, -3, baseY + sizeY + 6, TextureResources.verticalBar));
-                modules.add(new ModuleScaledImage(baseX, baseY - 3, sizeX, 3, TextureResources.horizontalBar));
-                modules.add(new ModuleScaledImage(baseX, 2 * baseY + sizeY, sizeX, -3, TextureResources.horizontalBar));
-            }
 
-            ModuleContainerPanYOnly pan2 = new ModuleContainerPanYOnly(baseX, baseY, buttonList, new LinkedList<>(), null, 40, 48, 0, 0, 0, 72);
-            modules.add(pan2);
         } else if (tabModule.getTab() == 0) {
             modules.add(new ModulePower(18, 20, getBatteries()));
             modules.add(toggleSwitch = new ModuleToggleSwitch(160, 5, 0, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage, 11, 26, getMachineEnabled()));
