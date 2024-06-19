@@ -41,7 +41,6 @@ public class RenderPlanetarySky extends IRenderHandler {
     private int glSkyList;
     private int glSkyList2;
 
-    static int m = 0;
 
     private static float xrotangle = 0;
 
@@ -95,7 +94,7 @@ public class RenderPlanetarySky extends IRenderHandler {
         GL11.glEndList();
     }
 
-    public static void renderPlanetPubHelper(BufferBuilder buffer, ResourceLocation icon, int locationX, int locationY, double zLevel, float size, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, float[] skyColor, float[] ringColor, boolean gasGiant, boolean hasRing, boolean hasDecorators, float[] shadowColorMultiplier, float alphaMultiplier2) {
+    public static void renderPlanetPubHelper(BufferBuilder buffer, ResourceLocation icon, int locationX, int locationY, double zLevel, float size, float alphaMultiplier, double shadowAngle, boolean hasAtmosphere, float[] skyColor, float[] ringColor, boolean gasGiant, boolean hasRing, double ringAngle, boolean hasDecorators, float[] shadowColorMultiplier, float alphaMultiplier2) {
         GlStateManager.enableBlend();
 
 
@@ -191,27 +190,22 @@ GL11.glPopMatrix();
         if (hasRing) {
             GL11.glPushMatrix();
             GL11.glRotatef(90f, 0f, 1f, 0f);
-            GL11.glRotatef(m, 1f, 0f, 0f); // this should rotate around the global z axis
-            //GL11.glRotatef(-xrotangle, 1f, 0f, 0f);
-            GL11.glRotatef(70f, 0f, 0f, 1f);
-
+            float m = -xrotangle;
+            while (m > 360)
+                m-=360;
+            while (m < 0)
+                m+=360;
+            GL11.glRotatef(m, 1f, 0f, 0f);
+            GL11.glRotated(ringAngle, 0f, 0f, 1f);
 
             GL11.glRotatef(m-90, 0f, 1f, 0f);
 
 
-//some hacky rotations stuff because I have no idea why the shadow is rendering the way it does
-            while (m > 360)
-                m-=360;
-            while (m < 0)
-                m+=180;
-
-            m++;
-            System.out.println("m: "+m);
-
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-            GlStateManager.color(ringColor[0], ringColor[1], ringColor[2], alphaMultiplier * 0.2f);
+            GlStateManager.color(ringColor[0], ringColor[1], ringColor[2], alphaMultiplier * 0.5f);
             float ringSize = size * 2f;
-            Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRings);
+            //Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRings);
+            Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRingsNew);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
             buffer.pos(-ringSize,  0- 0.00f, ringSize).tex(f15, f14).endVertex();
@@ -220,6 +214,7 @@ GL11.glPopMatrix();
             buffer.pos(-ringSize, 0 - 0.00f, -ringSize).tex(f15, f15).endVertex();
             Tessellator.getInstance().draw();
 
+            /*
             //GlStateManager.color(ringColor[0], ringColor[1], ringColor[2], (float) (alphaMultiplier * 0.5*Math.abs(Math.sin(Math.toRadians(m)))));
             GlStateManager.color(0f, 0f, 0f, alphaMultiplier);
             Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRingShadow);
@@ -229,6 +224,7 @@ GL11.glPopMatrix();
             buffer.pos(ringSize, 0 - 0.00f, -ringSize).tex(f14, f15).endVertex();
             buffer.pos(-ringSize, 0 - 0.00f, -ringSize).tex(f15, f15).endVertex();
             Tessellator.getInstance().draw();
+             */
 
             GL11.glPopMatrix();
         }
@@ -573,15 +569,22 @@ GL11.glPopMatrix();
         //This is done like this to prevent problems with superbright atmospheres on low-atmosphere planets
         //Plus you couldn't see stars during the day anyway
         int atmosphereInt = properties.getAtmosphereDensity();
-        f1 = atmosphereInt < 1 ? 0 : (float) Math.pow(f1, Math.sqrt(Math.max(atmosphere, 0.81)));
-        f2 = atmosphereInt < 1 ? 0 : (float) Math.pow(f2, Math.sqrt(Math.max(atmosphere, 0.81)));
-        f3 = atmosphereInt < 1 ? 0 : (float) Math.pow(f3, Math.sqrt(Math.max(atmosphere, 0.81)));
+//        System.out.println("before:"+f1+":"+f2+":"+f3);
+        f1 = atmosphereInt < 1 ? 0 : (float) Math.pow(f1, Math.sqrt(Math.max(atmosphere, 0.0001)));
+        f2 = atmosphereInt < 1 ? 0 : (float) Math.pow(f2, Math.sqrt(Math.max(atmosphere, 0.0001)));
+        f3 = atmosphereInt < 1 ? 0 : (float) Math.pow(f3, Math.sqrt(Math.max(atmosphere, 0.0001)));
 
+        f1*=Math.min(1,atmosphere);
+        f2*=Math.min(1,atmosphere);
+        f3*=Math.min(1,atmosphere);
 
-        GlStateManager.color(f1, f2, f3);
+//System.out.println(f1+":"+f2+":"+f3+"  atm:"+atmosphere);
+        //GlStateManager.color(f1, f2, f3);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
         GlStateManager.depthMask(false);
+        GlStateManager.enableBlend();
+        OpenGlHelper.glBlendFunc(770, 771, 1, 0);
         GlStateManager.enableFog();
         GlStateManager.color(f1, f2, f3);
         GL11.glCallList(this.glSkyList);
@@ -667,7 +670,8 @@ GL11.glPopMatrix();
 
             f10 = 100;
             double ringDist = 0;
-            mc.renderEngine.bindTexture(DimensionProperties.planetRings);
+            //mc.renderEngine.bindTexture(DimensionProperties.planetRings);
+            mc.renderEngine.bindTexture(DimensionProperties.planetRingsNew);
 
             GL11.glRotated(70, 1, 0, 0);
             GL11.glTranslated(0, -10, 0);
@@ -681,6 +685,7 @@ GL11.glPopMatrix();
             Tessellator.getInstance().draw();
             GL11.glPopMatrix();
 
+            /*
             GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
             GL11.glPushMatrix();
 
@@ -698,6 +703,7 @@ GL11.glPopMatrix();
             buffer.pos(f10, ringDist, f10).tex(1.0D, 1.0D).endVertex();
             Tessellator.getInstance().draw();
             GL11.glPopMatrix();
+             */
 
             GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
         }
@@ -709,13 +715,15 @@ GL11.glPopMatrix();
         GlStateManager.disableTexture2D();
         //This determines whether stars should come out regardless of thickness of atmosphere, as that is factored in later
         // - it checks if the colors of the sky are so close to black that you'd see stars, or if the atmosphere is zero and so no one gives a damn
-        float f18 = mc.world.getStarBrightness(partialTicks) * f6 + ((atmosphere == 0 || (f1 < 0.09 && f2 < 0.09 && f3 < 0.09)) ? 1 : 0) - (atmosphere > 1 ? atmosphere - 1 : 0);
+        float f18 = mc.world.getStarBrightness(partialTicks) * f6;//((atmosphere == 0 || (f1 < 0.09 && f2 < 0.09 && f3 < 0.09)) ? 1 : 0);// - (atmosphere > 1 ? atmosphere - 1 : 0);
 
-        if (mc.world.isRainingAt(mc.player.getPosition().add(0, 199, 0)))
-            f18 *= 1 - mc.world.getRainStrength(partialTicks);
 
-        if (f18 > 0.0F) {
-            GlStateManager.color(f18, f18, f18, f18);
+        float starAlpha = 1-((1-f18)*atmosphere);
+        System.out.println(starAlpha+":"+f18+":"+atmosphere);
+
+        //if (f18 > 0.0F) {
+        if (true){
+            GlStateManager.color(1, 1, 1, 1);
             GL11.glPushMatrix();
             if (isWarp) {
                 for (int i = -3; i < 5; i++) {
@@ -728,24 +736,24 @@ GL11.glPopMatrix();
                 //GL11.glTranslated(((System.currentTimeMillis()/10) + 50) % 100, 0, 0);
 
             } else {
-
+                GL11.glColor4f(1,1,1,starAlpha);
                 GL11.glCallList(this.starGLCallList);
                 //Extra stars for low ATM
                 if (atmosphere < 0.5) {
-                    GlStateManager.color(f18, f18, f18, f18 / 2f);
+                    GL11.glColor4f(1,1,1,starAlpha/2);
                     GL11.glPushMatrix();
                     GL11.glRotatef(-90, 0, 1, 0);
                     GL11.glCallList(this.starGLCallList);
                     GL11.glPopMatrix();
                 }
                 if (atmosphere < 0.25) {
-                    GlStateManager.color(f18, f18, f18, f18 / 4f);
+                    GL11.glColor4f(1,1,1,starAlpha/4);
                     GL11.glPushMatrix();
                     GL11.glRotatef(90, 0, 1, 0);
                     GL11.glCallList(this.starGLCallList);
                     GL11.glPopMatrix();
                 }
-                GlStateManager.color(f18, f18, f18, f18);
+                GlStateManager.color(1, 1, 1, 1);
 
             }
             GL11.glPopMatrix();
@@ -920,8 +928,7 @@ GL11.glPopMatrix();
         boolean gasGiant = properties.isGasGiant();
         float[] skyColor = properties.skyColor;
         float[] ringColor = properties.ringColor;
-
-        renderPlanetPubHelper(buffer, icon, 0, 0, -20, size * 0.2f, alphaMultiplier, shadowAngle, hasAtmosphere, skyColor, ringColor, gasGiant, hasRing, hasDecorators, shadowColorMultiplier, alphaMultiplier2);
+        renderPlanetPubHelper(buffer, icon, 0, 0, -20, size * 0.2f, alphaMultiplier, shadowAngle, hasAtmosphere, skyColor, ringColor, gasGiant, hasRing, properties.ringAngle, hasDecorators, shadowColorMultiplier, alphaMultiplier2);
     }
 
     protected void rotateAroundAxis() {
