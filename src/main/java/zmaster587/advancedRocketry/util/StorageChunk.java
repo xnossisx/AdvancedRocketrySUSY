@@ -869,7 +869,7 @@ public Block[][][] getblocks(){
                     this.metas[x][y][z] = buffer.readShort();
 
                     chunk.setBlockState(new BlockPos(x, y, z), this.blocks[x][y][z].getStateFromMeta(this.metas[x][y][z]));
-                    world.checkLightFor(EnumSkyBlock.BLOCK,new BlockPos(x, y, z));
+                    //world.checkLightFor(EnumSkyBlock.BLOCK,new BlockPos(x, y, z));
                 }
             }
         }
