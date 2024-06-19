@@ -108,6 +108,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public String customIcon;
     public float[] sunriseSunsetColors;
     public boolean hasRings;
+    public int ringangle;
     public boolean hasRivers;
     public List<ItemStack> requiredArtifacts;
     IAtmosphere atmosphereType;

@@ -41,6 +41,8 @@ public class RenderPlanetarySky extends IRenderHandler {
     private int glSkyList;
     private int glSkyList2;
 
+    static int m = 0;
+
     private static float xrotangle = 0;
 
     //Mostly vanilla code
@@ -166,11 +168,9 @@ public class RenderPlanetarySky extends IRenderHandler {
 
             }
 
-
-            GL11.glRotated(90 - shadowAngle * 180 / Math.PI, 0, 1, 0);
-
-
-            Minecraft.getMinecraft().world.getCelestialAngle(0);
+        }
+        GL11.glPushMatrix();
+            GL11.glRotated(90 - shadowAngle * 180 / Math.PI, 0, 1, 0);Minecraft.getMinecraft().world.getCelestialAngle(0);
             //Draw Shadow
             GlStateManager.clearColor(1f, 1f, 1f, 1f);
             GlStateManager.color(shadowColorMultiplier[0], shadowColorMultiplier[1], shadowColorMultiplier[2], alphaMultiplier2);
@@ -182,15 +182,31 @@ public class RenderPlanetarySky extends IRenderHandler {
             buffer.pos(size * 1.05F, 0 + 0.1f, -size * 1.05F).tex(f14, f15).endVertex();
             buffer.pos(-size * 1.05F, 0 + 0.1f, -size * 1.05F).tex(f15, f15).endVertex();
             Tessellator.getInstance().draw();
-        }
+GL11.glPopMatrix();
 
 
         GL11.glDepthMask(true);
         //Rings
+        GlStateManager.disableCull();
         if (hasRing) {
             GL11.glPushMatrix();
             GL11.glRotatef(90f, 0f, 1f, 0f);
-            GL11.glRotatef(-xrotangle, 1f, 0f, 0f);
+            GL11.glRotatef(m, 1f, 0f, 0f); // this should rotate around the global z axis
+            //GL11.glRotatef(-xrotangle, 1f, 0f, 0f);
+            GL11.glRotatef(70f, 0f, 0f, 1f);
+
+
+            GL11.glRotatef(m-90, 0f, 1f, 0f);
+
+
+//some hacky rotations stuff because I have no idea why the shadow is rendering the way it does
+            while (m > 360)
+                m-=360;
+            while (m < 0)
+                m+=180;
+
+            m++;
+            System.out.println("m: "+m);
 
             GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             GlStateManager.color(ringColor[0], ringColor[1], ringColor[2], alphaMultiplier * 0.2f);
@@ -204,6 +220,7 @@ public class RenderPlanetarySky extends IRenderHandler {
             buffer.pos(-ringSize, 0 - 0.00f, -ringSize).tex(f15, f15).endVertex();
             Tessellator.getInstance().draw();
 
+            //GlStateManager.color(ringColor[0], ringColor[1], ringColor[2], (float) (alphaMultiplier * 0.5*Math.abs(Math.sin(Math.toRadians(m)))));
             GlStateManager.color(0f, 0f, 0f, alphaMultiplier);
             Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRingShadow);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -212,8 +229,10 @@ public class RenderPlanetarySky extends IRenderHandler {
             buffer.pos(ringSize, 0 - 0.00f, -ringSize).tex(f14, f15).endVertex();
             buffer.pos(-ringSize, 0 - 0.00f, -ringSize).tex(f15, f15).endVertex();
             Tessellator.getInstance().draw();
+
             GL11.glPopMatrix();
         }
+        GlStateManager.enableCull();
         GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glDepthMask(false);
         GL11.glPopMatrix();
@@ -767,6 +786,7 @@ public class RenderPlanetarySky extends IRenderHandler {
                 if (parentHasRings) {
                     //Semihacky rotation stuff to keep rings synced to a different rotation than planet in the sky
                     xrotangle = -planetPositionTheta + ((float) (myTheta * 180f / Math.PI) % 360f);
+                    //System.out.println("r:"+xrotangle);
                 }
 
 
@@ -952,7 +972,7 @@ public class RenderPlanetarySky extends IRenderHandler {
             float f10;
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glPushMatrix();
-            GL11.glTranslatef(0, 100, 0);
+            GL11.glTranslatef(0, 30, 0);
 
             //float phase =  -((float)System.currentTimeMillis()/(float)3000.0);
             //phase *= 36f;
@@ -1065,10 +1085,10 @@ public class RenderPlanetarySky extends IRenderHandler {
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             float f10 = sunSize * 15f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
             //multiplier = 2;
-            buffer.pos(-f10, 150.0D, -f10).tex(0.0D, 0.0D).endVertex();
-            buffer.pos(f10, 150.0D, -f10).tex(1.0D, 0.0D).endVertex();
-            buffer.pos(f10, 150.0D, f10).tex(1.0D, 1.0D).endVertex();
-            buffer.pos(-f10, 150.0D, f10).tex(0.0D, 1.0D).endVertex();
+            buffer.pos(-f10, 120.0D, -f10).tex(0.0D, 0.0D).endVertex();
+            buffer.pos(f10, 120.0D, -f10).tex(1.0D, 0.0D).endVertex();
+            buffer.pos(f10, 120.0D, f10).tex(1.0D, 1.0D).endVertex();
+            buffer.pos(-f10, 120.0D, f10).tex(0.0D, 1.0D).endVertex();
             Tessellator.getInstance().draw();
         }
     }

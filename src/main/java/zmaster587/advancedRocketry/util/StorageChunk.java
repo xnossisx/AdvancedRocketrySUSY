@@ -498,6 +498,7 @@ public Block[][][] getblocks(){
                     metas[x][y][z] = (short) metasId[z + (sizeZ * y) + (sizeZ * sizeY * x)];
 
                     chunk.setBlockState(new BlockPos(x, y, z), this.blocks[x][y][z].getStateFromMeta(this.metas[x][y][z]));
+                    world.checkLightFor(EnumSkyBlock.BLOCK,new BlockPos(x, y, z));
                 }
             }
         }
@@ -868,6 +869,7 @@ public Block[][][] getblocks(){
                     this.metas[x][y][z] = buffer.readShort();
 
                     chunk.setBlockState(new BlockPos(x, y, z), this.blocks[x][y][z].getStateFromMeta(this.metas[x][y][z]));
+                    world.checkLightFor(EnumSkyBlock.BLOCK,new BlockPos(x, y, z));
                 }
             }
         }
