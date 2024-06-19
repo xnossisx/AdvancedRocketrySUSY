@@ -578,7 +578,7 @@ GL11.glPopMatrix();
         f2*=Math.min(1,atmosphere);
         f3*=Math.min(1,atmosphere);
 
-//System.out.println(f1+":"+f2+":"+f3+"  atm:"+atmosphere);
+        //System.out.println(f1+":"+f2+":"+f3+"  atm:"+atmosphere);
         //GlStateManager.color(f1, f2, f3);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
@@ -719,7 +719,7 @@ GL11.glPopMatrix();
 
 
         float starAlpha = 1-((1-f18)*atmosphere);
-        System.out.println(starAlpha+":"+f18+":"+atmosphere);
+        //System.out.println(starAlpha+":"+f18+":"+atmosphere);
 
         //if (f18 > 0.0F) {
         if (true){
