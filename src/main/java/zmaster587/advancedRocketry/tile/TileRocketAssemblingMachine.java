@@ -914,9 +914,17 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     public boolean onLinkComplete(@Nonnull ItemStack item, TileEntity entity,
                                   EntityPlayer player, World world) {
         TileEntity tile = world.getTileEntity(ItemLinker.getMasterCoords(item));
+        float maxlinkDistance = 5;
 
         if (tile instanceof IInfrastructure) {
             HashedBlockPosition pos = new HashedBlockPosition(tile.getPos());
+
+            if (pos.getDistance(new HashedBlockPosition(this.pos)) > maxlinkDistance){
+                if (!world.isRemote)
+                    player.sendMessage(new TextComponentTranslation("the machine is too far away to be linked"));
+                return false;
+            }
+
             if (!blockPos.contains(pos))
                 blockPos.add(pos);
 

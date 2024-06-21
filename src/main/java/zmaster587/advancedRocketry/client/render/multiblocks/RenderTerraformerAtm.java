@@ -2,6 +2,7 @@ package zmaster587.advancedRocketry.client.render.multiblocks;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -28,6 +29,10 @@ public class RenderTerraformerAtm extends TileEntitySpecialRenderer {
         }
     }
 
+    @Override
+    public boolean isGlobalRenderer(TileEntity te) {
+        return true;
+    }
     @Override
     public void render(TileEntity tile, double x,
                        double y, double z, float f, int damage, float a) {

@@ -33,6 +33,10 @@ public class RendererSpaceElevator extends TileEntitySpecialRenderer {
     }
 
     @Override
+    public boolean isGlobalRenderer(TileEntity te) {
+        return true;
+    }
+    @Override
     public void render(TileEntity tile, double x,
                        double y, double z, float f, int damage, float a) {
         TileSpaceElevator multiBlockTile = (TileSpaceElevator) tile;

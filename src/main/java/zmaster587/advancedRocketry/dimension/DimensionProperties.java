@@ -66,6 +66,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public static final ResourceLocation atmosphereLEO = new ResourceLocation("advancedrocketry:textures/planets/AtmosphereLEO.png");
     public static final ResourceLocation atmGlow = new ResourceLocation("advancedrocketry:textures/planets/atmGlow.png");
     public static final ResourceLocation planetRings = new ResourceLocation("advancedrocketry:textures/planets/rings.png");
+    public static final ResourceLocation planetRingsNew = new ResourceLocation("advancedrocketry:textures/planets/ringsnew.png");
     public static final ResourceLocation planetRingShadow = new ResourceLocation("advancedrocketry:textures/planets/ringShadow.png");
     public static final ResourceLocation shadow = new ResourceLocation("advancedrocketry:textures/planets/shadow.png");
     public static final ResourceLocation shadow3 = new ResourceLocation("advancedrocketry:textures/planets/shadow3.png");
@@ -108,6 +109,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public String customIcon;
     public float[] sunriseSunsetColors;
     public boolean hasRings;
+    public int ringAngle;
     public boolean hasRivers;
     public List<ItemStack> requiredArtifacts;
     IAtmosphere atmosphereType;
@@ -210,6 +212,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         status_terraforming = false;
         //water_can_exist = true;
         water_source_locked_positions = new ArrayList<>();
+
+        ringAngle = 70;
     }
 
     public void add_chunk_to_terraforming_list(Chunk chunk) {
@@ -1506,6 +1510,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         isNativeDimension = !nbt.hasKey("isNative") || nbt.getBoolean("isNative"); //Prevent world breakages when loading from old version
         isGasGiant = nbt.getBoolean("isGasGiant");
         hasRings = nbt.getBoolean("hasRings");
+        ringAngle = nbt.getInteger("ringAngle");
         seaLevel = nbt.getInteger("sealevel");
         //target_sea_level = nbt.getInteger("target_sea_level");
         generatorType = nbt.getInteger("genType");
@@ -1631,6 +1636,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         nbt.setTag("fogColor", list);
 
         if (hasRings) {
+            nbt.setInteger("ringAngle", ringAngle);
             list = new NBTTagList();
             for (float f : ringColor) {
                 list.appendTag(new NBTTagFloat(f));

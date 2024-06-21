@@ -63,6 +63,7 @@ public class XMLPlanetLoader {
     private static final String ATTR_ICON = "customIcon";
     private static final String ELEMENT_ISKNOWN = "isKnown";
     private static final String ELEMENT_HASRINGS = "hasRings";
+    private static final String ELEMENT_RING_ANGLE = "ringAngle";
     private static final String ELEMENT_RINGCOLOR = "ringColor";
     private static final String ELEMENT_GASGIANT = "GasGiant";
     private static final String ELEMENT_GAS = "gas";
@@ -221,6 +222,7 @@ public class XMLPlanetLoader {
 
         if (properties.hasRings) {
             nodePlanet.appendChild(createTextNode(doc, ELEMENT_HASRINGS, "true"));
+            nodePlanet.appendChild(createTextNode(doc, ELEMENT_RING_ANGLE, properties.ringAngle));
             nodePlanet.appendChild(createTextNode(doc, ELEMENT_RINGCOLOR, properties.ringColor[0] + "," + properties.ringColor[1] + "," + properties.ringColor[2]));
         }
 
@@ -866,6 +868,10 @@ public class XMLPlanetLoader {
                 properties.hasRings = Boolean.parseBoolean(planetPropertyNode.getTextContent());
             else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_CAN_DECORATE))
                 properties.setDecoratoration(Boolean.parseBoolean(planetPropertyNode.getTextContent()));
+            else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_RING_ANGLE)) {
+                properties.ringAngle = Integer.parseInt(planetPropertyNode.getTextContent());
+                System.out.println("read rings: "+properties.ringAngle);
+            }
             else if (planetPropertyNode.getNodeName().equalsIgnoreCase(ELEMENT_RINGCOLOR)) {
                 String[] colors = planetPropertyNode.getTextContent().split(",");
                 try {

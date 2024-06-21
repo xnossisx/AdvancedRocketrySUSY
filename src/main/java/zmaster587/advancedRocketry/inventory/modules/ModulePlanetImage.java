@@ -4,6 +4,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
 import zmaster587.advancedRocketry.client.render.planet.RenderPlanetarySky;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
@@ -35,7 +36,16 @@ public class ModulePlanetImage extends ModuleBase {
         //GL11.glTranslatef(xPosition, 100 + this.zLevel, yPosition);
         float newWidth = width / 2f;
         if (!Objects.equals(properties.customIcon, "void")) {
-            RenderPlanetarySky.renderPlanetPubHelper(vertexbuffer, (properties.isStar()) ? TextureResources.locationSunPng : properties.getPlanetIcon(), (int) (x + this.offsetX + newWidth), (int) (y + this.offsetY + newWidth), -0.1, newWidth, 1f, properties.getSolarTheta(), properties.hasAtmosphere(), properties.skyColor, properties.ringColor, properties.isGasGiant(), properties.hasRings(), properties.hasDecorators(), new float[]{0, 0, 0}, 1f);
+            ResourceLocation texture;
+            if (!properties.isStar())
+                texture = properties.getPlanetIcon();
+            else {
+                if (properties.getStar().isBlackHole())
+                    texture = TextureResources.locationBlackHole_icon;
+                else
+                    texture = TextureResources.locationSunPng;
+            }
+            RenderPlanetarySky.renderPlanetPubHelper_old(vertexbuffer, texture, (int) (x + this.offsetX + newWidth), (int) (y + this.offsetY + newWidth), -0.1, newWidth, 1f, properties.getSolarTheta(), properties.hasAtmosphere(), properties.skyColor, properties.ringColor, properties.isGasGiant(), properties.hasRings(), properties.hasDecorators(), new float[]{0, 0, 0}, 1f);
         }
         GL11.glPopMatrix();
     }

@@ -22,6 +22,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
@@ -302,7 +303,11 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         return (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
     }
 
-
+    @Override
+    @SideOnly(Side.CLIENT)
+    public double getMaxRenderDistanceSquared() {
+        return 160*160;
+    }
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
@@ -397,10 +402,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
             }
             if (radioButton.getOptionSelected() == 0) {
 
-                if (requiredN2 == 0)
+                if (requiredN2 == 0 && requiredO2 == 0) {
                     requiredN2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
-                if (requiredO2 == 0)
                     requiredO2 = ARConfiguration.getCurrentConfig().terraformliquidRate;
+                }
 
                 for (IFluidHandler handler : fluidInPorts) {
                     FluidStack fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidNitrogen, requiredN2), true);
@@ -581,6 +586,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
         if (!world.isRemote && id == NetworkPackets.TOGGLE.ordinal()) {
             outOfFluid = false;
+            was_outOfFluid_last_tick = false;
             setMachineRunning(isRunning());
         }
 

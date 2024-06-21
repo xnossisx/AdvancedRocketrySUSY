@@ -16,11 +16,13 @@ import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.block.*;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.entity.EntityStationDeployedRocket;
+import zmaster587.advancedRocketry.network.PacketInvalidLocationNotify;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.network.PacketEntity;
 import zmaster587.libVulpes.network.PacketHandler;
+import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.ZUtils;
 
 import javax.annotation.Nonnull;
@@ -205,6 +207,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
 
         boolean hasSatellite = false;
         boolean hasGuidance = false;
+        boolean invalidBlock = false;
         int fluidCapacity = 0;
 
         if (verifyScan(bb, world)) {
@@ -216,6 +219,16 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                         if (!world.isAirBlock(currPos)) {
                             IBlockState state = world.getBlockState(currPos);
                             Block block = state.getBlock();
+
+                            if (ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block)) {
+                                if (!block.isReplaceable(world, currPos)) {
+                                    invalidBlock = true;
+                                    if (!world.isRemote)
+                                        PacketHandler.sendToNearby(new PacketInvalidLocationNotify(new HashedBlockPosition(xCurr, yCurr, zCurr)), world.provider.getDimension(), getPos(), 64);
+                                }
+                                continue;
+                            }
+
                             numBlocks++;
 
                             //If rocketEngine increaseThrust
@@ -231,7 +244,7 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
                                     thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currPos);
                                 }
 
-                                stats.addEngineLocation(xCurr - actualMinX - ((float)(actualMaxX - actualMinX) / 2f), yCurr - actualMinY, zCurr - actualMinZ - ((float)(actualMaxZ - actualMinZ) / 2f));
+                                stats.addEngineLocation(xCurr - actualMinX - ((float) (actualMaxX - actualMinX) / 2f), yCurr - actualMinY, zCurr - actualMinZ - ((float) (actualMaxZ - actualMinZ) / 2f));
                                 //stats.addEngineLocation(xCurr - actualMinX, yCurr - actualMinY, zCurr - actualMinZ);
                             }
 
@@ -297,9 +310,9 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
             int totalFuelUse = bipropellantfuelUse + nuclearWorkingFluidUse + monopropellantfuelUse;
 
             //Set status
-            if (((fuelCapacityBipropellant > 0 && totalFuel > fuelCapacityBipropellant) || (fuelCapacityMonopropellant > 0 && totalFuel > fuelCapacityMonopropellant) || (fuelCapacityNuclearWorkingFluid > 0 && totalFuel > fuelCapacityNuclearWorkingFluid))
-                    ||
-                    ((thrustBipropellant > 0 && totalFuelUse > bipropellantfuelUse) || (thrustMonopropellant > 0 && totalFuelUse > monopropellantfuelUse) || (thrustNuclearTotalLimit > 0 && totalFuelUse > nuclearWorkingFluidUse)))
+            if (invalidBlock)
+                status = ErrorCodes.INVALIDBLOCK;
+            else if (((fuelCapacityBipropellant > 0 && totalFuel > fuelCapacityBipropellant) || (fuelCapacityMonopropellant > 0 && totalFuel > fuelCapacityMonopropellant) || (fuelCapacityNuclearWorkingFluid > 0 && totalFuel > fuelCapacityNuclearWorkingFluid)) || ((thrustBipropellant > 0 && totalFuelUse > bipropellantfuelUse) || (thrustMonopropellant > 0 && totalFuelUse > monopropellantfuelUse) || (thrustNuclearTotalLimit > 0 && totalFuelUse > nuclearWorkingFluidUse)))
                 status = ErrorCodes.COMBINEDTHRUST;
             else if (getThrust() < getNeededThrust())
                 status = ErrorCodes.NOENGINES;

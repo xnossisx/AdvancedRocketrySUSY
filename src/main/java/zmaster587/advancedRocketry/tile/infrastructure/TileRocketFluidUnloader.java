@@ -43,6 +43,7 @@ public class TileRocketFluidUnloader extends TileRocketFluidLoader implements II
             List<TileEntity> tiles = rocket.storage.getFluidTiles();
             boolean rocketFluidFull = false;
 
+            boolean doupdate = false;
             //Function returns if something can be moved
             for (TileEntity tile : tiles) {
                 IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
@@ -60,10 +61,13 @@ public class TileRocketFluidUnloader extends TileRocketFluidLoader implements II
                         shouldOperate = getFluidTank().fill(handler.drain(getFluidTank().getCapacity(), false), false) > 0;
 
                     if (shouldOperate) {
-                        getFluidTank().fill(handler.drain(getFluidTank().getCapacity() - getFluidTank().getFluidAmount(), true), true);
-                        PacketHandler.sendToNearby(new PacketEntity(rocket, (byte) EntityRocket.PacketType.RECIEVENBT.ordinal()), world.provider.getDimension(), getPos(), 128);
+                        doupdate = true;
+                        getFluidTank().fill(handler.drain(Math.max(50, getFluidTank().getCapacity() - getFluidTank().getFluidAmount()), true), true);
                     }
                 }
+            }
+            if (doupdate) {
+                PacketHandler.sendToNearby(new PacketEntity(rocket, (byte) 9987), world.provider.getDimension(), getPos(), 128);
             }
 
             //Update redstone state

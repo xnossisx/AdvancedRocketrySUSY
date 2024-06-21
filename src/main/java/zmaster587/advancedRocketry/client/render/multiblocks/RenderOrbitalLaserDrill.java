@@ -31,6 +31,10 @@ public class RenderOrbitalLaserDrill extends TileEntitySpecialRenderer {
     }
 
     @Override
+    public boolean isGlobalRenderer(TileEntity te) {
+        return true;
+    }
+    @Override
     public void render(TileEntity tile, double x,
                        double y, double z, float f, int damage, float a) {
         TileMultiBlock multiBlockTile = (TileMultiBlock) tile;
