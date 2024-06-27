@@ -4,9 +4,8 @@ import com.matthewprenger.cursegradle.CurseRelation
 import org.ajoberstar.grgit.Grgit
 import org.gradle.internal.jvm.Jvm
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
-import java.util.Date
 import java.text.SimpleDateFormat
-import java.util.TimeZone
+import java.util.*
 
 plugins {
     idea
@@ -149,7 +148,7 @@ repositories {
 dependencies {
     minecraft(group = "net.minecraftforge", name = "forge", version = "$mcVersion-$forgeVersion")
 
-    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
+//    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
     //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
     //implementation("zmaster587.libVulpes:LibVulpes:$mcVersion-$libVulpesVersion-$libVulpesBuildNum-deobf")
 

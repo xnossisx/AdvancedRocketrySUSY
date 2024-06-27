@@ -289,6 +289,7 @@ public class AdvancedRocketry {
         config = new Configuration(new File(event.getModConfigurationDirectory(), "/" + zmaster587.advancedRocketry.api.ARConfiguration.configFolder + "/advancedRocketry.cfg"));
         zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().config = config;
         config.load();
+
         ARConfiguration.loadPreInit();
         resetFromXml = config.getBoolean("resetPlanetsFromXML", Configuration.CATEGORY_GENERAL, false, "setting this to true will force AR to read from the XML file in the config/advRocketry instead of the local data, intended for use pack developers to ensure updates are pushed through");
 
@@ -1235,11 +1236,11 @@ public class AdvancedRocketry {
         ((BlockSeal) AdvancedRocketryBlocks.blockPipeSealer).clearMap();
         DimensionManager.dimOffset = config.getInt("minDimension", "Planet", 2, -127, 8000, "Dimensions including and after this number are allowed to be made into planets");
         zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().spaceDimId = config.get(Configuration.CATEGORY_GENERAL, "spaceStationId", -2, "Dimension ID to use for space stations").getInt();
+        WeightEngine.INSTANCE.save();
     }
 
     @SubscribeEvent
     public void registerOre(OreRegisterEvent event) {
-
         //Register ore products
         if (!zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().allowMakingItemsForOtherMods)
             return;

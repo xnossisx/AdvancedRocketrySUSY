@@ -26,9 +26,11 @@ import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.block.*;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.entity.EntityRocket;
+import zmaster587.advancedRocketry.item.ItemPackedStructure;
 import zmaster587.advancedRocketry.network.PacketInvalidLocationNotify;
 import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
 import zmaster587.advancedRocketry.util.StorageChunk;
+import zmaster587.advancedRocketry.util.WeightEngine;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.client.util.ProgressBarImage;
@@ -292,6 +294,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         boolean hasSatellite = false;
         boolean hasGuidance = false;
         boolean invalidBlock = false;
+        float weight = 0;
 
         if (verifyScan(bb, world)) {
             for (int yCurr = (int) bb.minY; yCurr <= bb.maxY; yCurr++) {
@@ -316,6 +319,8 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                             }
 
                             numBlocks++;
+
+                            weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
 
                             //If rocketEngine increaseThrust
                             final float x = xCurr - actualMinX - ((actualMaxX - actualMinX) / 2f);
@@ -359,11 +364,18 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                             }
 
                             TileEntity tile = world.getTileEntity(currBlockPos);
-                            if (tile instanceof TileSatelliteHatch)
+                            if (tile instanceof TileSatelliteHatch) {
                                 hasSatellite = true;
-                            if (tile instanceof TileGuidanceComputer)
+                                TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
+                                if (hatch.getSatellite() != null) {
+                                    weight += hatch.getSatellite().getProperties().getWeight();
+                                } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
+                                    ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0).getItem();
+                                    weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
+                                }
+                            } else if (tile instanceof TileGuidanceComputer) {
                                 hasGuidance = true;
-
+                            }
                         }
                     }
                 }
@@ -390,7 +402,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             stats.setFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID, fuelCapacityNuclearWorkingFluid);
 
             //Non-fuel stats
-            stats.setWeight(numBlocks);
+            stats.setWeight((int) weight);
             stats.setThrust(Math.max(Math.max(thrustMonopropellant, thrustBipropellant), thrustNuclearTotalLimit));
             stats.setDrillingPower(drillPower);
 

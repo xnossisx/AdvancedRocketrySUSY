@@ -69,7 +69,6 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
                 actualMaxY = (int) bb.minY,
                 actualMaxZ = (int) bb.minZ;
 
-
         for (int xCurr = (int) bb.minX; xCurr <= bb.maxX; xCurr++) {
             for (int zCurr = (int) bb.minZ; zCurr <= bb.maxZ; zCurr++) {
                 for (int yCurr = (int) bb.minY; yCurr <= bb.maxY; yCurr++) {

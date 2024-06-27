@@ -35,7 +35,6 @@ public abstract class SatelliteBase {
 
         //Satellite energy storage
         battery = new UniversalBattery(this.satelliteProperties.getPowerStorage());
-
     }
 
     public boolean acceptsItemInConstruction(@Nonnull ItemStack item) {

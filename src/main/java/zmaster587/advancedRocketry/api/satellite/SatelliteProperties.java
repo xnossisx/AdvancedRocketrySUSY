@@ -2,8 +2,9 @@ package zmaster587.advancedRocketry.api.satellite;
 
 import net.minecraft.nbt.NBTTagCompound;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
+import zmaster587.advancedRocketry.util.IWeighted;
 
-public class SatelliteProperties {
+public class SatelliteProperties implements IWeighted {
 
     private int powerGeneration, powerStorage, maxData;
     private long id;
@@ -75,6 +76,10 @@ public class SatelliteProperties {
     public SatelliteProperties setPowerGeneration(int powerGeneration) {
         this.powerGeneration = powerGeneration;
         return this;
+    }
+
+    public float getWeight() {
+        return 50 + getPowerStorage() * 0.1F + getPowerGeneration() * 0.2F + getMaxDataStorage() * 0.01F;
     }
 
     /**

@@ -51,7 +51,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class StorageChunk implements IBlockAccess, IStorageChunk {
+public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
 
     public Chunk chunk;
     public WorldDummy world;
@@ -64,8 +64,9 @@ public class StorageChunk implements IBlockAccess, IStorageChunk {
     private ArrayList<TileEntity> inventoryTiles;
     private ArrayList<TileEntity> liquidTiles;
     private Entity entity;
+    private int weight;
 
-public Block[][][] getblocks(){
+    public Block[][][] getblocks(){
     return blocks;
 }
 
@@ -107,6 +108,15 @@ public Block[][][] getblocks(){
         return tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null);
     }
 
+    public void setWeight(int weight) {
+        this.weight = weight;
+    }
+
+    @Override
+    public float getWeight() {
+        return this.weight;
+    }
+
     public static StorageChunk copyWorldBB(World world, AxisAlignedBB bb) {
         int actualMinX = (int) bb.maxX,
                 actualMinY = (int) bb.maxY,
@@ -115,6 +125,7 @@ public Block[][][] getblocks(){
                 actualMaxY = (int) bb.minY,
                 actualMaxZ = (int) bb.minZ;
 
+        float weight = 0;
 
         //Try to fit to smallest bounds
         for (int x = (int) bb.minX; x <= bb.maxX; x++) {
@@ -137,6 +148,8 @@ public Block[][][] getblocks(){
                             actualMaxY = y;
                         if (z > actualMaxZ)
                             actualMaxZ = z;
+
+                        weight += WeightEngine.INSTANCE.getWeight(world, pos);
                     }
                 }
             }
@@ -144,6 +157,7 @@ public Block[][][] getblocks(){
 
         StorageChunk ret = new StorageChunk((actualMaxX - actualMinX + 1), (actualMaxY - actualMinY + 1), (actualMaxZ - actualMinZ + 1));
 
+        ret.weight = (int) weight;
 
         //Iterate though the bounds given storing blocks/meta/tiles
         for (int x = actualMinX; x <= actualMaxX; x++) {
@@ -192,11 +206,16 @@ public Block[][][] getblocks(){
 
     public static StorageChunk cutWorldBB(World worldObj, AxisAlignedBB bb) {
         StorageChunk chunk = StorageChunk.copyWorldBB(worldObj, bb);
+
+        float weight = 0;
+
         for (int x = (int) bb.minX; x <= bb.maxX; x++) {
             for (int z = (int) bb.minZ; z <= bb.maxZ; z++) {
                 for (int y = (int) bb.minY; y <= bb.maxY; y++) {
-
                     BlockPos pos = new BlockPos(x, y, z);
+
+                    weight += WeightEngine.INSTANCE.getWeight(worldObj, pos);
+
                     //Workaround for dupe
                     TileEntity tile = worldObj.getTileEntity(pos);
                     if (tile instanceof IInventory) {
@@ -210,6 +229,8 @@ public Block[][][] getblocks(){
                 }
             }
         }
+
+        chunk.weight = (int) weight;
 
         //Carpenter's block's dupe
         for (Entity entity : worldObj.getEntitiesWithinAABB(EntityItem.class, bb.grow(5, 5, 5))) {
@@ -298,7 +319,7 @@ public Block[][][] getblocks(){
         nbt.setInteger("xSize", sizeX);
         nbt.setInteger("ySize", sizeY);
         nbt.setInteger("zSize", sizeZ);
-
+        nbt.setInteger("weight", weight);
 
         Iterator<TileEntity> tileEntityIterator = tileEntities.iterator();
         NBTTagList tileList = new NBTTagList();
@@ -477,6 +498,7 @@ public Block[][][] getblocks(){
         sizeX = nbt.getInteger("xSize");
         sizeY = nbt.getInteger("ySize");
         sizeZ = nbt.getInteger("zSize");
+        weight = nbt.getInteger("weight");
 
         blocks = new Block[sizeX][sizeY][sizeZ];
         metas = new short[sizeX][sizeY][sizeZ];
