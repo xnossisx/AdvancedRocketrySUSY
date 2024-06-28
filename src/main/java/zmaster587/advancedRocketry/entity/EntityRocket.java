@@ -1573,6 +1573,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         boolean allowLaunch = false;
 
+        this.stats.setWeight((int) storage.recalculateWeight());
 
         if (ARConfiguration.getCurrentConfig().experimentalSpaceFlight && storage.getGuidanceComputer() != null && storage.getGuidanceComputer().isEmpty()) {
             allowLaunch = true;

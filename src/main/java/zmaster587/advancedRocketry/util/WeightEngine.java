@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.util;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -33,11 +34,11 @@ public enum WeightEngine {
         if (stack.isEmpty()) {
             return 0;
         }
-        double weight = weights.getOrDefault(stack.getUnlocalizedName(), -1.0) * stack.getCount();
+        double weight = weights.getOrDefault(stack.getItem().getRegistryName().toString(), -1.0) * stack.getCount();
         if (weight >= 0) {
             return (float) weight;
         }
-        weights.put(stack.getUnlocalizedName(), 0.1);
+        weights.put(stack.getItem().getRegistryName().toString(), 0.1);
         return 0.1F;
         // TODO Make weight selection by regular expressions
     }
@@ -47,12 +48,16 @@ public enum WeightEngine {
     }
 
     public float getWeight(World world, BlockPos pos) {
-        float weight = getWeight(new ItemStack(world.getBlockState(pos).getBlock()));
+        return getWeight(world.getTileEntity(pos), world.getBlockState(pos).getBlock());
+    }
 
-        TileEntity te = world.getTileEntity(pos);
+    public float getTEWeight(TileEntity te) {
+        float weight = 0;
+
         if (te == null) {
             return weight;
         }
+
         IItemHandler capability = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         if (capability == null) {
             return weight;
@@ -63,6 +68,16 @@ public enum WeightEngine {
         return weight;
     }
 
+    public float getWeight(TileEntity te, Block blk) {
+        if (blk == null) {
+            // if block is null, TE should be not null
+            blk = te.getBlockType();
+        }
+        float weight = getWeight(new ItemStack(blk));
+
+        return weight + getTEWeight(te);
+    }
+
     public float getWeight(World world, Collection<BlockPos> poses) {
         return poses.stream().map(pos -> getWeight(world, pos)).reduce(0.0F, Float::sum);
     }
@@ -71,6 +86,7 @@ public enum WeightEngine {
         File f = new File(file);
         if (!f.exists()) {
             weights = new HashMap<>();
+            return;
         }
         try (Reader r = new FileReader(file)) {
             Gson GSON = new GsonBuilder().disableHtmlEscaping().create();

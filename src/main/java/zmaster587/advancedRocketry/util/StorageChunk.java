@@ -64,7 +64,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
     private ArrayList<TileEntity> inventoryTiles;
     private ArrayList<TileEntity> liquidTiles;
     private Entity entity;
-    private int weight;
+    private float weight;
 
     public Block[][][] getblocks(){
     return blocks;
@@ -117,6 +117,26 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
         return this.weight;
     }
 
+    public float recalculateWeight() {
+        this.weight = 0;
+
+        // plain blocks
+        for (int x = 0; x < this.sizeX; x++) {
+            for (int z = 0; z < this.sizeZ; z++) {
+                for (int y = 0; y < this.sizeY; y++) {
+                    this.weight += WeightEngine.INSTANCE.getWeight(null, this.blocks[x][y][z]);
+                }
+            }
+        }
+
+        // TEs
+        for (TileEntity te : this.tileEntities) {
+            this.weight += WeightEngine.INSTANCE.getTEWeight(te);
+        }
+
+        return this.weight;
+    }
+
     public static StorageChunk copyWorldBB(World world, AxisAlignedBB bb) {
         int actualMinX = (int) bb.maxX,
                 actualMinY = (int) bb.maxY,
@@ -124,8 +144,6 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
                 actualMaxX = (int) bb.minX,
                 actualMaxY = (int) bb.minY,
                 actualMaxZ = (int) bb.minZ;
-
-        float weight = 0;
 
         //Try to fit to smallest bounds
         for (int x = (int) bb.minX; x <= bb.maxX; x++) {
@@ -148,8 +166,6 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
                             actualMaxY = y;
                         if (z > actualMaxZ)
                             actualMaxZ = z;
-
-                        weight += WeightEngine.INSTANCE.getWeight(world, pos);
                     }
                 }
             }
@@ -157,13 +173,16 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
 
         StorageChunk ret = new StorageChunk((actualMaxX - actualMinX + 1), (actualMaxY - actualMinY + 1), (actualMaxZ - actualMinZ + 1));
 
-        ret.weight = (int) weight;
+        float weight = 0;
 
         //Iterate though the bounds given storing blocks/meta/tiles
         for (int x = actualMinX; x <= actualMaxX; x++) {
             for (int z = actualMinZ; z <= actualMaxZ; z++) {
                 for (int y = actualMinY; y <= actualMaxY; y++) {
                     BlockPos pos = new BlockPos(x, y, z);
+
+                    weight += WeightEngine.INSTANCE.getWeight(world, pos);
+
                     IBlockState state = world.getBlockState(pos);
                     ret.blocks[x - actualMinX][y - actualMinY][z - actualMinZ] = state.getBlock();
                     ret.metas[x - actualMinX][y - actualMinY][z - actualMinZ] = (short) state.getBlock().getMetaFromState(state);
@@ -200,6 +219,8 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
                 }
             }
         }
+
+        ret.weight = weight;
 
         return ret;
     }
@@ -319,7 +340,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
         nbt.setInteger("xSize", sizeX);
         nbt.setInteger("ySize", sizeY);
         nbt.setInteger("zSize", sizeZ);
-        nbt.setInteger("weight", weight);
+        nbt.setFloat("weight", weight);
 
         Iterator<TileEntity> tileEntityIterator = tileEntities.iterator();
         NBTTagList tileList = new NBTTagList();
@@ -498,7 +519,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
         sizeX = nbt.getInteger("xSize");
         sizeY = nbt.getInteger("ySize");
         sizeZ = nbt.getInteger("zSize");
-        weight = nbt.getInteger("weight");
+        weight = nbt.getFloat("weight");
 
         blocks = new Block[sizeX][sizeY][sizeZ];
         metas = new short[sizeX][sizeY][sizeZ];
