@@ -27,6 +27,7 @@ public class TextureResources {
     public static final ResourceLocation locationSunPng = new ResourceLocation("advancedrocketry:textures/env/sun.png");
     public static final ResourceLocation locationSunNew = new ResourceLocation("advancedrocketry:textures/env/sun2.png");
     public static final ResourceLocation locationAccretionDisk = new ResourceLocation("advancedrocketry:textures/env/accretiondisk.png");
+    public static final ResourceLocation locationAccretionDiskDense = new ResourceLocation("advancedrocketry:textures/env/accretiondiskdense.png");
     public static final ResourceLocation locationBlackHole = new ResourceLocation("advancedrocketry:textures/env/blackhole.png");
     public static final ResourceLocation locationBlackHoleBorder = new ResourceLocation("advancedrocketry:textures/env/blackholeborder.png");
     public static final ResourceLocation locationBlackHole_icon = new ResourceLocation("advancedrocketry:textures/env/blackhole_icon.png");
