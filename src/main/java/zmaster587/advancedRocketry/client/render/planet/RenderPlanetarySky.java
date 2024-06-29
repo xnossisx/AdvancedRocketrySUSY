@@ -42,7 +42,8 @@ public class RenderPlanetarySky extends IRenderHandler {
     private int glSkyList2;
 
 
-    private static float xrotangle = 0;
+    private static float xrotangle = 0; // used for ring rotation because I don't want to bother changing the definitions of methods.
+    private static float[] skycolor = {0,0,0}; // used for black hole rendering - same reason as above
 
     //Mostly vanilla code
     //TODO: make usable on other planets
@@ -580,6 +581,10 @@ GL11.glPopMatrix();
         f2*=Math.min(1,atmosphere);
         f3*=Math.min(1,atmosphere);
 
+        skycolor[0] = f1;
+        skycolor[1] = f2;
+        skycolor[2] = f3;
+
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
         GlStateManager.depthMask(false);
@@ -760,8 +765,12 @@ GL11.glPopMatrix();
 
         //--------------------------- Draw the suns --------------------
         if (!isWarp) {
-            if (parentProperties == null || !parentProperties.isStar())
+            if (parentProperties == null || !parentProperties.isStar()) {
+                xrotangle = ((float) (properties.getSolarTheta() * 180f / Math.PI) % 360f); // for black hole disk
+                //System.out.println(xrotangle+":"+properties.getSolarTheta());
                 drawStarAndSubStars(buffer, primaryStar, properties, solarOrbitalDistance, sunSize, sunColor, multiplier);
+                xrotangle = 0;
+            }
         }
 
         //Useful celestial angle for the next renders
@@ -978,7 +987,7 @@ GL11.glPopMatrix();
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder bufferBuilder = tessellator.getBuffer();
 
-        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+        bufferBuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
         for(int i = 0; i < slices; i++) {
             for(int j = 0; j < stacks; j++) {
@@ -987,15 +996,16 @@ GL11.glPopMatrix();
                 double firstLat = Math.PI * (j / (double)stacks) - Math.PI / 2;
                 double secondLat = Math.PI * ((j + 1) / (double)stacks) - Math.PI / 2;
 
-                bufferBuilder.pos(x + radius * Math.cos(firstLat) * Math.cos(firstLong), y + radius * Math.sin(firstLat), z + radius * Math.cos(firstLat) * Math.sin(firstLong)).endVertex();
-                bufferBuilder.pos(x + radius * Math.cos(secondLat) * Math.cos(firstLong), y + radius * Math.sin(secondLat), z + radius * Math.cos(secondLat) * Math.sin(firstLong)).endVertex();
-                bufferBuilder.pos(x + radius * Math.cos(secondLat) * Math.cos(secondLong), y + radius * Math.sin(secondLat), z + radius * Math.cos(secondLat) * Math.sin(secondLong)).endVertex();
-                bufferBuilder.pos(x + radius * Math.cos(firstLat) * Math.cos(secondLong), y + radius * Math.sin(firstLat), z + radius * Math.cos(firstLat) * Math.sin(secondLong)).endVertex();
+                bufferBuilder.pos(x + radius * Math.cos(firstLat) * Math.cos(firstLong), y + radius * Math.sin(firstLat), z + radius * Math.cos(firstLat) * Math.sin(firstLong)).tex(0.0D, 0.0D).endVertex();
+                bufferBuilder.pos(x + radius * Math.cos(secondLat) * Math.cos(firstLong), y + radius * Math.sin(secondLat), z + radius * Math.cos(secondLat) * Math.sin(firstLong)).tex(1.0D, 0.0D).endVertex();
+                bufferBuilder.pos(x + radius * Math.cos(secondLat) * Math.cos(secondLong), y + radius * Math.sin(secondLat), z + radius * Math.cos(secondLat) * Math.sin(secondLong)).tex(1.0D, 1.0D).endVertex();
+                bufferBuilder.pos(x + radius * Math.cos(firstLat) * Math.cos(secondLong), y + radius * Math.sin(firstLat), z + radius * Math.cos(firstLat) * Math.sin(secondLong)).tex(0.0D, 1.0D).endVertex();
             }
         }
 
         tessellator.draw();
     }
+
 
     protected void drawStar(BufferBuilder buffer, StellarBody sun, DimensionProperties properties, int solarOrbitalDistance, float sunSize, Vec3d sunColor, float multiplier) {
         if (sun != null && sun.isBlackHole()) {
@@ -1013,9 +1023,10 @@ GL11.glPopMatrix();
             GL11.glTranslatef(0, 100, 0);
             f10 = sunSize * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
 
-            GlStateManager.color(0,0,0);
+            mc.renderEngine.bindTexture(TextureResources.locationWhitePng);
             GlStateManager.disableCull();
-            renderSphere(0,0,0,f10,16,16);
+            GlStateManager.color(skycolor[0], skycolor[1], skycolor[2]); // Set the color
+            renderSphere(0, 0, 0, f10, 16, 16); // Draw the sphere
             GlStateManager.enableCull();
             GL11.glEnable(GL11.GL_BLEND);
             GL11.glDepthMask(false);
@@ -1060,15 +1071,49 @@ GL11.glPopMatrix();
             Tessellator.getInstance().draw();
             GL11.glPopMatrix();
 */
+            float diskangle = sun.diskAngle;
 
+            float m = -xrotangle;
+            while (m > 360)
+                m-=360;
+            while (m < 0)
+                m+=360;
             //Render accretion disk
-            mc.renderEngine.bindTexture(TextureResources.locationAccretionDisk);
+            mc.renderEngine.bindTexture(TextureResources.locationAccretionDiskDense);
             GlStateManager.depthMask(false);
+
+            float speedMult = 5;
+            GlStateManager.disableCull();
+
+
+            GL11.glPushMatrix();
+            GL11.glTranslatef(0, 100, 0);
+            GL11.glRotatef(90, 0f, 1f, 0f);
+            //GL11.glRotatef(m, 1f, 0f, 0f);
+            //GL11.glRotatef(diskangle, 0, 0, 1);
+            //GL11.glRotatef(90, 1, 0, 0);
+            GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 360 * speedMult)) / (360f * speedMult), 0, 1, 0);
+
+            GlStateManager.color((float) 1, (float) .7, (float) .5, 1f);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+            f10 = sunSize * 6.5f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
+            buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
+            buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
+            buffer.pos(f10, 0.0D, f10).tex(1.0D, 1.0D).endVertex();
+            buffer.pos(-f10, 0.0D, f10).tex(0.0D, 1.0D).endVertex();
+            Tessellator.getInstance().draw();
+            GL11.glPopMatrix();
+
+
+            mc.renderEngine.bindTexture(TextureResources.locationAccretionDisk);
+
             for (int i = 0; i < 1; i++) {
-                float speedMult = ((i) * 1.01f + 1)/0.1F;
+                speedMult = ((i) * 1.01f + 1)/0.1F;
                 GL11.glPushMatrix();
-                GL11.glTranslatef(0, 100, 0);
-                GL11.glRotatef(80, -1, 1, 0);
+                GL11.glTranslatef(0, 101, 0);
+                GL11.glRotatef(90, 0f, 1f, 0f);
+                GL11.glRotatef(m, 1f, 0f, 0f);
+                GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 36000)) / (100f * speedMult), 0, 1, 0);
 
                 GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
@@ -1081,10 +1126,13 @@ GL11.glPopMatrix();
                 Tessellator.getInstance().draw();
                 GL11.glPopMatrix();
 
+
                 GL11.glPushMatrix();
 
-                GL11.glTranslatef(0, 99.99f, 0);
-                GL11.glRotatef(80, -1, 1, 0);
+                GL11.glTranslatef(0, 100f, 0);
+                GL11.glRotatef(90, 0f, 1f, 0f);
+                GL11.glRotatef(m, 1f, 0f, 0f);
+                GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 360 * 50)) / (50f * speedMult), 0, 1, 0);
 
                 GlStateManager.color((float) 0.8, (float) .7, (float) .4, 1f);
@@ -1100,8 +1148,10 @@ GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
 
-                GL11.glTranslatef(0, 99.98f, 0);
-                GL11.glRotatef(80, -1, 1, 0);
+                GL11.glTranslatef(0, 99f, 0);
+                GL11.glRotatef(90, 0f, 1f, 0f);
+                GL11.glRotatef(m, 1f, 0f, 0f);
+                GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 360 * 25)) / (25f * speedMult), 0, 1, 0);
 
                 GlStateManager.color((float) 0.2, (float) .4, (float) 1, 1f);
@@ -1114,12 +1164,16 @@ GL11.glPopMatrix();
                 buffer.pos(-f10, 0.0D, f10).tex(0.0D, 1.0D).endVertex();
                 Tessellator.getInstance().draw();
                 GL11.glPopMatrix();
+
+
             }
 
             GlStateManager.depthMask(true);
             GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
             GlStateManager.depthMask(false);
             GL11.glPopMatrix();
+            GlStateManager.enableCull();
+
 
         } else {
             mc.renderEngine.bindTexture(TextureResources.locationSunPng);

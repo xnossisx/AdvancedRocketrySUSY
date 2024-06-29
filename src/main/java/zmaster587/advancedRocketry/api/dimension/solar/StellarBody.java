@@ -28,6 +28,7 @@ public class StellarBody {
     private int temperature;
     private HashMap<Integer, IDimensionProperties> planets;
     private boolean isBlackHole;
+    public float diskAngle;
 
     public StellarBody() {
         planets = new HashMap<>();
@@ -35,6 +36,7 @@ public class StellarBody {
         subStars = new LinkedList<>();
         starSeperation = 5f;
         isBlackHole = false;
+        diskAngle = 70;
     }
 
     public List<StellarBody> getSubStars() {
@@ -233,6 +235,7 @@ public class StellarBody {
         nbt.setFloat("size", size);
         nbt.setFloat("seperation", starSeperation);
         nbt.setBoolean("isBlackHole", isBlackHole);
+        nbt.setFloat("diskAngle", diskAngle);
 
         NBTTagList list = new NBTTagList();
 
@@ -253,6 +256,7 @@ public class StellarBody {
         posX = nbt.getShort("posX");
         posZ = nbt.getShort("posZ");
         isBlackHole = nbt.getBoolean("isBlackHole");
+        diskAngle = nbt.getFloat("diskAngle");
 
         if (nbt.hasKey("size"))
             size = nbt.getFloat("size");

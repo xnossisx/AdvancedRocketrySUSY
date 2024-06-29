@@ -132,16 +132,23 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                  */
 
 
-                float speedMult = 5;
-
+                //Render accretion disk
                 mc.renderEngine.bindTexture(TextureResources.locationAccretionDiskDense);
+                GlStateManager.depthMask(false);
+
+                float speedMult = 5;
+                GlStateManager.disableCull();
+
 
                 GL11.glPushMatrix();
                 GL11.glTranslatef(0, 100, 0);
-                GL11.glRotatef(-30, 1, 0, 0);
+                GL11.glRotatef(90, 0f, 1f, 0f);
+                //GL11.glRotatef(m, 1f, 0f, 0f);
+                //GL11.glRotatef(diskangle, 0, 0, 1);
+                //GL11.glRotatef(90, 1, 0, 0);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 360 * speedMult)) / (360f * speedMult), 0, 1, 0);
 
-                GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
+                GlStateManager.color((float) 1, (float) .7, (float) .5, 1f);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 f10 = size * 7f * AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance);
                 buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
