@@ -51,6 +51,7 @@ public class XMLPlanetLoader {
     private static final String ELEMENT_STAR = "star";
     private static final String ELEMENT_PLANET = "planet";
     private static final String ATTR_BLACKHOLE = "blackHole";
+    private static final String ATTR_BLACKHOLE_DISK_ANGLE = "diskAngle";
     private static final String ATTR_NAME = "name";
     private static final String ATTR_X = "x";
     private static final String ATTR_Y = "y";
@@ -137,6 +138,7 @@ public class XMLPlanetLoader {
         for (StellarBody star : stars) {
             Element nodeStar = doc.createElement(ELEMENT_STAR);
             nodeStar.setAttribute(ATTR_BLACKHOLE, Boolean.toString(star.isBlackHole()));
+            nodeStar.setAttribute(ATTR_BLACKHOLE_DISK_ANGLE, Float.toString(star.diskAngle));
             nodeStar.setAttribute(ATTR_NAME, star.getName());
             nodeStar.setAttribute(ATTR_TEMP, Integer.toString(star.getTemperature()));
             nodeStar.setAttribute(ATTR_X, Integer.toString(star.getPosX()));
@@ -150,6 +152,7 @@ public class XMLPlanetLoader {
                 Element nodeSubStar = doc.createElement(ELEMENT_STAR);
 
                 nodeSubStar.setAttribute(ATTR_BLACKHOLE, Boolean.toString(star2.isBlackHole()));
+                nodeSubStar.setAttribute(ATTR_BLACKHOLE_DISK_ANGLE, Float.toString(star2.diskAngle));
                 nodeSubStar.setAttribute(ATTR_TEMP, Integer.toString(star2.getTemperature()));
                 nodeSubStar.setAttribute(ATTR_SIZE, Float.toString(star2.getSize()));
                 nodeSubStar.setAttribute(ATTR_SEPERATION, Float.toString(star2.getStarSeparation()));
@@ -1013,6 +1016,17 @@ public class XMLPlanetLoader {
             if (nameNode != null && nameNode.getNodeValue().equalsIgnoreCase("true")) {
                 star.setBlackHole(true);
             }
+
+            nameNode = planetNode.getAttributes().getNamedItem(ATTR_BLACKHOLE_DISK_ANGLE);
+
+            if (nameNode != null && !nameNode.getNodeValue().isEmpty()) {
+                try {
+                    star.diskAngle = Float.parseFloat(nameNode.getNodeValue());
+                } catch (NumberFormatException e) {
+                    AdvancedRocketry.logger.warn("Error Reading star " + star.getName());
+                }
+            }
+
         }
 
         star.setId(starId++);
@@ -1051,6 +1065,16 @@ public class XMLPlanetLoader {
             nameNode = planetNode.getAttributes().getNamedItem(ATTR_BLACKHOLE);
             if (nameNode != null && nameNode.getNodeValue().equalsIgnoreCase("true")) {
                 star.setBlackHole(true);
+            }
+
+            nameNode = planetNode.getAttributes().getNamedItem(ATTR_BLACKHOLE_DISK_ANGLE);
+
+            if (nameNode != null && !nameNode.getNodeValue().isEmpty()) {
+                try {
+                    star.diskAngle = Float.parseFloat(nameNode.getNodeValue());
+                } catch (NumberFormatException e) {
+                    AdvancedRocketry.logger.warn("Error Reading star " + star.getName());
+                }
             }
 
             nameNode = planetNode.getAttributes().getNamedItem(ATTR_SEPERATION);
