@@ -1113,7 +1113,7 @@ GL11.glPopMatrix();
             for (int i = 0; i < 1; i++) {
                 speedMult = ((i) * 1.01f + 1)/0.1F;
                 GL11.glPushMatrix();
-                GL11.glTranslatef(0, 101, 0);
+                GL11.glTranslatef(0, 100.01f, 0);
                 GL11.glRotatef((float) currentplanetphi, 0f, 1f, 0f);
                 GL11.glRotatef(m, 1f, 0f, 0f);
                 GL11.glRotatef(diskangle, 0, 0, 1);
@@ -1151,7 +1151,7 @@ GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
 
-                GL11.glTranslatef(0, 99f, 0);
+                GL11.glTranslatef(0, 99.99f, 0);
                 GL11.glRotatef((float) currentplanetphi, 0f, 1f, 0f);
                 GL11.glRotatef(m, 1f, 0f, 0f);
                 GL11.glRotatef(diskangle, 0, 0, 1);
