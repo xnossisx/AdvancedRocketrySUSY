@@ -44,6 +44,7 @@ public class RenderPlanetarySky extends IRenderHandler {
 
     private static float xrotangle = 0; // used for ring rotation because I don't want to bother changing the definitions of methods.
     private static float[] skycolor = {0,0,0}; // used for black hole rendering - same reason as above
+    private static double currentplanetphi = 0; // used for calculating ring/disk angle
 
     //Mostly vanilla code
     //TODO: make usable on other planets
@@ -192,7 +193,7 @@ GL11.glPopMatrix();
         GlStateManager.disableCull();
         if (hasRing) {
             GL11.glPushMatrix();
-            GL11.glRotatef(90f, 0f, 1f, 0f);
+            GL11.glRotatef((float) currentplanetphi, 0f, 1f, 0f);
             float m = -xrotangle;
             while (m > 360)
                 m-=360;
@@ -551,6 +552,8 @@ GL11.glPopMatrix();
             primaryStar = DimensionManager.overworldProperties.getStar();
             properties = DimensionManager.overworldProperties;
         }
+
+        currentplanetphi = myPhi;
 
         GlStateManager.disableTexture2D();
         Vec3d vec3 = Minecraft.getMinecraft().world.getSkyColor(this.mc.getRenderViewEntity(), partialTicks);
@@ -1111,7 +1114,7 @@ GL11.glPopMatrix();
                 speedMult = ((i) * 1.01f + 1)/0.1F;
                 GL11.glPushMatrix();
                 GL11.glTranslatef(0, 101, 0);
-                GL11.glRotatef(90, 0f, 1f, 0f);
+                GL11.glRotatef((float) currentplanetphi, 0f, 1f, 0f);
                 GL11.glRotatef(m, 1f, 0f, 0f);
                 GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 36000)) / (100f * speedMult), 0, 1, 0);
@@ -1130,7 +1133,7 @@ GL11.glPopMatrix();
                 GL11.glPushMatrix();
 
                 GL11.glTranslatef(0, 100f, 0);
-                GL11.glRotatef(90, 0f, 1f, 0f);
+                GL11.glRotatef((float) currentplanetphi, 0f, 1f, 0f);
                 GL11.glRotatef(m, 1f, 0f, 0f);
                 GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 360 * 50)) / (50f * speedMult), 0, 1, 0);
@@ -1149,7 +1152,7 @@ GL11.glPopMatrix();
                 GL11.glPushMatrix();
 
                 GL11.glTranslatef(0, 99f, 0);
-                GL11.glRotatef(90, 0f, 1f, 0f);
+                GL11.glRotatef((float) currentplanetphi, 0f, 1f, 0f);
                 GL11.glRotatef(m, 1f, 0f, 0f);
                 GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 360 * 25)) / (25f * speedMult), 0, 1, 0);
@@ -1164,6 +1167,8 @@ GL11.glPopMatrix();
                 buffer.pos(-f10, 0.0D, f10).tex(0.0D, 1.0D).endVertex();
                 Tessellator.getInstance().draw();
                 GL11.glPopMatrix();
+
+
 
 
             }
