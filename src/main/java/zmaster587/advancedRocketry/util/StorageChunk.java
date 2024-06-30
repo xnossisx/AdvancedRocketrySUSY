@@ -37,6 +37,7 @@ import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.EntityRocketBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.stations.IStorageChunk;
+import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
 import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
 import zmaster587.advancedRocketry.world.util.WorldDummy;
@@ -122,8 +123,8 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
 
         // plain blocks
         for (int x = 0; x < this.sizeX; x++) {
-            for (int z = 0; z < this.sizeZ; z++) {
-                for (int y = 0; y < this.sizeY; y++) {
+            for (int y = 0; y < this.sizeY; y++) {
+                for (int z = 0; z < this.sizeZ; z++) {
                     this.weight += WeightEngine.INSTANCE.getWeight(null, this.blocks[x][y][z]);
                 }
             }
@@ -612,9 +613,13 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
         this.chunk.generateSkylightMap();
     }
 
-    //pass the coords of the xmin, ymin, zmin as well as the world to move the rocket
     @Override
     public void pasteInWorld(World world, int xCoord, int yCoord, int zCoord) {
+        this.pasteInWorld(world, xCoord, yCoord, zCoord, false);
+    }
+
+    //pass the coords of the xmin, ymin, zmin as well as the world to move the rocket
+    public void pasteInWorld(World world, int xCoord, int yCoord, int zCoord, boolean damage) {
 
         //Set all the blocks
         for (int x = 0; x < sizeX; x++) {
@@ -652,6 +657,10 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
 
             if (entity != null)
                 entity.readFromNBT(nbt);
+
+            if (damage && entity instanceof TileBrokenPart) {
+                ((TileBrokenPart) entity).transition();
+            }
         }
     }
 

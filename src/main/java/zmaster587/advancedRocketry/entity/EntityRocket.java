@@ -1685,9 +1685,9 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             infrastructure.unlinkRocket();
         }
 
-
         //paste the rocket into the world as blocks
-        storage.pasteInWorld(this.world, (int) (this.posX - storage.getSizeX() / 2f), (int) this.posY, (int) (this.posZ - storage.getSizeZ() / 2f));
+        storage.pasteInWorld(this.world, (int) (this.posX - storage.getSizeX() / 2f), (int) this.posY, (int) (this.posZ - storage.getSizeZ() / 2f), true);
+
         this.setDead();
     }
 

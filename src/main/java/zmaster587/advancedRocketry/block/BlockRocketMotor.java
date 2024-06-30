@@ -3,15 +3,23 @@ package zmaster587.advancedRocketry.block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import zmaster587.advancedRocketry.api.IRocketEngine;
+import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngine {
 
@@ -19,31 +27,31 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
         super(mat);
         this.setDefaultState(this.getDefaultState().withProperty(FACING, EnumFacing.DOWN));
     }
-    public IBlockState getActualState(@Nonnull IBlockState state, IBlockAccess world,
-                                      BlockPos pos) {
 
-        if (world.getBlockState(pos.add(0, 1, 0)).getBlock() instanceof BlockFuelTank){
+    public IBlockState getActualState(@Nonnull IBlockState state, IBlockAccess world, BlockPos pos) {
+        if (world.getBlockState(pos.add(0, 1, 0)).getBlock() instanceof BlockFuelTank) {
             return state.withProperty(FACING, EnumFacing.DOWN);
         }
-        if (world.getBlockState(pos.add(0, -1, 0)).getBlock() instanceof BlockFuelTank){
+        if (world.getBlockState(pos.add(0, -1, 0)).getBlock() instanceof BlockFuelTank) {
             return state.withProperty(FACING, EnumFacing.UP);
         }
-        if (world.getBlockState(pos.add(1, 0, 0)).getBlock() instanceof BlockFuelTank){
+        if (world.getBlockState(pos.add(1, 0, 0)).getBlock() instanceof BlockFuelTank) {
             return state.withProperty(FACING, EnumFacing.EAST);
         }
-        if (world.getBlockState(pos.add(-1, 0, 0)).getBlock() instanceof BlockFuelTank){
+        if (world.getBlockState(pos.add(-1, 0, 0)).getBlock() instanceof BlockFuelTank) {
             return state.withProperty(FACING, EnumFacing.WEST);
         }
-        if (world.getBlockState(pos.add(0, 0, 1)).getBlock() instanceof BlockFuelTank){
+        if (world.getBlockState(pos.add(0, 0, 1)).getBlock() instanceof BlockFuelTank) {
             return state.withProperty(FACING, EnumFacing.SOUTH);
         }
-        if (world.getBlockState(pos.add(0, 0, -1)).getBlock() instanceof BlockFuelTank){
+        if (world.getBlockState(pos.add(0, 0, -1)).getBlock() instanceof BlockFuelTank) {
             return state.withProperty(FACING, EnumFacing.NORTH);
         }
         return state;
     }
+
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
+    public boolean isOpaqueCube(@Nonnull IBlockState state) {
         return false;
     }
 
@@ -59,7 +67,55 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
 
     @Override
     public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, @Nonnull ItemStack stack) {
-
+        NBTTagCompound compound = stack.getTagCompound();
+        int stage = 0;
+        if (compound != null && compound.hasKey("destruction_stage")) {
+            stage = compound.getInteger("destruction_stage");
+        }
         world.setBlockState(pos, state.withProperty(FACING, EnumFacing.DOWN));
+
+        TileEntity te = world.getTileEntity(pos);
+        ((TileBrokenPart) te).setStage(stage);
+    }
+
+    @Override
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos, final IBlockState state, final EntityPlayer playerIn, final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        if (!worldIn.isRemote) {
+            TileEntity te = worldIn.getTileEntity(pos);
+            ((TileBrokenPart) te).transition();
+        }
+        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+    }
+
+    @Override
+    public void breakBlock(final World world, final BlockPos pos, final IBlockState state) {
+        if (!world.isRemote) {
+            ItemStack drop = new ItemStack(this.getItemDropped(state, world.rand, 0));
+
+            TileBrokenPart te = (TileBrokenPart) world.getTileEntity(pos);
+            NBTTagCompound compound = new NBTTagCompound();
+            compound.setInteger("destruction_stage", te.getStage());
+            drop.setTagCompound(compound);
+
+            world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), drop));
+        }
+
+        super.breakBlock(world, pos, state);
+    }
+
+    @Override
+    public void getDrops(final NonNullList<ItemStack> drops, final IBlockAccess world, final BlockPos pos, final IBlockState state, final int fortune) {
+        // no drops here
+    }
+
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
+
+    @Nullable
+    @Override
+    public TileEntity createTileEntity(final World worldIn, final IBlockState state) {
+        return new TileBrokenPart(10, 0.1F);
     }
 }

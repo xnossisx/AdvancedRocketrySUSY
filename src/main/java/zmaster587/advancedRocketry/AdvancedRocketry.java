@@ -350,6 +350,7 @@ public class AdvancedRocketry {
         EntityRegistry.registerModEntity(new ResourceLocation(Constants.modId, "ARHoverCraft"), EntityHoverCraft.class, "hovercraft", 9, this, 64, 3, true);
 
         //TileEntity Registration ---------------------------------------------------------------------------------------------
+        GameRegistry.registerTileEntity(TileBrokenPart.class, "ARbrokenPart");
         GameRegistry.registerTileEntity(TileRocketAssemblingMachine.class, "ARrocketBuilder");
         GameRegistry.registerTileEntity(TileWarpCore.class, "ARwarpCore");
         //GameRegistry.registerTileEntity(TileModelRender.class, "ARmodelRenderer");
