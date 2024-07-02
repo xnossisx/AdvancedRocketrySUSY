@@ -39,7 +39,7 @@ public class ChunkManagerPlanet extends BiomeProvider {
     private void setup(long seed, WorldType default1, String str, DimensionProperties properties){
         this.biomeCache = new BiomeCache(this);//new BiomeCacheExtended(this);
         //TODO: more biomes
-        //TODO: remove rivers
+        //TODO: remove rivers - why?
         GenLayer[] agenlayer = initializeAllBiomeGenerators(seed, default1, str, properties);//GenLayer.initializeAllBiomeGenerators(seed, default1); //;
         agenlayer = getModdedBiomeGenerators(default1, seed, agenlayer);
         this.genBiomes = agenlayer[0];

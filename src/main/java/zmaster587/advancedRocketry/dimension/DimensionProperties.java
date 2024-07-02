@@ -16,6 +16,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.Biome.TempCategory;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.common.BiomeDictionary;
 import net.minecraftforge.common.BiomeManager;
@@ -154,6 +155,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     boolean status_terraforming;
     public List<HashedBlockPosition> terraformingChangeList;
     public List<Chunk> terraformingChunkListCurrentCycle;
+    public BiomeProvider chunkMgrTerraformed;
 
     public List<watersourcelocked> water_source_locked_positions;
     //public boolean water_can_exist;
@@ -191,7 +193,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         canGenerateCraters = true;
         canGenerateGeodes = true;
         canGenerateStructures = true;
-        canGenerateVolcanoes = true;
+        canGenerateVolcanoes = false;
         canGenerateCaves = true;
         hasRivers = true;
         craterFrequencyMultiplier = 1f;
@@ -214,6 +216,17 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         water_source_locked_positions = new ArrayList<>();
 
         ringAngle = 70;
+
+
+        //dont need this here because the terraforming terminal will re-create it anyway
+        //this.chunkMgrTerraformed = new ChunkManagerPlanet(net.minecraftforge.common.DimensionManager.getWorld(id), net.minecraftforge.common.DimensionManager.getWorld(getId()).getWorldInfo().getGeneratorOptions(), getTerraformedBiomes());
+    }
+
+    public void reset_chunkmgr(){
+        World world = net.minecraftforge.common.DimensionManager.getWorld(getId());
+        getAverageTemp();
+        setTerraformedBiomes(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getViableBiomes());
+        chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
     }
 
     public void add_chunk_to_terraforming_list(Chunk chunk) {
@@ -708,8 +721,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
             setTerraformedBiomes(getViableBiomes());
 
-            WorldServer world = net.minecraftforge.common.DimensionManager.getWorld(getId());
-            ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(getId())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
+
+           reset_chunkmgr();
 
 
 
@@ -1051,9 +1064,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return true if the biome is not allowed to spawn on any Dimension
      */
     public boolean isBiomeblackListed(Biome biome) {
-        //use blacklist only when terraforming
-        if (!isTerraformed()) return false;
-
         return AdvancedRocketryBiomes.instance.getBlackListedBiomes().contains(Biome.getIdForBiome(biome));
     }
 

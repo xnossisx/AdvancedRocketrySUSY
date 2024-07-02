@@ -11,6 +11,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
+import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.relauncher.Side;
 import zmaster587.advancedRocketry.api.*;
@@ -62,21 +63,11 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     private float randomblocks_per_tick;
 
 
+
     public TileTerraformingTerminal() {
         super(1, 1);
          sat_power_per_tick = 0;
          randomblocks_per_tick = 0;
-        /*
-        buttonstopall = new ModuleButton(40, 60, 1, "stop all",this, TextureResources.buttonSquare,
-                "- emergency stop all terminals -\n" +
-                        "When resetting your satellites\n" +
-                        "you need to turn all terminals off\n" +
-                        "before you start turning them on\n" +
-                        "again or they will interfere with\n" +
-                        "each other\n\n" +
-                        "recommended to use only\n" +
-                        "in emergency situations");
-        */
         was_enabled_last_tick = false;
     }
 
@@ -150,7 +141,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
         int powerrequired = 120;
-        if (!world.isRemote && world.provider instanceof IPlanetaryProvider) {
+        if (!world.isRemote) {
 
             if (world.getTotalWorldTime() % 20 == 0)
                 //world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
@@ -160,9 +151,10 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                 if (!was_enabled_last_tick) {
                     was_enabled_last_tick = true;
                     DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).setIsTerraformed(true);
-                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getAverageTemp();
-                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).setTerraformedBiomes(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getViableBiomes());
-                    ((WorldProviderPlanet) net.minecraftforge.common.DimensionManager.getProvider(world.provider.getDimension())).chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
+
+                    //usually this should not need to be here because it is called at other places
+                    //just to be sure it is really called I do it again here
+                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).reset_chunkmgr();
 
                     Item biomeChanger = getStackInSlot(0).getItem();
                     if (biomeChanger instanceof ItemBiomeChanger) {
@@ -182,7 +174,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
         }
 
         if (!world.isRemote && was_enabled_last_tick) {
-            if (ARConfiguration.getCurrentConfig().enableTerraforming && world.provider.getClass() == WorldProviderPlanet.class) {
+            if (ARConfiguration.getCurrentConfig().enableTerraforming) {
                 Item biomeChanger = getStackInSlot(0).getItem();
                 if (biomeChanger instanceof ItemBiomeChanger) {
                     SatelliteBiomeChanger sat = (SatelliteBiomeChanger) ItemSatelliteIdentificationChip.getSatellite(getStackInSlot(0));
@@ -196,11 +188,23 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                                 try {
 
                                     HashedBlockPosition next_block = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).get_next_terraforming_block();
-                                    BiomeHandler.changeBiome(world, ((ChunkManagerPlanet) ((WorldProviderPlanet) world.provider).chunkMgrTerraformed).getBiomeGenAt(next_block.x, next_block.z), new BlockPos(next_block.x, 0, next_block.z), false);
+
+                                    BiomeProvider chunkmgr = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).chunkMgrTerraformed;
+
+                                    // this chunkmgr is not initialized by default because dimensionproperties
+                                    // inits during the forge mod init phase and some stuff is not loaded at this time.
+                                    // I will make sure it will be initialized here
+                                    // I have no idea where else to put it :(
+                                    if (chunkmgr == null)
+                                        DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).reset_chunkmgr();
+
+                                    BiomeHandler.changeBiome(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block.x, next_block.z), new BlockPos(next_block.x, 0, next_block.z), false);
 
 
                                 } catch (NullPointerException e) {
-                                    //Ghost
+                                    e.printStackTrace();
+                                } catch (NoClassDefFoundError e){
+                                    e.printStackTrace(); //WTF
                                 }
                             }
                         } else
@@ -213,9 +217,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void updateInventoryInfo() {
         if (moduleText != null) {
 
-            if (!(world.provider instanceof IPlanetaryProvider)) {
-                moduleText.setText("This planet can not be\nterraformed");
-            } else {
+
                 if (hasValidBiomeChanger() && world.isBlockIndirectlyGettingPowered(getPos()) != 0) {
                     BigDecimal bd = new BigDecimal(randomblocks_per_tick);
                     bd = bd.setScale(2, RoundingMode.HALF_UP);
@@ -229,7 +231,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                 } else {
                     moduleText.setText("place a biome remote here\nto make the satellite terraform\nthe entire planet");
                 }
-            }
+
         }
     }
 
@@ -270,7 +272,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
-        nbt.setBoolean("was_enabled_last_tick", was_enabled_last_tick);
+        //nbt.setBoolean("was_enabled_last_tick", was_enabled_last_tick);
         //nbt.setInteger("sat_power_per_tick", sat_power_per_tick);
         //nbt.setFloat("randomblocks_per_tick", randomblocks_per_tick);
         return nbt;
@@ -279,7 +281,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-        was_enabled_last_tick = nbt.getBoolean("was_enabled_last_tick");
+        //was_enabled_last_tick = nbt.getBoolean("was_enabled_last_tick");
         //sat_power_per_tick = nbt.getInteger("sat_power_per_tick");
         //randomblocks_per_tick = nbt.getFloat("randomblocks_per_tick");
     }
