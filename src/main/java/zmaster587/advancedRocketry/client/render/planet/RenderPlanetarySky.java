@@ -1097,7 +1097,7 @@ GL11.glPopMatrix();
             //GL11.glRotatef(90, 1, 0, 0);
             GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 360 * speedMult)) / (360f * speedMult), 0, 1, 0);
 
-            GlStateManager.color((float) 1, (float) .7, (float) .5, 1f);
+            GlStateManager.color((float) 1, (float) .7, (float) .55, 1f);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             f10 = sunSize * 6.5f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
             buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
@@ -1110,8 +1110,8 @@ GL11.glPopMatrix();
 
             mc.renderEngine.bindTexture(TextureResources.locationAccretionDisk);
 
-            for (int i = 0; i < 1; i++) {
-                speedMult = ((i) * 1.01f + 1)/0.1F;
+            for (int i = 0; i < 3; i++) {
+                speedMult = ((0) * 1.01f + 1)/0.1F;
                 GL11.glPushMatrix();
                 GL11.glTranslatef(0, 100.01f, 0);
                 GL11.glRotatef((float) currentplanetphi, 0f, 1f, 0f);
@@ -1119,7 +1119,11 @@ GL11.glPopMatrix();
                 GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 36000)) / (100f * speedMult), 0, 1, 0);
 
-                GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
+                // make every disks angle slightly different
+                GL11.glRotatef(120*i, 0, 1, 0);
+                GL11.glRotatef(0.5f, 1, 0, 0);
+
+                GlStateManager.color((float) 1, (float) .5, (float) .4, 0.3f);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 f10 = sunSize * 40f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
                 buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
@@ -1137,8 +1141,11 @@ GL11.glPopMatrix();
                 GL11.glRotatef(m, 1f, 0f, 0f);
                 GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 360 * 50)) / (50f * speedMult), 0, 1, 0);
+                // make every disks angle slightly different
+                GL11.glRotatef(120*i, 0, 1, 0);
+                GL11.glRotatef(0.5f, 1, 0, 0);
 
-                GlStateManager.color((float) 0.8, (float) .7, (float) .4, 1f);
+                GlStateManager.color((float) 0.8, (float) .7, (float) .4, 0.3f);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 f10 = sunSize * 30f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
                 //multiplier = 2;
@@ -1156,8 +1163,11 @@ GL11.glPopMatrix();
                 GL11.glRotatef(m, 1f, 0f, 0f);
                 GL11.glRotatef(diskangle, 0, 0, 1);
                 GL11.glRotatef((System.currentTimeMillis() % (int) (speedMult * 360 * 25)) / (25f * speedMult), 0, 1, 0);
+                // make every disks angle slightly different
+                GL11.glRotatef(120*i, 0, 1, 0);
+                GL11.glRotatef(0.5f, 1, 0, 0);
 
-                GlStateManager.color((float) 0.2, (float) .4, (float) 1, 1f);
+                GlStateManager.color((float) 0.2, (float) .4, (float) 1, 0.3f);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
                 f10 = sunSize * 15f * AstronomicalBodyHelper.getBodySizeMultiplier(solarOrbitalDistance);
                 //multiplier = 2;
