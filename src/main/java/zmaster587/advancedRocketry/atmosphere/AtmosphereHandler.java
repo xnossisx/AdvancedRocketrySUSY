@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.atmosphere;
 
+import net.minecraft.block.BlockLeaves;
+import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
@@ -93,6 +95,8 @@ public class AtmosphereHandler {
     //Called from setBlock in World.class
     public static void onBlockChange(@Nonnull World world, @Nonnull BlockPos bpos) {
 
+        // I am very sure all this shit here was NEVER tested!
+
         if (ARConfiguration.getCurrentConfig().enableOxygen && !world.isRemote && world.getChunkFromBlockCoords(new BlockPos(bpos)).isLoaded()) {
             HashedBlockPosition pos = new HashedBlockPosition(bpos);
 
@@ -129,10 +133,13 @@ public class AtmosphereHandler {
                     world.setBlockState(bpos, Blocks.FIRE.getDefaultState());
                 }
             }
-            //Plants should die
+
+
             else if (!handler.getAtmosphereType(bpos).allowsCombustion()) {
                 if (world.getBlockState(bpos).getBlock().isLeaves(world.getBlockState(bpos), world, bpos)) {
-                    world.setBlockToAir(bpos);
+                    if (!(Boolean)world.getBlockState(bpos).getValue(BlockLeaves.CHECK_DECAY)) {
+                        world.setBlockToAir(bpos);
+                    }
                 } else if (world.getBlockState(bpos).getMaterial() == Material.FIRE) {
                     world.setBlockToAir(bpos);
                 } else if (world.getBlockState(bpos).getMaterial() == Material.CACTUS) {
@@ -145,6 +152,7 @@ public class AtmosphereHandler {
                     world.setBlockState(bpos, Blocks.DIRT.getDefaultState());
                 }
             }
+
             //Gasses should automatically vaporize and dissipate
             if (handler.getAtmosphereType(bpos) == AtmosphereType.VACUUM) {
                 if (world.getBlockState(bpos).getMaterial() == Material.WATER && world.getBlockState(bpos).getBlock() instanceof IFluidBlock) {
@@ -154,9 +162,13 @@ public class AtmosphereHandler {
                 }
             }
             //Water blocks should also vaporize and disappear
-            /* yes but not like this because it crashes the game
+            /*
+            yes but not like this because it crashes the game
+            every updated water causes the water next to it to update -> stackoverflow -> server goes boom
+
+
             if (handler.getAtmosphereType(bpos) == AtmosphereType.SUPERHEATED || handler.getAtmosphereType(bpos) == AtmosphereType.SUPERHEATEDNOO2 || handler.getAtmosphereType(bpos) == AtmosphereType.VERYHOT || handler.getAtmosphereType(bpos) == AtmosphereType.VERYHOTNOO2) {
-                if (world.getBlockState(bpos).getMaterial() == Material.WATER) {
+                if (world.getBlockState(bpos).getMaterial() == Material.WATER && world.getBlockState(bpos).getValue(BlockLiquid.LEVEL) == 0) {
                     world.setBlockToAir(bpos);
                 }
             }
