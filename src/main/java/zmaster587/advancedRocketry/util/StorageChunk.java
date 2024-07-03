@@ -37,6 +37,9 @@ import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.EntityRocketBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.stations.IStorageChunk;
+import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
+import zmaster587.advancedRocketry.block.BlockNuclearRocketMotor;
+import zmaster587.advancedRocketry.block.BlockRocketMotor;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
 import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
@@ -52,7 +55,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
+public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBreakable {
 
     public Chunk chunk;
     public WorldDummy world;
@@ -739,6 +742,33 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted {
         }
 
         return null;
+    }
+
+    public float getBreakingProbability() {
+        float prob = 0;
+
+        for (TileEntity te : tileEntities) {
+            if (te instanceof TileBrokenPart) {
+                TileBrokenPart brokenPart = (TileBrokenPart) te;
+                float additionalProb = 0;
+
+                if (te.getBlockType() instanceof BlockNuclearRocketMotor) {
+                    additionalProb = 1F;
+                } else if (te.getBlockType() instanceof BlockRocketMotor || te.getBlockType() instanceof BlockBipropellantRocketMotor) {
+                    additionalProb = 0.2F;
+                }
+                prob += additionalProb * brokenPart.getStage() / 10;
+                if (prob >= 1) {
+                    return Math.min(1, prob);
+                }
+            }
+        }
+
+        return prob;
+    }
+
+    public boolean shouldBreak() {
+        return world.rand.nextFloat() < this.getBreakingProbability();
     }
 
     /**

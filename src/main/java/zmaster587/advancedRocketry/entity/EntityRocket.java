@@ -1561,6 +1561,39 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
     }
 
+    private double gauss(double mean, double div) {
+        Random rand = world.rand;
+        return mean + (rand.nextDouble() - 0.5F) * 2F * div;
+    }
+
+    public void explode() {
+        if (world.isRemote && Minecraft.getMinecraft().gameSettings.particleSetting < 2) {
+            AxisAlignedBB bb = getCollisionBoundingBox();
+            double meanX = (bb.maxX + bb.minX) / 2;
+            double meanY = (bb.maxY + bb.minY) / 2;
+            double meanZ = (bb.maxZ + bb.minZ) / 2;
+            double divX = (bb.maxX - bb.minX) / 1.2;
+            double divY = (bb.maxY - bb.minY) / 1.2;
+            double divZ = (bb.maxZ - bb.minZ) / 1.2;
+
+            if (Minecraft.getMinecraft().gameSettings.particleSetting < 1) {
+                for (int i = 0; i < 10; i++) {
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world,
+                            gauss(meanX, divX), gauss(meanY, divY), gauss(meanZ, divZ),
+                            (this.rand.nextFloat() - 0.5f) / 4f, (this.rand.nextFloat() - 0.5f) / 4f, (this.rand.nextFloat() - 0.5f) / 4f);
+                }
+            }
+
+            for (int i = 0; i < 50; i++) {
+                AdvancedRocketry.proxy.spawnParticle("rocketFlame", world,
+                        gauss(meanX, divX), gauss(meanY, divY), gauss(meanZ, divZ),
+                        (this.rand.nextFloat() - 0.5f) / 4f, (this.rand.nextFloat() - 0.5f) / 4f, (this.rand.nextFloat() - 0.5f) / 4f);
+            }
+        }
+
+        this.setDead();
+    }
+
     /**
      * Launches the rocket post determining its height, checking whether it can launch to the selected planet and whether it can exist,
      * among other factors. Also handles orbital height calculations
@@ -1574,6 +1607,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         boolean allowLaunch = false;
 
         this.stats.setWeight((int) storage.recalculateWeight());
+
+        if (storage.shouldBreak()) {
+            this.explode();
+            return;
+        }
 
         if (ARConfiguration.getCurrentConfig().experimentalSpaceFlight && storage.getGuidanceComputer() != null && storage.getGuidanceComputer().isEmpty()) {
             allowLaunch = true;
