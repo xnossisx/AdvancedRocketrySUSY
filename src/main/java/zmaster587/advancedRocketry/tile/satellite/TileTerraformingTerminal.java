@@ -150,11 +150,6 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
             if (hasValidBiomeChanger() && has_redstone) {
                 if (!was_enabled_last_tick) {
                     was_enabled_last_tick = true;
-                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).setIsTerraformed(true);
-
-                    //usually this should not need to be here because it is called at other places
-                    //just to be sure it is really called I do it again here
-                    DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).reset_chunkmgr();
 
                     Item biomeChanger = getStackInSlot(0).getItem();
                     if (biomeChanger instanceof ItemBiomeChanger) {
