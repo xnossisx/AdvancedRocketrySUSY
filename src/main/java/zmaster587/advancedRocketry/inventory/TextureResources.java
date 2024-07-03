@@ -24,11 +24,14 @@ public class TextureResources {
     public static final ResourceLocation[] tabPlanet = {new ResourceLocation("advancedrocketry", "textures/gui/buttons/tabPlanet.png"), new ResourceLocation("advancedrocketry", "textures/gui/buttons/tabPlanet_hover.png"), null, null};
     public static final ResourceLocation[] tabPlanetTracking = {new ResourceLocation("advancedrocketry", "textures/gui/buttons/tabGuidance.png"), new ResourceLocation("advancedrocketry", "textures/gui/buttons/tabGuidance_hover.png"), null, null};
 
+    // for black hole color - minecraft shits itself without it
+    public static final ResourceLocation locationWhitePng =    new ResourceLocation("advancedrocketry:textures/env/just_a_fucking_white_pixl.png");
+
     public static final ResourceLocation locationSunPng = new ResourceLocation("advancedrocketry:textures/env/sun.png");
     public static final ResourceLocation locationSunNew = new ResourceLocation("advancedrocketry:textures/env/sun2.png");
     public static final ResourceLocation locationAccretionDisk = new ResourceLocation("advancedrocketry:textures/env/accretiondisk.png");
+    public static final ResourceLocation locationAccretionDiskDense = new ResourceLocation("advancedrocketry:textures/env/accretiondiskdense.png");
     public static final ResourceLocation locationBlackHole = new ResourceLocation("advancedrocketry:textures/env/blackhole.png");
-    public static final ResourceLocation locationBlackHoleBorder = new ResourceLocation("advancedrocketry:textures/env/blackholeborder.png");
     public static final ResourceLocation locationBlackHole_icon = new ResourceLocation("advancedrocketry:textures/env/blackhole_icon.png");
     public static final ResourceLocation locationReticle = new ResourceLocation("advancedrocketry:textures/gui/recticle.png");
     public static final ResourceLocation selectionCircle = new ResourceLocation("advancedrocketry:textures/gui/Selection.png");

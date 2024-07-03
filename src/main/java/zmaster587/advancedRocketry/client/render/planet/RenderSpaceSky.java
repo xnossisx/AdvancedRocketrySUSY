@@ -48,6 +48,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
         float planetOrbitalDistance = spaceObject.getOrbitalDistance();
 
         if (properties.isStar()) {
+            planetOrbitalDistance = 190F;
             if (properties.getStar().isBlackHole()) {
                 size = 10;
                 GL11.glDepthMask(true);
@@ -57,9 +58,23 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 GL11.glDisable(GL11.GL_BLEND);
                 GL11.glPushMatrix();
                 //GL11.glRotatef(50, 1, 0, 0);
-                GL11.glRotatef(180, 0, 0, -1);
+                GL11.glRotatef(120, -1, 0, 0);
+                GL11.glRotatef(180, 0, 1, 0);
                 //GL11.glRotatef(180, 0, 1, 0);
 
+                GL11.glPushMatrix();
+                GL11.glTranslatef(0, 100, 0);
+                f10 = size * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance);
+
+                GlStateManager.color(0,0,0);
+                GlStateManager.disableCull();
+                renderSphere(0,0,0,f10,32,23);
+                GlStateManager.enableCull();
+                GL11.glEnable(GL11.GL_BLEND);
+                GL11.glDepthMask(false);
+
+                GL11.glPopMatrix();
+                /*
                 GL11.glPushMatrix();
                 mc.renderEngine.bindTexture(TextureResources.locationBlackHole);
                 GL11.glTranslatef(0, 100, 0);
@@ -114,13 +129,43 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 Tessellator.getInstance().draw();
                 GL11.glPopMatrix();
 
+                 */
 
-                for (int i = 0; i < 3; i++) {
-                    float speedMult = (i) * 1.01f + 1;
+
+                //Render accretion disk
+                mc.renderEngine.bindTexture(TextureResources.locationAccretionDiskDense);
+                GlStateManager.depthMask(false);
+
+                float speedMult = 5;
+                GlStateManager.disableCull();
+
+
+                GL11.glPushMatrix();
+                GL11.glTranslatef(0, 100, 0);
+                GL11.glRotatef(90, 0f, 1f, 0f);
+                //GL11.glRotatef(m, 1f, 0f, 0f);
+                //GL11.glRotatef(diskangle, 0, 0, 1);
+                //GL11.glRotatef(90, 1, 0, 0);
+                GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 360 * speedMult)) / (360f * speedMult), 0, 1, 0);
+
+                GlStateManager.color((float) 1, (float) .7, (float) .5, 1f);
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+                f10 = size * 7f * AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance);
+                buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
+                buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
+                buffer.pos(f10, 0.0D, f10).tex(1.0D, 1.0D).endVertex();
+                buffer.pos(-f10, 0.0D, f10).tex(0.0D, 1.0D).endVertex();
+                Tessellator.getInstance().draw();
+                GL11.glPopMatrix();
+
+                for (int i = 0; i < 1; i++) {
+                    speedMult = (i) * 1.05f + 5;
                     //Render accretion disk
+
                     mc.renderEngine.bindTexture(TextureResources.locationAccretionDisk);
+
                     GL11.glPushMatrix();
-                    GL11.glTranslatef(0, 100 + i * 50, 0);
+                    GL11.glTranslatef(0, 100, 0);
                     GL11.glRotatef(60, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 360 * speedMult)) / (360f * speedMult), 0, 1, 0);
 
@@ -136,7 +181,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
                     GL11.glPushMatrix();
 
-                    GL11.glTranslatef(0, 99.9f + i * 50, 0);
+                    GL11.glTranslatef(0, 99.9f, 0);
                     GL11.glRotatef(60, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 200 * speedMult)) / (200f * speedMult), 0, 1, 0);
 
@@ -153,7 +198,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
                     GL11.glPushMatrix();
 
-                    GL11.glTranslatef(0, 99.8f + i * 50, 0);
+                    GL11.glTranslatef(0, 99.8f, 0);
                     GL11.glRotatef(60, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (36000 * speedMult)) / (100f * speedMult), 0, 1, 0);
 
