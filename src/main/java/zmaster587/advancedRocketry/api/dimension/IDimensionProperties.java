@@ -185,7 +185,8 @@ public interface IDimensionProperties {
     /**
      * @return true if terraforming activity has changed the planet properties
      */
-    boolean isTerraformed();
+    // F*ck you
+    //boolean isTerraformed();
 
     /**
      * @return reource location of the planet

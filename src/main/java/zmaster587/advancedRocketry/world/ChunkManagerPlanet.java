@@ -12,6 +12,7 @@ import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.ChunkGeneratorSettings;
 import net.minecraft.world.gen.layer.*;
 import net.minecraftforge.common.BiomeManager.BiomeEntry;
+import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 
@@ -54,7 +55,7 @@ public class ChunkManagerPlanet extends BiomeProvider {
 
 
     public ChunkManagerPlanet(World world, String str, List<BiomeEntry> biomes) {
-        this(world.getSeed(), world.getWorldInfo().getTerrainType(), str, DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()));
+        this(world.getSeed(), AdvancedRocketry.planetWorldType, str, DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()));
         //Note: world MUST BE REGISTERED WITH THE DIMENSION MANAGER
         //This is a mess!
         this.biomes = biomes;

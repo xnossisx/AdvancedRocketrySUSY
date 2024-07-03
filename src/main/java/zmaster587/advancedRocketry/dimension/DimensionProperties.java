@@ -152,7 +152,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private int seaLevel;
     private int generatorType;
     //public int target_sea_level;
-    boolean status_terraforming;
     public List<HashedBlockPosition> terraformingChangeList;
     public List<Chunk> terraformingChunkListCurrentCycle;
     public BiomeProvider chunkMgrTerraformed;
@@ -211,7 +210,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         //target_sea_level = seaLevel;
         terraformingChangeList = new LinkedList<>();
         terraformingChunkListCurrentCycle = new LinkedList<>();
-        status_terraforming = false;
         //water_can_exist = true;
         water_source_locked_positions = new ArrayList<>();
 
@@ -225,8 +223,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public void reset_chunkmgr(){
         World world = net.minecraftforge.common.DimensionManager.getWorld(getId());
         getAverageTemp();
-        setTerraformedBiomes(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getViableBiomes());
-        chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
+        setTerraformedBiomes(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getViableBiomes(false));
+        chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), getTerraformedBiomes());
     }
 
     public void add_chunk_to_terraforming_list(Chunk chunk) {
@@ -237,6 +235,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             }
         }
         if (!is_there) {
+            terraformingChunkListCurrentCycle.add(chunk);
             for (int i = 0; i < 256; i++) {
                 int coord = i;
                 int x = (coord & 0xF) + chunk.x * 16;
@@ -247,6 +246,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
     private void reset_terraforming_chunk_positions(){
         terraformingChangeList.clear();
+        terraformingChunkListCurrentCycle.clear();
         Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(getId())).getChunkProvider().getLoadedChunks();
         if (list.size() > 0) {
             for (Chunk chunk:list){
@@ -256,10 +256,18 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
     public HashedBlockPosition get_next_terraforming_block() {
         if (terraformingChangeList.size() == 0) {
-           reset_terraforming_chunk_positions();
+            //long startTime = System.currentTimeMillis();
+            reset_terraforming_chunk_positions();
+            //long endTime = System.currentTimeMillis();
+            //long executionTime = endTime - startTime;  // Time in milliseconds
+            //System.out.println("reset chunklist: "+executionTime+"ms");
         }
-        if (terraformingChangeList.size() == 0) return null; // this should never happen. Yes it would crash the game, but if it does, my code is wrong and needs to be fixed anyway
-        return terraformingChangeList.remove(nextInt(0,terraformingChangeList.size()));
+        if (terraformingChangeList.size() == 0) {
+            System.out.println("List is 0 - this should never happen!!");
+            return null; // this should never happen. Yes it would crash the game, but if it does, my code is wrong and needs to be fixed anyway
+        }
+        //return terraformingChangeList.remove(nextInt(0,terraformingChangeList.size()));
+        return terraformingChangeList.remove(0);
     }
     public DimensionProperties(int id, String name) {
         this(id);
@@ -699,12 +707,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     /**
      * @return true if currently terraformed
      */
-    public boolean isTerraformed() {
-        return status_terraforming;
-    }
-    public void setIsTerraformed(boolean b) {
-        status_terraforming = b;
-    }
+
     public int getAtmosphereDensity() {
         return atmosphereDensity;
     }
@@ -716,13 +719,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         int prevAtm = this.atmosphereDensity;
         this.atmosphereDensity = atmosphereDensity;
 
-        getAverageTemp();
-
-
-            setTerraformedBiomes(getViableBiomes());
-
-
-           reset_chunkmgr();
+        reset_chunkmgr();
 
 
 
@@ -1070,11 +1067,11 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     /**
      * @return a list of biomes allowed to spawn in this dimension
      */
-    public List<Biome> getViableBiomes() {
+    public List<Biome> getViableBiomes(boolean allow_single_biome) {
         Random random = new Random(System.nanoTime());
         List<Biome> viableBiomes = new ArrayList<>();
 
-        if (atmosphereDensity > AtmosphereTypes.LOW.value && random.nextInt(3) == 0 && !isTerraformed()) {
+        if (atmosphereDensity > AtmosphereTypes.LOW.value && random.nextInt(3) == 0 && allow_single_biome) {
             List<Biome> list = new LinkedList<>(AdvancedRocketryBiomes.instance.getSingleBiome());
 
             while (list.size() > 1) {

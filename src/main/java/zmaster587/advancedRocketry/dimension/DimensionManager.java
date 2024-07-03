@@ -325,7 +325,7 @@ public class DimensionManager implements IGalaxy {
 
         properties.rotationalPeriod = (int) (Math.pow((1 / properties.gravitationalMultiplier), 3) * 24000);
 
-        properties.addBiomes(properties.getViableBiomes());
+        properties.addBiomes(properties.getViableBiomes(true));
         properties.initDefaultAttributes();
 
         registerDim(properties, true);
