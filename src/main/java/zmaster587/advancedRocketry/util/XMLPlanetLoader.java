@@ -964,7 +964,7 @@ public class XMLPlanetLoader {
 
         //If no biomes are specified add some!
         if (properties.getBiomes().isEmpty())
-            properties.addBiomes(properties.getViableBiomes());
+            properties.addBiomes(properties.getViableBiomes(true));
 
         return list;
     }

@@ -1,7 +1,5 @@
 package zmaster587.advancedRocketry.world;
 
-import com.google.common.collect.Lists;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.crash.CrashReportCategory;
 import net.minecraft.init.Biomes;
@@ -14,20 +12,15 @@ import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.gen.ChunkGeneratorSettings;
 import net.minecraft.world.gen.layer.*;
 import net.minecraftforge.common.BiomeManager.BiomeEntry;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 import java.util.List;
 
 public class ChunkManagerPlanet extends BiomeProvider {
-    //TODO: make higher biome ids work
-    private static Field fBiomeCacheMap;
-    private static Field fBiomeCache;
     /**
      * A GenLayer containing the indices into BiomeGenBase.biomeList[]
      */
@@ -39,20 +32,11 @@ public class ChunkManagerPlanet extends BiomeProvider {
     private void setup(long seed, WorldType default1, String str, DimensionProperties properties){
         this.biomeCache = new BiomeCache(this);//new BiomeCacheExtended(this);
         //TODO: more biomes
-        //TODO: remove rivers
+        //TODO: remove rivers - why?
         GenLayer[] agenlayer = initializeAllBiomeGenerators(seed, default1, str, properties);//GenLayer.initializeAllBiomeGenerators(seed, default1); //;
         agenlayer = getModdedBiomeGenerators(default1, seed, agenlayer);
         this.genBiomes = agenlayer[0];
         this.biomeIndexLayer = agenlayer[1];
-
-        ReflectionHelper.setPrivateValue(BiomeProvider.class, this, this.genBiomes, "genBiomes", "field_76944_d");
-        ReflectionHelper.setPrivateValue(BiomeProvider.class, this, this.biomeIndexLayer, "biomeIndexLayer", "field_76945_e");
-
-        fBiomeCache = ReflectionHelper.findField(BiomeCache.class, "cache", "field_76841_d");
-        fBiomeCache.setAccessible(true);
-
-        fBiomeCacheMap = ReflectionHelper.findField(BiomeCache.class, "cacheMap", "field_76843_c");
-        fBiomeCacheMap.setAccessible(true);
     }
 
     long seed;
@@ -190,16 +174,6 @@ public class ChunkManagerPlanet extends BiomeProvider {
     }
 
 
-    public void resetCache() {
-
-        try {
-            fBiomeCacheMap.set(this.biomeCache, new Long2ObjectOpenHashMap(4096));
-            fBiomeCache.set(this.biomeCache, Lists.newArrayList());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
 
     @Nonnull
     public Biome[] getBiomesForGeneration(@Nullable Biome[] biomes, int x, int z, int width, int height) {

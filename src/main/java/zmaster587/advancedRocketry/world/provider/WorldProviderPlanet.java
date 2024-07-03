@@ -44,7 +44,7 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 public class WorldProviderPlanet extends WorldProvider implements IPlanetaryProvider {
-    public BiomeProvider chunkMgrTerraformed;
+
 
 	/*@Override
 	protected void registerWorldChunkManager() {
@@ -103,7 +103,6 @@ public class WorldProviderPlanet extends WorldProvider implements IPlanetaryProv
 
 
         this.biomeProvider = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getBiomes());
-        this.chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getTerraformedBiomes());
         //AdvancedRocketry.planetWorldType.getChunkManager(worldObj);
     }
 
