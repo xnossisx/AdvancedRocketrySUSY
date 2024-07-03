@@ -4,9 +4,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
@@ -49,11 +51,6 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
     }
 
     @Override
-    public boolean isOpaqueCube(@Nonnull IBlockState state) {
-        return false;
-    }
-
-    @Override
     public int getThrust(World world, BlockPos pos) {
         return 10;
     }
@@ -61,6 +58,21 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
     @Override
     public int getFuelConsumptionRate(World world, int x, int y, int z) {
         return 1;
+    }
+
+    @Override
+    public boolean isOpaqueCube(@Nonnull IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean isBlockNormalCube(@Nonnull final IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public EnumBlockRenderType getRenderType(final IBlockState state) {
+        return EnumBlockRenderType.INVISIBLE;
     }
 
     @Override
@@ -86,19 +98,19 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
 //    }
 
     @Override
-    public void breakBlock(final World world, final BlockPos pos, final IBlockState state) {
-        if (!world.isRemote) {
+    public void harvestBlock(final World world, final EntityPlayer player, final BlockPos pos, final IBlockState state, @Nullable final TileEntity te, final ItemStack stack) {
+        if (!world.isRemote && !player.isCreative()) {
             ItemStack drop = new ItemStack(this.getItemDropped(state, world.rand, 0));
 
-            TileBrokenPart te = (TileBrokenPart) world.getTileEntity(pos);
+            TileBrokenPart tile = (TileBrokenPart) te;
             NBTTagCompound compound = new NBTTagCompound();
-            compound.setInteger("destruction_stage", te.getStage());
+            compound.setInteger("destruction_stage", tile.getStage());
             drop.setTagCompound(compound);
 
             world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), drop));
         }
 
-        super.breakBlock(world, pos, state);
+        super.harvestBlock(world, player, pos, state, te, stack);
     }
 
     @Override

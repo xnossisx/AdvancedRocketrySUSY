@@ -1,6 +1,6 @@
 # Blender v2.77 (sub 0) OBJ File: 'combustion.blend'
 # www.blender.org
-mtllib rocketmotor.mtl
+mtllib bipropellantrocket.mtl
 o rocketmotor
 v 0.500000 0.456373 0.220000
 v 0.302010 0.456373 0.302010

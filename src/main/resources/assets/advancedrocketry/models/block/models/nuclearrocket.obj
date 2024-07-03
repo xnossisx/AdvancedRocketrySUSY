@@ -1,6 +1,6 @@
 # Blender v2.79 (sub 0) OBJ File: 'rocket.blend'
 # www.blender.org
-mtllib nuclearrocketmotor.mtl
+mtllib nuclearrocket.mtl
 o rocketmotor
 v 0.302010 0.456373 0.302010
 v 0.500000 0.005000 -0.000500
