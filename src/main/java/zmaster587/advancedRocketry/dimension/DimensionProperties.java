@@ -266,8 +266,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             System.out.println("List is 0 - this should never happen!!");
             return null; // this should never happen. Yes it would crash the game, but if it does, my code is wrong and needs to be fixed anyway
         }
-        //return terraformingChangeList.remove(nextInt(0,terraformingChangeList.size()));
-        return terraformingChangeList.remove(0);
+        return terraformingChangeList.remove(nextInt(0,terraformingChangeList.size()));
+        //return terraformingChangeList.remove(0);
     }
     public DimensionProperties(int id, String name) {
         this(id);
