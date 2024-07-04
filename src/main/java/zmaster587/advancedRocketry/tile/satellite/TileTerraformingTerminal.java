@@ -140,7 +140,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void update() {
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
-        int powerrequired = 120;
+        int powerrequired = 1;
         if (!world.isRemote) {
 
             if (world.getTotalWorldTime() % 20 == 0)
@@ -175,7 +175,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                     SatelliteBiomeChanger sat = (SatelliteBiomeChanger) ItemSatelliteIdentificationChip.getSatellite(getStackInSlot(0));
                     IUniversalEnergy battery = sat.getBattery();
 
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 1000; i++) {
                         //TODO: Better imp
 
                         if (battery.getUniversalEnergyStored() > powerrequired) {

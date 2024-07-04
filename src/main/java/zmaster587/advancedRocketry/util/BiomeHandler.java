@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.util;
 
 import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
@@ -26,12 +27,14 @@ import java.util.List;
 import java.util.Random;
 
 import static zmaster587.advancedRocketry.util.AstronomicalBodyHelper.getAverageTemperature;
+import static zmaster587.advancedRocketry.util.AstronomicalBodyHelper.getOrbitalPeriod;
 
 public class BiomeHandler {
 
 
 
-    public static void changeBiome(World world, Biome biomeId, BlockPos pos, boolean regen_vegetation) {
+    //try to not change this method definition again because it will mess up the REID mixin
+    public static void changeBiome(World world, Biome biomeId, BlockPos pos, boolean was_biome_remote) {
         Chunk chunk = world.getChunkFromBlockCoords(pos);
 
         Biome biome = world.getBiome(pos);
@@ -53,12 +56,20 @@ public class BiomeHandler {
             } catch (IndexOutOfBoundsException e) {
                 e.printStackTrace();
             }
+
+            if (!was_biome_remote) {
+                int treegen = biomeId.decorator.treesPerChunk;
+                if (world.rand.nextInt(16 * 16) < treegen)
+                    biomeId.getRandomTreeFeature(world.rand).generate(world, world.rand, yy);
+            }
             decorateBiome(world, yy, biomeId);
+
 
             PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 256);
         }
+
         //for biome remote use
-        else if(regen_vegetation) {
+        else if(was_biome_remote) {
             BlockPos yy = world.getHeight(pos);
 
             while (!world.getBlockState(yy.down()).isOpaqueCube() && yy.getY() > 0)

@@ -266,8 +266,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             System.out.println("List is 0 - this should never happen!!");
             return null; // this should never happen. Yes it would crash the game, but if it does, my code is wrong and needs to be fixed anyway
         }
-        return terraformingChangeList.remove(nextInt(0,terraformingChangeList.size()));
-        //return terraformingChangeList.remove(0);
+        //return terraformingChangeList.remove(nextInt(0,terraformingChangeList.size()));
+        return terraformingChangeList.remove(0);
     }
     public DimensionProperties(int id, String name) {
         this(id);
@@ -1110,14 +1110,16 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                     viableBiomes.add(biome);
                 }
             }
-            viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
+            //if (allow_single_biome)
+                //viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
         } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.COLD)) {
             for (Biome biome : Biome.REGISTRY) {
                 if (biome != null && !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.HOT) && !isBiomeblackListed(biome)) {
                     viableBiomes.add(biome);
                 }
             }
-            viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
+            //if (allow_single_biome)
+                //viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
         } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.FRIGID)) {
 
             for (Biome biome : Biome.REGISTRY) {
