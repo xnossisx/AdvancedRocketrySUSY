@@ -975,7 +975,6 @@ public class DimensionManager implements IGalaxy {
                     DimensionProperties loadedDim = (DimensionProperties) loadedPlanets.get(properties.getId());
                     if (loadedDim != null) {
                         properties.copySatellites(loadedDim);
-                        properties.copyTerraformedBiomes(loadedDim);
                     }
                 }
                 if (properties.isNativeDimension)
