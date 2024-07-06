@@ -2,6 +2,7 @@ package zmaster587.advancedRocketry.util;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.world.World;
+import org.lwjgl.Sys;
 
 public class chunkdata {
     public int x;
@@ -60,9 +61,12 @@ public class chunkdata {
             }
         }
         if (all_generated){
+            //System.out.println("chunk fully generated: "+this.x+":"+this.z);
             terrain_fully_generated = true;
             this.blockStates = null; // no longer needed, gc should collect them now
+            helper.check_next_border_chunk_fully_generated(x,z); // update border chunks next to this one to check if they can decorate
             helper.check_can_decorate(x,z);
+
         }
     }
 
@@ -79,7 +83,11 @@ public class chunkdata {
         }
         if (all_decorated){
             // populate uses the biome at blockpos 0,0, in the chunk x+1,z+1, that's why we need the chunks next to it generated
-            world.provider.createChunkGenerator().populate(this.x, this.z);
+            if (!chunk_fully_generated)
+                if (helper.can_populate(this.x, this.z) == 1){
+                    world.provider.createChunkGenerator().populate(this.x, this.z);
+                    System.out.println("populate chunk "+this.x+":"+this.z);
+                }
             helper.setChunkFullyGenerated(this.x,this.z);
         }
 

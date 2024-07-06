@@ -26,6 +26,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import org.apache.commons.lang3.ArrayUtils;
+import org.lwjgl.Sys;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.atmosphere.AtmosphereRegister;
@@ -153,6 +154,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public TerraformingHelper terraformingHelper;
     public List<BlockPos> terraformingProtectedBlocks;
     public List<ChunkPos> terraformingChunksDone;
+    public List<ChunkPos> terraformingChunksAlreadyAdded;
 
     //class
 
@@ -215,6 +217,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
         terraformingProtectedBlocks = new LinkedList<>();
         terraformingChunksDone = new LinkedList<>();
+        terraformingChunksAlreadyAdded = new LinkedList<>();
 
         ringAngle = 70;
 
@@ -226,8 +229,13 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public void load_terraforming_helper(boolean reset) {
         getAverageTemp();
         getViableBiomes(false);
-        if (reset)
+        if (reset){
             terraformingChunksDone.clear();
+            terraformingChunksAlreadyAdded.clear();
+        }
+
+        System.out.println("load helper with protecting blocks: "+terraformingProtectedBlocks.size());
+
         terraformingHelper = new TerraformingHelper(getId(), getBiomesEntries(getViableBiomes(false)), terraformingChunksDone);
 
         Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(getId())).getChunkProvider().getLoadedChunks();
@@ -246,10 +254,13 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 break;
             }
         }
+        System.out.println("register protecting block called");
         if (!already_registered) {
             terraformingProtectedBlocks.add(p);
-            if (terraformingHelper != null)
+            System.out.println("block registered");
+            if (terraformingHelper != null){
                 terraformingHelper.recalculate_chunk_status();
+            }
         }
     }
 
@@ -279,6 +290,16 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         if (terraformingHelper != null) {
             chunkdata current_chunk = terraformingHelper.getChunkFromList(chunk.x, chunk.z);
             if (current_chunk == null || !current_chunk.chunk_fully_generated) {
+
+                boolean chunk_was_already_added = false; // do not add a chunk twice, the helper will manage it once it is added
+                for (ChunkPos i :terraformingChunksAlreadyAdded){
+                    if (chunk.x == i.x && chunk.z == i.z){
+                        chunk_was_already_added = true;
+                        break;
+                    }
+                }
+                if (chunk_was_already_added)
+                    return;
 
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
@@ -1608,6 +1629,11 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 int z = ((NBTTagCompound) entry).getInteger("z");
                 int y = ((NBTTagCompound) entry).getInteger("y");
                 terraformingProtectedBlocks.add(new BlockPos(x, y, z));
+                System.out.println("read protecting block at "+x+":"+y+":"+z+" - - "+terraformingProtectedBlocks.size());
+            }
+            if (terraformingHelper != null) {
+                terraformingHelper.recalculate_chunk_status();
+                System.out.println("calling recalculate_chunk_status after readfrom nbt");
             }
         }
 

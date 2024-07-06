@@ -141,7 +141,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void update() {
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
-        int powerrequired = 120;
+        int powerrequired = 12;
         if (!world.isRemote) {
 
             if (world.getTotalWorldTime() % 20 == 0)
@@ -176,7 +176,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                     SatelliteBiomeChanger sat = (SatelliteBiomeChanger) ItemSatelliteIdentificationChip.getSatellite(getStackInSlot(0));
                     IUniversalEnergy battery = sat.getBattery();
 
-                    for (int i = 0; i < 16*16; i++) {
+                    for (int i = 0; i < 10; i++) {
                         //TODO: Better imp
 
                         if (battery.getUniversalEnergyStored() > powerrequired) {
@@ -193,8 +193,8 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                                     BlockPos next_block_pos = t.get_next_position(false);
 
                                     if (next_block_pos != null) { // it is null when there is everything terraformed
-                                        //battery.extractEnergy(powerrequired, false);
-                                        BiomeHandler.changeBiome(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, world.provider.getDimension());
+                                        battery.extractEnergy(powerrequired, false);
+                                        BiomeHandler.terraform(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, world.provider.getDimension());
                                     }
 
                                 //} catch (NullPointerException e) {
