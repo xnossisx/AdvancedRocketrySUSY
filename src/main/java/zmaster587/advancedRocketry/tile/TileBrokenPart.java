@@ -67,6 +67,11 @@ public class TileBrokenPart extends TileEntitySyncable {
         return false;
     }
 
+    @Override
+    public boolean canRenderBreaking() {
+        return true;
+    }
+
     @Nonnull
     @Override
     public NBTTagCompound writeToNBT(final NBTTagCompound compound) {

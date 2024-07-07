@@ -5,7 +5,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
@@ -21,7 +20,6 @@ import zmaster587.libVulpes.block.BlockFullyRotatable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Random;
 
 public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngine {
 
@@ -49,7 +47,7 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
         if (world.getBlockState(pos.add(0, 0, -1)).getBlock() instanceof BlockFuelTank) {
             return state.withProperty(FACING, EnumFacing.NORTH);
         }
-        return state;
+        return super.getActualState(state, world, pos);
     }
 
     @Override
@@ -108,11 +106,6 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
         super.harvestBlock(world, player, pos, state, te, stack);
     }
 
-    @Override
-    public Item getItemDropped(final IBlockState state, final Random rand, final int fortune) {
-        return super.getItemDropped(state, rand, fortune).setMaxDamage(10);
-    }
-
     public IBlockState getStateFromMeta(int meta) {
         if (meta > 5) {
             return this.getDefaultState();
@@ -133,6 +126,6 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
     @Nullable
     @Override
     public TileEntity createTileEntity(final World worldIn, final IBlockState state) {
-        return new TileBrokenPart(10, 0.1F);
+        return new TileBrokenPart(10, 0.05F);
     }
 }
