@@ -131,10 +131,10 @@ repositories {
         name = "ModMaven"
         url = uri("https://modmaven.k-4u.nl")
     }
-    maven {
-        name = "Galacticraft"
-        url = uri("https://maven.galacticraft.dev/repository/legacy-releases/")
-    }
+    //maven {
+    //    name = "Galacticraft"
+    //    url = uri("https://maven.galacticraft.dev/repository/legacy-releases/")
+    //}
 //    maven {
 //        name = "LibVulpes"
 //        url = uri("http://maven.dmodoomsirius.me/")
@@ -152,8 +152,8 @@ dependencies {
     //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
     //implementation("zmaster587.libVulpes:LibVulpes:$mcVersion-$libVulpesVersion-$libVulpesBuildNum-deobf")
 
-    compileOnly(fg.deobf("dev.galacticraft:galacticraft-legacy:$gcVersion"))
-
+    //compileOnly(fg.deobf("dev.galacticraft:galacticraft-legacy:$gcVersion"))
+    compileOnly(fg.deobf("curse.maven:galacticraft-legacy-564236:4671122"))
     compileOnly(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}:api"))
     //runtimeOnly(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}")) // I think this crashes the game for me when running from IntelliJ
 

@@ -9,7 +9,9 @@ import java.util.List;
 
 public interface Afuckinginterface {
 
-    public void setListforDIM(int dim, List<BlockPos> protectingblocklist, List<ChunkPos> chunksDoneList);
+    public void initdim(int dim);
+
+    public boolean isinitialized(int dim);
 
     public List<BlockPos> getProtectingBlocksForDimension(int dim);
 

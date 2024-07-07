@@ -154,8 +154,8 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         this.mapFeaturesEnabled = dimProps.canGenerateStructures() && ARConfiguration.getCurrentConfig().generateVanillaStructures;
 
         //TODO: may break on little planets
-        float atmDensity = ((WorldProviderPlanet) worldObj.provider).getAtmosphereDensity(new BlockPos(0, 0, 0));
-        habitable = ((WorldProviderPlanet) worldObj.provider).getAtmosphere(new BlockPos(0, 0, 0)).isBreathable();
+        float atmDensity = dimProps.getAtmosphereDensity() / 100f; // this fucking shit does not belong here -> ((WorldProviderPlanet) worldObj.provider).getAtmosphereDensity(new BlockPos(0, 0, 0));
+        habitable = dimProps.getAtmosphere().isBreathable();
 
 
         if (ARConfiguration.getCurrentConfig().generateCraters && dimProps.canGenerateCraters() && atmDensity <= 0.05)

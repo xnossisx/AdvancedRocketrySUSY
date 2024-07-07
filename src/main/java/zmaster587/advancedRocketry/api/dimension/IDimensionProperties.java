@@ -150,7 +150,7 @@ public interface IDimensionProperties {
      */
     SatelliteBase removeSatellite(long id);
 
-    void writeToNBT(NBTTagCompound nbt, boolean write_terraforming_biomes);
+    void writeToNBT(NBTTagCompound nbt);
 
     void readFromNBT(NBTTagCompound nbt);
 

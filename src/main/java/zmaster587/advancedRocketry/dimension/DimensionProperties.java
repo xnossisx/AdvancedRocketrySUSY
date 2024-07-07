@@ -225,11 +225,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         //water_can_exist = true;
         water_source_locked_positions = new ArrayList<>();
 
-
-
-if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
-    proxylists.setListforDIM(getId(),new ArrayList<>(), new ArrayList<>());
-}
         terraformingChunksAlreadyAdded = new ArrayList<>();
 
         ringAngle = 70;
@@ -241,6 +236,10 @@ if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
 
     public void load_terraforming_helper(boolean reset) {
         if (!net.minecraftforge.common.DimensionManager.getWorld(getId()).isRemote) {
+
+            if (!proxylists.isinitialized(getId())){
+                proxylists.initdim(getId());
+            }
 
             getAverageTemp();
             getViableBiomes(false);
@@ -1637,49 +1636,10 @@ if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
             fillerBlock = null;
 
 
-//terraforming data
-        // I have no idea how this can be called on client but it seems to just do it so idk
-        if (nbt.hasKey("fullyGeneratedChunks")) {
-
-            list = nbt.getTagList("fullyGeneratedChunks", NBT.TAG_COMPOUND);
-            if (!list.hasNoTags())
-                proxylists.setChunksFullyTerraformed(getId(), new ArrayList<>());
-            for (NBTBase entry : list) {
-                assert entry instanceof NBTTagCompound;
-                int x = ((NBTTagCompound) entry).getInteger("x");
-                int z = ((NBTTagCompound) entry).getInteger("z");
-                System.out.println("Chunk fully terraformed: " + x + ":" + z);
-
-                boolean chunk_was_already_done = false;
-                for (ChunkPos i : proxylists.getChunksFullyTerraformed(getId())) {
-                    if (x == i.x && z == i.z) {
-                        chunk_was_already_done = true;
-                        break;
-                    }
-                }
-                if (!chunk_was_already_done)
-                    proxylists.getChunksFullyTerraformed(getId()).add(new ChunkPos(x, z));
-                else System.out.println("Chunk is already in list: " + x + ":" + z);
-            }
-        }
-
-        if (nbt.hasKey("terraformingProtectedBlocks")) {
-
-            list = nbt.getTagList("terraformingProtectedBlocks", NBT.TAG_COMPOUND);
-            if (!list.hasNoTags())
-                proxylists.setProtectingBlocksForDimension(getId(), new ArrayList<>());
-            for (NBTBase entry : list) {
-                assert entry instanceof NBTTagCompound;
-                int x = ((NBTTagCompound) entry).getInteger("x");
-                int z = ((NBTTagCompound) entry).getInteger("z");
-                int y = ((NBTTagCompound) entry).getInteger("y");
-                proxylists.getProtectingBlocksForDimension(getId()).add(new BlockPos(x, y, z));
-                System.out.println("read protecting block at " + x + ":" + y + ":" + z + " - - " + proxylists.getProtectingBlocksForDimension(getId()).size());
-            }
-        }
-
         readFromTechnicalNBT(nbt);
     }
+
+
 
     private void writeTechnicalNBT(NBTTagCompound nbt) {
         NBTTagList list;
@@ -1703,14 +1663,81 @@ if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
                 allSatelliteNBT.setTag(entry.getKey().toString(), satelliteNBT);
             }
             nbt.setTag("satallites", allSatelliteNBT);
+        }   }
+
+    //terraforming data
+    public void read_terraforming_data(NBTTagCompound nbt){
+
+        int dimid =getId();
+        if (!proxylists.isinitialized(dimid)){
+            proxylists.initdim(dimid);
         }
+
+        if (nbt.hasKey("fullyGeneratedChunks")) {
+
+            NBTTagList list = nbt.getTagList("fullyGeneratedChunks", NBT.TAG_COMPOUND);
+            if (!list.hasNoTags())
+                proxylists.setChunksFullyTerraformed(dimid, new ArrayList<>());
+            for (NBTBase entry : list) {
+                assert entry instanceof NBTTagCompound;
+                int x = ((NBTTagCompound) entry).getInteger("x");
+                int z = ((NBTTagCompound) entry).getInteger("z");
+                System.out.println("Chunk fully terraformed: " + x + ":" + z);
+
+                boolean chunk_was_already_done = false;
+                for (ChunkPos i : proxylists.getChunksFullyTerraformed(dimid)) {
+                    if (x == i.x && z == i.z) {
+                        chunk_was_already_done = true;
+                        break;
+                    }
+                }
+                if (!chunk_was_already_done)
+                    proxylists.getChunksFullyTerraformed(dimid).add(new ChunkPos(x, z));
+                else System.out.println("Chunk is already in list: " + x + ":" + z);
+            }
+        }
+
+        if (nbt.hasKey("terraformingProtectedBlocks")) {
+
+            NBTTagList list = nbt.getTagList("terraformingProtectedBlocks", NBT.TAG_COMPOUND);
+            if (!list.hasNoTags())
+                proxylists.setProtectingBlocksForDimension(dimid, new ArrayList<>());
+            for (NBTBase entry : list) {
+                assert entry instanceof NBTTagCompound;
+                int x = ((NBTTagCompound) entry).getInteger("x");
+                int z = ((NBTTagCompound) entry).getInteger("z");
+                int y = ((NBTTagCompound) entry).getInteger("y");
+                proxylists.getProtectingBlocksForDimension(dimid).add(new BlockPos(x, y, z));
+                System.out.println("read protecting block at " + x + ":" + y + ":" + z + " - - " + proxylists.getProtectingBlocksForDimension(dimid).size());
+            }
+        }
+    }
+    public void write_terraforming_data(NBTTagCompound nbt) {
+        // write terraforming data
+
+        int dimid = getId();
+            NBTTagList list = new NBTTagList();
+            for (ChunkPos pos : proxylists.getChunksFullyTerraformed(dimid)) {
+                NBTTagCompound entry = new NBTTagCompound();
+                entry.setInteger("x", pos.x);
+                entry.setInteger("z", pos.z);
+                list.appendTag(entry);
+            }
+            nbt.setTag("fullyGeneratedChunks", list);
+
+            list = new NBTTagList();
+            for (BlockPos pos : proxylists.getProtectingBlocksForDimension(dimid)) {
+                NBTTagCompound entry = new NBTTagCompound();
+                entry.setInteger("x", pos.getX());
+                entry.setInteger("y", pos.getY());
+                entry.setInteger("z", pos.getZ());
+                list.appendTag(entry);
+            }
+            nbt.setTag("terraformingProtectedBlocks", list);
 
 
     }
-    //public void writeToNBT(NBTTagCompound nbt) {
-
-    //}
-    public void writeToNBT(NBTTagCompound nbt, boolean write_terraforming_info) { // filter out info in client packet because it is too big
+    public void writeToNBT(NBTTagCompound nbt) {
         NBTTagList list;
 
         if (skyColor != null) {
@@ -1872,28 +1899,6 @@ if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
         }
 
 
-        // write terraforming data
-
-        if (write_terraforming_info) {
-            list = new NBTTagList();
-            for (ChunkPos pos : proxylists.getChunksFullyTerraformed(getId())) {
-                NBTTagCompound entry = new NBTTagCompound();
-                entry.setInteger("x", pos.x);
-                entry.setInteger("z", pos.z);
-                list.appendTag(entry);
-            }
-            nbt.setTag("fullyGeneratedChunks", list);
-
-            list = new NBTTagList();
-            for (BlockPos pos : proxylists.getProtectingBlocksForDimension(getId())) {
-                NBTTagCompound entry = new NBTTagCompound();
-                entry.setInteger("x", pos.getX());
-                entry.setInteger("y", pos.getY());
-                entry.setInteger("z", pos.getZ());
-                list.appendTag(entry);
-            }
-            nbt.setTag("terraformingProtectedBlocks", list);
-        }
 
         writeTechnicalNBT(nbt);
     }
