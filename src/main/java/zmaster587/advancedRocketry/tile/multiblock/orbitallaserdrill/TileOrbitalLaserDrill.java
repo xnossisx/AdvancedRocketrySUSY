@@ -216,7 +216,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
         if (id == 15) {
             laserZ = nbt.getInteger("currentZ");
             laserX = nbt.getInteger("currentX");
-            //positionText.setText("position:\n"+this.laserX+":"+this.laserZ);
+            positionText.setText("position:\n"+this.laserX+":"+this.laserZ);
         }else if (id == 11){
             resetSpiral();
             mode = MODE.values()[nbt.getInteger("mode")];
@@ -224,12 +224,12 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
             yCenter = nbt.getInteger("newZ");
             laserZ = nbt.getInteger("currentZ");
             laserX = nbt.getInteger("currentX");
-            //positionText.setText("position:\n"+this.laserX+":"+this.laserZ);
+            positionText.setText("position:\n"+this.laserX+":"+this.laserZ);
             updateText.setText(this.getMode().toString());
             locationX.setText(String.valueOf(this.xCenter));
             locationZ.setText(String.valueOf(this.yCenter));
             //System.out.println("reset client:"+xCenter+":"+yCenter+":"+mode);
-            resetBtn.setColor(0xa0a0a0);
+            resetBtn.setColor(0xf0f0f0);
         }
        else if (id == 12) {
            this.isRunning = nbt.getBoolean("isRunning");
@@ -435,7 +435,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
 
                         this.laserX += 3 * prevDir.getFrontOffsetX();
                         this.laserZ += 3 * prevDir.getFrontOffsetZ();
-                        PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos,128);
+                        PacketHandler.sendToNearby(new PacketMachine(this, (byte) 15), this.world.provider.getDimension(), pos,128);
 
                     }
                 }
@@ -746,7 +746,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
 
     @Override
     public void onModuleUpdated(ModuleBase module) {
-        resetBtn.setColor(0x60a060);
+        resetBtn.setColor(0x90ff90);
         if (module == locationX) {
             if (!((ModuleTextBox) module).getText().isEmpty() && !((ModuleTextBox) module).getText().contentEquals("-"))
                 xCenter = Integer.parseInt(((ModuleTextBox) module).getText());
@@ -800,7 +800,8 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
-        resetBtn.setColor(0x60a060);
+        if (buttonId!=2)
+            resetBtn.setColor(0x90ff90);
         if (buttonId == 0) {
             this.decrementMode();
             updateText.setText(this.getMode().toString());
