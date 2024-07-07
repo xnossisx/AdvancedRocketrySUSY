@@ -40,6 +40,7 @@ import zmaster587.advancedRocketry.api.stations.IStorageChunk;
 import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
 import zmaster587.advancedRocketry.block.BlockNuclearRocketMotor;
 import zmaster587.advancedRocketry.block.BlockRocketMotor;
+import zmaster587.advancedRocketry.item.ItemPackedStructure;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
 import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
@@ -136,6 +137,16 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         // TEs
         for (TileEntity te : this.tileEntities) {
             this.weight += WeightEngine.INSTANCE.getTEWeight(te);
+
+            if (te instanceof TileSatelliteHatch) {
+                TileSatelliteHatch hatch = (TileSatelliteHatch) te;
+                if (hatch.getSatellite() != null) {
+                    weight += hatch.getSatellite().getProperties().getWeight();
+                } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
+                    ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0).getItem();
+                    weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
+                }
+            }
         }
 
         return this.weight;
