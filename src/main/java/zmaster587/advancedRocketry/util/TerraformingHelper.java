@@ -53,9 +53,6 @@ public class TerraformingHelper {
     int safe_zone_radius = 3;
     int border_zone = 1;
 
-    boolean lockqueue = false;
-    List<Vec3i> temp_queue;
-
 
     public TerraformingHelper(int dimension, List<BiomeManager.BiomeEntry> biomes, List<ChunkPos> generated_chunks){
         this.dimId = dimension;
@@ -64,7 +61,6 @@ public class TerraformingHelper {
         this.world = net.minecraftforge.common.DimensionManager.getWorld(dimId);
         this.chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), biomeList);
         this.terraformingqueue = new ArrayList<>();
-        temp_queue = new ArrayList<>();
         chunkDataMap = new HashMap<>();
         generator = new ChunkProviderPlanet(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), world.getWorldInfo().getGeneratorOptions());
 
@@ -118,7 +114,7 @@ public class TerraformingHelper {
      A Border chunk is considered fully generated when every type.ALLOWED chunks next to it are fully generated.
      This is because a fully terrain generated chunk will no longer change its heightmap so it will not modify the heightmap of the border chunk next to it
      */
-    public void check_next_border_chunk_fully_generated(int px, int pz) {
+    public synchronized void check_next_border_chunk_fully_generated(int px, int pz) {
 
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
@@ -130,22 +126,15 @@ public class TerraformingHelper {
                     int chunkposxhigh = chunkposxlow + 16;
                     int chunkposzhigh = chunkposzlow + 16;
 
-                    lockqueue = true;
-                    for(Vec3i p: terraformingqueue) {
-                        if (p == null) {
-                            // AFAIK add_position_to_queue is the only method where the list is modified. I have no fucking idea how this can be null
-                            //System.out.println("ERROR FOUND NULL BLOCKPOS IN LIST");
-                            continue;
-                        }
+
+                    for(Vec3i p : terraformingqueue){
                         if (p.getX() >= chunkposxlow && p.getX() < chunkposxhigh) {
                             if (p.getZ() >= chunkposzlow && p.getZ() < chunkposzhigh) {
                                 return;
                             }
                         }
                     }
-                    lockqueue = false;
-                    terraformingqueue.addAll(temp_queue);
-                    temp_queue.clear();
+
 
                     for (int x2 = -1; x2 <= 1; x2++) {
                         for (int z2 = -1; z2 <= 1; z2++) {
@@ -241,22 +230,18 @@ public class TerraformingHelper {
 
 
 
-    public void add_position_to_queue(BlockPos p){
+    public synchronized void add_position_to_queue(BlockPos p){
         //System.out.println("add position: "+p.getX()+":"+p.getZ());
         if (p == null){
             System.out.print("ERROR POSITION IS NULL");
             return;
         }
-        if(!lockqueue)
             terraformingqueue.add(new Vec3i(p.getX(),p.getY(),p.getZ())); // HOW TF CAN THIS EVER BE NULL?!?!?
-        else {
-            //well this was it...
-            //System.out.println("Queue is locked - adding position to temp queue");
-            temp_queue.add(new Vec3i(p.getX(), p.getY(), p.getZ()));
-        }
-    }
 
-    public BlockPos get_next_position(boolean random){
+        }
+
+
+    public synchronized BlockPos get_next_position(boolean random){
         if (terraformingqueue.isEmpty())
             return null;
         int index = 0;
@@ -264,7 +249,7 @@ public class TerraformingHelper {
             index = nextInt(0,terraformingqueue.size());
 
         Vec3i pos = terraformingqueue.remove(index);
-        if(pos == null) return null; // Screw it - This is now beyond my pay grade now....
+        //if(pos == null) return null; // Screw it - This is now beyond my pay grade now....
         return new BlockPos(pos);
     }
 

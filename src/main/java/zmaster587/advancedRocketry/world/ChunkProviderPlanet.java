@@ -284,12 +284,14 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         boolean is_terraforming = false;
         if (bp == null) {
             this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, x * 16, z * 16, 16, 16);
-            this.setBlocksInChunk(x, z, chunkprimer);
+            this.setBlocksInChunk(x, z, chunkprimer); // this messes up biome generation, needs to reset biomes
+            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, x * 16, z * 16, 16, 16);
             this.replaceBiomeBlocks(x, z, chunkprimer, this.biomesForGeneration);
         }
         else {
             this.biomesForGeneration = bp.getBiomes(this.biomesForGeneration, x * 16, z * 16, 16, 16);
-            this.setBlocksInChunk(x, z, chunkprimer, bp);
+            this.setBlocksInChunk(x, z, chunkprimer, bp); // this messes up biome generation, needs to reset biomes
+            this.biomesForGeneration = bp.getBiomes(this.biomesForGeneration, x * 16, z * 16, 16, 16);
             this.replaceBiomeBlocks(x, z, chunkprimer, this.biomesForGeneration);
             is_terraforming = true;
         }
