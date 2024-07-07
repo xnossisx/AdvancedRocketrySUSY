@@ -67,7 +67,7 @@ public class PacketStationUpdate extends BasePacket {
             case DIM_PROPERTY_UPDATE:
                 NBTTagCompound nbt = new NBTTagCompound();
                 try {
-                    spaceObject.getProperties().writeToNBT(nbt);
+                    spaceObject.getProperties().writeToNBT(nbt, false);
                     PacketBuffer packetBuffer = new PacketBuffer(out);
                     packetBuffer.writeCompoundTag(nbt);
                 } catch (NullPointerException e) {

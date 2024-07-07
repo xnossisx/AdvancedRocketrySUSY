@@ -29,10 +29,7 @@ import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static zmaster587.advancedRocketry.util.AstronomicalBodyHelper.getAverageTemperature;
 import static zmaster587.advancedRocketry.util.AstronomicalBodyHelper.getOrbitalPeriod;
@@ -76,17 +73,19 @@ public class BiomeHandler {
         startTime = System.currentTimeMillis();
         DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(dimId);
 
-        ChunkPos cpos = props.terraformingHelper.getChunkPosFromBlockPos(pos);
+        ChunkPos cpos = DimensionProperties.proxylists.gethelper(props.getId()).getChunkPosFromBlockPos(pos);
 
 
-        IBlockState[] target_blocks = props.terraformingHelper.getBlocksAt(pos.getX(), pos.getZ()); // 4-6ms
-        chunkdata data = props.terraformingHelper.getChunkFromList(cpos.x, cpos.z); // 4-6ms
+        IBlockState[] target_blocks = DimensionProperties.proxylists.gethelper(props.getId()).getBlocksAt(pos.getX(), pos.getZ()); // 4-6ms
+        chunkdata data = DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z); // 4-6ms
+        //System.out.println("d1"+(System.currentTimeMillis()-startTime));
+        //startTime = System.currentTimeMillis();
 
         if (data.type == TerraformingType.PROTECTED){
             //System.out.println("working protected");
             decorate_simple(world, biomeId,old_biome, pos);
-            props.terraformingHelper.getChunkFromList(cpos.x, cpos.z).set_position_fully_generated(inchunkx,inchunkz);
-            props.terraformingHelper.register_height_change(pos); // it does not really changetheheight but it will notify the border to update
+            DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_fully_generated(inchunkx,inchunkz);
+            DimensionProperties.proxylists.gethelper(props.getId()).register_height_change(pos); // it does not really changetheheight but it will notify the border to update
         }
         else if (data.type == TerraformingType.ALLOWED) {
             //System.out.println("working full");
@@ -109,64 +108,70 @@ public class BiomeHandler {
                 }
                 // as long as terrain does not match the target height, re-add position to queue
                 if (current_height == target_height) {
-                    props.terraformingHelper.getChunkFromList(cpos.x, cpos.z).set_position_fully_generated(inchunkx, inchunkz);
+                    DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_fully_generated(inchunkx, inchunkz);
                 } else {
-                    props.terraformingHelper.add_position_to_queue(pos);
-                    props.terraformingHelper.register_height_change(pos);
+                    DimensionProperties.proxylists.gethelper(props.getId()).add_position_to_queue(pos);
+                    DimensionProperties.proxylists.gethelper(props.getId()).register_height_change(pos);
                 }
 
             }
         }
 
         else if (data.type == TerraformingType.BORDER){
-            //System.out.println("working border");
 
-            world.getChunkFromBlockCoords(pos.add(-1,0,0)); // Ensure the chunk of the target positions are generated
-            world.getChunkFromBlockCoords(pos.add(1,0,0)); // Ensure the chunk of the target positions are generated
-            world.getChunkFromBlockCoords(pos.add(0,0,-1)); // Ensure the chunk of the target positions are generated
-            world.getChunkFromBlockCoords(pos.add(0,0,1)); // Ensure the chunk of the target positions are generated
+            if (target_blocks != null) {
 
-            int next_heightsx0 = world.getHeight(pos.add(-1,0,0)).getY();
-            int next_heightsx1 = world.getHeight(pos.add(1,0,0)).getY();
-            int next_heightsz0 = world.getHeight(pos.add(0,0,-1)).getY();
-            int next_heightsz1 = world.getHeight(pos.add(0,0,1)).getY();
+                int filter_size = 5;
+                //System.out.println("working border");
 
-            int avg_height = Math.round ((float) (next_heightsz1 + next_heightsx1 + next_heightsx0 + next_heightsz0) / 4);
+                world.getChunkFromBlockCoords(pos.add(-filter_size, 0, 0)); // Ensure the chunk of the target positions are generated
+                world.getChunkFromBlockCoords(pos.add(filter_size, 0, 0)); // Ensure the chunk of the target positions are generated
+                world.getChunkFromBlockCoords(pos.add(0, 0, -filter_size)); // Ensure the chunk of the target positions are generated
+                world.getChunkFromBlockCoords(pos.add(0, 0, filter_size)); // Ensure the chunk of the target positions are generated
 
-            int prev_height = world.getHeight(pos).getY();
-            if (avg_height == prev_height){ // nothing to do
-                return;
-            }
+                int heightsum = 0;
+                int num_samples = 0;
+                for (int x = -filter_size; x <= filter_size; x++) {
+                    for (int z = -filter_size; z <= filter_size; z++) {
+                        heightsum += world.getHeight(pos.add(x, 0, z)).getY();
+                        num_samples += 1;
+                    }
+                }
 
-            //fast replacing
-            for (int i = 5; i < 256; i++) {
-                IBlockState target= target_blocks[i];
-                if (i < avg_height)
-                    if (target == Blocks.AIR.getDefaultState())
+                int avg_height = heightsum / num_samples;
+
+                int prev_height = world.getHeight(pos).getY();
+                if (avg_height == prev_height) { // nothing to do
+                    return;
+                }
+
+                //fast replacing
+                for (int i = 5; i < 256; i++) {
+                    IBlockState target = target_blocks[i];
+                    if (i < avg_height)
+                        if (target == Blocks.AIR.getDefaultState())
+                            target = biomeId.topBlock;
+                    if (i == avg_height)
                         target = biomeId.topBlock;
-                if (i == avg_height)
-                    target = biomeId.topBlock;
-                if (i > avg_height)
-                    target = Blocks.AIR.getDefaultState();
-                world.setBlockState(new BlockPos(pos.getX(), i, pos.getZ()), target, 2);
-            }
+                    if (i > avg_height)
+                        target = Blocks.AIR.getDefaultState();
+                    world.setBlockState(new BlockPos(pos.getX(), i, pos.getZ()), target, 2);
+                }
 
-            int new_height = world.getHeight(pos).getY();
-
-            if (prev_height != new_height){
-                props.terraformingHelper.register_height_change(pos);
-                props.terraformingHelper.add_position_to_queue(pos);
-            }else{
-                props.terraformingHelper.check_next_border_chunk_fully_generated(cpos.x,cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
-            }
+                int new_height = world.getHeight(pos).getY();
+                if (prev_height != new_height) {
+                    DimensionProperties.proxylists.gethelper(props.getId()).register_height_change(pos);
+                    DimensionProperties.proxylists.gethelper(props.getId()).add_position_to_queue(pos);
+                } else {
+                    DimensionProperties.proxylists.gethelper(props.getId()).check_next_border_chunk_fully_generated(cpos.x, cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
+                }
+            }else DimensionProperties.proxylists.gethelper(props.getId()).check_next_border_chunk_fully_generated(cpos.x, cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
         }
-        //System.out.println("d1: " +(System.currentTimeMillis() - startTime));
-        startTime = System.currentTimeMillis();
 
-        int can_populate = props.terraformingHelper.can_populate(cpos.x, cpos.z);
+        int can_populate = DimensionProperties.proxylists.gethelper(props.getId()).can_populate(cpos.x, cpos.z);
         if (can_populate == -1){
             //because it can never be populated, it is considered "done with population"
-            props.terraformingHelper.getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);
+            DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);
         }
         if (can_populate == 1) {
 
@@ -174,13 +179,13 @@ public class BiomeHandler {
             // we shift the actual tree generation by 8 blocks so that it overlaps with the chunks next to it
             // can_populate() ensures that the chunks next to it are ready for decoration
 
-            if (!props.terraformingHelper.getChunkFromList(cpos.x,cpos.z).fully_decorated[inchunkx][inchunkz]) {
+            if (!DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x,cpos.z).fully_decorated[inchunkx][inchunkz]) {
                 //System.out.println("decorate block");
                 int treegen = biomeId.decorator.treesPerChunk;
                 if (world.rand.nextInt(16 * 16) < treegen)
                     biomeId.getRandomTreeFeature(world.rand).generate(world, world.rand, world.getHeight(pos.add(8, 0, 8)));
 
-                props.terraformingHelper.getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);
+                DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);
             }
         }
     }

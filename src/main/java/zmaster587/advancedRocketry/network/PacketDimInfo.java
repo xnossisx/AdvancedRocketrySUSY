@@ -47,7 +47,7 @@ public class PacketDimInfo extends BasePacket {
             //Try to send the nbt data of the dimension to the client, if it fails(probably due to non existent Biome ids) then remove the dimension
             PacketBuffer packetBuffer = new PacketBuffer(out);
             try {
-                dimProperties.writeToNBT(nbt);
+                dimProperties.writeToNBT(nbt, false);
                 out.writeBoolean(false);
                 packetBuffer.writeCompoundTag(nbt);
 

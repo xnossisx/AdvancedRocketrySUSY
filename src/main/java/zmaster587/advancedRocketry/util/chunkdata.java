@@ -61,7 +61,7 @@ public class chunkdata {
             }
         }
         if (all_generated){
-            //System.out.println("chunk fully generated: "+this.x+":"+this.z);
+            System.out.println("chunk fully generated: "+this.x+":"+this.z);
             terrain_fully_generated = true;
             this.blockStates = null; // no longer needed, gc should collect them now
             helper.check_next_border_chunk_fully_generated(x,z); // update border chunks next to this one to check if they can decorate

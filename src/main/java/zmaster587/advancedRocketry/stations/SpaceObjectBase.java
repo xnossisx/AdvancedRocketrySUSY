@@ -250,7 +250,7 @@ public abstract class SpaceObjectBase implements ISpaceObject {
 
     @Override
     public void writeToNbt(NBTTagCompound nbt) {
-        properties.writeToNBT(nbt);
+        properties.writeToNBT(nbt, false);
         nbt.setInteger("id", getId());
         nbt.setInteger("posX", posX);
         nbt.setInteger("posY", posY);

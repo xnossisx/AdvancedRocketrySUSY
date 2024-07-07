@@ -141,7 +141,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void update() {
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
-        int powerrequired = 12;
+        int powerrequired = 1;
         if (!world.isRemote) {
 
             if (world.getTotalWorldTime() % 20 == 0)
@@ -176,18 +176,18 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                     SatelliteBiomeChanger sat = (SatelliteBiomeChanger) ItemSatelliteIdentificationChip.getSatellite(getStackInSlot(0));
                     IUniversalEnergy battery = sat.getBattery();
 
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 1000; i++) {
                         //TODO: Better imp
 
                         if (battery.getUniversalEnergyStored() > powerrequired) {
                                 try {
 
 
-                                    TerraformingHelper t = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).terraformingHelper;
+                                    TerraformingHelper t = DimensionProperties.proxylists.gethelper(world.provider.getDimension());
 
                                     if (t == null) {
                                         DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).load_terraforming_helper(false);
-                                        t = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).terraformingHelper;
+                                        t = DimensionProperties.proxylists.gethelper(world.provider.getDimension());
                                     }
                                     BiomeProvider chunkmgr = t.chunkMgrTerraformed;
                                     BlockPos next_block_pos = t.get_next_position(false);
@@ -195,6 +195,9 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                                     if (next_block_pos != null) { // it is null when there is everything terraformed
                                         battery.extractEnergy(powerrequired, false);
                                         BiomeHandler.terraform(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, world.provider.getDimension());
+                                    }else{
+                                        System.out.println("nothing to terraform");
+                                        break; // nothing to do, everything is terraformed
                                     }
 
                                 //} catch (NullPointerException e) {

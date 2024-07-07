@@ -600,7 +600,7 @@ public class DimensionManager implements IGalaxy {
         for (Entry<Integer, DimensionProperties> dimSet : dimensionList.entrySet()) {
 
             NBTTagCompound dimNbt = new NBTTagCompound();
-            dimSet.getValue().writeToNBT(dimNbt);
+            dimSet.getValue().writeToNBT(dimNbt, true);
 
             dimListnbt.setTag(dimSet.getKey().toString(), dimNbt);
         }
@@ -974,9 +974,7 @@ public class DimensionManager implements IGalaxy {
                 if (loadedPlanets.containsKey(properties.getId())) {
                     DimensionProperties loadedDim = (DimensionProperties) loadedPlanets.get(properties.getId());
                     if (loadedDim != null) {
-                        properties.copySatellites(loadedDim);
-                        properties.terraformingProtectedBlocks = loadedDim.terraformingProtectedBlocks;
-                        properties.terraformingChunksDone = loadedDim.terraformingChunksDone;
+                        properties.copyData(loadedDim);
                     }
                 }
                 if (properties.isNativeDimension)

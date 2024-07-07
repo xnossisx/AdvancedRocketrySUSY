@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
@@ -47,10 +48,13 @@ public class TerraformingHelper {
     // - When a protecting Block has been removed and chunk status is re-calculated
     //   add every chunk that was PROTECTED and no longer is PROTECTED to the queue for terraforming.
     //   doesn't matter if it is type ALLOWED or type BORDER
-    public List<BlockPos> terraformingqueue;
+    private List<Vec3i> terraformingqueue;
 
     int safe_zone_radius = 3;
     int border_zone = 1;
+
+    boolean lockqueue = false;
+    List<Vec3i> temp_queue;
 
 
     public TerraformingHelper(int dimension, List<BiomeManager.BiomeEntry> biomes, List<ChunkPos> generated_chunks){
@@ -59,7 +63,8 @@ public class TerraformingHelper {
         this.biomeList = biomes;
         this.world = net.minecraftforge.common.DimensionManager.getWorld(dimId);
         this.chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), biomeList);
-        this.terraformingqueue = new LinkedList<>();
+        this.terraformingqueue = new ArrayList<>();
+        temp_queue = new ArrayList<>();
         chunkDataMap = new HashMap<>();
         generator = new ChunkProviderPlanet(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), world.getWorldInfo().getGeneratorOptions());
 
@@ -115,23 +120,32 @@ public class TerraformingHelper {
      */
     public void check_next_border_chunk_fully_generated(int px, int pz) {
 
-        //System.out.println("border check called");
-
         for (int x = -1; x <= 1; x++) {
             for (int z = -1; z <= 1; z++) {
                 chunkdata data = getChunkFromList(px + x, pz + z);
+                if (data == null)continue;
                 if (data != null && !data.terrain_fully_generated && data.type == TerraformingType.BORDER) {
+                    int chunkposxlow = data.x * 16;
+                    int chunkposzlow = data.z * 16;
+                    int chunkposxhigh = chunkposxlow + 16;
+                    int chunkposzhigh = chunkposzlow + 16;
 
-                    int chunkposxlow = data.x*16;
-                    int chunkposzlow = data.z*16;
-                    int chunkposxhigh = chunkposxlow+16;
-                    int chunkposzhigh = chunkposzlow+16;
-                    for (BlockPos p : this.terraformingqueue){
-                        if (p.getX() >= chunkposxlow && p.getX() < chunkposxhigh){
-                            if (p.getZ() >= chunkposzlow && p.getZ() < chunkposzhigh){
+                    lockqueue = true;
+                    for(Vec3i p: terraformingqueue) {
+                        if (p == null) {
+                            // AFAIK add_position_to_queue is the only method where the list is modified. I have no fucking idea how this can be null
+                            //System.out.println("ERROR FOUND NULL BLOCKPOS IN LIST");
+                            continue;
+                        }
+                        if (p.getX() >= chunkposxlow && p.getX() < chunkposxhigh) {
+                            if (p.getZ() >= chunkposzlow && p.getZ() < chunkposzhigh) {
                                 return;
-                            }}
+                            }
+                        }
                     }
+                    lockqueue = false;
+                    terraformingqueue.addAll(temp_queue);
+                    temp_queue.clear();
 
                     for (int x2 = -1; x2 <= 1; x2++) {
                         for (int z2 = -1; z2 <= 1; z2++) {
@@ -144,11 +158,11 @@ public class TerraformingHelper {
                             }
                         }
                     }
-
-                        data.terrain_fully_generated = true;
-                        data.blockStates = null; // no longer needed, gc should collect them now - actually, these are never needed but who cares...
-                        check_next_border_chunk_fully_generated(data.x,data.z); // update border chunks next to this one to check if they can decorate
-                        check_can_decorate(data.x,data.z);
+                    System.out.println("terrain fully generated");
+                    data.terrain_fully_generated = true;
+                    data.blockStates = null; // no longer needed, gc should collect them now - actually, these are never needed but who cares...
+                    check_next_border_chunk_fully_generated(data.x, data.z); // update border chunks next to this one to check if they can decorate
+                    check_can_decorate(data.x, data.z);
 
                 }
             }
@@ -163,7 +177,7 @@ public class TerraformingHelper {
                         //re-add all position to queue for decoration
                         for (int bx = 0; bx < 16; bx++) {
                             for (int bz = 0; bz < 16; bz++) {
-                                terraformingqueue.add(new BlockPos((px+x)*16+bx, 0, (pz+z)*16+bz));
+                                add_position_to_queue(new BlockPos((px+x)*16+bx, 0, (pz+z)*16+bz));
                             }
                         }
                     }
@@ -181,7 +195,7 @@ public class TerraformingHelper {
     public TerraformingType get_chunk_type(int x, int z) {
 
         TerraformingType type = TerraformingType.ALLOWED;
-        for (BlockPos i : props.terraformingProtectedBlocks) {
+        for (BlockPos i : DimensionProperties.proxylists.getProtectingBlocksForDimension(props.getId())) {
             //System.out.println("found protecting block at "+i.getX()+":"+i.getY()+":"+i.getZ());
             ChunkPos cpos = getChunkPosFromBlockPos(i);
             int dx = cpos.x - x;
@@ -225,13 +239,21 @@ public class TerraformingHelper {
         return chunkDataMap.get(key);
     }
 
-    public void setPositionReady(int x, int z){
-        ChunkPos cpos = getChunkPosFromBlockPos(new BlockPos(x,0,z));
-        getChunkFromList(cpos.x, cpos.z).set_position_fully_generated(x%16, z%16);
-    }
+
 
     public void add_position_to_queue(BlockPos p){
-        terraformingqueue.add(p);
+        //System.out.println("add position: "+p.getX()+":"+p.getZ());
+        if (p == null){
+            System.out.print("ERROR POSITION IS NULL");
+            return;
+        }
+        if(!lockqueue)
+            terraformingqueue.add(new Vec3i(p.getX(),p.getY(),p.getZ())); // HOW TF CAN THIS EVER BE NULL?!?!?
+        else {
+            //well this was it...
+            //System.out.println("Queue is locked - adding position to temp queue");
+            temp_queue.add(new Vec3i(p.getX(), p.getY(), p.getZ()));
+        }
     }
 
     public BlockPos get_next_position(boolean random){
@@ -240,14 +262,17 @@ public class TerraformingHelper {
         int index = 0;
         if (random)
             index = nextInt(0,terraformingqueue.size());
-        return terraformingqueue.remove(0);
+
+        Vec3i pos = terraformingqueue.remove(index);
+        if(pos == null) return null; // Screw it - This is now beyond my pay grade now....
+        return new BlockPos(pos);
     }
 
     public IBlockState[] getBlocksAt(int x, int z){
         ChunkPos cpos = getChunkPosFromBlockPos(new BlockPos(x,0,z));
         chunkdata data = getChunkFromList(cpos.x,cpos.z);
         if (data == null){
-            //System.out.println("generate new chunk: "+chunk.x+":"+chunk.z);
+            System.out.println("generate new chunk: "+cpos.x+":"+cpos.z);
             ChunkPrimer primer = generator.getChunkPrimer(cpos.x, cpos.z, chunkMgrTerraformed);
 
             IBlockState[][][] blockStates = new IBlockState[16][16][256];
@@ -276,6 +301,6 @@ public class TerraformingHelper {
 
     public void setChunkFullyGenerated(int x, int z) {
         getChunkFromList(x,z).chunk_fully_generated = true;
-        props.terraformingChunksDone.add(new ChunkPos(x,z));
+        DimensionProperties.proxylists.getChunksFullyTerraformed(props.getId()).add(new ChunkPos(x,z));
     }
 }

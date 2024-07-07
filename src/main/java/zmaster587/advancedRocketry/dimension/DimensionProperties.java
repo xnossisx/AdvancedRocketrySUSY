@@ -25,6 +25,9 @@ import net.minecraftforge.common.BiomeManager.BiomeEntry;
 import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.relauncher.Side;
 import org.apache.commons.lang3.ArrayUtils;
 import org.lwjgl.Sys;
 import zmaster587.advancedRocketry.AdvancedRocketry;
@@ -34,6 +37,9 @@ import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
 import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereType;
+import zmaster587.advancedRocketry.common.CommonProxy;
+import zmaster587.advancedRocketry.fuckin_bs_integrated_server_and_client_variable_sharing_crap_fix_fuckit_Im_in_rage.Afuckinginterface;
+import zmaster587.advancedRocketry.fuckin_bs_integrated_server_and_client_variable_sharing_crap_fix_fuckit_Im_in_rage.serverlists;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.item.ItemBiomeChanger;
 import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
@@ -151,16 +157,21 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     private int generatorType;
     //public int target_sea_level;
 
-    public TerraformingHelper terraformingHelper;
-    public List<BlockPos> terraformingProtectedBlocks;
-    public List<ChunkPos> terraformingChunksDone;
+
+
+
+    @SidedProxy(serverSide = "zmaster587.advancedRocketry.fuckin_bs_integrated_server_and_client_variable_sharing_crap_fix_fuckit_Im_in_rage.serverlists", clientSide = "zmaster587.advancedRocketry.fuckin_bs_integrated_server_and_client_variable_sharing_crap_fix_fuckit_Im_in_rage.clientlists")
+    public static Afuckinginterface proxylists;
+
+
+
     public List<ChunkPos> terraformingChunksAlreadyAdded;
 
     //class
 
 
-
     public List<watersourcelocked> water_source_locked_positions;
+
     //public boolean water_can_exist;
     public DimensionProperties(int id) {
         name = "Temp";
@@ -215,8 +226,10 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         water_source_locked_positions = new ArrayList<>();
 
 
-        terraformingProtectedBlocks = new LinkedList<>();
-        terraformingChunksDone = new LinkedList<>();
+
+if (FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) {
+    proxylists.setListforDIM(getId(),new LinkedList<>(), new LinkedList<>());
+}
         terraformingChunksAlreadyAdded = new LinkedList<>();
 
         ringAngle = 70;
@@ -227,28 +240,32 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     public void load_terraforming_helper(boolean reset) {
-        getAverageTemp();
-        getViableBiomes(false);
-        if (reset){
-            terraformingChunksDone.clear();
-            terraformingChunksAlreadyAdded.clear();
-        }
+        if (!net.minecraftforge.common.DimensionManager.getWorld(getId()).isRemote) {
 
-        System.out.println("load helper with protecting blocks: "+terraformingProtectedBlocks.size());
+            getAverageTemp();
+            getViableBiomes(false);
+            if (reset) {
+               proxylists.getChunksFullyTerraformed(getId()).clear();
+                terraformingChunksAlreadyAdded.clear();
+            }
 
-        terraformingHelper = new TerraformingHelper(getId(), getBiomesEntries(getViableBiomes(false)), terraformingChunksDone);
+            System.out.println("load helper with protecting blocks: " + proxylists.getProtectingBlocksForDimension(getId()).size() + " (" + reset + ")");
 
-        Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(getId())).getChunkProvider().getLoadedChunks();
-        if (!list.isEmpty()) {
-            for (Chunk chunk:list){
-                add_chunk_to_terraforming_list(chunk);
+            proxylists.sethelper(getId(), new TerraformingHelper(getId(), getBiomesEntries(getViableBiomes(false)), proxylists.getChunksFullyTerraformed(getId())));
+
+            Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(getId())).getChunkProvider().getLoadedChunks();
+            if (!list.isEmpty()) {
+                for (Chunk chunk : list) {
+                    add_chunk_to_terraforming_list(chunk);
+                }
             }
         }
 
     }
+
     public void registerProtectingBlock(BlockPos p) {
         boolean already_registered = false;
-        for (BlockPos i : terraformingProtectedBlocks) {
+        for (BlockPos i : proxylists.getProtectingBlocksForDimension(getId())) {
             if (i.equals(p)) {
                 already_registered = true;
                 break;
@@ -256,26 +273,26 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         }
         System.out.println("register protecting block called");
         if (!already_registered) {
-            terraformingProtectedBlocks.add(p);
+            proxylists.getProtectingBlocksForDimension(getId()).add(p);
             System.out.println("block registered");
-            if (terraformingHelper != null){
-                terraformingHelper.recalculate_chunk_status();
+            if (proxylists.gethelper(getId()) != null) {
+                proxylists.gethelper(getId()).recalculate_chunk_status();
             }
         }
     }
 
     public void unregisterProtectingBlock(BlockPos p) {
-        for (BlockPos i : terraformingProtectedBlocks) {
+        for (BlockPos i : proxylists.getProtectingBlocksForDimension(getId())) {
             if (i.equals(p)) {
-                terraformingProtectedBlocks.remove(i);
-                if (terraformingHelper != null)
-                    terraformingHelper.recalculate_chunk_status();
+                proxylists.getProtectingBlocksForDimension(getId()).remove(i);
+                if (proxylists.gethelper(getId()) != null)
+                    proxylists.gethelper(getId()).recalculate_chunk_status();
                 break;
             }
         }
     }
 
-    public void add_block_to_terraforming_queue(BlockPos p){
+    public void add_block_to_terraforming_queue(BlockPos p) {
         //boolean is_there = false;
         //for (BlockPos i : terraformingHelper.terraformingqueue) {
         //    if (i.equals(p)) {
@@ -283,17 +300,18 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         //    }
         //}
         //if (!is_there)
-            terraformingHelper.add_position_to_queue(p);
+        proxylists.gethelper(getId()).add_position_to_queue(p);
     }
+
     public void add_chunk_to_terraforming_list(Chunk chunk) {
 
-        if (terraformingHelper != null) {
-            chunkdata current_chunk = terraformingHelper.getChunkFromList(chunk.x, chunk.z);
+        if (proxylists.gethelper(getId()) != null) {
+            chunkdata current_chunk = proxylists.gethelper(getId()).getChunkFromList(chunk.x, chunk.z);
             if (current_chunk == null || !current_chunk.chunk_fully_generated) {
 
                 boolean chunk_was_already_added = false; // do not add a chunk twice, the helper will manage it once it is added
-                for (ChunkPos i :terraformingChunksAlreadyAdded){
-                    if (chunk.x == i.x && chunk.z == i.z){
+                for (ChunkPos i : terraformingChunksAlreadyAdded) {
+                    if (chunk.x == i.x && chunk.z == i.z) {
                         chunk_was_already_added = true;
                         break;
                     }
@@ -317,6 +335,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         this(id);
         this.name = name;
     }
+
     public DimensionProperties(int id, boolean shouldRegister) {
         this(id);
         isStation = !shouldRegister;
@@ -345,10 +364,11 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         return properties;
     }
 
-    public void copySatellites(DimensionProperties props) {
+    public void copyData(DimensionProperties props) {
         this.satellites = props.satellites;
         this.tickingSatellites = props.tickingSatellites;
     }
+
 
     @Override
     public Object clone() {
@@ -684,7 +704,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      * @return if a planet, the same as getParentOrbitalDistance(), if a moon, the moon's distance from the host star
      */
     public int getSolarOrbitalDistance() {
-        if (this.isStar()){
+        if (this.isStar()) {
             return 1;
         }
         if (parentPlanet != Constants.INVALID_PLANET)
@@ -744,9 +764,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         return parentPlanet != Constants.INVALID_PLANET && parentPlanet != SpaceObjectManager.WARPDIMID;
     }
 
-    /**
-     * @return true if currently terraformed
-     */
 
     public int getAtmosphereDensity() {
         return atmosphereDensity;
@@ -760,7 +777,6 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         this.atmosphereDensity = atmosphereDensity;
 
         load_terraforming_helper(true);
-
 
 
         PacketHandler.sendToAll(new PacketDimInfo(getId(), this));
@@ -1034,14 +1050,15 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 BlockPos p = i.pos.getBlockPos();
                 iterator_2.remove(); // Safe removal during iteration
                 World world = (net.minecraftforge.common.DimensionManager.getWorld(getId()));
-                world.notifyNeighborsOfStateChange(p,world.getBlockState(p).getBlock(),false);
+                world.notifyNeighborsOfStateChange(p, world.getBlockState(p).getBlock(), false);
             }
         }
 
     }
-    public void add_water_locked_pos(HashedBlockPosition pos){
-        for (watersourcelocked i : water_source_locked_positions){
-            if (i.pos.equals(pos)){
+
+    public void add_water_locked_pos(HashedBlockPosition pos) {
+        for (watersourcelocked i : water_source_locked_positions) {
+            if (i.pos.equals(pos)) {
                 i.reset_timer();
                 return;
             }
@@ -1094,7 +1111,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
      */
     public boolean isBiomeblackListed(Biome biome, boolean is_NOT_terraforming) {
 
-        if (!is_NOT_terraforming){
+        if (!is_NOT_terraforming) {
             String modId = biome.getRegistryName().getResourceDomain();
 
             if (!modId.equals("minecraft") && !modId.equals("advancedrocketry")) {
@@ -1153,7 +1170,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 }
             }
             //if (not_terraforming)
-                //viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
+            //viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
         } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.COLD)) {
             for (Biome biome : Biome.REGISTRY) {
                 if (biome != null && !BiomeDictionary.getTypes(biome).contains(BiomeDictionary.Type.HOT) && !isBiomeblackListed(biome, not_terraforming)) {
@@ -1161,7 +1178,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 }
             }
             //if (not_terraforming)
-                //viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
+            //viableBiomes.addAll(BiomeDictionary.getBiomes(BiomeDictionary.Type.OCEAN));
         } else if (Temps.getTempFromValue(averageTemperature).hotterOrEquals(Temps.FRIGID)) {
 
             for (Biome biome : Biome.REGISTRY) {
@@ -1412,6 +1429,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
+
         NBTTagList list;
 
         if (nbt.hasKey("skyColor")) {
@@ -1609,34 +1627,35 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
 
 //terraforming data
-        if (nbt.hasKey("fullyGeneratedChunks")) {
-            terraformingChunksDone.clear();
-            list = nbt.getTagList("fullyGeneratedChunks", NBT.TAG_COMPOUND);
-            for (NBTBase entry : list) {
-                assert entry instanceof NBTTagCompound;
-                int x = ((NBTTagCompound) entry).getInteger("x");
-                int z = ((NBTTagCompound) entry).getInteger("z");
-                terraformingChunksDone.add(new ChunkPos(x, z));
-            }
-        }
+         // I have no idea how this can be called on client but it seems to just do it so idk
+            if (nbt.hasKey("fullyGeneratedChunks")) {
 
-        if (nbt.hasKey("terraformingProtectedBlocks")) {
-            terraformingProtectedBlocks.clear();
-            list = nbt.getTagList("terraformingProtectedBlocks", NBT.TAG_COMPOUND);
-            for (NBTBase entry : list) {
-                assert entry instanceof NBTTagCompound;
-                int x = ((NBTTagCompound) entry).getInteger("x");
-                int z = ((NBTTagCompound) entry).getInteger("z");
-                int y = ((NBTTagCompound) entry).getInteger("y");
-                terraformingProtectedBlocks.add(new BlockPos(x, y, z));
-                System.out.println("read protecting block at "+x+":"+y+":"+z+" - - "+terraformingProtectedBlocks.size());
+                list = nbt.getTagList("fullyGeneratedChunks", NBT.TAG_COMPOUND);
+                if (!list.hasNoTags())
+                    proxylists.setChunksFullyTerraformed(getId(), new LinkedList<>());
+                for (NBTBase entry : list) {
+                    assert entry instanceof NBTTagCompound;
+                    int x = ((NBTTagCompound) entry).getInteger("x");
+                    int z = ((NBTTagCompound) entry).getInteger("z");
+                    System.out.println("Chunk fully terraformed: " + x + ":" + z);
+                    proxylists.getChunksFullyTerraformed(getId()).add(new ChunkPos(x, z));
+                }
             }
-            if (terraformingHelper != null) {
-                terraformingHelper.recalculate_chunk_status();
-                System.out.println("calling recalculate_chunk_status after readfrom nbt");
-            }
-        }
 
+            if (nbt.hasKey("terraformingProtectedBlocks")) {
+
+                list = nbt.getTagList("terraformingProtectedBlocks", NBT.TAG_COMPOUND);
+                if (!list.hasNoTags())
+                    proxylists.setProtectingBlocksForDimension(getId(), new LinkedList<>());
+                for (NBTBase entry : list) {
+                    assert entry instanceof NBTTagCompound;
+                    int x = ((NBTTagCompound) entry).getInteger("x");
+                    int z = ((NBTTagCompound) entry).getInteger("z");
+                    int y = ((NBTTagCompound) entry).getInteger("y");
+                    proxylists.getProtectingBlocksForDimension(getId()).add(new BlockPos(x, y, z));
+                    System.out.println("read protecting block at " + x + ":" + y + ":" + z + " - - " + proxylists.getProtectingBlocksForDimension(getId()).size());
+                }
+            }
 
         readFromTechnicalNBT(nbt);
     }
@@ -1667,8 +1686,10 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
 
     }
+    //public void writeToNBT(NBTTagCompound nbt) {
 
-    public void writeToNBT(NBTTagCompound nbt) {
+    //}
+    public void writeToNBT(NBTTagCompound nbt, boolean write_terraforming_info) { // filter out info in client packet because it is too big
         NBTTagList list;
 
         if (skyColor != null) {
@@ -1832,25 +1853,26 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
         // write terraforming data
 
+        if (write_terraforming_info) {
+            list = new NBTTagList();
+            for (ChunkPos pos : proxylists.getChunksFullyTerraformed(getId())) {
+                NBTTagCompound entry = new NBTTagCompound();
+                entry.setInteger("x", pos.x);
+                entry.setInteger("z", pos.z);
+                list.appendTag(entry);
+            }
+            nbt.setTag("fullyGeneratedChunks", list);
 
-        list = new NBTTagList();
-        for (ChunkPos pos: terraformingChunksDone) {
-            NBTTagCompound entry = new NBTTagCompound();
-            entry.setInteger("x", pos.x);
-            entry.setInteger("z", pos.z);
-            list.appendTag(entry);
+            list = new NBTTagList();
+            for (BlockPos pos : proxylists.getProtectingBlocksForDimension(getId())) {
+                NBTTagCompound entry = new NBTTagCompound();
+                entry.setInteger("x", pos.getX());
+                entry.setInteger("y", pos.getY());
+                entry.setInteger("z", pos.getZ());
+                list.appendTag(entry);
+            }
+            nbt.setTag("terraformingProtectedBlocks", list);
         }
-        nbt.setTag("fullyGeneratedChunks", list);
-
-        list = new NBTTagList();
-        for (BlockPos pos: terraformingProtectedBlocks) {
-            NBTTagCompound entry = new NBTTagCompound();
-            entry.setInteger("x", pos.getX());
-            entry.setInteger("y", pos.getY());
-            entry.setInteger("z", pos.getZ());
-            list.appendTag(entry);
-        }
-        nbt.setTag("terraformingProtectedBlocks", list);
 
         writeTechnicalNBT(nbt);
     }
@@ -2125,6 +2147,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         public boolean hotterThan(Temps type) {
             return this.compareTo(type) < 0;
         }
+
         public boolean hotterOrEquals(Temps type) {
             return this.compareTo(type) <= 0;
         }
