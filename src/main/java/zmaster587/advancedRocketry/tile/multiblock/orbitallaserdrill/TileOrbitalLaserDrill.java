@@ -252,7 +252,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
            checkjam();
            checkCanRun();
             //update clients on new data
-           PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), 128, pos, this.world.provider.getDimension());
+           PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos, 128);
        }
         else if (id == 13)
             //update clients on new data
