@@ -791,7 +791,12 @@ GL11.glPopMatrix();
 
                 GL11.glRotatef((float) myPhi, 0f, 0f, 1f);
                 GL11.glRotatef(planetPositionTheta, 1f, 0f, 0f);
-                rotateAroundAntiAxis();
+
+                // THIS MESSES UP PLANET ROTATION ON SPACE STATIONS
+                // THIS SHOULD NOT BE CALLED WHEN ON SPACE STATION!!!!!
+                if (world.provider.getDimension() != ARConfiguration.getCurrentConfig().spaceDimId) {
+                    rotateAroundAntiAxis();
+                }
 
                 float phiAngle = (float) ((myPhi) * Math.PI / 180f);
 
