@@ -110,10 +110,10 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
         numSteps = 0;
         prevDir = null;
         resetBtn = new ModuleButton(40, 20, 2, LibVulpes.proxy.getLocalizedString("msg.spacelaser.reset"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild, 34, 20);
-        positionText = new ModuleText(103, 63, "empty... shit!", 0x0b0b0b);
-        updateText = new ModuleText(103, 63, "also empty...", 0x0b0b0b);
-        locationX = new ModuleNumericTextbox(this, 113, 31, 50, 10, 16);
-        locationZ = new ModuleNumericTextbox(this, 113, 41, 50, 10, 16);
+        positionText = new ModuleText(83, 63, "empty... shit!", 0x0b0b0b);
+        updateText = new ModuleText(83, 63, "also empty...", 0x0b0b0b);
+        locationX = new ModuleNumericTextbox(this, 93, 31, 50, 10, 16);
+        locationZ = new ModuleNumericTextbox(this, 93, 41, 50, 10, 16);
         tickSinceLastOperation = 0;
         laserX = 0;
         laserZ = 0;
@@ -216,7 +216,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
         if (id == 15) {
             laserZ = nbt.getInteger("currentZ");
             laserX = nbt.getInteger("currentX");
-            positionText.setText("position:\n"+this.laserX+":"+this.laserZ);
+            positionText.setText("position:\n"+this.laserX+" : "+this.laserZ);
         }else if (id == 11){
             resetSpiral();
             mode = MODE.values()[nbt.getInteger("mode")];
@@ -224,7 +224,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
             yCenter = nbt.getInteger("newZ");
             laserZ = nbt.getInteger("currentZ");
             laserX = nbt.getInteger("currentX");
-            positionText.setText("position:\n"+this.laserX+":"+this.laserZ);
+            positionText.setText("position:\n"+this.laserX+" : "+this.laserZ);
             updateText.setText(this.getMode().toString());
             locationX.setText(String.valueOf(this.xCenter));
             locationZ.setText(String.valueOf(this.yCenter));
@@ -770,17 +770,17 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
             locationX.setText(String.valueOf(this.xCenter));
             locationZ.setText(String.valueOf(this.yCenter));
 
-            modules.add(updateText = new ModuleText(130, 20, this.getMode().toString(), 0x0b0b0b, true));
-            modules.add(new ModuleText(103, 33, "X:", 0x0b0b0b));
-            modules.add(new ModuleText(103, 43, "Z:", 0x0b0b0b));
+            modules.add(updateText = new ModuleText(110, 20, this.getMode().toString(), 0x0b0b0b, true));
+            modules.add(new ModuleText(83, 33, "X:", 0x0b0b0b));
+            modules.add(new ModuleText(83, 43, "Z:", 0x0b0b0b));
 
             modules.add(positionText);
 
             modules.add(new ModuleImage(8, 16, TextureResources.laserGuiBG));
         }
 
-        modules.add(new ModuleButton(103, 20, 0, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonLeft, 5, 8));
-        modules.add(new ModuleButton(157, 20, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight, 5, 8));
+        modules.add(new ModuleButton(83, 20, 0, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonLeft, 5, 8));
+        modules.add(new ModuleButton(137, 20, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight, 5, 8));
         modules.add(resetBtn);
         modules.add(new ModulePower(11, 25, batteries));
         modules.add(new ModuleSlotArray(56, 54, this, 0, 1));
