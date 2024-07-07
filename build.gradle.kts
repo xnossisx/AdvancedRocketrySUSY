@@ -160,7 +160,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation ("net.minecraftforge:mergetool:0.2.3.3")
-    // implementation ("zmaster587.libVulpes:libVulpes:1.12.2-0.4.2+:deobf")
+//    implementation ("zmaster587.libVulpes:libVulpes:1.12.2-0.4.2+:deobf")
 }
 
 tasks.processResources {
