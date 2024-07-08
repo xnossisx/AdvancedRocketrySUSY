@@ -355,7 +355,7 @@ public class ARConfiguration {
         arConfig.crystalliserMaximumGravity = (float) config.get(Configuration.CATEGORY_GENERAL, "crystalliserMaximumGravity", 0f, "Maximum gravity the crystalliser will function at. Use 0.0 to disable!").getDouble();
         arConfig.enableLaserDrill = config.get(Configuration.CATEGORY_GENERAL, "EnableLaserDrill", true, "Enables the laser drill machine").getBoolean();
         arConfig.spaceLaserPowerMult = (float) config.get(Configuration.CATEGORY_GENERAL, "LaserDrillPowerMultiplier", 1d, "Power multiplier for the laser drill machine").getDouble();
-        arConfig.laserDrillPlanet = config.get(Configuration.CATEGORY_GENERAL, "laserDrillPlanet", false, "If true the orbital laser will actually mine blocks on the planet below (currently not working)").getBoolean();
+        arConfig.laserDrillPlanet = config.get(Configuration.CATEGORY_GENERAL, "laserDrillPlanet", false, "If true the orbital laser will actually mine blocks on the planet below").getBoolean();
         String[] str = config.getStringList("spaceLaserDimIdBlackList", Configuration.CATEGORY_GENERAL, new String[]{}, "Laser drill will not mine these dimension");
         arConfig.enableTerraforming = config.get(Configuration.CATEGORY_GENERAL, "EnableTerraforming", true, "Enables terraforming items and blocks").getBoolean();
         arConfig.terraformSpeed = config.get(Configuration.CATEGORY_GENERAL, "terraformMult", 1f, "Multplier for atmosphere change speed").getDouble();
