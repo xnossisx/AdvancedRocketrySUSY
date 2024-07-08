@@ -590,6 +590,12 @@ public class AdvancedRocketry {
         OreDictionary.registerOre("slab", new ItemStack(Blocks.STONE_SLAB));
         OreDictionary.registerOre("blockWarpCoreCore", new ItemStack(Blocks.GOLD_BLOCK));
         OreDictionary.registerOre("blockWarpCoreRim", MaterialRegistry.getMaterialFromName("Titanium").getProduct(AllowedProducts.getProductByName("BLOCK")));
+
+        Item.getItemFromBlock(AdvancedRocketryBlocks.blockEngine).setMaxDamage(10);
+        Item.getItemFromBlock(AdvancedRocketryBlocks.blockAdvEngine).setMaxDamage(10);
+        Item.getItemFromBlock(AdvancedRocketryBlocks.blockBipropellantEngine).setMaxDamage(10);
+        Item.getItemFromBlock(AdvancedRocketryBlocks.blockAdvBipropellantEngine).setMaxDamage(10);
+        Item.getItemFromBlock(AdvancedRocketryBlocks.blockNuclearEngine).setMaxDamage(10);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
