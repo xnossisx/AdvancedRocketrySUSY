@@ -601,11 +601,12 @@ public class DimensionManager implements IGalaxy {
 
             NBTTagCompound dimNbt = new NBTTagCompound();
             dimSet.getValue().writeToNBT(dimNbt);
-
+            dimSet.getValue().write_terraforming_data(dimNbt);
             dimListnbt.setTag(dimSet.getKey().toString(), dimNbt);
         }
 
         nbt.setTag("dimList", dimListnbt);
+
 
         //Stats
         NBTTagCompound stats = new NBTTagCompound();
@@ -974,8 +975,7 @@ public class DimensionManager implements IGalaxy {
                 if (loadedPlanets.containsKey(properties.getId())) {
                     DimensionProperties loadedDim = (DimensionProperties) loadedPlanets.get(properties.getId());
                     if (loadedDim != null) {
-                        properties.copySatellites(loadedDim);
-                        properties.copyTerraformedBiomes(loadedDim);
+                        properties.copyData(loadedDim);
                     }
                 }
                 if (properties.isNativeDimension)
@@ -1082,6 +1082,7 @@ public class DimensionManager implements IGalaxy {
 
         for (String key : dimListNbt.getKeySet()) {
             DimensionProperties properties = DimensionProperties.createFromNBT(Integer.parseInt(key), dimListNbt.getCompoundTag(key));
+            properties.read_terraforming_data(dimListNbt.getCompoundTag(key));
 
             int keyInt = Integer.parseInt(key);
 				/*if(!net.minecraftforge.common.DimensionManager.isDimensionRegistered(keyInt) && properties.isNativeDimension && !properties.isGasGiant()) {
