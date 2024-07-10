@@ -252,6 +252,8 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
             proxylists.sethelper(getId(), new TerraformingHelper(getId(), getBiomesEntries(getViableBiomes(false)), proxylists.getChunksFullyTerraformed(getId())));
 
+            System.out.println("num biomes: "+ getViableBiomes(false).size());
+
             Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(getId())).getChunkProvider().getLoadedChunks();
             if (!list.isEmpty()) {
                 for (Chunk chunk : list) {
@@ -270,10 +272,10 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
                 break;
             }
         }
-        System.out.println("register protecting block called");
+        //System.out.println("register protecting block called");
         if (!already_registered) {
             proxylists.getProtectingBlocksForDimension(getId()).add(p);
-            System.out.println("block registered");
+            //System.out.println("block registered");
             if (proxylists.gethelper(getId()) != null) {
                 proxylists.gethelper(getId()).recalculate_chunk_status();
             }
@@ -1118,11 +1120,11 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public boolean isBiomeblackListed(Biome biome, boolean is_NOT_terraforming) {
 
         if (!is_NOT_terraforming) {
-            String modId = biome.getRegistryName().getResourceDomain();
+            //String modId = biome.getRegistryName().getResourceDomain();
 
-            if (!modId.equals("minecraft") && !modId.equals("advancedrocketry")) {
-                return true;
-            }
+            //if (!modId.equals("minecraft") && !modId.equals("advancedrocketry")) {
+            //    return true;
+            //}
         }
         if (biome.equals(AdvancedRocketryBiomes.spaceBiome)) return true;
 
@@ -1712,6 +1714,9 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         // write terraforming data
 
         int dimid = getId();
+        if (!proxylists.isinitialized(dimid)){
+            return;
+        }
             NBTTagList list = new NBTTagList();
             for (ChunkPos pos : proxylists.getChunksFullyTerraformed(dimid)) {
                 NBTTagCompound entry = new NBTTagCompound();
