@@ -119,8 +119,8 @@ class MiningDrill extends AbstractDrill {
 
         if (ticketLaser != null) {
             Chunk chunk = world.getChunkFromBlockCoords(new BlockPos (x,0,z)); // force the chunk to generate
-            System.out.println("pos"+x+":"+z);
-            System.out.println("chunkpos"+chunk.x+":"+chunk.z);
+            //System.out.println("pos"+x+":"+z);
+            //System.out.println("chunkpos"+chunk.x+":"+chunk.z);
             ForgeChunkManager.forceChunk(ticketLaser, new ChunkPos(chunk.x, chunk.z));
 
             int y = 64;

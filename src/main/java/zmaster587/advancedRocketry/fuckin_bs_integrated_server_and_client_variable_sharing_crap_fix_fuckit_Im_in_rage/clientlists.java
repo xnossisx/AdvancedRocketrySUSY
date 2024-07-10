@@ -3,12 +3,8 @@ package zmaster587.advancedRocketry.fuckin_bs_integrated_server_and_client_varia
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import zmaster587.advancedRocketry.util.TerraformingHelper;
-import zmaster587.advancedRocketry.fuckin_bs_integrated_server_and_client_variable_sharing_crap_fix_fuckit_Im_in_rage.dimensionTerraformingInfo;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class clientlists implements Afuckinginterface {
     Map<Integer, dimensionTerraformingInfo> terraforminginfolists;
@@ -19,11 +15,11 @@ public class clientlists implements Afuckinginterface {
 
     public void initdim(int dim){
         if (terraforminginfolists.get(dim) != null){
-            terraforminginfolists.get(dim).terraformingChunksDone = new ArrayList<>();
+            terraforminginfolists.get(dim).terraformingChunksDone = new HashSet<>();
             terraforminginfolists.get(dim).terraformingProtectedBlocks = new ArrayList<>();
         }else{
             dimensionTerraformingInfo info = new dimensionTerraformingInfo();
-            info.terraformingChunksDone = new ArrayList<>();
+            info.terraformingChunksDone = new HashSet<>();
             info.terraformingProtectedBlocks = new ArrayList<>();
             terraforminginfolists.put(dim,info);
         }
@@ -35,16 +31,16 @@ public class clientlists implements Afuckinginterface {
         if (terraforminginfolists.get(dim) == null)return null;
         return terraforminginfolists.get(dim).terraformingProtectedBlocks;
     }
-    public void setProtectingBlocksForDimension(int dim, List<BlockPos> blocks){
+    public void setProtectingBlocksForDimension(int dim, ArrayList<BlockPos> blocks){
         if (terraforminginfolists.get(dim) == null)return;
         terraforminginfolists.get(dim).terraformingProtectedBlocks = blocks;
     }
 
-    public void setChunksFullyTerraformed(int dim, List<ChunkPos> lpos){
+    public void setChunksFullyTerraformed(int dim, HashSet<ChunkPos> lpos){
         if (terraforminginfolists.get(dim) == null)return;
         terraforminginfolists.get(dim).terraformingChunksDone = lpos;
     }
-    public List<ChunkPos> getChunksFullyTerraformed(int dim){
+    public HashSet<ChunkPos> getChunksFullyTerraformed(int dim){
         if (terraforminginfolists.get(dim) == null)return null;
         return terraforminginfolists.get(dim).terraformingChunksDone;
     }

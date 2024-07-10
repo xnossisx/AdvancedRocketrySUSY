@@ -4,11 +4,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import zmaster587.advancedRocketry.util.TerraformingHelper;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class dimensionTerraformingInfo{
     public dimensionTerraformingInfo(){}
-    public List<BlockPos> terraformingProtectedBlocks;
-    public List<ChunkPos> terraformingChunksDone;
+    public ArrayList<BlockPos> terraformingProtectedBlocks;
+    public HashSet<ChunkPos> terraformingChunksDone;
     public TerraformingHelper terraformingHelper;
 }

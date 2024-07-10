@@ -5,6 +5,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import zmaster587.advancedRocketry.util.TerraformingHelper;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public interface Afuckinginterface {
@@ -15,11 +17,11 @@ public interface Afuckinginterface {
 
     public List<BlockPos> getProtectingBlocksForDimension(int dim);
 
-    public void setProtectingBlocksForDimension(int dim, List<BlockPos> blocks);
+    public void setProtectingBlocksForDimension(int dim, ArrayList<BlockPos> blocks);
 
-    public void setChunksFullyTerraformed(int dim, List<ChunkPos> lpos);
+    public void setChunksFullyTerraformed(int dim, HashSet<ChunkPos> lpos);
 
-    public List<ChunkPos> getChunksFullyTerraformed(int dim);
+    public HashSet<ChunkPos> getChunksFullyTerraformed(int dim);
 
     public void sethelper(int dim, TerraformingHelper helper);
 

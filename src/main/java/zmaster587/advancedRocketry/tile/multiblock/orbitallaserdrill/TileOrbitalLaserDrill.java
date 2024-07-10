@@ -49,7 +49,7 @@ import java.util.List;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.IItemHandler;
 
-public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISidedInventory, IGuiCallback, IButtonInventory {
+public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGuiCallback, IButtonInventory {
 
     private static final int POWER_PER_OPERATION = (int) (10000 * ARConfiguration.getCurrentConfig().spaceLaserPowerMult);
     private final AbstractDrill drill;
@@ -91,7 +91,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
                     {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null}
             },
     };
-    private ItemStack lens;
     public int radius, xCenter, yCenter, numSteps;
     private EnumFacing prevDir;
     private ModuleTextBox locationX, locationZ;
@@ -102,7 +101,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
 
     public TileOrbitalLaserDrill() {
         super();
-        lens = ItemStack.EMPTY;
 
         radius = 0;
         xCenter = 0;
@@ -481,21 +479,16 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        if (lens != null) {
-            NBTTagCompound tag = new NBTTagCompound();
-            lens.writeToNBT(tag);
-            nbt.setTag("GlassPane", tag);
-        }
-
         nbt.setBoolean("isRunning", isRunning);
         nbt.setInteger("laserX", laserX);
         nbt.setInteger("laserZ", laserZ);
         nbt.setByte("mode", (byte) mode.ordinal());
         nbt.setBoolean("jammed", this.isJammed);
 
+        nbt.setInteger("CenterX", xCenter);
+        nbt.setInteger("CenterY", yCenter);
+
         if (mode == MODE.SPIRAL && prevDir != null) {
-            nbt.setInteger("CenterX", xCenter);
-            nbt.setInteger("CenterY", yCenter);
             nbt.setInteger("radius", radius);
             nbt.setInteger("numSteps", numSteps);
             nbt.setInteger("prevDir", prevDir.ordinal());
@@ -510,19 +503,15 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
 
         isRunning = nbt.getBoolean("isRunning");
 
-        if (nbt.hasKey("GlassPane")) {
-            NBTTagCompound tag = nbt.getCompoundTag("GlassPane");
-            lens = new ItemStack(tag);
-        }
-
         laserX = nbt.getInteger("laserX");
         laserZ = nbt.getInteger("laserZ");
         mode = MODE.values()[nbt.getByte("mode")];
         this.isJammed = nbt.getBoolean("jammed");
 
+        xCenter = nbt.getInteger("CenterX");
+        yCenter = nbt.getInteger("CenterY");
+
         if (mode == MODE.SPIRAL && nbt.hasKey("prevDir")) {
-            xCenter = nbt.getInteger("CenterX");
-            yCenter = nbt.getInteger("CenterY");
             radius = nbt.getInteger("radius");
             numSteps = nbt.getInteger("numSteps");
             prevDir = EnumFacing.values()[nbt.getInteger("prevDir")];
@@ -556,7 +545,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
     }
 
     private boolean unableToRun() {
-        return lens.isEmpty() || !canMachineSeeEarth() || batteries.getUniversalEnergyStored() == 0 || !(this.world.provider instanceof WorldProviderSpace) || !zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().canTravelTo(((WorldProviderSpace) this.world.provider).getDimensionProperties(getPos()).getParentPlanet()) ||
+        return !canMachineSeeEarth() || batteries.getUniversalEnergyStored() == 0 || !(this.world.provider instanceof WorldProviderSpace) || !zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().canTravelTo(((WorldProviderSpace) this.world.provider).getDimensionProperties(getPos()).getParentPlanet()) ||
                 ARConfiguration.getCurrentConfig().laserBlackListDims.contains(((WorldProviderSpace) this.world.provider).getDimensionProperties(getPos()).getParentPlanet());
     }
 
@@ -566,7 +555,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
     public void checkCanRun() {
         if (world.isRemote)return; // client has no business here
 
-        //Laser requires lense, redstone power, not be jammed, and be in orbit and energy to function
+        //Laser  redstone power, not be jammed, and be in orbit and energy to function
         if (this.finished || this.isJammed || world.isBlockIndirectlyGettingPowered(getPos()) == 0 || unableToRun()) {
             if (isRunning) {
                 drill.deactivate();
@@ -609,106 +598,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
         return batteries.getUniversalEnergyStored() != 0;
     }
 
-    //InventoryHandling start
-    @Override
-    public int getSizeInventory() {
-        return inv.getSizeInventory();
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack getStackInSlot(int i) {
-        if (i == 0)
-            return lens;
-        else {
-            i--;
-            return inv.getStackInSlot(i);
-        }
-    }
-
-    @Override
-    @Nonnull
-    public ItemStack decrStackSize(int i, int j) {
-        ItemStack ret;
-
-        if (i == 0) {
-            ret = lens.copy();
-            lens = ItemStack.EMPTY;
-            return ret;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void setInventorySlotContents(int i, @Nonnull ItemStack itemstack) {
-
-        //TODO: add gregcipies
-        if (i == 0)
-            lens = itemstack;
-        else {
-
-            if (InventoryCompat.canInjectItems(inv, itemstack))
-                InventoryCompat.injectItem(inv, itemstack);
-
-            this.checkCanRun();
-        }
-    }
-
-    @Override
-    @Nonnull
-    public String getName() {
-        return getMachineName();
-    }
-
-    @Override
-    public int getInventoryStackLimit() {
-        return 64;
-    }
-
-    @Override
-    public boolean isUsableByPlayer(EntityPlayer entityplayer) {
-        return entityplayer.getDistanceSq(pos) <= 64;
-    }
-
-    @Override
-    public boolean isEmpty() {
-        return lens.isEmpty();
-    }
-
-    @Override
-    public void openInventory(EntityPlayer entity) {
-        // TODO Perhaps make sure laser isn't running
-    }
-
-    @Override
-    public void closeInventory(EntityPlayer entity) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    @Nonnull
-    public int[] getSlotsForFace(EnumFacing side) {
-        return new int[]{};
-    }
-
-    @Override
-    public boolean canInsertItem(int index, @Nonnull ItemStack itemStackIn, @Nullable EnumFacing direction) {
-        return false;
-    }
-
-    @Override
-    public boolean canExtractItem(int index, @Nonnull ItemStack stack, @Nullable EnumFacing direction) {
-        return false;
-    }
-
-    @Override
-    public boolean isItemValidForSlot(int i, @Nonnull ItemStack itemstack) {
-        if (i == 0)
-            return AdvancedRocketryItems.itemLens == itemstack.getItem();
-
-        return inv.isItemValidForSlot(i, itemstack);
-    }
 
     /**
      * @return returns whether enough power is stored for the next operation
@@ -738,12 +627,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
     public void setJammed(boolean b) {
         this.isJammed = b;
     }
-
-    @Override
-    public boolean hasCustomName() {
-        return false;
-    }
-
     @Override
     public void onModuleUpdated(ModuleBase module) {
         resetBtn.setColor(0x90ff90);
@@ -767,9 +650,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
             modules.add(locationX);
             modules.add(locationZ);
 
-            locationX.setText(String.valueOf(this.xCenter));
-            locationZ.setText(String.valueOf(this.yCenter));
-
             modules.add(updateText = new ModuleText(110, 20, this.getMode().toString(), 0x0b0b0b, true));
             modules.add(new ModuleText(83, 33, "X:", 0x0b0b0b));
             modules.add(new ModuleText(83, 43, "Z:", 0x0b0b0b));
@@ -783,7 +663,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
         modules.add(new ModuleButton(137, 20, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight, 5, 8));
         modules.add(resetBtn);
         modules.add(new ModulePower(11, 25, batteries));
-        modules.add(new ModuleSlotArray(56, 54, this, 0, 1));
 
         return modules;
     }
@@ -815,31 +694,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements ISi
             return;
     }
 
-    @Override
-    @Nonnull
-    public ItemStack removeStackFromSlot(int index) {
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public int getField(int id) {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
-    public void clear() {
-
-    }
 
     public enum MODE {
         SINGLE,

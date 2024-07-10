@@ -50,11 +50,11 @@ public class TerraformingHelper {
     //   doesn't matter if it is type ALLOWED or type BORDER
     private List<Vec3i> terraformingqueue;
 
-    int safe_zone_radius = 3;
-    int border_zone = 1;
+    int safe_zone_radius = 3; // radius for protected zone
+    int border_zone = 3; // border zone size
 
 
-    public TerraformingHelper(int dimension, List<BiomeManager.BiomeEntry> biomes, List<ChunkPos> generated_chunks){
+    public TerraformingHelper(int dimension, List<BiomeManager.BiomeEntry> biomes, HashSet<ChunkPos> generated_chunks){
         this.dimId = dimension;
         this.props = DimensionManager.getInstance().getDimensionProperties(dimension);
         this.biomeList = biomes;
@@ -147,7 +147,7 @@ public class TerraformingHelper {
                             }
                         }
                     }
-                    System.out.println("terrain fully generated");
+                    System.out.println("border chunk terrain fully generated");
                     data.terrain_fully_generated = true;
                     data.blockStates = null; // no longer needed, gc should collect them now - actually, these are never needed but who cares...
                     check_next_border_chunk_fully_generated(data.x, data.z); // update border chunks next to this one to check if they can decorate
@@ -164,9 +164,10 @@ public class TerraformingHelper {
                 if (getChunkFromList(px+x,pz+z) != null && !getChunkFromList(px+x,pz+z).chunk_fully_generated){
                     if (can_populate(px+x,pz+z) != 0){
                         //re-add all position to queue for decoration
+                        System.out.println("chunk can populate now: "+(px+x)+":"+(pz+z));
                         for (int bx = 0; bx < 16; bx++) {
                             for (int bz = 0; bz < 16; bz++) {
-                                add_position_to_queue(new BlockPos((px+x)*16+bx, 0, (pz+z)*16+bz));
+                                add_position_to_queue_at_front(new BlockPos((px+x)*16+bx, 0, (pz+z)*16+bz));
                             }
                         }
                     }
@@ -236,9 +237,19 @@ public class TerraformingHelper {
             System.out.print("ERROR POSITION IS NULL");
             return;
         }
-            terraformingqueue.add(new Vec3i(p.getX(),p.getY(),p.getZ())); // HOW TF CAN THIS EVER BE NULL?!?!?
-
+        terraformingqueue.add(new Vec3i(p.getX(),p.getY(),p.getZ()));
+    }
+    public synchronized void add_position_to_queue_at_front(BlockPos p){
+        //System.out.println("add position: "+p.getX()+":"+p.getZ());
+        if (p == null){
+            System.out.print("ERROR POSITION IS NULL");
+            return;
         }
+        int insertionIndex;
+        insertionIndex = new Random().nextInt(Math.min(terraformingqueue.size(), 1000));
+
+        terraformingqueue.add(insertionIndex, new Vec3i(p.getX(),p.getY(),p.getZ()));
+    }
 
 
     public synchronized BlockPos get_next_position(boolean random){
@@ -249,7 +260,6 @@ public class TerraformingHelper {
             index = nextInt(0,terraformingqueue.size());
 
         Vec3i pos = terraformingqueue.remove(index);
-        //if(pos == null) return null; // Screw it - This is now beyond my pay grade now....
         return new BlockPos(pos);
     }
 

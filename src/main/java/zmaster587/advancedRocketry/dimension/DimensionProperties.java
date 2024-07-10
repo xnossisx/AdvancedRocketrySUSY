@@ -306,15 +306,11 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
         if (proxylists.gethelper(getId()) != null) {
 
-            boolean chunk_was_already_done = false; // do not add a chunk twice, the helper will manage it once it is added
-            for (ChunkPos i : proxylists.getChunksFullyTerraformed(getId())) {
-                if (chunk.x == i.x && chunk.z == i.z) {
-                    chunk_was_already_done = true;
-                    break;
-                }
-            }
+            boolean chunk_was_already_done = proxylists.getChunksFullyTerraformed(getId()).contains(new ChunkPos(chunk.x,chunk.z));; // do not add a chunk if it is already fully terraformed
             if (chunk_was_already_done)
                 return;
+
+            //System.out.println("add chunk to terraforming list: "+chunk.x+":"+chunk.z);
 
             chunkdata current_chunk = proxylists.gethelper(getId()).getChunkFromList(chunk.x, chunk.z);
             if (current_chunk == null || !current_chunk.chunk_fully_generated) {
@@ -1677,7 +1673,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
 
             NBTTagList list = nbt.getTagList("fullyGeneratedChunks", NBT.TAG_COMPOUND);
             if (!list.hasNoTags())
-                proxylists.setChunksFullyTerraformed(dimid, new ArrayList<>());
+                proxylists.setChunksFullyTerraformed(dimid, new HashSet<ChunkPos>());
             for (NBTBase entry : list) {
                 assert entry instanceof NBTTagCompound;
                 int x = ((NBTTagCompound) entry).getInteger("x");

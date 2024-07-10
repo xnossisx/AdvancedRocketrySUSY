@@ -51,7 +51,7 @@ public class BiomeHandler {
         decorateBiome(world, yy, biomeId);
     }
 
-    // Bro I am sorry for changing this again and I know it will mess up your mixin but terraforming had a big update so....
+    // Bro I am sorry for changing this again and I know it will mess up your mixin but terraforming had a BIG update so....
     public static void changeBiome(World world, Biome biomeId, Biome old_biome, BlockPos pos) {
         Chunk chunk = world.getChunkFromBlockCoords(pos);
         if (old_biome != biomeId) {
@@ -64,10 +64,25 @@ public class BiomeHandler {
         }
     }
 
+    public static int get_height_blocks_only(IBlockState[] blocks) {
+        int h = blocks.length-1;
+        while (h>0 && (!blocks[h].isOpaqueCube())){
+            h--;
+        }
+        return h;
+    }
+
+    public static int get_height_blocks_only(World world, BlockPos pos) {
+        BlockPos yy = world.getHeight(pos);
+        while ((!world.getBlockState(yy).isOpaqueCube()) && yy.getY() > 0)
+            yy = yy.down();
+        return yy.getY();
+    }
+
     public static void do_heavy_terraforming(World world, Biome biomeId, Biome old_biome, BlockPos pos, int dimId){
 
         int inchunkx = ((pos.getX() % 16) + 16) % 16;
-     int inchunkz = ((pos.getZ() % 16) + 16) % 16;
+        int inchunkz = ((pos.getZ() % 16) + 16) % 16;
 
         long startTime;
         startTime = System.currentTimeMillis();
@@ -92,22 +107,19 @@ public class BiomeHandler {
 
             if (!data.fully_generated[inchunkx][inchunkz]) {
                 //fast replacing
-                for (int i = 5; i < 255; i++) {
+                for (int i = 0; i < 255; i++) {
                     world.setBlockState(new BlockPos(pos.getX(), i, pos.getZ()), target_blocks[i], 2);
                 }
 
-                // check if the terrain is fully generated to target height
-                int current_height = world.getHeight(pos.getX(), pos.getZ()); // returns the y value above the highest block
-                int target_height = 0;
-                for (int i = 255; i > 5; i--) {
-                    // go down until there is a non-air block, this is target height
-                    if (target_blocks[i] != Blocks.AIR.getDefaultState()) {
-                        target_height = i + 1;
-                        break;
-                    }
-                }
+
                 // as long as terrain does not match the target height, re-add position to queue
-                if (current_height == target_height) {
+                //System.out.println("heights:"+get_height_blocks_only(world, pos) +":"+ get_height_blocks_only(target_blocks));
+
+                // you need to check this for the entire chunk
+                // or the laser will reset on every new world load to its starting position and ignore the radius and iterate every chunk and skip over the ones that are already generated
+                // or make it like this: every time a single position is fully generated, check every chunk 3x3 around it and see if you can populate them
+                // use the chunk list again - replace spiral mod  with global mode that scatters the chunks to make it a little more random. every new load it will start from its starting position again
+                if (get_height_blocks_only(world, pos) == get_height_blocks_only(target_blocks)) {
                     DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_fully_generated(inchunkx, inchunkz);
                 } else {
                     DimensionProperties.proxylists.gethelper(props.getId()).add_position_to_queue(pos);
@@ -119,6 +131,17 @@ public class BiomeHandler {
 
         else if (data.type == TerraformingType.BORDER){
 
+            //this is to be sure the top block is changed even if the height matches already
+            BlockPos yy = world.getHeight(pos);
+            while (!world.getBlockState(yy.down()).isOpaqueCube() && yy.getY() > 0)
+                yy = yy.down();
+
+            if (old_biome.topBlock != biomeId.topBlock) {
+                if (world.getBlockState(yy.down()) == old_biome.topBlock)
+                    world.setBlockState(yy.down(), biomeId.topBlock);
+            }
+
+
             if (target_blocks != null) {
 
                 int filter_size = 5;
@@ -129,24 +152,30 @@ public class BiomeHandler {
                 world.getChunkFromBlockCoords(pos.add(0, 0, -filter_size)); // Ensure the chunk of the target positions are generated
                 world.getChunkFromBlockCoords(pos.add(0, 0, filter_size)); // Ensure the chunk of the target positions are generated
 
-                int heightsum = 0;
-                int num_samples = 0;
+
+                //this has to be weighted by distance
+                float heightsum = 0;
+                float num_samples = 0;
                 for (int x = -filter_size; x <= filter_size; x++) {
                     for (int z = -filter_size; z <= filter_size; z++) {
-                        heightsum += world.getHeight(pos.add(x, 0, z)).getY();
-                        num_samples += 1;
+                        float w = (1.0f / (0.2f + x*x + z*z));
+                        heightsum += get_height_blocks_only(world, pos.add(x, 0, z)) * w;
+                        num_samples += 1 * w;
                     }
                 }
 
-                int avg_height = heightsum / num_samples;
+                int avg_height = Math.round(heightsum / num_samples);
 
-                int prev_height = world.getHeight(pos).getY();
+                int prev_height = get_height_blocks_only(world, pos);
                 if (avg_height == prev_height) { // nothing to do
                     return;
                 }
 
+                //now we want to set the target height to >= sea level to fill it with the oceanblock
+                avg_height = Math.max(props.getSeaLevel(),avg_height);
+
                 //fast replacing
-                for (int i = 5; i < 256; i++) {
+                for (int i = 0; i < 256; i++) {
                     IBlockState target = target_blocks[i];
                     if (i < avg_height)
                         if (target == Blocks.AIR.getDefaultState())
@@ -158,14 +187,17 @@ public class BiomeHandler {
                     world.setBlockState(new BlockPos(pos.getX(), i, pos.getZ()), target, 2);
                 }
 
-                int new_height = world.getHeight(pos).getY();
+                int new_height = get_height_blocks_only(world, pos);
                 if (prev_height != new_height) {
                     DimensionProperties.proxylists.gethelper(props.getId()).register_height_change(pos);
                     DimensionProperties.proxylists.gethelper(props.getId()).add_position_to_queue(pos);
                 } else {
                     DimensionProperties.proxylists.gethelper(props.getId()).check_next_border_chunk_fully_generated(cpos.x, cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
                 }
-            }else DimensionProperties.proxylists.gethelper(props.getId()).check_next_border_chunk_fully_generated(cpos.x, cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
+            }
+            else DimensionProperties.proxylists.gethelper(props.getId()).check_next_border_chunk_fully_generated(cpos.x, cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
+
+
         }
 
         int can_populate = DimensionProperties.proxylists.gethelper(props.getId()).can_populate(cpos.x, cpos.z);
@@ -193,8 +225,8 @@ public class BiomeHandler {
     public static void terraform(World world, Biome biomeId, BlockPos pos, boolean was_biome_remote, int dimId) {
         Chunk chunk = world.getChunkFromBlockCoords(pos);
         if (biomeId == null)return;
-        Biome old_biome = world.getBiome(pos);
 
+        Biome old_biome = world.getBiome(pos);
         changeBiome(world,biomeId, old_biome, pos);
 
         //for biome remote use, only change top block and do simple decoration
@@ -275,6 +307,5 @@ public class BiomeHandler {
     }
 
 }
-
 
 
