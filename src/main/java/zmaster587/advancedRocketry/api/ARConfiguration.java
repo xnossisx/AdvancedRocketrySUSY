@@ -272,14 +272,20 @@ public class ARConfiguration {
     @ConfigProperty(needsSync = true)
     public boolean experimentalSpaceFlight;
 
-    public ARConfiguration() {
+    @ConfigProperty
+    public boolean advancedWeightSystem;
 
-    }
+    @ConfigProperty
+    public boolean partsWearSystem;
+
+    @ConfigProperty
+    public double increaseWearIntensityProb;
+
+    public ARConfiguration() {}
 
     public ARConfiguration(ARConfiguration config) {
         Field[] fields = ARConfiguration.class.getDeclaredFields();
         List<Field> fieldList = new ArrayList<>(fields.length);
-
 
         // getDeclaredFields returns an unordered list, so we need to sort them
         for (Field field : fields) {
@@ -446,6 +452,9 @@ public class ARConfiguration {
         arConfig.gravityAffectsFuel = config.get(ROCKET, "gravityAffectsFuels", true, "If true planets with higher gravity require more fuel and lower gravity would require less").getBoolean();
         arConfig.launchingDestroysBlocks = config.get(ROCKET, "launchBlockDestruction", false, "If true rocket launches will kill plants, glass soil, turn rock into lava, and more").getBoolean();
         blackListRocketBlocksStr = config.getStringList("rocketBlockBlackList", ROCKET, new String[]{"minecraft:portal", "minecraft:bedrock", "minecraft:snow_layer", "minecraft:water", "minecraft:flowing_water", "minecraft:lava", "minecraft:flowing_lava", "minecraft:fire", "advancedrocketry:rocketfire"}, "Mod:Blockname  for example \"minecraft:chest\"");
+        arConfig.advancedWeightSystem = config.get(ROCKET, "advancedWeightSystem", true, "Enables advanced weight system which computes rocket weight, including the handled inventories. Block weights are stores in weights.json").getBoolean();
+        arConfig.partsWearSystem = config.get(ROCKET, "partsWearSystem", true, "Enables rocket parts wear subsystem. Every rocket start it has probability to explode based on parts' wear intensities").getBoolean();
+        arConfig.increaseWearIntensityProb = config.get(ROCKET, "increaseWearIntensityProb", 0.025, "Every rocket usage every part has this probability to increase wear intensity").getDouble();
 
         //Ore and worldgen configuration
         //Ore configuration

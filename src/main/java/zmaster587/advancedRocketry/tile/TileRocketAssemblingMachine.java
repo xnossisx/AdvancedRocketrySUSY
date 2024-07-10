@@ -318,9 +318,11 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                                 continue;
                             }
 
-                            numBlocks++;
-
-                            weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
+                            if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                                weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
+                            } else {
+                                weight += 1;
+                            }
 
                             //If rocketEngine increaseThrust
                             final float x = xCurr - actualMinX - ((actualMaxX - actualMinX) / 2f);
@@ -366,12 +368,14 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                             TileEntity tile = world.getTileEntity(currBlockPos);
                             if (tile instanceof TileSatelliteHatch) {
                                 hasSatellite = true;
-                                TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
-                                if (hatch.getSatellite() != null) {
-                                    weight += hatch.getSatellite().getProperties().getWeight();
-                                } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
-                                    ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0).getItem();
-                                    weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
+                                if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                                    TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
+                                    if (hatch.getSatellite() != null) {
+                                        weight += hatch.getSatellite().getProperties().getWeight();
+                                    } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
+                                        ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0).getItem();
+                                        weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
+                                    }
                                 }
                             } else if (tile instanceof TileGuidanceComputer) {
                                 hasGuidance = true;

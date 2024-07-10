@@ -69,6 +69,7 @@ import zmaster587.advancedRocketry.network.PacketSatellite;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStationObject;
 import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
+import zmaster587.advancedRocketry.tile.TileRocketAssemblingMachine;
 import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
 import zmaster587.advancedRocketry.util.*;
 import zmaster587.advancedRocketry.world.util.TeleporterNoPortal;
@@ -1606,9 +1607,17 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         boolean allowLaunch = false;
 
-        this.stats.setWeight((int) storage.recalculateWeight());
+        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+            this.stats.setWeight((int) storage.recalculateWeight());
+            for (HashedBlockPosition pos : this.infrastructureCoords) {
+                TileEntity te = world.getTileEntity(pos.getBlockPos());
+                if (te instanceof TileRocketAssemblingMachine) {
+                    ((TileRocketAssemblingMachine) te).getRocketStats().setWeight(this.stats.getWeight());
+                }
+            }
+        }
 
-        if (storage.shouldBreak()) {
+        if (ARConfiguration.getCurrentConfig().partsWearSystem && storage.shouldBreak()) {
             this.explode();
             return;
         }
@@ -1659,6 +1668,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
 
 
+        if (this.stats.getWeight() >= this.stats.getThrust()) {
+            allowLaunch = false;
+        }
+
         //Check to see what place we should be going to
         //This is bad but it works and is mostly intelligible so it's here for now
         stats.orbitHeight = (storage.getGuidanceComputer() == null) ? getEntryHeight(this.world.provider.getDimension()) : storage.getGuidanceComputer().getLaunchSequence(this.world.provider.getDimension(), this.getPosition());
@@ -1666,8 +1679,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         //TODO: Clean this logic a bit?
         if (allowLaunch || !stats.hasSeat() || ((DimensionManager.getInstance().isDimensionCreated(destinationDimId)) || destinationDimId == ARConfiguration.getCurrentConfig().spaceDimId || destinationDimId == 0)) { //Abort if destination is invalid
-
-
             setInFlight(true);
             Iterator<IInfrastructure> connectedTiles = connectedInfrastructure.iterator();
 
@@ -1825,6 +1836,9 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
 
         setInFlight(isInFlight = nbt.getBoolean("flight"));
+        motionX = nbt.getDouble("motionX");
+        motionY = nbt.getDouble("motionY");
+        motionZ = nbt.getDouble("motionZ");
 
         readMissionPersistentNBT(nbt);
         if (nbt.hasKey("data")) {
@@ -1866,6 +1880,9 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         nbt.setBoolean("rcs_mode", rcs_mode);
         nbt.setInteger("rcs_mode_cnt", rcs_mode_counter);
         nbt.setBoolean("inSpaceFlight", getInSpaceFlight());
+        nbt.setDouble("motionX", motionX);
+        nbt.setDouble("motionY", motionY);
+        nbt.setDouble("motionZ", motionZ);
         stats.writeToNBT(nbt);
 
         if (!infrastructureCoords.isEmpty()) {

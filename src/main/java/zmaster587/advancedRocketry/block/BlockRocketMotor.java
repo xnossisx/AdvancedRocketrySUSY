@@ -9,11 +9,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumBlockRenderType;
 import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.IRocketEngine;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
@@ -83,14 +83,14 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
         ((TileBrokenPart) te).setStage(stack.getItemDamage());
     }
 
-    @Override
-    public boolean onBlockActivated(final World worldIn, final BlockPos pos, final IBlockState state, final EntityPlayer playerIn, final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-        if (!worldIn.isRemote) {
-            TileEntity te = worldIn.getTileEntity(pos);
-            ((TileBrokenPart) te).transition();
-        }
-        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
-    }
+//    @Override
+//    public boolean onBlockActivated(final World worldIn, final BlockPos pos, final IBlockState state, final EntityPlayer playerIn, final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+//        if (!worldIn.isRemote) {
+//            TileEntity te = worldIn.getTileEntity(pos);
+//            ((TileBrokenPart) te).transition();
+//        }
+//        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+//    }
 
     @Override
     public void harvestBlock(final World world, final EntityPlayer player, final BlockPos pos, final IBlockState state, @Nullable final TileEntity te, final ItemStack stack) {
@@ -126,6 +126,6 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
     @Nullable
     @Override
     public TileEntity createTileEntity(final World worldIn, final IBlockState state) {
-        return new TileBrokenPart(10, 0.05F);
+        return new TileBrokenPart(10, 2 * (float) ARConfiguration.getCurrentConfig().increaseWearIntensityProb);
     }
 }
