@@ -874,10 +874,6 @@ GL11.glPopMatrix();
         GL11.glPopMatrix();
         GlStateManager.disableTexture2D();
 
-        //GlStateManager.color(f1, f2, f3, 0.05F);
-        //GL11.glCallList(this.glSkyList);
-
-
         GlStateManager.color(0.0F, 0.0F, 0.0F);
 
         double d0 = this.mc.player.getPositionEyes(partialTicks).y - mc.world.getHorizon();
