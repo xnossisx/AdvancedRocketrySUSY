@@ -13,14 +13,16 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.IRocketEngine;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
+import zmaster587.advancedRocketry.util.IBrokenPartBlock;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class BlockBipropellantRocketMotor extends BlockFullyRotatable implements IRocketEngine {
+public class BlockBipropellantRocketMotor extends BlockFullyRotatable implements IRocketEngine, IBrokenPartBlock {
 
     public BlockBipropellantRocketMotor(Material mat) {
         super(mat);
@@ -67,10 +69,9 @@ public class BlockBipropellantRocketMotor extends BlockFullyRotatable implements
     @Override
     public void harvestBlock(final World world, final EntityPlayer player, final BlockPos pos, final IBlockState state, @Nullable final TileEntity te, final ItemStack stack) {
         if (!world.isRemote && !player.isCreative()) {
-            ItemStack drop = new ItemStack(this.getItemDropped(state, world.rand, 0));
-
             TileBrokenPart tile = (TileBrokenPart) te;
-            drop.setItemDamage(tile.getStage());
+
+            ItemStack drop = getDropItem(state, world, tile);
 
             world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), drop));
         }
@@ -98,6 +99,15 @@ public class BlockBipropellantRocketMotor extends BlockFullyRotatable implements
     @Nullable
     @Override
     public TileEntity createTileEntity(final World worldIn, final IBlockState state) {
-        return new TileBrokenPart(10, 0.025F);
+        return new TileBrokenPart(10, (float) ARConfiguration.getCurrentConfig().increaseWearIntensityProb);
+    }
+
+    @Override
+    public ItemStack getDropItem(final IBlockState state, final World world, final @Nullable TileBrokenPart te) {
+        ItemStack drop = new ItemStack(this.getItemDropped(state, world.rand, 0));
+        if (te != null) {
+            drop.setItemDamage(te.getStage());
+        }
+        return drop;
     }
 }

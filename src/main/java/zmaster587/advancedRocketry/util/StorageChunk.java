@@ -51,10 +51,7 @@ import zmaster587.libVulpes.util.ZUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBreakable {
 
@@ -64,6 +61,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
     private Block[][][] blocks;
     public int sizeX, sizeY, sizeZ;
     private short[][][] metas;
+    private Map<BlockPos, TileEntity> pos2te = new HashMap<>();
     private ArrayList<TileEntity> tileEntities;
     //To store inventories (All inventories)
     private ArrayList<TileEntity> inventoryTiles;
@@ -71,9 +69,9 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
     private Entity entity;
     private float weight;
 
-    public Block[][][] getblocks(){
-    return blocks;
-}
+    public Block[][][] getblocks() {
+        return blocks;
+    }
 
     public StorageChunk() {
         sizeX = 0;
@@ -152,6 +150,11 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         return this.weight;
     }
 
+    public void addTileEntity(TileEntity te) {
+        pos2te.put(te.getPos(), te);
+        tileEntities.add(te);
+    }
+
     public static StorageChunk copyWorldBB(World world, AxisAlignedBB bb) {
         int actualMinX = (int) bb.maxX,
                 actualMinY = (int) bb.maxY,
@@ -228,7 +231,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                                 ret.liquidTiles.add(newTile);
                             }
 
-                            ret.tileEntities.add(newTile);
+                            ret.addTileEntity(newTile);
                         }
                     }
                 }
@@ -337,7 +340,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
 
     public void setBlockState(BlockPos pos, IBlockState state) {
 
-        System.out.println("Block "+pos.getX()+":"+pos.getY()+":"+pos.getZ()+" set to "+state.getBlock().getUnlocalizedName());
+//        System.out.println("Block "+pos.getX()+":"+pos.getY()+":"+pos.getZ()+" set to "+state.getBlock().getUnlocalizedName());
 
         int x = pos.getX();
         int y = pos.getY();
@@ -548,7 +551,6 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         int[] metasId = nbt.getIntArray("metaList");
 
 
-
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
                 for (int z = 0; z < sizeZ; z++) {
@@ -556,7 +558,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                     metas[x][y][z] = (short) metasId[z + (sizeZ * y) + (sizeZ * sizeY * x)];
 
                     chunk.setBlockState(new BlockPos(x, y, z), this.blocks[x][y][z].getStateFromMeta(this.metas[x][y][z]));
-                    world.checkLightFor(EnumSkyBlock.BLOCK,new BlockPos(x, y, z));
+                    world.checkLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z));
                 }
             }
         }
@@ -577,7 +579,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                     liquidTiles.add(tile);
                 }
 
-                tileEntities.add(tile);
+                this.addTileEntity(tile);
                 tile.setWorld(world);
 
                 chunk.addTileEntity(tile);
@@ -678,13 +680,9 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         }
     }
 
-    @Override
+    @Nullable
     public TileEntity getTileEntity(@Nonnull BlockPos pos) {
-        for (TileEntity tileE : tileEntities) {
-            if (tileE.getPos().compareTo(pos) == 0)
-                return tileE;
-        }
-        return null;
+        return pos2te.getOrDefault(pos, null);
     }
 
     @Override
@@ -778,6 +776,18 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         return prob;
     }
 
+    public List<TileBrokenPart> getBrokenBlocks() {
+        List<TileBrokenPart> res = new ArrayList<>();
+
+        for (TileEntity te : tileEntities) {
+            if (te instanceof TileBrokenPart) {
+                res.add((TileBrokenPart) te);
+            }
+        }
+
+        return res;
+    }
+
     public boolean shouldBreak() {
         return world.rand.nextFloat() < this.getBreakingProbability();
     }
@@ -867,7 +877,8 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
             }
         }
     }
-    public void writetiles(ByteBuf out){
+
+    public void writetiles(ByteBuf out) {
         PacketBuffer buffer = new PacketBuffer(out);
         buffer.writeShort(tileEntities.size());
         Iterator<TileEntity> tileIterator = tileEntities.iterator();
@@ -895,7 +906,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
 
     public void writeToNetwork(ByteBuf out) {
 
-        if (DimensionManager.getWorld(0).isRemote)System.out.println("This should have never been called!");
+        if (DimensionManager.getWorld(0).isRemote) System.out.println("This should have never been called!");
 
         PacketBuffer buffer = new PacketBuffer(out);
 
@@ -951,7 +962,6 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         this.blocks = new Block[sizeX][sizeY][sizeZ];
         this.metas = new short[sizeX][sizeY][sizeZ];
         chunk = new Chunk(world, 0, 0);
-
 
 
         for (int x = 0; x < sizeX; x++) {

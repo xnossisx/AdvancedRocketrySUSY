@@ -2330,7 +2330,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     @Override
     public boolean canInteractWithContainer(EntityPlayer entity) {
-        boolean ret = !this.isDead && this.getDistanceToEntity(entity) < 64;
+        boolean ret = !this.isDead && this.getDistance(entity) < 64;
         if (!ret)
             RocketInventoryHelper.removePlayerFromInventoryBypass(entity);
 

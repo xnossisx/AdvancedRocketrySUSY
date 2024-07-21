@@ -63,7 +63,7 @@ tasks.compileJava {
 
 
 minecraft {
-    mappings("snapshot", "20170624-1.12")
+    mappings("snapshot", "20171003-1.12")
 
     accessTransformer(file("src/main/resources/META-INF/accessTransformer.cfg"))
 
@@ -155,6 +155,7 @@ dependencies {
     //compileOnly(fg.deobf("dev.galacticraft:galacticraft-legacy:$gcVersion"))
     compileOnly(fg.deobf("curse.maven:galacticraft-legacy-564236:4671122"))
     compileOnly(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}:api"))
+    implementation(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}")) // Sorry but it won't start wihout jei...
     //runtimeOnly(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}")) // I think this crashes the game for me when running from IntelliJ
 
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
