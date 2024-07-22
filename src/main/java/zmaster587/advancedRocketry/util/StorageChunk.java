@@ -984,6 +984,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                 TileEntity tile = ZUtils.createTile(nbt);
                 tile.setWorld(world);
                 tileEntities.add(tile);
+                pos2te.put(tile.getPos(), tile);
 
                 if (isInventoryBlock(tile)) {
                     inventoryTiles.add(tile);
