@@ -30,6 +30,7 @@ import zmaster587.advancedRocketry.util.IBrokenPartBlock;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.advancedRocketry.util.nbt.NBTHelper;
 import zmaster587.libVulpes.LibVulpes;
+import zmaster587.libVulpes.block.BlockTile;
 import zmaster587.libVulpes.interfaces.ILinkableTile;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.items.ItemLinker;
@@ -37,17 +38,15 @@ import zmaster587.libVulpes.network.PacketEntity;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.IComparatorOverride;
+import zmaster587.libVulpes.tile.TileEntityRFConsumer;
 import zmaster587.libVulpes.util.IAdjBlockUpdate;
 import zmaster587.libVulpes.util.INetworkMachine;
 
 import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
-public class TileRocketServiceStation extends TileEntity implements IModularInventory, ITickable, IAdjBlockUpdate, IInfrastructure, ILinkableTile, INetworkMachine, IButtonInventory, IProgressBar, IComparatorOverride {
+public class TileRocketServiceStation extends TileEntityRFConsumer implements IModularInventory, ITickable, IAdjBlockUpdate, IInfrastructure, ILinkableTile, INetworkMachine, IButtonInventory, IProgressBar, IComparatorOverride {
 
     EntityRocketBase linkedRocket;
 
@@ -66,10 +65,13 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     TileBrokenPart[] partsProcessing = new TileBrokenPart[0];
     IBlockState[] statesProcessing = new IBlockState[0];
 
+    int initialPartToRepairCount;
     List<TileBrokenPart> partsToRepair = new LinkedList<>();
     List<IBlockState> statesToRepair = new LinkedList<>();
 
     public TileRocketServiceStation() {
+        super(10000);
+
         destroyProbText = new ModuleText(90, 30, LibVulpes.proxy.getLocalizedString("msg.serviceStation.destroyProbNA"), 0x2b2b2b, true);
         wornMotorsText = new ModuleText(40, 30 + 30, LibVulpes.proxy.getLocalizedString("msg.serviceStation.wornMotorsText"), 0x2b2b2b, true);
         wornSeatsText = new ModuleText(90, 30 + 30, LibVulpes.proxy.getLocalizedString("msg.serviceStation.wornSeatsText"), 0x2b2b2b, true);
@@ -113,6 +115,10 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     }
 
     public void updateRepairList() {
+        updateRepairList(true);
+    }
+
+    public void updateRepairList(boolean initial) {
         EntityRocket rocket = (EntityRocket) linkedRocket;
         partsToRepair = new LinkedList<>();
         statesToRepair = new LinkedList<>();
@@ -122,6 +128,10 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
                 partsToRepair.add((TileBrokenPart) te);
                 statesToRepair.add(rocket.storage.getBlockState(te.getPos()));
             }
+        }
+
+        if (initial) {
+            initialPartToRepairCount = partsToRepair.size();
         }
     }
 
@@ -239,7 +249,6 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
         partsProcessing[assemblerIndex] = part;
 
         // add to the assembler
-        // TODO Test!
         ItemStack resultingStack = partBlock.getDropItem(statesToRepair.get(0), world, part);
         if (!addItemToOneOfTheInventories(assembler.getItemInPorts(), resultingStack)) {
             AdvancedRocketry.logger.error("Precision assembler at " + assembler.getPos() + " overflows. Repaired part lost");
@@ -260,10 +269,7 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
 
             TilePrecisionAssembler assembler = assemblers.get(i);
 
-            // TODO Implement a better way to match damageable blocks' stacks
-            if (assembler.getItemInPorts().isEmpty()
-                    || assembler.getItemInPorts().get(0).getStackInSlot(0)
-                                .getUnlocalizedName().contains("rocket")) {
+            if (hasItemInInventories(assembler.getItemInPorts(), "motor", false)) {
                 // assembler already have a motor for work, skipping
                 continue;
             }
@@ -279,30 +285,62 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     }
 
     @Override
-    public void update() {
-        if (!world.isRemote && world.getWorldTime() % 20 == 0) {
-            if (linkedRocket instanceof EntityRocket) {
-                if (getEquivalentPower() && linkedRocket != null) {
-                    if (!was_powered) {
-                        scanForAssemblers();
-                        was_powered = true;
-                    } else {
-                        if (assemblerPoses != null) {
-                            // lazy access to assembler list loaded from NBT
-                            assemblers = assemblerPoses.stream().map(pos -> (TilePrecisionAssembler) world.getTileEntity(pos)).collect(Collectors.toList());
-                            assemblerPoses = null;
-                        }
-                    }
+    public void performFunction() {
+        if (linkedRocket instanceof EntityRocket) {
+            // stay with the right blockstate
+            IBlockState state = world.getBlockState(pos);
+            if (!state.getValue(BlockTile.STATE)) {
+                world.setBlockState(pos, state.withProperty(BlockTile.STATE, true));
+            }
 
-                    giveWorkToAssemblers();
+            if (getEquivalentPower() && linkedRocket != null) {
+                if (!was_powered) {
+                    scanForAssemblers();
+                    was_powered = true;
+                } else {
+                    if (assemblerPoses != null) {
+                        // lazy access to assembler list loaded from NBT
+                        assemblers = assemblerPoses.stream().map(pos -> (TilePrecisionAssembler) world.getTileEntity(pos)).collect(Collectors.toList());
+                        assemblerPoses = null;
+
+                        this.statesProcessing = new IBlockState[assemblers.size()];
+                        this.partsProcessing = new TileBrokenPart[assemblers.size()];
+
+                        updateRepairList(false);
+                    }
                 }
+
+                giveWorkToAssemblers();
             }
-            if (!getEquivalentPower()) {
-                was_powered = false;
-            }
+        }
+        if (!getEquivalentPower()) {
+            was_powered = false;
         }
     }
 
+    @Override
+    public boolean canPerformFunction() {
+        if (world.isRemote || world.getWorldTime() % 20 != 0) {
+            return false;
+        }
+
+        boolean hasWork = partsToRepair.size() > 0 || Arrays.stream(partsProcessing).anyMatch(Objects::nonNull);
+
+        if (hasWork) {
+            return true;
+        }
+
+        IBlockState state = world.getBlockState(pos);
+        if (state.getValue(BlockTile.STATE)) {
+            world.setBlockState(pos, state.withProperty(BlockTile.STATE, false));
+        }
+        return false;
+    }
+
+    @Override
+    public int getPowerPerOperation() {
+        return 10;
+    }
 
     @Override
     public boolean onLinkStart(@Nonnull ItemStack item, TileEntity entity, EntityPlayer player, World world) {
@@ -327,11 +365,19 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     @Override
     public void unlinkRocket() {
         linkedRocket = null;
+
+        dropRepairStats();
+    }
+
+    public void dropRepairStats() {
+        partsToRepair = new LinkedList<>();
+        statesToRepair = new LinkedList<>();
+        initialPartToRepairCount = 0;
     }
 
     @Override
     public boolean disconnectOnLiftOff() {
-        return true;
+        return false;
     }
 
     @Override
@@ -352,27 +398,22 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         was_powered = nbt.getBoolean("was_powered");
+        initialPartToRepairCount = nbt.getInteger("initialPartToRepairCount");
 
-        if (nbt.hasKey("partsProcessing")) {
-            // if tile has "new" format
-            assemblerPoses = NBTHelper.readCollection("assemblerPoses", nbt, ArrayList::new, NBTHelper::readBlockPos);
-            partsProcessing = NBTHelper.readCollection("partsProcessing", nbt, ArrayList::new, NBTHelper::readTileEntity).toArray(new TileBrokenPart[0]);
-            statesProcessing = NBTHelper.readCollection("statesProcessing", nbt, ArrayList::new, NBTHelper::readState).toArray(new IBlockState[0]);
-//            partsToRepair = NBTHelper.readCollection("partsToRepair", nbt, LinkedList::new, tag -> (TileBrokenPart) world.getTileEntity(NBTHelper.readBlockPos(tag)));
-//            statesToRepair = NBTHelper.readCollection("statesToRepair", nbt, LinkedList::new, NBTHelper::readState);
-        }
+        assemblerPoses = NBTHelper.readCollection("assemblerPoses", nbt, ArrayList::new, NBTHelper::readBlockPos);
+        partsProcessing = NBTHelper.readCollection("partsProcessing", nbt, ArrayList::new, NBTHelper::readTileEntity).toArray(new TileBrokenPart[0]);
+        statesProcessing = NBTHelper.readCollection("statesProcessing", nbt, ArrayList::new, NBTHelper::readState).toArray(new IBlockState[0]);
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setBoolean("was_powered", was_powered);
+        nbt.setInteger("initialPartToRepairCount", initialPartToRepairCount);
 
         NBTHelper.writeCollection("assemblerPoses", nbt, this.assemblers, te -> NBTHelper.writeBlockPos(te.getPos()));
         NBTHelper.writeCollection("partsProcessing", nbt, Arrays.asList(this.partsProcessing), NBTHelper::writeTileEntity);
         NBTHelper.writeCollection("statesProcessing", nbt, Arrays.asList(this.statesProcessing), NBTHelper::writeState);
-//        NBTHelper.writeCollection("partsToRepair", nbt, this.partsToRepair, te -> NBTHelper.writeBlockPos(te.getPos()));
-//        NBTHelper.writeCollection("statesToRepair", nbt, this.statesToRepair, NBTHelper::writeState);
 
         return nbt;
     }
@@ -389,16 +430,12 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     }
 
     @Override
-    public void useNetworkData(EntityPlayer player, Side side, byte id,
-                               NBTTagCompound nbt) {
-
-    }
-
-    @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
         LinkedList<ModuleBase> modules = new LinkedList<>();
 
-        modules.add(new ModuleButton(63, 100, 0, "Repair!", this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild));
+        modules.add(new ModulePower(10, 20, this.energy));
+        modules.add(new ModuleButton(63 - 52 / 2, 100, 0, LibVulpes.proxy.getLocalizedString("msg.serviceStation.assemblerScan"),
+                this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild, 104, 16));
 
         updateText();
 
@@ -411,7 +448,7 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
         modules.add(wornSeatsCount);
         modules.add(wornTanksCount);
 
-        modules.add(new ModuleProgress(32, 133, 3, TextureResources.progressToMission, this));
+        modules.add(new ModuleProgress(32, 133, 0, TextureResources.progressToMission, this));
 
         if (!world.isRemote) {
             PacketHandler.sendToPlayer(new PacketMachine(this, (byte) 1), player);
@@ -453,12 +490,17 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     }
 
     @Override
+    public void useNetworkData(EntityPlayer player, Side side, byte id,
+                               NBTTagCompound nbt) {
+        if (id == 0) {
+            scanForAssemblers();
+        }
+    }
+
+    @Override
     public void onInventoryButtonPressed(int buttonId) {
-        if (buttonId != -1)
-            PacketHandler.sendToServer(new PacketMachine(this, (byte) (buttonId + 100)));
-        else {
-            //state = redstoneControl.getState();
-            PacketHandler.sendToServer(new PacketMachine(this, (byte) 2));
+        if (buttonId == 0) {
+            PacketHandler.sendToServer(new PacketMachine(this, (byte) 0));
         }
     }
 
@@ -494,8 +536,7 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
                     System.out.println("Huh, error....");
                     return 0;
                 }
-                EntityRocket rocket = (EntityRocket) linkedRocket;
-                return 0;
+                return initialPartToRepairCount - partsToRepair.size() - (int) Arrays.stream(partsProcessing).filter(Objects::nonNull).count();
             }
 
         return 0;
@@ -507,7 +548,10 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
 //            return ARConfiguration.getCurrentConfig().orbit;
 //        else if (id == 1)
 //            return 200;
-        return 1;
+        if (id == 0) {
+            return initialPartToRepairCount;
+        }
+        return 0;
     }
 
     @Override

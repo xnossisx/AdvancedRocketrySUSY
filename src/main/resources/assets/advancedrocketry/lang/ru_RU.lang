@@ -275,6 +275,8 @@ msg.serviceStation.serviceProgressNA=Прогресс обслуживания: 
 msg.serviceStation.wornMotorsText=Двигатели
 msg.serviceStation.wornSeatsText=Сиденья
 msg.serviceStation.wornTanksText=Резервуары
+msg.serviceStation.assemblerScan=Сканировать сборщики
+msg.serviceStation.link=Вы подключили частотный связыватель к станции техобслуживания на
 
 msg.guidanceComputerHatch.loadingState=Состояние загрузки:
 msg.guidanceComputerHatch.ejectonlanding=Автоматический выброс при посадке
