@@ -1,13 +1,11 @@
 package zmaster587.advancedRocketry.tile.infrastructure;
 
 import io.netty.buffer.ByteBuf;
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -21,15 +19,17 @@ import zmaster587.advancedRocketry.api.EntityRocketBase;
 import zmaster587.advancedRocketry.api.IFuelTank;
 import zmaster587.advancedRocketry.api.IInfrastructure;
 import zmaster587.advancedRocketry.api.IMission;
-import zmaster587.advancedRocketry.block.*;
+import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
+import zmaster587.advancedRocketry.block.BlockRocketMotor;
+import zmaster587.advancedRocketry.block.BlockSeat;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.tile.multiblock.machine.TilePrecisionAssembler;
 import zmaster587.advancedRocketry.util.IBrokenPartBlock;
 import zmaster587.advancedRocketry.util.StorageChunk;
+import zmaster587.advancedRocketry.util.nbt.NBTHelper;
 import zmaster587.libVulpes.LibVulpes;
-import zmaster587.libVulpes.compat.InventoryCompat;
 import zmaster587.libVulpes.interfaces.ILinkableTile;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.items.ItemLinker;
@@ -42,9 +42,10 @@ import zmaster587.libVulpes.util.INetworkMachine;
 
 import javax.annotation.Nonnull;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class TileRocketServiceStation extends TileEntity implements IModularInventory, ITickable, IAdjBlockUpdate, IInfrastructure, ILinkableTile, INetworkMachine, IButtonInventory, IProgressBar, IComparatorOverride {
 
@@ -61,12 +62,12 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     boolean was_powered = false;
 
     List<TilePrecisionAssembler> assemblers = new ArrayList<>();
+    List<BlockPos> assemblerPoses = new ArrayList<>();
     TileBrokenPart[] partsProcessing = new TileBrokenPart[0];
     IBlockState[] statesProcessing = new IBlockState[0];
 
     List<TileBrokenPart> partsToRepair = new LinkedList<>();
     List<IBlockState> statesToRepair = new LinkedList<>();
-    List<BlockPos> posesToRepair = new LinkedList<>();
 
     public TileRocketServiceStation() {
         destroyProbText = new ModuleText(90, 30, LibVulpes.proxy.getLocalizedString("msg.serviceStation.destroyProbNA"), 0x2b2b2b, true);
@@ -192,6 +193,12 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
             IBlockState state = statesProcessing[index];
             TileBrokenPart te = partsProcessing[index];
 
+            if (te == null) {
+                AdvancedRocketry.logger.warn("Rocket service station at " + getPos()
+                        + " is out of sync with connected assemblers! Repairing part lost");
+                return false;
+            }
+
             te.setStage(0);
             storage.addTileEntity(te);
             storage.setBlockState(te.getPos(), state);
@@ -219,6 +226,12 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
         TilePrecisionAssembler assembler = assemblers.get(assemblerIndex);
         TileBrokenPart part = partsToRepair.get(0);
         IBlockState state = statesToRepair.get(0);
+        if (!(part.getBlockType() instanceof IBrokenPartBlock)) {
+            AdvancedRocketry.logger.warn("Rocket part at " + part.getPos() + " is out of sync with its block! Removing");
+            statesToRepair.remove(0);
+            partsToRepair.remove(0);
+            return;
+        }
         IBrokenPartBlock partBlock = (IBrokenPartBlock) part.getBlockType();
 
         // add to processing list
@@ -273,6 +286,12 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
                     if (!was_powered) {
                         scanForAssemblers();
                         was_powered = true;
+                    } else {
+                        if (assemblerPoses != null) {
+                            // lazy access to assembler list loaded from NBT
+                            assemblers = assemblerPoses.stream().map(pos -> (TilePrecisionAssembler) world.getTileEntity(pos)).collect(Collectors.toList());
+                            assemblerPoses = null;
+                        }
                     }
 
                     giveWorkToAssemblers();
@@ -333,12 +352,28 @@ public class TileRocketServiceStation extends TileEntity implements IModularInve
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
         was_powered = nbt.getBoolean("was_powered");
+
+        if (nbt.hasKey("partsProcessing")) {
+            // if tile has "new" format
+            assemblerPoses = NBTHelper.readCollection("assemblerPoses", nbt, ArrayList::new, NBTHelper::readBlockPos);
+            partsProcessing = NBTHelper.readCollection("partsProcessing", nbt, ArrayList::new, NBTHelper::readTileEntity).toArray(new TileBrokenPart[0]);
+            statesProcessing = NBTHelper.readCollection("statesProcessing", nbt, ArrayList::new, NBTHelper::readState).toArray(new IBlockState[0]);
+//            partsToRepair = NBTHelper.readCollection("partsToRepair", nbt, LinkedList::new, tag -> (TileBrokenPart) world.getTileEntity(NBTHelper.readBlockPos(tag)));
+//            statesToRepair = NBTHelper.readCollection("statesToRepair", nbt, LinkedList::new, NBTHelper::readState);
+        }
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
         nbt.setBoolean("was_powered", was_powered);
+
+        NBTHelper.writeCollection("assemblerPoses", nbt, this.assemblers, te -> NBTHelper.writeBlockPos(te.getPos()));
+        NBTHelper.writeCollection("partsProcessing", nbt, Arrays.asList(this.partsProcessing), NBTHelper::writeTileEntity);
+        NBTHelper.writeCollection("statesProcessing", nbt, Arrays.asList(this.statesProcessing), NBTHelper::writeState);
+//        NBTHelper.writeCollection("partsToRepair", nbt, this.partsToRepair, te -> NBTHelper.writeBlockPos(te.getPos()));
+//        NBTHelper.writeCollection("statesToRepair", nbt, this.statesToRepair, NBTHelper::writeState);
+
         return nbt;
     }
 
