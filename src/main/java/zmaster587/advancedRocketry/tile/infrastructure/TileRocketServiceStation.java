@@ -125,8 +125,11 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
 
         for (TileEntity te : rocket.storage.getTileEntityList()) {
             if (te instanceof TileBrokenPart) {
-                partsToRepair.add((TileBrokenPart) te);
-                statesToRepair.add(rocket.storage.getBlockState(te.getPos()));
+                TileBrokenPart part = (TileBrokenPart) te;
+                if (part.getStage() > 0) {
+                    partsToRepair.add(part);
+                    statesToRepair.add(rocket.storage.getBlockState(te.getPos()));
+                }
             }
         }
 
