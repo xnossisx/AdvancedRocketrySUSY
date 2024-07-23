@@ -33,13 +33,11 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import zmaster587.advancedRocketry.AdvancedRocketry;
-import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.api.EntityRocketBase;
+import zmaster587.advancedRocketry.api.*;
+import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.stations.IStorageChunk;
-import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
-import zmaster587.advancedRocketry.block.BlockNuclearRocketMotor;
-import zmaster587.advancedRocketry.block.BlockRocketMotor;
+import zmaster587.advancedRocketry.block.*;
 import zmaster587.advancedRocketry.item.ItemPackedStructure;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
@@ -146,8 +144,125 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                 }
             }
         }
-
         return this.weight;
+    }
+
+    public void recalculateStats(StatsRocket stats) {
+        int thrustMonopropellant = 0;
+        int thrustBipropellant = 0;
+        int thrustNuclearNozzleLimit = 0;
+        int thrustNuclearReactorLimit = 0;
+        int thrustNuclearTotalLimit = 0;
+        int monopropellantfuelUse = 0;
+        int bipropellantfuelUse = 0;
+        int nuclearWorkingFluidUseMax = 0;
+        int fuelCapacityMonopropellant = 0;
+        int fuelCapacityBipropellant = 0;
+        int fuelCapacityOxidizer = 0;
+        int fuelCapacityNuclearWorkingFluid = 0;
+
+        float drillPower = 0f;
+        stats.reset();
+
+        float weight = 0;
+
+        for (int yCurr = 0; yCurr <= this.sizeY; yCurr++) {
+            for (int xCurr = 0; xCurr <= this.sizeX; xCurr++) {
+                for (int zCurr = 0; zCurr <= this.sizeZ; zCurr++) {
+                    BlockPos currBlockPos = new BlockPos(xCurr, yCurr, zCurr);
+                    BlockPos abovePos = new BlockPos(xCurr, yCurr + 1, zCurr);
+                    BlockPos belowPos = new BlockPos(xCurr, yCurr - 1, zCurr);
+
+                    if (this.getBlockState(currBlockPos).getBlock() != Blocks.AIR) {
+                        IBlockState state = world.getBlockState(currBlockPos);
+                        Block block = state.getBlock();
+
+                        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                            weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
+                        } else {
+                            weight += 1;
+                        }
+
+                        //If rocketEngine increaseThrust
+                        if (block instanceof IRocketEngine && (world.getBlockState(belowPos).getBlock().isAir(world.getBlockState(belowPos), world, belowPos) || world.getBlockState(belowPos).getBlock() instanceof BlockLandingPad || world.getBlockState(belowPos).getBlock() == AdvancedRocketryBlocks.blockLaunchpad)) {
+                            if (block instanceof BlockNuclearRocketMotor) {
+                                nuclearWorkingFluidUseMax += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
+                                thrustNuclearNozzleLimit += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                            } else if (block instanceof BlockBipropellantRocketMotor) {
+                                bipropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
+                                thrustBipropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                            } else if (block instanceof BlockRocketMotor) {
+                                monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
+                                thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                            }
+                            stats.addEngineLocation(xCurr, yCurr, zCurr);
+                        }
+
+                        if (block instanceof IFuelTank) {
+                            if (block instanceof BlockFuelTank) {
+                                fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            } else if (block instanceof BlockBipropellantFuelTank) {
+                                fuelCapacityBipropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            } else if (block instanceof BlockOxidizerFuelTank) {
+                                fuelCapacityOxidizer += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            } else if (block instanceof BlockNuclearFuelTank) {
+                                fuelCapacityNuclearWorkingFluid += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            }
+                        }
+
+                        if (block instanceof IRocketNuclearCore && ((world.getBlockState(belowPos).getBlock() instanceof IRocketNuclearCore) || (world.getBlockState(belowPos).getBlock() instanceof IRocketEngine))) {
+                            thrustNuclearReactorLimit += ((IRocketNuclearCore) block).getMaxThrust(world, currBlockPos);
+                        }
+
+                        if (block instanceof BlockSeat && world.getBlockState(abovePos).getBlock().isPassable(world, abovePos)) {
+                            stats.addPassengerSeat(xCurr, yCurr, zCurr);
+                        }
+
+                        if (block instanceof IMiningDrill) {
+                            drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
+                        }
+
+                        TileEntity tile = world.getTileEntity(currBlockPos);
+                        if (tile instanceof TileSatelliteHatch) {
+                            if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                                TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
+                                if (hatch.getSatellite() != null) {
+                                    weight += hatch.getSatellite().getProperties().getWeight();
+                                } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
+                                    ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0).getItem();
+                                    weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        int nuclearWorkingFluidUse = 0;
+        if (thrustNuclearNozzleLimit > 0) {
+            //Only run the number of engines our cores can support - we can't throttle these effectively because they're small, so they shut off if they don't get full power
+            thrustNuclearTotalLimit = Math.min(thrustNuclearNozzleLimit, thrustNuclearReactorLimit);
+            nuclearWorkingFluidUse = (int) (nuclearWorkingFluidUseMax * (thrustNuclearTotalLimit / (float) thrustNuclearNozzleLimit));
+            thrustNuclearTotalLimit = (nuclearWorkingFluidUse * thrustNuclearNozzleLimit) / nuclearWorkingFluidUseMax;
+        }
+
+        //Set fuel stats
+        //Thrust depending on rocket type
+        stats.setBaseFuelRate(FuelRegistry.FuelType.LIQUID_MONOPROPELLANT, monopropellantfuelUse);
+        stats.setBaseFuelRate(FuelRegistry.FuelType.LIQUID_BIPROPELLANT, bipropellantfuelUse);
+        stats.setBaseFuelRate(FuelRegistry.FuelType.LIQUID_OXIDIZER, bipropellantfuelUse);
+        stats.setBaseFuelRate(FuelRegistry.FuelType.NUCLEAR_WORKING_FLUID, nuclearWorkingFluidUse);
+        //Fuel storage depending on rocket type
+        stats.setFuelCapacity(FuelRegistry.FuelType.LIQUID_MONOPROPELLANT, fuelCapacityMonopropellant);
+        stats.setFuelCapacity(FuelRegistry.FuelType.LIQUID_BIPROPELLANT, fuelCapacityBipropellant);
+        stats.setFuelCapacity(FuelRegistry.FuelType.LIQUID_OXIDIZER, fuelCapacityOxidizer);
+        stats.setFuelCapacity(FuelRegistry.FuelType.NUCLEAR_WORKING_FLUID, fuelCapacityNuclearWorkingFluid);
+
+        //Non-fuel stats
+        stats.setWeight((int) weight);
+        stats.setThrust(Math.max(Math.max(thrustMonopropellant, thrustBipropellant), thrustNuclearTotalLimit));
+        stats.setDrillingPower(drillPower);
     }
 
     public void addTileEntity(TileEntity te) {
@@ -983,8 +1098,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
 
                 TileEntity tile = ZUtils.createTile(nbt);
                 tile.setWorld(world);
-                tileEntities.add(tile);
-                pos2te.put(tile.getPos(), tile);
+                this.addTileEntity(tile);
 
                 if (isInventoryBlock(tile)) {
                     inventoryTiles.add(tile);

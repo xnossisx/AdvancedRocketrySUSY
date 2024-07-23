@@ -240,7 +240,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     }
 
     public void scanRocket(World world, BlockPos pos2, AxisAlignedBB bb) {
-
         int thrustMonopropellant = 0;
         int thrustBipropellant = 0;
         int thrustNuclearNozzleLimit = 0;
@@ -253,7 +252,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         int fuelCapacityBipropellant = 0;
         int fuelCapacityOxidizer = 0;
         int fuelCapacityNuclearWorkingFluid = 0;
-        int numBlocks = 0;
+
         float drillPower = 0f;
         stats.reset();
 

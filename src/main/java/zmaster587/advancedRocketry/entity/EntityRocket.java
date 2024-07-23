@@ -1607,6 +1607,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         boolean allowLaunch = false;
 
+        this.storage.recalculateStats(this.stats);
+
         if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
             this.stats.setWeight((int) storage.recalculateWeight());
             for (HashedBlockPosition pos : this.infrastructureCoords) {
