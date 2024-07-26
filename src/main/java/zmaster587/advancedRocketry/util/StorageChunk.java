@@ -744,13 +744,9 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         this.chunk.generateSkylightMap();
     }
 
+    //pass the coords of the xmin, ymin, zmin as well as the world to move the rocket
     @Override
     public void pasteInWorld(World world, int xCoord, int yCoord, int zCoord) {
-        this.pasteInWorld(world, xCoord, yCoord, zCoord, false);
-    }
-
-    //pass the coords of the xmin, ymin, zmin as well as the world to move the rocket
-    public void pasteInWorld(World world, int xCoord, int yCoord, int zCoord, boolean damage) {
 
         //Set all the blocks
         for (int x = 0; x < sizeX; x++) {
@@ -788,9 +784,13 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
 
             if (entity != null)
                 entity.readFromNBT(nbt);
+        }
+    }
 
-            if (damage && entity instanceof TileBrokenPart) {
-                ((TileBrokenPart) entity).transition();
+    public void damageParts() {
+        for (TileEntity tile : tileEntities) {
+            if (tile instanceof TileBrokenPart) {
+                ((TileBrokenPart) tile).transition();
             }
         }
     }

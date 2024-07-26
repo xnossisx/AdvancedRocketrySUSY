@@ -516,7 +516,7 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
     @Override
     public int getTotalProgress(int id) {
 //        if (id == 0)
-//            return ARConfiguration.getCurrentConfig().orbit;
+//            return ARConfiguration.getCurrentConfig().orbit;ё
 //        else if (id == 1)
 //            return 200;
         if (id == 0) {

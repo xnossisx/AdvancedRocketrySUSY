@@ -849,6 +849,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     public void setFire(int seconds) {
     }
 
+    private void syncRocket() {
+        NBTTagCompound nbtdata = new NBTTagCompound();
+
+        this.writeToNBT(nbtdata);
+        PacketHandler.sendToNearby(new PacketEntity(this, (byte) 0, nbtdata), world.provider.getDimension(), new BlockPos(this), 64);
+    }
+
     @Override
     public void onUpdate() {
         super.onUpdate();
@@ -989,6 +996,9 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 double distanceSq = this.spacePosition.distanceToSpacePosition2(new SpacePosition());
                 //Land, only handle on server
                 if (!world.isRemote) {
+                    this.storage.damageParts();
+                    syncRocket();
+
                     if (distanceSq < 0.5f * spacePosition.world.getRenderSizePlanetView() * spacePosition.world.getRenderSizePlanetView()) {
                         this.destinationDimId = spacePosition.world.getId();
                         this.setRCS(false);
@@ -1737,7 +1747,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         }
 
         //paste the rocket into the world as blocks
-        storage.pasteInWorld(this.world, (int) (this.posX - storage.getSizeX() / 2f), (int) this.posY, (int) (this.posZ - storage.getSizeZ() / 2f), true);
+        storage.pasteInWorld(this.world, (int) (this.posX - storage.getSizeX() / 2f), (int) this.posY, (int) (this.posZ - storage.getSizeZ() / 2f));
 
         this.setDead();
     }
