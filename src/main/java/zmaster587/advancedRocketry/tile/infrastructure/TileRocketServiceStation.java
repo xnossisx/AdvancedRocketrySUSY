@@ -5,7 +5,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -27,6 +26,7 @@ import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.tile.multiblock.machine.TilePrecisionAssembler;
 import zmaster587.advancedRocketry.util.IBrokenPartBlock;
+import zmaster587.advancedRocketry.util.InventoryUtil;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.advancedRocketry.util.nbt.NBTHelper;
 import zmaster587.libVulpes.LibVulpes;
@@ -118,7 +118,7 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
         updateRepairList(true);
     }
 
-    public void updateRepairList(boolean initial) {
+    private void updateRepairList(boolean initial) {
         EntityRocket rocket = (EntityRocket) linkedRocket;
         partsToRepair = new LinkedList<>();
         statesToRepair = new LinkedList<>();
@@ -138,7 +138,7 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
         }
     }
 
-    public void scanForAssemblers() {
+    private void scanForAssemblers() {
         this.assemblers = new ArrayList<>();
 
         int size = 5;
@@ -158,51 +158,11 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
         this.partsProcessing = new TileBrokenPart[assemblers.size()];
     }
 
-    private boolean hasItemInInventories(Iterable<IInventory> invs, String substr, boolean consume) {
-        for (IInventory inv : invs) {
-            if (hasItemInInventory(inv, substr, consume)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean hasItemInInventory(IInventory inv, String substr, boolean consume) {
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            if (inv.getStackInSlot(i).getUnlocalizedName().toLowerCase().contains(substr)) {
-                if (consume) {
-                    inv.setInventorySlotContents(i, ItemStack.EMPTY);
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean addItemToOneOfTheInventories(Iterable<IInventory> invs, ItemStack stack) {
-        for (IInventory inv : invs) {
-            if (addItemToInventory(inv, stack)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private boolean addItemToInventory(IInventory inv, ItemStack stack) {
-        for (int i = 0; i < inv.getSizeInventory(); i++) {
-            if (inv.getStackInSlot(i).isEmpty()) {
-                inv.setInventorySlotContents(i, stack);
-                return true;
-            }
-        }
-        return false;
-    }
-
     private boolean processAssemblerResult(int index) {
         StorageChunk storage = ((EntityRocket) linkedRocket).storage;
         TilePrecisionAssembler assembler = assemblers.get(index);
 
-        if (hasItemInInventories(assembler.getItemOutPorts(), "rocket", true)) {
+        if (InventoryUtil.hasItemInInventories(assembler.getItemOutPorts(), "rocket", true)) {
             IBlockState state = statesProcessing[index];
             TileBrokenPart te = partsProcessing[index];
 
@@ -253,7 +213,7 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
 
         // add to the assembler
         ItemStack resultingStack = partBlock.getDropItem(statesToRepair.get(0), world, part);
-        if (!addItemToOneOfTheInventories(assembler.getItemInPorts(), resultingStack)) {
+        if (!InventoryUtil.addItemToOneOfTheInventories(assembler.getItemInPorts(), resultingStack)) {
             AdvancedRocketry.logger.error("Precision assembler at " + assembler.getPos() + " overflows. Repaired part lost");
         }
         statesToRepair.remove(0);
@@ -265,14 +225,22 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
         assembler.onInventoryUpdated();
     }
 
-    public void giveWorkToAssemblers() {
+    private void giveWorkToAssemblers() {
         boolean dirty = false;
         for (int i = 0; i < assemblers.size(); i++) {
+            if (assemblers.get(i).isInvalid()) {
+                // it is invalid, so we should not operate with it
+                assemblers.set(i, null);
+                partsProcessing[i] = null;
+                statesProcessing[i] = null;
+                continue;
+            }
+
             dirty = dirty || processAssemblerResult(i);
 
             TilePrecisionAssembler assembler = assemblers.get(i);
 
-            if (hasItemInInventories(assembler.getItemInPorts(), "motor", false)) {
+            if (InventoryUtil.hasItemInInventories(assembler.getItemInPorts(), "motor", false)) {
                 // assembler already have a motor for work, skipping
                 continue;
             }
@@ -380,7 +348,7 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
 
     @Override
     public boolean disconnectOnLiftOff() {
-        return false;
+        return true;
     }
 
     @Override
