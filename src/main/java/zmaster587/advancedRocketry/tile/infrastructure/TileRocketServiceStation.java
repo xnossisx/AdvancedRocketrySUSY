@@ -348,7 +348,7 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
 
     @Override
     public boolean disconnectOnLiftOff() {
-        return false;
+        return true;
     }
 
     @Override
