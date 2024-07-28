@@ -601,7 +601,7 @@ public class ChunkProviderPlanet implements IChunkGenerator {
 
     @Override
     public void recreateStructures(Chunk chunkIn, int x, int z) {
-        /* this causes tons of crashes and I dont know why
+
         if (this.mapFeaturesEnabled || !habitable) {
             if (this.settings.useMineShafts) {
                 this.mineshaftGenerator.generate(this.worldObj, x, z, null);
@@ -624,8 +624,6 @@ public class ChunkProviderPlanet implements IChunkGenerator {
             }
 
         }
-
-         */
     }
 
     @Override
