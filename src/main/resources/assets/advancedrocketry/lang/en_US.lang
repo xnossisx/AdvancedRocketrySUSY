@@ -425,6 +425,16 @@ msg.itemplanetidchip.stationid=Station Id:
 msg.itemplanetidchip.artifacts=Artifacts:
 msg.vent.trace=Oxygen Trace
 
+msg.serviceStation.destroyProbNA=Destroy probability: N/A
+msg.serviceStation.destroyProb=Destroy probability:
+msg.serviceStation.serviceProgress=Service progress:
+msg.serviceStation.serviceProgressNA=Service progress: N/A
+msg.serviceStation.wornMotorsText=Engines
+msg.serviceStation.wornSeatsText=Seats
+msg.serviceStation.wornTanksText=Tanks
+msg.serviceStation.assemblerScan=Scan for assemblers
+msg.serviceStation.link=You program the linker with the service station at
+
 msg.itemsatellite.pwr=Power Storage: 
 msg.itemsatellite.nopwr=No Power Storage
 msg.itemsatellite.pwrgen=Power Generation: 

@@ -33,13 +33,11 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.items.CapabilityItemHandler;
 import zmaster587.advancedRocketry.AdvancedRocketry;
-import zmaster587.advancedRocketry.api.Constants;
-import zmaster587.advancedRocketry.api.EntityRocketBase;
+import zmaster587.advancedRocketry.api.*;
+import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.stations.IStorageChunk;
-import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
-import zmaster587.advancedRocketry.block.BlockNuclearRocketMotor;
-import zmaster587.advancedRocketry.block.BlockRocketMotor;
+import zmaster587.advancedRocketry.block.*;
 import zmaster587.advancedRocketry.item.ItemPackedStructure;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
@@ -51,10 +49,7 @@ import zmaster587.libVulpes.util.ZUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBreakable {
 
@@ -64,6 +59,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
     private Block[][][] blocks;
     public int sizeX, sizeY, sizeZ;
     private short[][][] metas;
+    private Map<BlockPos, TileEntity> pos2te = new HashMap<>();
     private ArrayList<TileEntity> tileEntities;
     //To store inventories (All inventories)
     private ArrayList<TileEntity> inventoryTiles;
@@ -71,9 +67,9 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
     private Entity entity;
     private float weight;
 
-    public Block[][][] getblocks(){
-    return blocks;
-}
+    public Block[][][] getblocks() {
+        return blocks;
+    }
 
     public StorageChunk() {
         sizeX = 0;
@@ -148,8 +144,130 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                 }
             }
         }
-
         return this.weight;
+    }
+
+    public void recalculateStats(StatsRocket stats) {
+        int thrustMonopropellant = 0;
+        int thrustBipropellant = 0;
+        int thrustNuclearNozzleLimit = 0;
+        int thrustNuclearReactorLimit = 0;
+        int thrustNuclearTotalLimit = 0;
+        int monopropellantfuelUse = 0;
+        int bipropellantfuelUse = 0;
+        int nuclearWorkingFluidUseMax = 0;
+        int fuelCapacityMonopropellant = 0;
+        int fuelCapacityBipropellant = 0;
+        int fuelCapacityOxidizer = 0;
+        int fuelCapacityNuclearWorkingFluid = 0;
+
+        float drillPower = 0f;
+        stats.reset();
+
+        float weight = 0;
+
+        for (int yCurr = 0; yCurr <= this.sizeY; yCurr++) {
+            for (int xCurr = 0; xCurr <= this.sizeX; xCurr++) {
+                for (int zCurr = 0; zCurr <= this.sizeZ; zCurr++) {
+                    BlockPos currBlockPos = new BlockPos(xCurr, yCurr, zCurr);
+                    BlockPos abovePos = new BlockPos(xCurr, yCurr + 1, zCurr);
+                    BlockPos belowPos = new BlockPos(xCurr, yCurr - 1, zCurr);
+
+                    if (this.getBlockState(currBlockPos).getBlock() != Blocks.AIR) {
+                        IBlockState state = world.getBlockState(currBlockPos);
+                        Block block = state.getBlock();
+
+                        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                            weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
+                        } else {
+                            weight += 1;
+                        }
+
+                        //If rocketEngine increaseThrust
+                        if (block instanceof IRocketEngine && (world.getBlockState(belowPos).getBlock().isAir(world.getBlockState(belowPos), world, belowPos) || world.getBlockState(belowPos).getBlock() instanceof BlockLandingPad || world.getBlockState(belowPos).getBlock() == AdvancedRocketryBlocks.blockLaunchpad)) {
+                            if (block instanceof BlockNuclearRocketMotor) {
+                                nuclearWorkingFluidUseMax += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
+                                thrustNuclearNozzleLimit += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                            } else if (block instanceof BlockBipropellantRocketMotor) {
+                                bipropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
+                                thrustBipropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                            } else if (block instanceof BlockRocketMotor) {
+                                monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
+                                thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                            }
+                            stats.addEngineLocation(xCurr, yCurr, zCurr);
+                        }
+
+                        if (block instanceof IFuelTank) {
+                            if (block instanceof BlockFuelTank) {
+                                fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            } else if (block instanceof BlockBipropellantFuelTank) {
+                                fuelCapacityBipropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            } else if (block instanceof BlockOxidizerFuelTank) {
+                                fuelCapacityOxidizer += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            } else if (block instanceof BlockNuclearFuelTank) {
+                                fuelCapacityNuclearWorkingFluid += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            }
+                        }
+
+                        if (block instanceof IRocketNuclearCore && ((world.getBlockState(belowPos).getBlock() instanceof IRocketNuclearCore) || (world.getBlockState(belowPos).getBlock() instanceof IRocketEngine))) {
+                            thrustNuclearReactorLimit += ((IRocketNuclearCore) block).getMaxThrust(world, currBlockPos);
+                        }
+
+                        if (block instanceof BlockSeat && world.getBlockState(abovePos).getBlock().isPassable(world, abovePos)) {
+                            stats.addPassengerSeat(xCurr, yCurr, zCurr);
+                        }
+
+                        if (block instanceof IMiningDrill) {
+                            drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
+                        }
+
+                        TileEntity tile = world.getTileEntity(currBlockPos);
+                        if (tile instanceof TileSatelliteHatch) {
+                            if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                                TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
+                                if (hatch.getSatellite() != null) {
+                                    weight += hatch.getSatellite().getProperties().getWeight();
+                                } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
+                                    ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0).getItem();
+                                    weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        int nuclearWorkingFluidUse = 0;
+        if (thrustNuclearNozzleLimit > 0) {
+            //Only run the number of engines our cores can support - we can't throttle these effectively because they're small, so they shut off if they don't get full power
+            thrustNuclearTotalLimit = Math.min(thrustNuclearNozzleLimit, thrustNuclearReactorLimit);
+            nuclearWorkingFluidUse = (int) (nuclearWorkingFluidUseMax * (thrustNuclearTotalLimit / (float) thrustNuclearNozzleLimit));
+            thrustNuclearTotalLimit = (nuclearWorkingFluidUse * thrustNuclearNozzleLimit) / nuclearWorkingFluidUseMax;
+        }
+
+        //Set fuel stats
+        //Thrust depending on rocket type
+        stats.setBaseFuelRate(FuelRegistry.FuelType.LIQUID_MONOPROPELLANT, monopropellantfuelUse);
+        stats.setBaseFuelRate(FuelRegistry.FuelType.LIQUID_BIPROPELLANT, bipropellantfuelUse);
+        stats.setBaseFuelRate(FuelRegistry.FuelType.LIQUID_OXIDIZER, bipropellantfuelUse);
+        stats.setBaseFuelRate(FuelRegistry.FuelType.NUCLEAR_WORKING_FLUID, nuclearWorkingFluidUse);
+        //Fuel storage depending on rocket type
+        stats.setFuelCapacity(FuelRegistry.FuelType.LIQUID_MONOPROPELLANT, fuelCapacityMonopropellant);
+        stats.setFuelCapacity(FuelRegistry.FuelType.LIQUID_BIPROPELLANT, fuelCapacityBipropellant);
+        stats.setFuelCapacity(FuelRegistry.FuelType.LIQUID_OXIDIZER, fuelCapacityOxidizer);
+        stats.setFuelCapacity(FuelRegistry.FuelType.NUCLEAR_WORKING_FLUID, fuelCapacityNuclearWorkingFluid);
+
+        //Non-fuel stats
+        stats.setWeight((int) weight);
+        stats.setThrust(Math.max(Math.max(thrustMonopropellant, thrustBipropellant), thrustNuclearTotalLimit));
+        stats.setDrillingPower(drillPower);
+    }
+
+    public void addTileEntity(TileEntity te) {
+        pos2te.put(te.getPos(), te);
+        tileEntities.add(te);
     }
 
     public static StorageChunk copyWorldBB(World world, AxisAlignedBB bb) {
@@ -228,7 +346,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                                 ret.liquidTiles.add(newTile);
                             }
 
-                            ret.tileEntities.add(newTile);
+                            ret.addTileEntity(newTile);
                         }
                     }
                 }
@@ -337,7 +455,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
 
     public void setBlockState(BlockPos pos, IBlockState state) {
 
-        System.out.println("Block "+pos.getX()+":"+pos.getY()+":"+pos.getZ()+" set to "+state.getBlock().getUnlocalizedName());
+//        System.out.println("Block "+pos.getX()+":"+pos.getY()+":"+pos.getZ()+" set to "+state.getBlock().getUnlocalizedName());
 
         int x = pos.getX();
         int y = pos.getY();
@@ -548,7 +666,6 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         int[] metasId = nbt.getIntArray("metaList");
 
 
-
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
                 for (int z = 0; z < sizeZ; z++) {
@@ -556,7 +673,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                     metas[x][y][z] = (short) metasId[z + (sizeZ * y) + (sizeZ * sizeY * x)];
 
                     chunk.setBlockState(new BlockPos(x, y, z), this.blocks[x][y][z].getStateFromMeta(this.metas[x][y][z]));
-                    world.checkLightFor(EnumSkyBlock.BLOCK,new BlockPos(x, y, z));
+                    world.checkLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z));
                 }
             }
         }
@@ -577,7 +694,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                     liquidTiles.add(tile);
                 }
 
-                tileEntities.add(tile);
+                this.addTileEntity(tile);
                 tile.setWorld(world);
 
                 chunk.addTileEntity(tile);
@@ -627,13 +744,9 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         this.chunk.generateSkylightMap();
     }
 
+    //pass the coords of the xmin, ymin, zmin as well as the world to move the rocket
     @Override
     public void pasteInWorld(World world, int xCoord, int yCoord, int zCoord) {
-        this.pasteInWorld(world, xCoord, yCoord, zCoord, false);
-    }
-
-    //pass the coords of the xmin, ymin, zmin as well as the world to move the rocket
-    public void pasteInWorld(World world, int xCoord, int yCoord, int zCoord, boolean damage) {
 
         //Set all the blocks
         for (int x = 0; x < sizeX; x++) {
@@ -671,20 +784,20 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
 
             if (entity != null)
                 entity.readFromNBT(nbt);
+        }
+    }
 
-            if (damage && entity instanceof TileBrokenPart) {
-                ((TileBrokenPart) entity).transition();
+    public void damageParts() {
+        for (TileEntity tile : tileEntities) {
+            if (tile instanceof TileBrokenPart) {
+                ((TileBrokenPart) tile).transition();
             }
         }
     }
 
-    @Override
+    @Nullable
     public TileEntity getTileEntity(@Nonnull BlockPos pos) {
-        for (TileEntity tileE : tileEntities) {
-            if (tileE.getPos().compareTo(pos) == 0)
-                return tileE;
-        }
-        return null;
+        return pos2te.getOrDefault(pos, null);
     }
 
     @Override
@@ -778,6 +891,18 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         return prob;
     }
 
+    public List<TileBrokenPart> getBrokenBlocks() {
+        List<TileBrokenPart> res = new ArrayList<>();
+
+        for (TileEntity te : tileEntities) {
+            if (te instanceof TileBrokenPart) {
+                res.add((TileBrokenPart) te);
+            }
+        }
+
+        return res;
+    }
+
     public boolean shouldBreak() {
         return world.rand.nextFloat() < this.getBreakingProbability();
     }
@@ -867,7 +992,8 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
             }
         }
     }
-    public void writetiles(ByteBuf out){
+
+    public void writetiles(ByteBuf out) {
         PacketBuffer buffer = new PacketBuffer(out);
         buffer.writeShort(tileEntities.size());
         Iterator<TileEntity> tileIterator = tileEntities.iterator();
@@ -895,7 +1021,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
 
     public void writeToNetwork(ByteBuf out) {
 
-        if (DimensionManager.getWorld(0).isRemote)System.out.println("This should have never been called!");
+        if (DimensionManager.getWorld(0).isRemote) System.out.println("This should have never been called!");
 
         PacketBuffer buffer = new PacketBuffer(out);
 
@@ -953,7 +1079,6 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         chunk = new Chunk(world, 0, 0);
 
 
-
         for (int x = 0; x < sizeX; x++) {
             for (int y = 0; y < sizeY; y++) {
                 for (int z = 0; z < sizeZ; z++) {
@@ -973,7 +1098,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
 
                 TileEntity tile = ZUtils.createTile(nbt);
                 tile.setWorld(world);
-                tileEntities.add(tile);
+                this.addTileEntity(tile);
 
                 if (isInventoryBlock(tile)) {
                     inventoryTiles.add(tile);
