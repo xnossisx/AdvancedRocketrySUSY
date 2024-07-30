@@ -8,6 +8,7 @@ entity.rocket.name=Ракета
 
 tile.landingPad.name=Посадочная площадка
 tile.serviceStation.name=Станция техобслуживания
+tile.servicemonitor.name=Монитор состояния
 tile.seat.name=Сиденье
 tile.pad.name=Стартовая площадка
 tile.structuretower.name=Структурная башня
@@ -269,8 +270,8 @@ msg.monitoringStation.link=Вы подключили частотный связ
 msg.monitoringStation.progress=Прогресс:
 
 msg.serviceStation.destroyProbNA=Вероятность разрушения: Н/Д
-msg.serviceStation.destroyProb=Вероятность разрушения:
-msg.serviceStation.serviceProgress=Прогресс обслуживания:
+msg.serviceStation.destroyProb=Вероятность разрушения
+msg.serviceStation.serviceProgress=Прогресс обслуживания
 msg.serviceStation.serviceProgressNA=Прогресс обслуживания: Н/Д
 msg.serviceStation.wornMotorsText=Двигатели
 msg.serviceStation.wornSeatsText=Сиденья
@@ -397,6 +398,11 @@ msg.itemsatellite.nopwrgen=Энергия не генерируется!
 msg.itemsatellite.data=Хранилище данных:
 msg.itemsatellite.nodata=Нет хранилища данных!
 msg.itemsatellite.empty=Пустое шасси
+msg.itemsatellite.weight=Масса спутника:
+msg.itemsatellite.noweight=Ошибка в подсчёте массы
+
+msg.brokenstage.text=Стадия повреждений
+
 msg.itemsatchip.id=ID:
 msg.itemsatchip.planet=Планета:
 msg.itemsatchip.planetunk=Планета: Неизвестно

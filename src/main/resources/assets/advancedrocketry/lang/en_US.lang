@@ -16,6 +16,7 @@ entity.hovercraft.name=Hovercraft
 tile.landingPad.name=Landing Pad
 tile.seat.name=Seat
 tile.pad.name=Launch Pad
+tile.servicemonitor.name=Service monitor
 tile.structuretower.name=Structure Tower
 tile.rocketAssembler.name=Rocket Assembling Machine
 tile.turf.name=Moon Turf
@@ -426,8 +427,8 @@ msg.itemplanetidchip.artifacts=Artifacts:
 msg.vent.trace=Oxygen Trace
 
 msg.serviceStation.destroyProbNA=Destroy probability: N/A
-msg.serviceStation.destroyProb=Destroy probability:
-msg.serviceStation.serviceProgress=Service progress:
+msg.serviceStation.destroyProb=Destroy probability
+msg.serviceStation.serviceProgress=Service progress
 msg.serviceStation.serviceProgressNA=Service progress: N/A
 msg.serviceStation.wornMotorsText=Engines
 msg.serviceStation.wornSeatsText=Seats
@@ -443,6 +444,11 @@ msg.itemsatellite.microwavestatus=Collecting Power
 msg.itemsatellite.data=Data Storage: 
 msg.itemsatellite.nodata=No Data Storage!
 msg.itemsatellite.empty=Empty Chassis
+msg.itemsatellite.weight=Chassis weight:
+msg.itemsatellite.noweight=Error in weight calculation
+
+msg.brokenstage.text=Destruction stage
+
 msg.itemsatchip.id=ID: 
 msg.itemsatchip.planet=Planet: 
 msg.itemsatchip.planetunk=Planet: Unknown
