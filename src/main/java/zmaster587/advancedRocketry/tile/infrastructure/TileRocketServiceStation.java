@@ -431,7 +431,7 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
     private void updateText() {
         if (linkedRocket != null) {
             if (!(linkedRocket instanceof EntityRocket)) {
-                System.out.println("Huh, error....");
+//                System.out.println("Huh, error....");
                 destroyProbText.setText(LibVulpes.proxy.getLocalizedString("msg.serviceStation.destroyProbNA"));
                 return;
             }
@@ -504,7 +504,7 @@ public class TileRocketServiceStation extends TileEntityRFConsumer implements IM
         if (world.isRemote)
             if (id == 0) {
                 if (!(linkedRocket instanceof EntityRocket)) {
-                    System.out.println("Huh, error....");
+//                    System.out.println("Huh, error....");
                     return 0;
                 }
                 return initialPartToRepairCount - partsToRepair.size() - (int) Arrays.stream(partsProcessing).filter(Objects::nonNull).count();
