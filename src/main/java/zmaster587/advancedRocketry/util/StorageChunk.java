@@ -200,18 +200,18 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                                 monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
                                 thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
                             }
-                            stats.addEngineLocation(xCurr, yCurr, zCurr);
+                            stats.addEngineLocation(xCurr - (float) this.sizeX /2+0.5f, yCurr+0.5f, zCurr- (float) this.sizeZ /2+0.5f);
                         }
 
                         if (block instanceof IFuelTank) {
-                            if (block instanceof BlockFuelTank) {
-                                fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                            } else if (block instanceof BlockBipropellantFuelTank) {
+                             if (block instanceof BlockBipropellantFuelTank) {
                                 fuelCapacityBipropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
                             } else if (block instanceof BlockOxidizerFuelTank) {
                                 fuelCapacityOxidizer += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
                             } else if (block instanceof BlockNuclearFuelTank) {
                                 fuelCapacityNuclearWorkingFluid += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                            }else if (block instanceof BlockFuelTank) {
+                                fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
                             }
                         }
 

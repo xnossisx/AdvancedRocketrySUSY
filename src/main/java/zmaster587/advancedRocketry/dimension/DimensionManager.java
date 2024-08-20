@@ -127,6 +127,15 @@ public class DimensionManager implements IGalaxy {
         } else return getInstance().getDimensionProperties(dimId);
     }
 
+    public static DimensionProperties getEffectiveDimId_byID(int dimId, BlockPos pos) {
+
+        if (dimId == ARConfiguration.getCurrentConfig().spaceDimId) {
+            ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos);
+            if (spaceObject != null) return (DimensionProperties) spaceObject.getProperties().getParentProperties();
+            else return defaultSpaceDimensionProperties;
+        } else return getInstance().getDimensionProperties(dimId);
+    }
+
     /**
      * @return an Integer array of dimensions registered with this DimensionManager
      */

@@ -1036,7 +1036,7 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public void tick() {
 
         Iterator<SatelliteBase> iterator = tickingSatellites.values().iterator();
-
+        //System.out.println(":"+tickingSatellites.size());
         while (iterator.hasNext()) {
             SatelliteBase satellite = iterator.next();
             satellite.tickEntity();
@@ -1120,11 +1120,12 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     public boolean isBiomeblackListed(Biome biome, boolean is_NOT_terraforming) {
 
         if (!is_NOT_terraforming) {
-            //String modId = biome.getRegistryName().getResourceDomain();
-
-            //if (!modId.equals("minecraft") && !modId.equals("advancedrocketry")) {
-            //    return true;
-            //}
+            String modId = biome.getRegistryName().getResourceDomain();
+            if (!ARConfiguration.getCurrentConfig().allowNonArBiomesInTerraforming) {
+                if (!modId.equals("minecraft") && !modId.equals("advancedrocketry")) {
+                    return true;
+                }
+            }
         }
         if (biome.equals(AdvancedRocketryBiomes.spaceBiome)) return true;
 

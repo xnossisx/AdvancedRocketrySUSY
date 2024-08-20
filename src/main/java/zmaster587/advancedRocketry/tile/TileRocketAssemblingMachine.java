@@ -337,18 +337,18 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                                     monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr, yCurr, zCurr);
                                     thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
                                 }
-                                stats.addEngineLocation(x, yCurr - actualMinY, z);
+                                stats.addEngineLocation(x+0.5f, yCurr - actualMinY+0.5f, z+0.5f);
                             }
 
                             if (block instanceof IFuelTank) {
-                                if (block instanceof BlockFuelTank) {
-                                    fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                                } else if (block instanceof BlockBipropellantFuelTank) {
+                                if (block instanceof BlockBipropellantFuelTank) {
                                     fuelCapacityBipropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
                                 } else if (block instanceof BlockOxidizerFuelTank) {
                                     fuelCapacityOxidizer += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
                                 } else if (block instanceof BlockNuclearFuelTank) {
                                     fuelCapacityNuclearWorkingFluid += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                                } else if (block instanceof BlockFuelTank) {
+                                    fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos, state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
                                 }
                             }
 

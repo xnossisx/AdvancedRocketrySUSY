@@ -236,6 +236,8 @@ public class ARConfiguration {
     @ConfigProperty
     public int planetDiscoveryChance;
     @ConfigProperty
+    public boolean allowNonArBiomesInTerraforming;
+    @ConfigProperty
     public double oxygenVentPowerMultiplier;
     @ConfigProperty
     public boolean skyOverride;
@@ -370,6 +372,7 @@ public class ARConfiguration {
         arConfig.terraformliquidRate = config.get(Configuration.CATEGORY_GENERAL, "TerraformerFluidConsumeRate", 40, "how many millibuckets/t are required to keep the terraformer running").getInt();
         arConfig.allowTerraformNonAR = config.get(Configuration.CATEGORY_GENERAL, "allowTerraformingNonARWorlds", false, "If true dimensions not added by AR can be terraformed, including the overworld").getBoolean();
         arConfig.enableGravityController = config.get(Configuration.CATEGORY_GENERAL, "enableGravityMachine", true, "If false the gravity controller cannot be built or used").getBoolean();
+        arConfig.allowNonArBiomesInTerraforming = config.get(Configuration.CATEGORY_GENERAL, "allowNonArBiomesInTerraforming", false, "non-ar biomes from mods with custom world gen can not be decorated in terraforming. If you want fully decorated terraforming with only default biomes, set this to false").getBoolean();
 
         //Oxygen
         arConfig.enableOxygen = config.get(OXYGEN, "EnableAtmosphericEffects", true, "If true, allows players being hurt due to lack of oxygen and allows effects from non-standard atmosphere types").getBoolean();

@@ -726,7 +726,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     }
 
     public boolean isDescentPhase() {
-        return ARConfiguration.getCurrentConfig().automaticRetroRockets && isInOrbit() && this.posY < 300 && (this.motionY < -0.4f || world.isRemote);
+        return ARConfiguration.getCurrentConfig().automaticRetroRockets && isInOrbit() && ((this.posY < 500 && (this.motionY < -0.5f || world.isRemote)) || (this.posY < 200 && (this.motionY < -0.2f || world.isRemote)));
     }
 
     public boolean isStartupPhase() {
@@ -1119,12 +1119,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 //if the player holds the forward key then decelerate
                 if (isInOrbit() && (burningFuel || descentPhase)) {
                     float vel = descentPhase ? 1f : getPassengerMovingForward();
-                    this.motionY -= this.motionY * vel / 50f;
+                    this.motionY -= this.motionY * vel / 40f;
                 }
                 this.velocityChanged = true;
 
             } else if (isInOrbit() && descentPhase) { //For unmanned rockets
-                this.motionY -= this.motionY / 50f;
+                this.motionY -= this.motionY / 40f;
                 this.velocityChanged = true;
             }
 
@@ -1132,7 +1132,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 //If out of fuel or descending then accelerate downwards
                 if (isInOrbit() || !burningFuel) {
                     //this.motionY = Math.min(this.motionY - 0.001, 1);
-                    this.motionY = this.motionY - 0.001;
+                    this.motionY = this.motionY - 0.0001;
                 } else
                     //this.motionY = Math.min(this.motionY + 0.001, 1);
                     this.motionY += stats.getAcceleration(DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getGravitationalMultiplier()) * deltaTime;
@@ -1217,6 +1217,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         if (this.posY < getTopBlock(getPosition()).getY() + 5 && this.posX > getTopBlock(getPosition()).getY() && ARConfiguration.getCurrentConfig().launchingDestroysBlocks && motionY < -0.1) {
             damageGroundBelowRocket(world, (int) this.posX, (int) this.posY - 1, (int) this.posZ, (int) Math.pow(stats.getThrust(), 0.4));
         }
+
+        //System.out.println("motiony:"+motionY);
     }
 
     public void onTurnRight(boolean state) {
@@ -1533,7 +1535,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 }
             } else {
                 int destinationId = storage.getDestinationDimId(world.provider.getDimension(), (int) posX, (int) posZ);
-                DimensionProperties properties = DimensionManager.getEffectiveDimId(world, this.getPosition());
+                DimensionProperties properties = DimensionManager.getEffectiveDimId_byID(destinationId, this.getPosition());
                 int world2;
                 if (destinationId == ARConfiguration.getCurrentConfig().spaceDimId || destinationId == Constants.INVALID_PLANET)
                     world2 = properties.getId();
@@ -1620,6 +1622,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         boolean allowLaunch = false;
 
         this.storage.recalculateStats(this.stats);
+
+        NBTTagCompound nbtdata = new NBTTagCompound();
+        writeToNBT(nbtdata);
+        PacketHandler.sendToNearby(new PacketEntity(this, (byte) 0, nbtdata), this.world.provider.getDimension(), this.getPosition(), 64);
+
 
         if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
             this.stats.setWeight((int) storage.recalculateWeight());
