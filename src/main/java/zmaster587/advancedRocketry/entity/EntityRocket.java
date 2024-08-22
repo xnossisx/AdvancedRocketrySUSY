@@ -2160,10 +2160,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 float xOffset = this.storage.getSizeX() % 2 == 0 ? 0.5f : 0f;
                 float zOffset = this.storage.getSizeZ() % 2 == 0 ? 0.5f : 0f;
                 float halfy = storage.getSizeY() / 2f;
+                float halfx = storage.getSizeX() / 2f;
+                float halfz = storage.getSizeZ() / 2f;
 
-                double xPos = seatPos.x + xOffset;
-                double yPos = seatPos.y - 0.5f - halfy;
-                double zPos = seatPos.z + zOffset;
+                double xPos = seatPos.x + xOffset - halfx+0.5;
+                double yPos = seatPos.y - 0.5f - halfy-0.5f;
+                double zPos = seatPos.z + zOffset - halfz+0.5;
                 float angle = (float) (getRCSRotateProgress() * 0.9f * Math.PI / 180f);
 
                 double yNew = (yPos) * MathHelper.cos(angle) + (-zPos - 0.5) * MathHelper.sin(angle);
