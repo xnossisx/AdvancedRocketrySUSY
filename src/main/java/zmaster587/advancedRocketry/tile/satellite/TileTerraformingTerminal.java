@@ -191,13 +191,13 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                                     }
 
                                     BiomeProvider chunkmgr = t.chunkMgrTerraformed;
-                                    BlockPos next_block_pos = t.get_next_position(false);
-                                    //BlockPos next_block_pos = t.get_next_position_biomechanging(false);
+                                    //BlockPos next_block_pos = t.get_next_position(false);
+                                    BlockPos next_block_pos = t.get_next_position_biomechanging(false);
 
                                     if (next_block_pos != null) { // it is null when there is everything terraformed
                                         battery.extractEnergy(powerrequired, false);
-                                        BiomeHandler.terraform(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, world.provider.getDimension());
-                                        //BiomeHandler.terraform_biomes(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos,  world.provider.getDimension());
+                                        //BiomeHandler.terraform(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, world.provider.getDimension());
+                                        BiomeHandler.terraform_biomes(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos,  world.provider.getDimension());
                                     }else{
                                         //System.out.println("nothing to terraform");
                                         break; // nothing to do, everything is terraformed

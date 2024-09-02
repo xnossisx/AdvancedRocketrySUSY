@@ -54,6 +54,9 @@ public class TerraformingHelper {
     int safe_zone_radius = 3; // radius for protected zone
     int border_zone = 3; // border zone size
 
+    public boolean has_blocks_in_tf_queue(){
+        return !terraformingqueue.isEmpty();
+    }
 
     public TerraformingHelper(int dimension, List<BiomeManager.BiomeEntry> biomes, HashSet<ChunkPos> generated_chunks, HashSet<ChunkPos> biomechanged_chunks){
         this.dimId = dimension;
