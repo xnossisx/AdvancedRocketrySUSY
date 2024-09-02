@@ -141,7 +141,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void update() {
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
-        int powerrequired = 40; //120;
+        int powerrequired = 6; //120;
         if (!world.isRemote) {
 
             if (world.getTotalWorldTime() % 20 == 0)
@@ -189,12 +189,15 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
                                         DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).load_terraforming_helper(false);
                                         t = DimensionProperties.proxylists.gethelper(world.provider.getDimension());
                                     }
+
                                     BiomeProvider chunkmgr = t.chunkMgrTerraformed;
                                     BlockPos next_block_pos = t.get_next_position(false);
+                                    //BlockPos next_block_pos = t.get_next_position_biomechanging(false);
 
                                     if (next_block_pos != null) { // it is null when there is everything terraformed
                                         battery.extractEnergy(powerrequired, false);
                                         BiomeHandler.terraform(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, world.provider.getDimension());
+                                        //BiomeHandler.terraform_biomes(world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos,  world.provider.getDimension());
                                     }else{
                                         //System.out.println("nothing to terraform");
                                         break; // nothing to do, everything is terraformed

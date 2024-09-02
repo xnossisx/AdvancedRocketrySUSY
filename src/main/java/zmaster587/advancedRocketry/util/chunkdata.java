@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.util;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import org.lwjgl.Sys;
 
@@ -21,11 +22,16 @@ public class chunkdata {
     // as long as the atmosphere does not change, chunks that are fully generated will not register their blocks in the terraforming queue
     public boolean chunk_fully_generated;
 
+    public boolean chunk_fully_biomechanged;
+
     // if the y values of new chunk and chunk in world match, terrain at this position is considered fully generated
     public boolean[][] fully_generated;
 
     // if all positions have been decorated
     public boolean[][] fully_decorated;
+
+    // if all positions have been biomechanged
+    public boolean[][] fully_biomechanged;
 
 
     public IBlockState[][][] blockStates;
@@ -44,6 +50,7 @@ public class chunkdata {
         terrain_fully_generated = false;
         fully_generated = new boolean[16][16];
         fully_decorated = new boolean[16][16];
+        fully_biomechanged = new boolean[16][16];
     }
 
     /*
@@ -64,8 +71,29 @@ public class chunkdata {
             System.out.println("chunk fully generated: "+this.x+":"+this.z);
             terrain_fully_generated = true;
             this.blockStates = null; // no longer needed, gc should collect them now
-            helper.check_next_border_chunk_fully_generated(x,z); // update border chunks next to this one to check if they can decorate
-            helper.check_can_decorate(x,z);
+            helper.check_next_border_chunk_fully_generated(this.x,this.z); // update border chunks next to this one to check if they can decorate
+            helper.check_can_decorate(this.x,this.z);
+
+        }
+    }
+
+
+    public void set_position_biomechanged(int x, int z){
+        fully_biomechanged[x][z] = true;
+        boolean all_generated = true;
+        for (int i = 0; i < 16; i++) {
+            for (int j = 0; j < 16; j++) {
+                if (fully_biomechanged[i][j] == false) {
+                    all_generated = false;
+                }
+            }
+        }
+        if (all_generated){
+            System.out.println("chunk fully biomechanged: "+this.x+":"+this.z);
+            chunk_fully_biomechanged = true;
+
+            /// add chunk to terraforming queue now
+            helper.set_chunk_biomechanged(new ChunkPos(this.x, this.z));
 
         }
     }

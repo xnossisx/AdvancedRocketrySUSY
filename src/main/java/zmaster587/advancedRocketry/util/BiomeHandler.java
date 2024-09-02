@@ -222,6 +222,28 @@ public class BiomeHandler {
         }
     }
 
+    public static void terraform_biomes(World world, Biome biomeId, BlockPos pos, int dimId) {
+        Biome old_biome = world.getBiome(pos);
+        changeBiome(world,biomeId, old_biome, pos);
+        decorate_simple(world, biomeId, old_biome, pos);
+
+        DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(dimId);
+        ChunkPos cpos = DimensionProperties.proxylists.gethelper(props.getId()).getChunkPosFromBlockPos(pos);
+        chunkdata data = DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z);
+
+        int inchunkx = ((pos.getX() % 16) + 16) % 16;
+        int inchunkz = ((pos.getZ() % 16) + 16) % 16;
+        if (data == null){
+            DimensionProperties.proxylists.gethelper(props.getId()).generate_new_chunkdata(new ChunkPos(cpos.x, cpos.z));
+            data = DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z);
+        }
+        data.set_position_biomechanged(inchunkx,inchunkz);
+
+        Chunk chunk = world.getChunkFromBlockCoords(pos);
+        PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
+
+    }
+
     public static void terraform(World world, Biome biomeId, BlockPos pos, boolean was_biome_remote, int dimId) {
         Chunk chunk = world.getChunkFromBlockCoords(pos);
         if (biomeId == null)return;
