@@ -64,36 +64,41 @@ class terraformingdrill extends AbstractDrill{
 
             TerraformingHelper t = get_my_helper();
             BiomeProvider chunkmgr = t.chunkMgrTerraformed;
-            BlockPos next_block_pos = t.get_next_position(false);
+            BlockPos next_block_pos = null;
+            for (int i = 0; i<1;i++) { // make it faster but might have laser render bugs
+                next_block_pos = t.get_next_position(false);
 
-            if(next_block_pos == null){
-                System.out.println("Queue empty - returning");
-                return null;
-            }
+                if (next_block_pos == null) {
+                    //System.out.println("Queue empty - returning");
+                    return null;
+                }
 
-            // blocks are usually added per chunk so it may be efficient to keep it loaded
-            // one chunk has to be loaded anyway to prevent dim unloading
+                // blocks are usually added per chunk so it may be efficient to keep it loaded
+                // one chunk has to be loaded anyway to prevent dim unloading
 
-            ChunkPos currentChunk = t.getChunkPosFromBlockPos(next_block_pos);
-            if (last_worked_chunk != null){
-                if (!currentChunk.equals(last_worked_chunk)){
-                    releaseticket();
-                    //just load chunk 0 0 to keep the dimension loaded
-                    System.out.println("request ticket at chunk "+currentChunk.x+":"+currentChunk.z);
-                    ticketLaser = ForgeChunkManager.requestTicket(AdvancedRocketry.instance, laser.world, ForgeChunkManager.Type.NORMAL);
-                    if (ticketLaser != null) {
-                        ForgeChunkManager.forceChunk(ticketLaser, new ChunkPos(0, 0));
+                //System.out.println("terraform heightmap at "+next_block_pos.getX()+":"+next_block_pos.getZ());
+
+
+
+                ChunkPos currentChunk = t.getChunkPosFromBlockPos(next_block_pos);
+                if (last_worked_chunk != null) {
+                    if (!currentChunk.equals(last_worked_chunk)) {
+                        releaseticket();
+                        //just load chunk 0 0 to keep the dimension loaded
+                        //System.out.println("request ticket at chunk " + currentChunk.x + ":" + currentChunk.z);
+                        ticketLaser = ForgeChunkManager.requestTicket(AdvancedRocketry.instance, laser.world, ForgeChunkManager.Type.NORMAL);
+                        if (ticketLaser != null) {
+                            ForgeChunkManager.forceChunk(ticketLaser, new ChunkPos(currentChunk.x, currentChunk.z));
+                        }
                     }
                 }
+                last_worked_chunk = currentChunk;
+
+
+                BiomeHandler.terraform(laser.world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, laser.world.provider.getDimension());
             }
-            last_worked_chunk = currentChunk;
 
-
-            System.out.println("terraform heightmap at "+next_block_pos.getX()+":"+next_block_pos.getZ());
-            laser.setPosition(next_block_pos.getX(),next_block_pos.getY(), next_block_pos.getZ());
-
-            BiomeHandler.terraform(laser.world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, laser.world.provider.getDimension());
-
+            laser.setPosition(next_block_pos.getX(), laser.world.getHeight(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos.getZ());
 
             //} catch (NullPointerException e) {
             //    e.printStackTrace();
@@ -107,11 +112,12 @@ class terraformingdrill extends AbstractDrill{
 
 
 
-
-            laser = new EntityLaserNode(world, x, 0, z);
-            laser.markValid();
-            laser.forceSpawn = true;
-            world.spawnEntity(laser);
+            if (laser == null) {
+                laser = new EntityLaserNode(world, x, 0, z);
+                laser.markValid();
+                laser.forceSpawn = true;
+                world.spawnEntity(laser);
+            }
             return true;
 
     }

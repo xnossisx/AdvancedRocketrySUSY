@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill;
 
 import io.netty.buffer.ByteBuf;
+import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityEmergencyBoxRenderer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -20,9 +21,11 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.ForgeChunkManager;
 import net.minecraftforge.common.ForgeChunkManager.Ticket;
 import net.minecraftforge.common.ForgeChunkManager.Type;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
+import org.lwjgl.opencl.CL;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
@@ -100,10 +103,13 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     private MultiInventory inv;
     private MODE mode;
 
+    boolean client_first_loop = true; // for render bug on client
     //private Ticket ticket; // this is useless anyway because it would not load the energy supply system and the laser would run out of energy
 
     public TileOrbitalLaserDrill() {
         super();
+
+        client_first_loop = true;
 
         radius = 0;
         xCenter = 0;
@@ -177,6 +183,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             out.writeInt(this.yCenter);
             out.writeInt(this.laserX);
             out.writeInt(this.laserZ);
+            out.writeBoolean(this.isRunning);
         }
         else if (id == 12)
             out.writeBoolean(isRunning);
@@ -201,6 +208,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             nbt.setInteger("newZ", in.readInt());
             nbt.setInteger("currentX", in.readInt());
             nbt.setInteger("currentZ", in.readInt());
+            nbt.setBoolean("isRunning", in.readBoolean());
         }
         else if (id == 12)
             nbt.setBoolean("isRunning", in.readBoolean());
@@ -224,6 +232,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             positionText.setText("position:\n"+this.laserX+" : "+this.laserZ);
         }else if (id == 11){
             resetSpiral();
+            this.isRunning = nbt.getBoolean("isRunning");
             mode = MODE.values()[nbt.getInteger("mode")];
             xCenter = nbt.getInteger("newX");
             yCenter = nbt.getInteger("newZ");
@@ -336,7 +345,10 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             return;
         }
         isRunning = value;
-        PacketHandler.sendToNearby(new PacketMachine(this, (byte) 12), this.world.provider.getDimension(), pos, 128);
+        // this needs to be sent to all to update players on ground of change
+        // or you make 2 packages, one for space dim and one for ground dim at laser coords but this is more easy this way...
+        PacketHandler.sendToAll(new PacketMachine(this, (byte) 12));
+        //PacketHandler.sendToNearby(new PacketMachine(this, (byte) 12), this.world.provider.getDimension(), pos, 128);
 
         markDirty();
     }
@@ -380,12 +392,18 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     @Override
     public void update() {
 
+
         //Freaky janky crap to make sure the multiblock loads on chunkload etc
+        if(world.isRemote && client_first_loop){
+            PacketHandler.sendToServer(new PacketMachine(this, (byte) 13));
+            client_first_loop=false;
+        }
         if (timeAlive == 0 && !world.isRemote) {
             if (isComplete())
                 canRender = completeStructure = completeStructure(world.getBlockState(pos));
             timeAlive = 0x1;
             checkCanRun();
+
         }
 
         if (!this.world.isRemote) {
@@ -462,6 +480,9 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     }
 
     public boolean isReadyForOperation() {
+
+        if (mode == MODE.T_FORM) return true; // every tick on terraforming
+
         if (batteries.getUniversalEnergyStored() == 0)
             return false;
 
@@ -499,7 +520,8 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-        nbt.setBoolean("isRunning", isRunning);
+
+
         nbt.setInteger("laserX", laserX);
         nbt.setInteger("laserZ", laserZ);
         nbt.setByte("mode", (byte) mode.ordinal());
@@ -521,8 +543,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         super.readFromNBT(nbt);
 
 
-        isRunning = nbt.getBoolean("isRunning");
-
         laserX = nbt.getInteger("laserX");
         laserZ = nbt.getInteger("laserZ");
         mode = MODE.values()[nbt.getByte("mode")];
@@ -542,7 +562,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         }else {
             this.drill = this.miningDrill;
         }
-
     }
 
     /**

@@ -249,11 +249,13 @@ public class BiomeHandler {
         if (biomeId == null)return;
 
         Biome old_biome = world.getBiome(pos);
-        changeBiome(world,biomeId, old_biome, pos);
+
 
         //for biome remote use, only change top block and do simple decoration
         if(was_biome_remote) {
+            changeBiome(world,biomeId, old_biome, pos); // this should not be needed in heavy terraforming because it should have already been done before
             decorate_simple(world, biomeId, old_biome, pos);
+            PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
         }
 
         if (!was_biome_remote) { // heavy terraforming here...
@@ -261,7 +263,7 @@ public class BiomeHandler {
         }
 
 
-        PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
+
 
     }
 
