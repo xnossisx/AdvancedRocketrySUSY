@@ -122,12 +122,13 @@ public class chunkdata {
                     System.out.println("populate chunk "+this.x+":"+this.z);
 
                     //make a biome lasers here
-                    for (int i = 0; i < 32; i++) {
-                        int bx = world.rand.nextInt(16);
-                        int bz = world.rand.nextInt(16);
-                        BlockPos pos = new BlockPos(this.x*16+bx,0,this.z*16+bz);
-                        PacketHandler.sendToNearby(new PacketBiomeIDChange(world.getChunkFromChunkCoords(this.x,this.z), world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
-                    }
+                    // no - looks bad
+                    //for (int i = 0; i < 32; i++) {
+                    //    int bx = world.rand.nextInt(16);
+                    //    int bz = world.rand.nextInt(16);
+                    //    BlockPos pos = new BlockPos(this.x*16+bx,0,this.z*16+bz);
+                    //    PacketHandler.sendToNearby(new PacketBiomeIDChange(world.getChunkFromChunkCoords(this.x,this.z), world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
+                    //}
 
                 }
             helper.setChunkFullyGenerated(this.x,this.z);

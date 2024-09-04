@@ -1080,23 +1080,24 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             }
         }
 
-        if (proxylists.gethelper(getId()) != null) {
-            TerraformingHelper t = proxylists.gethelper(getId());
-            if (t.has_blocks_in_dec_queue()) {
-                //if (new Random().nextInt(100) < 50) {
-                    for(int i =  0;i<5;i++) {
+        World world = (net.minecraftforge.common.DimensionManager.getWorld(getId()));
+        //world has to be loaded
+        if (world != null) {
+            if (proxylists.gethelper(getId()) != null) {
+                TerraformingHelper t = proxylists.gethelper(getId());
+                if (t.has_blocks_in_dec_queue()) {
+                    //if (new Random().nextInt(100) < 50) {
+                    for (int i = 0; i < 5; i++) {
                         BlockPos target = t.get_next_position_decoration(true);
                         if (target != null) {
-                            World world = (net.minecraftforge.common.DimensionManager.getWorld(getId()));
                             BiomeHandler.do_decoration(world, target, getId());
-                        }
-                        else break;
+                        } else break;
                     }
-                //}
+                    //}
+                }
             }
         }
     }
-
     public void add_water_locked_pos(HashedBlockPosition pos) {
         for (watersourcelocked i : water_source_locked_positions) {
             if (i.pos.equals(pos)) {

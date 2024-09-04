@@ -116,8 +116,10 @@ public class TerraformingHelper {
     public void register_height_change_actual(BlockPos pos){
         ChunkPos cpos = getChunkPosFromBlockPos(pos);
         chunkdata data= getChunkFromList(cpos.x,cpos.z);
-        if (data !=null  && data.type == TerraformingType.BORDER)
+        if (data !=null  && data.type == TerraformingType.BORDER) {
             add_position_to_queue(pos);
+            //System.out.println("add position to queue again");
+        }
     }
     public void register_height_change(BlockPos pos){
         register_height_change_actual(pos.add(1,0,0));
@@ -255,7 +257,16 @@ public class TerraformingHelper {
             System.out.print("ERROR POSITION IS NULL");
             return;
         }
-        terraformingqueue.add(new Vec3i(p.getX(),p.getY(),p.getZ()));
+
+        //if on protected chunk, instantly add to decoration queue as it will not work protected chunks
+        ChunkPos cp = getChunkPosFromBlockPos(p);
+        if(get_chunk_type(cp.x,cp.z) == TerraformingType.PROTECTED){
+            int inchunkx = ((p.getX() % 16) + 16) % 16;
+            int inchunkz = ((p.getZ() % 16) + 16) % 16;
+            getChunkFromList(cp.x, cp.z).set_position_fully_generated(inchunkx, inchunkz);
+        }else {
+            terraformingqueue.add(new Vec3i(p.getX(), p.getY(), p.getZ()));
+        }
     }
 
     public synchronized void add_position_to_biomechanging_queue(BlockPos p){

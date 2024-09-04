@@ -96,6 +96,8 @@ public class BiomeHandler {
         //System.out.println("d1"+(System.currentTimeMillis()-startTime));
         //startTime = System.currentTimeMillis();
 
+        //this should never be executed because it was removed from queue
+        //protected chunks will not be added to this queue again
         if (data.type == TerraformingType.PROTECTED) {
             //System.out.println("working protected");
             decorate_simple(world, biomeId, old_biome, pos);
@@ -153,6 +155,7 @@ public class BiomeHandler {
                 }
 
 
+
                 // as long as terrain does not match the target height, re-add position to queue
                 //System.out.println("heights:"+get_height_blocks_only(world, pos) +":"+ get_height_blocks_only(target_blocks));
 
@@ -165,6 +168,11 @@ public class BiomeHandler {
                 } else {
                     DimensionProperties.proxylists.gethelper(props.getId()).add_position_to_queue(pos);
                     DimensionProperties.proxylists.gethelper(props.getId()).register_height_change(pos);
+
+                    //because height was changed, decorate the top block again
+                    //this will update the top block and make some grass/flowers
+                    world.setBlockState(world.getHeight(pos).down(),biomeId.topBlock);
+                    //decorateBiome(world, pos, biomeId); //if we want to do grass and flowers - but this would not fit right after laser hits
                 }
 
             }
@@ -269,8 +277,9 @@ public class BiomeHandler {
                     biomeId.getRandomTreeFeature(world.rand).generate(world, world.rand, world.getHeight(pos.add(8, 0, 8)));
 
                     //make a biome laser here
-                    Chunk chunk = world.getChunkFromBlockCoords(pos);
-                    PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos.add(8, 0, 8))), world.provider.getDimension(), pos, 1024);
+                    // nah... looks ugly
+                    //Chunk chunk = world.getChunkFromBlockCoords(pos);
+                    //PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos.add(8, 0, 8))), world.provider.getDimension(), pos, 1024);
                 }
 
                 DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);

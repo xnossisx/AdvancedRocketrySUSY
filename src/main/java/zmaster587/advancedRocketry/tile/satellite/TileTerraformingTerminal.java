@@ -141,7 +141,7 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
     public void update() {
         super.update();
         boolean has_redstone = world.isBlockIndirectlyGettingPowered(getPos()) != 0;
-        int powerrequired = 6; //120;
+        int powerrequired = 80; //120;
         if (!world.isRemote) {
 
             if (world.getTotalWorldTime() % 20 == 0)

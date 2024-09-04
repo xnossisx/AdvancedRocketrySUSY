@@ -40,17 +40,22 @@ class terraformingdrill extends AbstractDrill{
     terraformingdrill(){
 
     }
+    public TerraformingHelper get_my_helper() {
+     return get_my_helper(null);
+    }
+    public TerraformingHelper get_my_helper(World w){
+        if (w == null)
+            w = laser.world;
 
-    private TerraformingHelper get_my_helper(){
-        if (!DimensionProperties.proxylists.isinitialized(laser.world.provider.getDimension())){
-            DimensionProperties.proxylists.initdim(laser.world.provider.getDimension());
+        if (!DimensionProperties.proxylists.isinitialized(w.provider.getDimension())){
+            DimensionProperties.proxylists.initdim(w.provider.getDimension());
         }
 
-        TerraformingHelper t = DimensionProperties.proxylists.gethelper(laser.world.provider.getDimension());
+        TerraformingHelper t = DimensionProperties.proxylists.gethelper(w.provider.getDimension());
 
         if (t == null) {
-            DimensionManager.getInstance().getDimensionProperties(laser.world.provider.getDimension()).load_terraforming_helper(false);
-            t = DimensionProperties.proxylists.gethelper(laser.world.provider.getDimension());
+            DimensionManager.getInstance().getDimensionProperties(w.provider.getDimension()).load_terraforming_helper(false);
+            t = DimensionProperties.proxylists.gethelper(w.provider.getDimension());
         }
         return t;
     }
@@ -67,7 +72,8 @@ class terraformingdrill extends AbstractDrill{
             TerraformingHelper t = get_my_helper();
             BiomeProvider chunkmgr = t.chunkMgrTerraformed;
             BlockPos next_block_pos = null;
-            for (int i = 0; i<4;i++) { // make it faster but might have laser render bugs
+            Vec3d laserpos = null;
+            for (int i = 0; i<6;i++) {
                 next_block_pos = t.get_next_position(false);
 
                 if (next_block_pos == null) {
@@ -100,10 +106,11 @@ class terraformingdrill extends AbstractDrill{
                 BiomeHandler.terraform(laser.world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, laser.world.provider.getDimension());
 
                 //because it syncs entity position not every tick, just place it in the middle of the chunk it is currently working in
-                Vec3d laserpos = new Vec3d(currentChunk.x*16+8, laser.world.getHeight(currentChunk.x*16+8, currentChunk.z*16+8), currentChunk.z*16+8);
-                laser.setPosition(laserpos.x,laserpos.y,laserpos.z);
+                 laserpos = new Vec3d(currentChunk.x*16+8, laser.world.getHeight(currentChunk.x*16+8, currentChunk.z*16+8), currentChunk.z*16+8);
+
             }
 
+            laser.setPositionAndUpdate(laserpos.x,laserpos.y,laserpos.z);
 
 
             //} catch (NullPointerException e) {
