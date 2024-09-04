@@ -1,11 +1,13 @@
 package zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill;
 
+import com.sun.javafx.geom.Vec3f;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.Chunk;
@@ -65,7 +67,7 @@ class terraformingdrill extends AbstractDrill{
             TerraformingHelper t = get_my_helper();
             BiomeProvider chunkmgr = t.chunkMgrTerraformed;
             BlockPos next_block_pos = null;
-            for (int i = 0; i<1;i++) { // make it faster but might have laser render bugs
+            for (int i = 0; i<4;i++) { // make it faster but might have laser render bugs
                 next_block_pos = t.get_next_position(false);
 
                 if (next_block_pos == null) {
@@ -96,9 +98,13 @@ class terraformingdrill extends AbstractDrill{
 
 
                 BiomeHandler.terraform(laser.world, ((ChunkManagerPlanet) chunkmgr).getBiomeGenAt(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos, false, laser.world.provider.getDimension());
+
+                //because it syncs entity position not every tick, just place it in the middle of the chunk it is currently working in
+                Vec3d laserpos = new Vec3d(currentChunk.x*16+8, laser.world.getHeight(currentChunk.x*16+8, currentChunk.z*16+8), currentChunk.z*16+8);
+                laser.setPosition(laserpos.x,laserpos.y,laserpos.z);
             }
 
-            laser.setPosition(next_block_pos.getX(), laser.world.getHeight(next_block_pos.getX(), next_block_pos.getZ()), next_block_pos.getZ());
+
 
             //} catch (NullPointerException e) {
             //    e.printStackTrace();

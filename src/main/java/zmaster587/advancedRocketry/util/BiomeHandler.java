@@ -79,7 +79,7 @@ public class BiomeHandler {
         return yy.getY();
     }
 
-    public static void do_heavy_terraforming(World world, Biome biomeId, Biome old_biome, BlockPos pos, int dimId){
+    public static void do_heavy_terraforming(World world, Biome biomeId, Biome old_biome, BlockPos pos, int dimId) {
 
         int inchunkx = ((pos.getX() % 16) + 16) % 16;
         int inchunkz = ((pos.getZ() % 16) + 16) % 16;
@@ -96,19 +96,60 @@ public class BiomeHandler {
         //System.out.println("d1"+(System.currentTimeMillis()-startTime));
         //startTime = System.currentTimeMillis();
 
-        if (data.type == TerraformingType.PROTECTED){
+        if (data.type == TerraformingType.PROTECTED) {
             //System.out.println("working protected");
-            decorate_simple(world, biomeId,old_biome, pos);
-            DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_fully_generated(inchunkx,inchunkz);
+            decorate_simple(world, biomeId, old_biome, pos);
+            DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_fully_generated(inchunkx, inchunkz);
             DimensionProperties.proxylists.gethelper(props.getId()).register_height_change(pos); // it does not really changetheheight but it will notify the border to update
-        }
-        else if (data.type == TerraformingType.ALLOWED) {
+        } else if (data.type == TerraformingType.ALLOWED) {
             //System.out.println("working full");
 
             if (!data.fully_generated[inchunkx][inchunkz]) {
                 //fast replacing
+                //for (int i = 0; i < 255; i++) {
+                //    world.setBlockState(new BlockPos(pos.getX(), i, pos.getZ()), target_blocks[i], 2);
+                //}
+
+
+                int target_height = 255;
+                for (int i = 255; i >= 0; i--) {
+                    if(!target_blocks[i].equals(Blocks.AIR.getDefaultState())){
+                        target_height = i;
+                        break;
+                    }
+                }
+                int current_world_height = world.getHeight(pos.getX(), pos.getZ());
+
+                //slow replacing
+                int y_per_iteration = 3;
+                int blocks_replaced = 0;
+                //go up from 0
                 for (int i = 0; i < 255; i++) {
-                    world.setBlockState(new BlockPos(pos.getX(), i, pos.getZ()), target_blocks[i], 2);
+                    if (i>target_height)break;
+
+                    if (blocks_replaced >= y_per_iteration)
+                        break;
+
+                    if (!world.getBlockState(new BlockPos(pos.getX(), i, pos.getZ())).equals(target_blocks[i])) {
+                        world.setBlockState(new BlockPos(pos.getX(), i, pos.getZ()), target_blocks[i], 2);
+
+                        //if both are underground player would not notice so only limit the actual height changes
+                        if (i>=current_world_height) {
+                            blocks_replaced += 1;
+                        }
+                    }
+                }
+                //now go down from 255
+                for (int i = 255; i >=0; i--) {
+                    if (i<=target_height)break;
+
+                    if (blocks_replaced >= y_per_iteration)
+                        break;
+
+                    if (!world.getBlockState(new BlockPos(pos.getX(), i, pos.getZ())).equals(target_blocks[i])) {
+                        world.setBlockState(new BlockPos(pos.getX(), i, pos.getZ()), target_blocks[i], 2);
+                        blocks_replaced += 1;
+                    }
                 }
 
 
@@ -127,9 +168,7 @@ public class BiomeHandler {
                 }
 
             }
-        }
-
-        else if (data.type == TerraformingType.BORDER){
+        } else if (data.type == TerraformingType.BORDER) {
 
             //this is to be sure the top block is changed even if the height matches already
             BlockPos yy = world.getHeight(pos);
@@ -158,7 +197,7 @@ public class BiomeHandler {
                 float num_samples = 0;
                 for (int x = -filter_size; x <= filter_size; x++) {
                     for (int z = -filter_size; z <= filter_size; z++) {
-                        float w = (1.0f / (0.2f + x*x + z*z));
+                        float w = (1.0f / (0.2f + x * x + z * z));
                         heightsum += get_height_blocks_only(world, pos.add(x, 0, z)) * w;
                         num_samples += 1 * w;
                     }
@@ -172,7 +211,7 @@ public class BiomeHandler {
                 }
 
                 //now we want to set the target height to >= sea level to fill it with the oceanblock
-                avg_height = Math.max(props.getSeaLevel(),avg_height);
+                avg_height = Math.max(props.getSeaLevel(), avg_height);
 
                 //fast replacing
                 for (int i = 0; i < 256; i++) {
@@ -194,11 +233,23 @@ public class BiomeHandler {
                 } else {
                     DimensionProperties.proxylists.gethelper(props.getId()).check_next_border_chunk_fully_generated(cpos.x, cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
                 }
-            }
-            else DimensionProperties.proxylists.gethelper(props.getId()).check_next_border_chunk_fully_generated(cpos.x, cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
-
-
+            } else
+                DimensionProperties.proxylists.gethelper(props.getId()).check_next_border_chunk_fully_generated(cpos.x, cpos.z); // maybe this was the last border block in queue? if yes, its terrain is done!
         }
+    }
+
+
+    public static void do_decoration(World world, BlockPos pos, int dimId){
+
+        Biome biomeId = world.getBiome(pos);
+        int inchunkx = ((pos.getX() % 16) + 16) % 16;
+        int inchunkz = ((pos.getZ() % 16) + 16) % 16;
+
+        DimensionProperties props = DimensionManager.getInstance().getDimensionProperties(dimId);
+
+        ChunkPos cpos = DimensionProperties.proxylists.gethelper(props.getId()).getChunkPosFromBlockPos(pos);
+
+
 
         int can_populate = DimensionProperties.proxylists.gethelper(props.getId()).can_populate(cpos.x, cpos.z);
         if (can_populate == -1){
@@ -214,13 +265,20 @@ public class BiomeHandler {
             if (!DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x,cpos.z).fully_decorated[inchunkx][inchunkz]) {
                 //System.out.println("decorate block");
                 int treegen = biomeId.decorator.treesPerChunk;
-                if (world.rand.nextInt(16 * 16) < treegen)
+                if (world.rand.nextInt(16 * 16) < treegen) {
                     biomeId.getRandomTreeFeature(world.rand).generate(world, world.rand, world.getHeight(pos.add(8, 0, 8)));
+
+                    //make a biome laser here
+                    Chunk chunk = world.getChunkFromBlockCoords(pos);
+                    PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos.add(8, 0, 8))), world.provider.getDimension(), pos, 1024);
+                }
 
                 DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);
             }
         }
     }
+
+
 
     public static void terraform_biomes(World world, Biome biomeId, BlockPos pos, int dimId) {
         Biome old_biome = world.getBiome(pos);

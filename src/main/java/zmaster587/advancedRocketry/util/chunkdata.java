@@ -1,9 +1,14 @@
 package zmaster587.advancedRocketry.util;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
+import net.minecraft.world.chunk.Chunk;
 import org.lwjgl.Sys;
+import zmaster587.advancedRocketry.network.PacketBiomeIDChange;
+import zmaster587.libVulpes.network.PacketHandler;
+import zmaster587.libVulpes.util.HashedBlockPosition;
 
 public class chunkdata {
     public int x;
@@ -115,6 +120,15 @@ public class chunkdata {
                 if (helper.can_populate(this.x, this.z) == 1){
                     world.provider.createChunkGenerator().populate(this.x, this.z);
                     System.out.println("populate chunk "+this.x+":"+this.z);
+
+                    //make a biome lasers here
+                    for (int i = 0; i < 32; i++) {
+                        int bx = world.rand.nextInt(16);
+                        int bz = world.rand.nextInt(16);
+                        BlockPos pos = new BlockPos(this.x*16+bx,0,this.z*16+bz);
+                        PacketHandler.sendToNearby(new PacketBiomeIDChange(world.getChunkFromChunkCoords(this.x,this.z), world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
+                    }
+
                 }
             helper.setChunkFullyGenerated(this.x,this.z);
         }

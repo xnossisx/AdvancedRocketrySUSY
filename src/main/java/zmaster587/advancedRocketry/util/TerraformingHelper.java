@@ -49,6 +49,7 @@ public class TerraformingHelper {
     //   add every chunk that was PROTECTED and no longer is PROTECTED to the queue for terraforming.
     //   doesn't matter if it is type ALLOWED or type BORDER
     private List<Vec3i> terraformingqueue;
+    private List<Vec3i> decorationqueue;
     private List<Vec3i> biomechangingqueue;
 
     int safe_zone_radius = 3; // radius for protected zone
@@ -56,6 +57,9 @@ public class TerraformingHelper {
 
     public boolean has_blocks_in_tf_queue(){
         return !terraformingqueue.isEmpty();
+    }
+    public boolean has_blocks_in_dec_queue(){
+        return !decorationqueue.isEmpty();
     }
 
     public TerraformingHelper(int dimension, List<BiomeManager.BiomeEntry> biomes, HashSet<ChunkPos> generated_chunks, HashSet<ChunkPos> biomechanged_chunks){
@@ -66,6 +70,7 @@ public class TerraformingHelper {
         this.chunkMgrTerraformed = new ChunkManagerPlanet(world, world.getWorldInfo().getGeneratorOptions(), biomeList);
         this.terraformingqueue = new ArrayList<>();
         this.biomechangingqueue = new ArrayList<>();
+        this.decorationqueue = new ArrayList<>();
         chunkDataMap = new HashMap<>();
         generator = new ChunkProviderPlanet(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), world.getWorldInfo().getGeneratorOptions());
 
@@ -180,7 +185,7 @@ public class TerraformingHelper {
                         System.out.println("chunk can populate now: "+(px+x)+":"+(pz+z));
                         for (int bx = 0; bx < 16; bx++) {
                             for (int bz = 0; bz < 16; bz++) {
-                                add_position_to_queue_at_front(new BlockPos((px+x)*16+bx, 0, (pz+z)*16+bz));
+                                add_position_to_decoration_queue(new BlockPos((px+x)*16+bx, 0, (pz+z)*16+bz));
                             }
                         }
                     }
@@ -262,16 +267,17 @@ public class TerraformingHelper {
         biomechangingqueue.add(new Vec3i(p.getX(),p.getY(),p.getZ()));
     }
 
-    public synchronized void add_position_to_queue_at_front(BlockPos p){
+    public synchronized void add_position_to_decoration_queue(BlockPos p){
         //System.out.println("add position: "+p.getX()+":"+p.getZ());
         if (p == null){
             System.out.print("ERROR POSITION IS NULL");
             return;
         }
-        int insertionIndex;
-        insertionIndex = new Random().nextInt(Math.min(terraformingqueue.size(), 1000));
-
-        terraformingqueue.add(insertionIndex, new Vec3i(p.getX(),p.getY(),p.getZ()));
+        int insertionIndex = 0;
+        if (decorationqueue.size() > 0) {
+            insertionIndex = new Random().nextInt(Math.min(decorationqueue.size(), 1000));
+        }
+        decorationqueue.add(insertionIndex, new Vec3i(p.getX(),p.getY(),p.getZ()));
     }
 
 
@@ -293,6 +299,17 @@ public class TerraformingHelper {
             index = nextInt(0,biomechangingqueue.size());
 
         Vec3i pos = biomechangingqueue.remove(index);
+        return new BlockPos(pos);
+    }
+
+    public synchronized BlockPos get_next_position_decoration(boolean random){
+        if (decorationqueue.isEmpty())
+            return null;
+        int index = 0;
+        if (random)
+            index = nextInt(0,decorationqueue.size());
+
+        Vec3i pos = decorationqueue.remove(index);
         return new BlockPos(pos);
     }
 
