@@ -244,13 +244,14 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             getAverageTemp();
             getViableBiomes(false);
             if (reset) {
-               proxylists.getChunksFullyTerraformed(getId()).clear();
+                proxylists.getChunksFullyTerraformed(getId()).clear();
+                proxylists.getChunksFullyBiomeChanged(getId()).clear();
                 terraformingChunksAlreadyAdded.clear();
             }
 
             System.out.println("load helper with protecting blocks: " + proxylists.getProtectingBlocksForDimension(getId()).size() + " (" + reset + ")");
 
-            proxylists.sethelper(getId(), new TerraformingHelper(getId(), getBiomesEntries(getViableBiomes(false)), proxylists.getChunksFullyTerraformed(getId())));
+            proxylists.sethelper(getId(), new TerraformingHelper(getId(), getBiomesEntries(getViableBiomes(false)), proxylists.getChunksFullyTerraformed(getId()), proxylists.getChunksFullyBiomeChanged(getId())));
 
             System.out.println("num biomes: "+ getViableBiomes(false).size());
 
@@ -294,16 +295,33 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
     }
 
     public void add_block_to_terraforming_queue(BlockPos p) {
-        //boolean is_there = false;
-        //for (BlockPos i : terraformingHelper.terraformingqueue) {
-        //    if (i.equals(p)) {
-        //        is_there = true;
-        //    }
-        //}
-        //if (!is_there)
         proxylists.gethelper(getId()).add_position_to_queue(p);
     }
+    public void add_chunk_to_terraforming_list_but_this_time_real_terraforming_and_not_biomechanging(ChunkPos pos){
+        for (int x = 0; x < 16; x++) {
+            for (int z = 0; z < 16; z++) {
+                    add_block_to_terraforming_queue(new BlockPos(pos.x * 16 + x, 0, pos.z * 16 + z));
+            }
+        }
+    }
 
+    public void add_block_to_biomechanging_queue(BlockPos p) {
+        proxylists.gethelper(getId()).add_position_to_biomechanging_queue(p);
+    }
+
+    synchronized boolean chunk_was_added_to_terraforming_list_if_not_add_it(ChunkPos pos){
+        for (ChunkPos i : terraformingChunksAlreadyAdded) {
+            if (pos.x == i.x && pos.z == i.z) {
+                return true;
+            }
+        }
+        terraformingChunksAlreadyAdded.add(new ChunkPos(pos.x,pos.z));
+        return false;
+    }
+
+    //adds a chunk to the terraforming list
+    //adds it to be biomechanged by default
+    //if it already was biomechanged fully, add it directly to terraforming queue
     public void add_chunk_to_terraforming_list(Chunk chunk) {
 
         if (proxylists.gethelper(getId()) != null) {
@@ -315,26 +333,26 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             //System.out.println("add chunk to terraforming list: "+chunk.x+":"+chunk.z);
 
             chunkdata current_chunk = proxylists.gethelper(getId()).getChunkFromList(chunk.x, chunk.z);
-            if (current_chunk == null || !current_chunk.chunk_fully_generated) {
+            if (current_chunk == null || !current_chunk.chunk_fully_biomechanged) {
 
-                boolean chunk_was_already_added = false; // do not add a chunk twice, the helper will manage it once it is added
-                for (ChunkPos i : terraformingChunksAlreadyAdded) {
-                    if (chunk.x == i.x && chunk.z == i.z) {
-                        chunk_was_already_added = true;
-                        break;
-                    }
-                }
-                if (chunk_was_already_added)
+                if(chunk_was_added_to_terraforming_list_if_not_add_it(new ChunkPos(chunk.x,chunk.z)))
                     return;
+
+
 
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         if (current_chunk == null || !current_chunk.fully_generated[x][z])
                             // if a position in the chunk is already fully generated, skip
-                            add_block_to_terraforming_queue(new BlockPos(chunk.x * 16 + x, 0, chunk.z * 16 + z));
+                            add_block_to_biomechanging_queue(new BlockPos(chunk.x * 16 + x, 0, chunk.z * 16 + z));
 
                     }
                 }
+            }else  if (!current_chunk.chunk_fully_generated) {
+                if(chunk_was_added_to_terraforming_list_if_not_add_it(new ChunkPos(chunk.x,chunk.z)))
+                    return;
+
+                add_chunk_to_terraforming_list_but_this_time_real_terraforming_and_not_biomechanging(new ChunkPos(chunk.x,chunk.z));
             }
         }
     }
@@ -1062,8 +1080,24 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             }
         }
 
+        World world = (net.minecraftforge.common.DimensionManager.getWorld(getId()));
+        //world has to be loaded
+        if (world != null) {
+            if (proxylists.gethelper(getId()) != null) {
+                TerraformingHelper t = proxylists.gethelper(getId());
+                if (t.has_blocks_in_dec_queue()) {
+                    //if (new Random().nextInt(100) < 50) {
+                    for (int i = 0; i < 5; i++) {
+                        BlockPos target = t.get_next_position_decoration(true);
+                        if (target != null) {
+                            BiomeHandler.do_decoration(world, target, getId());
+                        } else break;
+                    }
+                    //}
+                }
+            }
+        }
     }
-
     public void add_water_locked_pos(HashedBlockPosition pos) {
         for (watersourcelocked i : water_source_locked_positions) {
             if (i.pos.equals(pos)) {
@@ -1696,6 +1730,30 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             }
         }
 
+        if (nbt.hasKey("fullyBiomeChangedChunks")) {
+
+            NBTTagList list = nbt.getTagList("fullyBiomeChangedChunks", NBT.TAG_COMPOUND);
+            if (!list.hasNoTags())
+                proxylists.setChunksFullyBiomeChanged(dimid, new HashSet<ChunkPos>());
+            for (NBTBase entry : list) {
+                assert entry instanceof NBTTagCompound;
+                int x = ((NBTTagCompound) entry).getInteger("x");
+                int z = ((NBTTagCompound) entry).getInteger("z");
+                System.out.println("Chunk fully biome changed: " + x + ":" + z);
+
+                boolean chunk_was_already_done = false;
+                for (ChunkPos i : proxylists.getChunksFullyBiomeChanged(dimid)) {
+                    if (x == i.x && z == i.z) {
+                        chunk_was_already_done = true;
+                        break;
+                    }
+                }
+                if (!chunk_was_already_done)
+                    proxylists.getChunksFullyBiomeChanged(dimid).add(new ChunkPos(x, z));
+                else System.out.println("Chunk is already in list: " + x + ":" + z);
+            }
+        }
+
         if (nbt.hasKey("terraformingProtectedBlocks")) {
 
             NBTTagList list = nbt.getTagList("terraformingProtectedBlocks", NBT.TAG_COMPOUND);
@@ -1718,16 +1776,25 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
         if (!proxylists.isinitialized(dimid)){
             return;
         }
-            NBTTagList list = new NBTTagList();
-            for (ChunkPos pos : proxylists.getChunksFullyTerraformed(dimid)) {
-                NBTTagCompound entry = new NBTTagCompound();
-                entry.setInteger("x", pos.x);
-                entry.setInteger("z", pos.z);
-                list.appendTag(entry);
-            }
-            nbt.setTag("fullyGeneratedChunks", list);
+        NBTTagList list = new NBTTagList();
+        for (ChunkPos pos : proxylists.getChunksFullyTerraformed(dimid)) {
+            NBTTagCompound entry = new NBTTagCompound();
+            entry.setInteger("x", pos.x);
+            entry.setInteger("z", pos.z);
+            list.appendTag(entry);
+        }
+        nbt.setTag("fullyGeneratedChunks", list);
 
-            list = new NBTTagList();
+        list = new NBTTagList();
+        for (ChunkPos pos : proxylists.getChunksFullyBiomeChanged(dimid)) {
+            NBTTagCompound entry = new NBTTagCompound();
+            entry.setInteger("x", pos.x);
+            entry.setInteger("z", pos.z);
+            list.appendTag(entry);
+        }
+        nbt.setTag("fullyBiomeChangedChunks", list);
+
+        list = new NBTTagList();
             for (BlockPos pos : proxylists.getProtectingBlocksForDimension(dimid)) {
                 NBTTagCompound entry = new NBTTagCompound();
                 entry.setInteger("x", pos.getX());
