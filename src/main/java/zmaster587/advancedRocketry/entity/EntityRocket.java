@@ -735,10 +735,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                         (this.posY < ch + 300 && (this.motionY < -0.5f || world.isRemote)) ||
                                 (this.posY < ch + 150 && (this.motionY < -0.4f || world.isRemote)) ||
                                 (this.posY < ch + 100 && (this.motionY < -0.3f || world.isRemote)) ||
-                                (this.posY < ch + 50 && (this.motionY < -0.2f || world.isRemote)) ||
-                                (this.posY < ch + 20 && (this.motionY < -0.15f || world.isRemote)) ||
-                                (this.posY < ch + 10 && (this.motionY < -0.8f || world.isRemote))||
-                                (this.posY < ch + 5 && (this.motionY < -0.01f || world.isRemote))
+                                (this.posY < ch + 70 && (this.motionY < -0.2f || world.isRemote)) ||
+                                (this.posY < ch + 50 && (this.motionY < -0.15f || world.isRemote)) ||
+                                (this.posY < ch + 25 && (this.motionY < -0.8f || world.isRemote))||
+                                (this.posY < ch + 10 && (this.motionY < -0.01f || world.isRemote))
                 );
     }
 
@@ -765,7 +765,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     private void runEngines() {
         //Spawn in the particle effects for the engines
-        int engineNum = 0;
+        int max_engine_for_smoke = 64;
+        int engineNum = stats.getEngineLocations().size();
         if (world.isRemote && Minecraft.getMinecraft().gameSettings.particleSetting < 2 && areEnginesRunning()) {
             for (Vector3F<Float> vec : stats.getEngineLocations()) {
 
@@ -777,17 +778,20 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
 
 
-
-                if (Minecraft.getMinecraft().gameSettings.particleSetting < 1  && (handler == null || (atmosphere != null && atmosphere.allowsCombustion()))) {
-                    double yo = 1.5;
+                boolean can_smoke = true;
+                if (engineNum > max_engine_for_smoke){
+                    can_smoke = rand.nextInt(engineNum) <= max_engine_for_smoke;
+                }
+                if (can_smoke && Minecraft.getMinecraft().gameSettings.particleSetting < 1  && (handler == null || (atmosphere != null && atmosphere.allowsCombustion()))) {
+                    double yo = 1 + this.rand.nextFloat();
                     float xzv = 6f;
                     if (motionY > 0)
                         xzv = 32;
-                    AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, this.posX + vec.x, this.posY + vec.y - yo, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / xzv, -1.5-this.rand.nextFloat()/6.0, (this.rand.nextFloat() - 0.5f) / xzv);
+                    AdvancedRocketry.proxy.spawnDynamicRocketSmoke(world, this.posX + vec.x, this.posY + vec.y - yo, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / xzv, -1.5 - this.rand.nextFloat() / 6.0, (this.rand.nextFloat() - 0.5f) / xzv, engineNum);
                 }
 
                 for (int i = 0; i < 5; i++) {
-                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x, this.posY + vec.y - 1.25, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -1, (this.rand.nextFloat() - 0.5f) / 6f);
+                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x, this.posY + vec.y - 0.75, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -0.75, (this.rand.nextFloat() - 0.5f) / 6f);
                 }
             }
         }
@@ -1109,6 +1113,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
             if (burningFuel || descentPhase) {
                 //Burn the rocket fuel
+                // TODO SHOULD WE BURN IN DECENT PHASE TOO???
+                // TODO THIS COULD MAKE IT SO THAT OUT OF FUEL -> You crash -> rocket takes a lot of damage
                 if (!world.isRemote && !descentPhase) {
                     setFuelAmount(getRocketFuelType(), getFuelAmount(getRocketFuelType()) - getFuelConsumptionRate(getRocketFuelType()));
                     if (getRocketFuelType() == FuelType.LIQUID_BIPROPELLANT)

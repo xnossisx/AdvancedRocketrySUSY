@@ -3,9 +3,21 @@ package zmaster587.advancedRocketry.entity.fx;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
+import static java.lang.Math.min;
+
 public class TrailFx extends InverseTrailFx {
 
+    float max_speed_increase = 3.0f;
+    float current_speed_increase = 1.0f;
+    int max_engines_for_calculation = 64;
 
+    //increase x-z motion
+    public void register_additional_engines(int n){
+        float enginepx = min(1,n/(float)max_engines_for_calculation);
+        float d = max_speed_increase - current_speed_increase;
+        current_speed_increase = current_speed_increase+d*enginepx;
+
+    }
 
     public TrailFx(World world, double x,
                    double y, double z, double motx, double moty, double motz) {
@@ -24,7 +36,7 @@ public class TrailFx extends InverseTrailFx {
         this.motionX = motx;
         this.motionY = moty;
         this.motionZ = motz;
-        this.particleMaxAge = (int) world.rand.nextInt(300) + 50;
+        this.particleMaxAge = (int) world.rand.nextInt(400) + 50;
 
         icon = new ResourceLocation("advancedrocketry:textures/particle/soft1.png");
     }
@@ -59,18 +71,10 @@ public class TrailFx extends InverseTrailFx {
         if (this.posY < ch + 1) {
             this.motionY = 0;
             this.posY = ch +1 ;
-            //double particlespeed = 0.25* Math.sqrt(motionX*motionX+motionY*motionY+motionZ*motionZ);
 
             this.motionX = (world.rand.nextFloat() - 0.5) / 4;
             this.motionZ = (world.rand.nextFloat() - 0.5) / 4;
-            //this.motionY = (world.rand.nextFloat()) / 40;
 
-            //double new_speed = Math.sqrt(motionX*motionX+motionY*motionY+motionZ*motionZ);
-            //if (new_speed < particlespeed) {
-            //    motionX *= particlespeed / new_speed;
-            //    motionY *= particlespeed / new_speed;
-            //    motionZ *= particlespeed / new_speed;
-            //}
 
         }
         if (this.motionY < 0) {
@@ -82,6 +86,6 @@ public class TrailFx extends InverseTrailFx {
         this.motionY *= 0.98;
         this.motionY += 0.0005;
 
-        this.setPosition(posX + this.motionX, posY + this.motionY, posZ + this.motionZ);
+        this.setPosition(posX + this.motionX*current_speed_increase, posY + this.motionY, posZ + this.motionZ*current_speed_increase);
     }
 }

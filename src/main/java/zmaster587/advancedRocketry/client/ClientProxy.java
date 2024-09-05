@@ -322,6 +322,15 @@ public class ClientProxy extends CommonProxy {
     }
 
     @Override
+    public void spawnDynamicRocketSmoke(World world, double x, double y,
+                                        double z, double motionX, double motionY, double motionZ, int engineNum) {
+        TrailFx fx = new TrailFx(world, x, y, z, motionX, motionY, motionZ);
+        fx.register_additional_engines(engineNum);
+        Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+
+    }
+
+    @Override
     public void spawnParticle(String particle, World world, double x, double y, double z, double motionX, double motionY, double motionZ) {
         switch (particle) {
             case "rocketFlame": {

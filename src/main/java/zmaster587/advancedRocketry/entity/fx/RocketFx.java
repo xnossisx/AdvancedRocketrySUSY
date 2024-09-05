@@ -11,10 +11,14 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 public class RocketFx extends Particle {
 
     public static final ResourceLocation icon = new ResourceLocation("advancedrocketry:textures/particle/soft2.png");
 
+    float alpha = 0.8f;
 
     public RocketFx(World world, double x,
                     double y, double z, double motx, double moty, double motz, float scale) {
@@ -23,7 +27,7 @@ public class RocketFx extends Particle {
         this.prevPosX = this.posX = x;
         this.prevPosY = this.posY = y;
         this.prevPosZ = this.posZ = z;
-
+        this.particleAlpha = alpha;
         this.particleRed = 0.9F + this.rand.nextFloat() / 10f;
         this.particleGreen = 0.6F + this.rand.nextFloat() / 5f;
         this.particleBlue = 0.0F;
@@ -32,7 +36,7 @@ public class RocketFx extends Particle {
         this.motionX = motx;
         this.motionY = moty;
         this.motionZ = motz;
-        this.particleMaxAge = (int) (8.0D / (Math.random() * 0.8D + 0.6D));
+        this.particleMaxAge = (int) ((int) (8.0D / (Math.random() * 0.8D + 0.6D))*1.3);
     }
 
     public RocketFx(World world, double x,
@@ -58,7 +62,7 @@ public class RocketFx extends Particle {
         float f5 = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - interpPosX);
         float f6 = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - interpPosY);
         float f7 = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - interpPosZ);
-        int i = this.getBrightnessForRender(partialTicks);
+        int i = 240;//this.getBrightnessForRender(partialTicks);
         int j = i >> 16 & 65535;
         int k = i & 65535;
         Vec3d[] avec3d = new Vec3d[]{new Vec3d(-rotationX * f4 - rotationXY * f4, -rotationZ * f4, -rotationYZ * f4 - rotationXZ * f4), new Vec3d(-rotationX * f4 + rotationXY * f4, rotationZ * f4, -rotationYZ * f4 + rotationXZ * f4), new Vec3d(rotationX * f4 + rotationXY * f4, rotationZ * f4, rotationYZ * f4 + rotationXZ * f4), new Vec3d(rotationX * f4 - rotationXY * f4, -rotationZ * f4, rotationYZ * f4 - rotationXZ * f4)};
@@ -103,32 +107,26 @@ public class RocketFx extends Particle {
         this.prevPosZ = this.posZ;
 
         //Change color and alpha over lifespan
-        this.particleAlpha = 1 - (this.particleAge / (float) this.particleMaxAge);
+        this.particleAlpha = alpha-alpha*(this.particleAge / (float) this.particleMaxAge); //1 - (this.particleAge / (float) this.particleMaxAge);
         this.particleGreen -= this.particleGreen * this.particleAge / ((float) this.particleMaxAge * 2);
 
         if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
         }
+        this.setPosition(posX + this.motionX, posY + this.motionY, posZ + this.motionZ);
 
         int ch = world.getHeight((int) this.posX, (int) this.posZ);
         if (this.posY < ch  -0.8) {
             this.motionY = 0;
             this.posY = ch  -0.8 ;
-            //double particlespeed = 0.25* Math.sqrt(motionX*motionX+motionY*motionY+motionZ*motionZ);
 
             this.motionX = (world.rand.nextFloat() - 0.5) / 2;
             this.motionZ = (world.rand.nextFloat() - 0.5) / 2;
             this.motionY = (world.rand.nextFloat()) / 6;
+            this.setPosition(posX + this.motionX, posY + this.motionY, posZ + this.motionZ);
 
-            //double new_speed = Math.sqrt(motionX*motionX+motionY*motionY+motionZ*motionZ);
-            //if (new_speed < particlespeed) {
-            //    motionX *= particlespeed / new_speed;
-            //    motionY *= particlespeed / new_speed;
-            //    motionZ *= particlespeed / new_speed;
-            //}
 
         }
 
-        this.setPosition(posX + this.motionX, posY + this.motionY, posZ + this.motionZ);
     }
 }

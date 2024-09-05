@@ -49,7 +49,7 @@ public class InverseTrailFx extends Particle {
         float f13 = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - interpPosZ);
         float f10 = 0.25F * this.particleScale;
 
-        int i = this.getBrightnessForRender(partialTicks);
+        int i = 240;//this.getBrightnessForRender(partialTicks);
         int j = i >> 16 & 65535;
         int k = i & 65535;
 
