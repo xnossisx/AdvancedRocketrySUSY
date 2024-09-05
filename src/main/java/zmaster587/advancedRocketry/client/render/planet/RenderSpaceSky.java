@@ -41,25 +41,20 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
     @Override
     public void renderPlanet2(BufferBuilder buffer, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
-        renderPlanet2(buffer, properties, size, alphaMultiplier, shadowAngle, hasRing, shadowColorMultiplier, alphaMultiplier2, -1);
-    }
-    public void renderPlanet2(BufferBuilder buffer, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2, float OrbitalDistance) {
         //ResourceLocation icon, int locationX, int locationY, double zLevel, float planetOrbitalDistance, float alphaMultiplier, double angle, boolean hasAtmosphere, float[] atmColor, float[] ringColor, boolean isGasgiant, boolean hasRings, boolean hasDecorators) {
         int clientRenderDistanceBlocks = mc.gameSettings.renderDistanceChunks * 16;
 
-        float planetOrbitalDistance = OrbitalDistance;
-        if (planetOrbitalDistance < 0) {
-            ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(mc.player.getPosition());
+        ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(mc.player.getPosition());
 
-            if (spaceObject == null)
-                return;
-            planetOrbitalDistance = spaceObject.getOrbitalDistance();
-        }
+        if (spaceObject == null)
+            return;
+        float planetOrbitalDistance = spaceObject.getOrbitalDistance();
+
 
         if (properties.isStar()) {
             planetOrbitalDistance = 190F;
             double target_distance = 150;
-            double tr_y = max(32,clientRenderDistanceBlocks*1.1);
+            double tr_y = max(32, clientRenderDistanceBlocks * 1.1);
 
             double px_size_scale = tr_y / target_distance;
             size = (float) (10);
@@ -83,15 +78,14 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
                 f10 = size * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance);
 
-                GlStateManager.color(0,0,0);
+                GlStateManager.color(0, 0, 0);
                 GlStateManager.disableCull();
-                renderSphere(0,0,0,f10,32,23);
+                renderSphere(0, 0, 0, f10, 32, 23);
                 GlStateManager.enableCull();
                 GL11.glEnable(GL11.GL_BLEND);
                 GL11.glDepthMask(false);
 
                 GL11.glPopMatrix();
-
 
 
                 //Render accretion disk
@@ -126,7 +120,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                     mc.renderEngine.bindTexture(TextureResources.locationAccretionDisk);
 
                     GL11.glPushMatrix();
-                    GL11.glRotatef(60+ro, 1, 0, 0);
+                    GL11.glRotatef(60 + ro, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 360 * speedMult)) / (360f * speedMult), 0, 1, 0);
 
                     GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
@@ -142,7 +136,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                     GL11.glPushMatrix();
 
                     GL11.glTranslatef(0, -0.1f, 0);
-                    GL11.glRotatef(60+ro, 1, 0, 0);
+                    GL11.glRotatef(60 + ro, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 200 * speedMult)) / (200f * speedMult), 0, 1, 0);
 
                     GlStateManager.color((float) 0.8, (float) .7, (float) .4, 1f);
@@ -159,7 +153,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                     GL11.glPushMatrix();
 
                     GL11.glTranslatef(0, -0.2f, 0);
-                    GL11.glRotatef(60+ro, 1, 0, 0);
+                    GL11.glRotatef(60 + ro, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (36000 * speedMult)) / (100f * speedMult), 0, 1, 0);
 
                     GlStateManager.color((float) 0.2, (float) .4, (float) 1, 1f);
@@ -197,7 +191,6 @@ public class RenderSpaceSky extends RenderPlanetarySky {
             return;
 
 
-
         float[] atmColor = properties.skyColor;
 
         GL11.glPushMatrix();
@@ -230,7 +223,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
         //TODO: draw sky planets
 
         GlStateManager.color(1f, 1f, 1f, alphaMultiplier);
-double yo = -10;
+        double yo = -10;
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         buffer.pos(-f10, yo, f10).tex(f16, f17).endVertex();
         buffer.pos(f10, yo, f10).tex(f14, f17).endVertex();

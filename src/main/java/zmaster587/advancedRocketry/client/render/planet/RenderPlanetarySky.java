@@ -914,13 +914,86 @@ GL11.glPopMatrix();
         GlStateManager.enableTexture2D();
 
         //RocketEventHandler.onPostWorldRender(partialTicks);
-        if (d0 > 300 && mc.player.dimension != ARConfiguration.getCurrentConfig().spaceDimId) {
+        float target_texture_v = 200;
+        float fade_out = 250;
+        if (d0 > target_texture_v && mc.player.dimension != ARConfiguration.getCurrentConfig().spaceDimId) {
             properties = DimensionManager.getInstance().getDimensionProperties(mc.player.dimension);
-            new RenderSpaceSky().renderPlanet2(buffer, properties, 0, 1, 0, properties.hasRings, new float[]{0, 0, 0}, 1, (float) d0 / 10f);
+
+            // Calculate t using linear interpolation
+            float t = (float) (d0 - target_texture_v) / fade_out;
+
+            // Clamp t to the range [0, 1] to ensure smooth blending
+            t = Math.min(1f, Math.max(0f, t));
+
+            //System.out.println("t"+t);
+
+
+            renderplanetbelow(buffer, properties, (float) d0 / 10f, t);
         }
+        GlStateManager.depthMask(true);
         //Fix player/items going transparent
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.depthMask(true);
+
+    }
+
+    public void renderplanetbelow(BufferBuilder buffer, DimensionProperties properties, float dist, float transparency) {
+
+
+
+        GL11.glPushMatrix();
+
+        // Save current OpenGL state
+        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
+        GlStateManager.disableFog();
+
+        // Enable blending for transparency
+        GL11.glEnable(GL11.GL_BLEND);
+        GlStateManager.enableBlend(); // Enable blending for transparency
+
+        // Set the blend function for transparency (standard source alpha blending)
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.depthMask(false);
+        GlStateManager.disableDepth();    // Disable depth testing
+
+        // Bind the planet's texture
+        mc.renderEngine.bindTexture(properties.getPlanetIconLEO());
+
+        // Set texture parameters for smooth scaling
+        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+
+        // Set planet size based on distance
+        float f10 = 100f * AstronomicalBodyHelper.getBodySizeMultiplier(dist);
+
+        float Xoffset = (float) ((System.currentTimeMillis() / 1000000d % 1));
+
+        float f14 = 1f + Xoffset;
+        float f15 = 0f + Xoffset;
+
+// THIS °§$%°§%$& DOES NOT WORK FOR T<0.5
+        GlStateManager.color(1f, 1f, 1f, transparency);
+
+        double yo = -10;
+
+        // Start rendering the quad with the texture
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos(-f10, yo, f10).tex(f15, f14).endVertex();
+        buffer.pos(f10, yo, f10).tex(f14, f14).endVertex();
+        buffer.pos(f10, yo, -f10).tex(f14, f15).endVertex();
+        buffer.pos(-f10, yo, -f10).tex(f15, f15).endVertex();
+
+        // Draw the texture
+        Tessellator.getInstance().draw();
+
+        // Restore the previous OpenGL state
+        GL11.glPopAttrib();
+        GL11.glPopMatrix();
+
+        // Reset color to full opacity and enable fog again
+        GlStateManager.color(1f, 1f, 1f, 1f);
+        GlStateManager.enableFog();
+
+
     }
 
     protected ResourceLocation getTextureForPlanet(DimensionProperties properties) {
