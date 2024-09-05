@@ -220,7 +220,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                         }
 
                         if (block instanceof BlockSeat && world.getBlockState(abovePos).getBlock().isPassable(world, abovePos)) {
-                            stats.addPassengerSeat((int) (xCurr- (float) this.sizeX /2+0.5f), yCurr, (int) (- (float) this.sizeX /2+0.5f));
+                            stats.addPassengerSeat((int) (xCurr - (float) this.sizeX / 2 + 0.5f), yCurr, (int) (zCurr - (float) this.sizeZ / 2 + 0.5f));
                         }
 
                         if (block instanceof IMiningDrill) {
