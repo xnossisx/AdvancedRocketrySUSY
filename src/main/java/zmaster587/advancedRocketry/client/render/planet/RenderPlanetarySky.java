@@ -38,6 +38,7 @@ public class RenderPlanetarySky extends IRenderHandler {
     Vector3F<Float> axis;
     Minecraft mc = Minecraft.getMinecraft();
     private int starGLCallList;
+    private int starGLCallListSmall;
     private int glSkyList;
     private int glSkyList2;
 
@@ -51,14 +52,22 @@ public class RenderPlanetarySky extends IRenderHandler {
     public RenderPlanetarySky() {
         axis = new Vector3F<>(1f, 0f, 0f);
 
-        this.starGLCallList = GLAllocation.generateDisplayLists(3);
+        this.starGLCallList = GLAllocation.generateDisplayLists(4);
         GL11.glPushMatrix();
         GL11.glNewList(this.starGLCallList, GL11.GL_COMPILE);
         this.renderStars();
         GL11.glEndList();
         GL11.glPopMatrix();
+
+        this.starGLCallListSmall = this.starGLCallList + 1;
+        GL11.glPushMatrix();
+        GL11.glNewList(this.starGLCallListSmall, GL11.GL_COMPILE);
+        this.renderStarsSmall();
+        GL11.glEndList();
+        GL11.glPopMatrix();
+
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        this.glSkyList = this.starGLCallList + 1;
+        this.glSkyList = this.starGLCallList + 2;
         GL11.glNewList(this.glSkyList, GL11.GL_COMPILE);
         byte b2 = 64;
         int i = 256 / b2 + 2;
@@ -78,7 +87,7 @@ public class RenderPlanetarySky extends IRenderHandler {
         }
 
         GL11.glEndList();
-        this.glSkyList2 = this.starGLCallList + 2;
+        this.glSkyList2 = this.starGLCallList + 3;
         GL11.glNewList(this.glSkyList2, GL11.GL_COMPILE);
         f = -16.0F;
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
@@ -388,6 +397,56 @@ GL11.glPopMatrix();
                 double d5 = d0 * 100.0D;
                 double d6 = d1 * 100.0D;
                 double d7 = d2 * 100.0D;
+                double d8 = Math.atan2(d0, d2);
+                double d9 = Math.sin(d8);
+                double d10 = Math.cos(d8);
+                double d11 = Math.atan2(Math.sqrt(d0 * d0 + d2 * d2), d1);
+                double d12 = Math.sin(d11);
+                double d13 = Math.cos(d11);
+                double d14 = random.nextDouble() * Math.PI * 2.0D;
+                double d15 = Math.sin(d14);
+                double d16 = Math.cos(d14);
+
+                for (int j = 0; j < 4; ++j) {
+                    double d17 = 0.0D;
+                    double d18 = (double) ((j & 2) - 1) * d3;
+                    double d19 = (double) ((j + 1 & 2) - 1) * d3;
+                    double d20 = d18 * d16 - d19 * d15;
+                    double d21 = d19 * d16 + d18 * d15;
+                    double d22 = d20 * d12 + d17 * d13;
+                    double d23 = d17 * d12 - d20 * d13;
+                    double d24 = d23 * d9 - d21 * d10;
+                    double d25 = d21 * d9 + d23 * d10;
+                    buffer.pos(d5 + d24, d6 + d22, d7 + d25).endVertex();
+                }
+            }
+        }
+
+        Tessellator.getInstance().draw();
+        //buffer.finishDrawing();
+    }
+
+
+    private void renderStarsSmall() {
+        Random random = new Random(10842L);
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+
+        for (int i = 0; i < 5000; ++i) {
+            double d0 = random.nextFloat() * 2.0F - 1.0F;
+            double d1 = random.nextFloat() * 2.0F - 1.0F;
+            double d2 = random.nextFloat() * 2.0F - 1.0F;
+            double d3 = 0.025F + random.nextFloat() * 0.05F;
+            double d4 = d0 * d0 + d1 * d1 + d2 * d2;
+
+            if (d4 < 1.0D && d4 > 0.01D) {
+                d4 = 1.0D / Math.sqrt(d4);
+                d0 *= d4;
+                d1 *= d4;
+                d2 *= d4;
+                double d5 = d0 * 30.0D;
+                double d6 = d1 * 30.0D;
+                double d7 = d2 * 30.0D;
                 double d8 = Math.atan2(d0, d2);
                 double d9 = Math.sin(d8);
                 double d10 = Math.cos(d8);
@@ -728,15 +787,20 @@ GL11.glPopMatrix();
         //if (f18 > 0.0F) {
         if (true) {
             GlStateManager.color(1, 1, 1, 1);
+
             GL11.glPushMatrix();
             if (isWarp) {
-                for (int i = -3; i < 5; i++) {
-                    GL11.glPushMatrix();
-                    double magnitude = i * -100 + (((System.currentTimeMillis()) + 50) % 2000) / 20f;
-                    GL11.glTranslated(-travelDirection.getFrontOffsetZ() * magnitude, 0, travelDirection.getFrontOffsetX() * magnitude);
-                    GL11.glCallList(this.starGLCallList);
-                    GL11.glPopMatrix();
+                for (int i = -3; i < 6; i++) {
+                    double magnitude = i * -50 + (((System.currentTimeMillis()) + 50) % 1000) / 20f;
+                    for (int o = 1; o < 50; o++) {
+                        GL11.glPushMatrix();
+                        GL11.glTranslated(-travelDirection.getFrontOffsetZ() *1* (magnitude+o*0.5) , 0, travelDirection.getFrontOffsetX() *1* (magnitude+o*0.5));
+                        GL11.glCallList(this.starGLCallListSmall);
+                        GL11.glPopMatrix();
+                    }
                 }
+
+
                 //GL11.glTranslated(((System.currentTimeMillis()/10) + 50) % 100, 0, 0);
 
             } else {
@@ -924,7 +988,7 @@ GL11.glPopMatrix();
 
         float target_texture_v = -20 + (float) (-mc.world.getHorizon() + mc.player.world.getHeight(mc.player.getPosition()).getY()+300 - fade_out/2); // because of this shit 0.5 alpha error
 
-        if (d0 > target_texture_v && mc.player.dimension != ARConfiguration.getCurrentConfig().spaceDimId) {
+        if (d0 > target_texture_v && mc.player.dimension != ARConfiguration.getCurrentConfig().spaceDimId && !isWarp) {
             properties = DimensionManager.getInstance().getDimensionProperties(mc.player.dimension);
 
 
@@ -951,6 +1015,7 @@ GL11.glPopMatrix();
 
 
         GL11.glPushMatrix();
+        GlStateManager.depthMask(true);
 
         // Save current OpenGL state
         GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
@@ -962,8 +1027,8 @@ GL11.glPopMatrix();
 
         // Set the blend function for transparency (standard source alpha blending)
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        GlStateManager.depthMask(false);
-        GlStateManager.disableDepth();    // Disable depth testing
+
+
 
         // Bind the planet's texture
         mc.renderEngine.bindTexture(properties.getPlanetIconLEO());
@@ -973,7 +1038,7 @@ GL11.glPopMatrix();
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 
         // Set planet size based on distance
-        float f10 = 10f * AstronomicalBodyHelper.getBodySizeMultiplier(dist);
+        float f10 = 5f * AstronomicalBodyHelper.getBodySizeMultiplier(dist);
 
         float Xoffset = (float) ((System.currentTimeMillis() / 1000000d % 1));
 
@@ -983,7 +1048,7 @@ GL11.glPopMatrix();
 // THIS °§$%°§%$& DOES NOT WORK FOR T<0.5
         GlStateManager.color(1f, 1f, 1f, transparency);
 
-        double yo = -1;
+        double yo = -0.1;
 
         // Start rendering the quad with the texture
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -998,6 +1063,8 @@ GL11.glPopMatrix();
         // Restore the previous OpenGL state
         GL11.glPopAttrib();
         GL11.glPopMatrix();
+
+        //GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
 
         // Reset color to full opacity and enable fog again
         GlStateManager.color(1f, 1f, 1f, 1f);

@@ -53,13 +53,12 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
         if (properties.isStar()) {
             planetOrbitalDistance = 190F;
-            double target_distance = 150;
-            double tr_y = max(32, clientRenderDistanceBlocks * 1.1);
 
-            double px_size_scale = tr_y / target_distance;
-            size = (float) (10);
+            double tr_y = 100;
 
-            float ro = -0f;
+            size = 10f;
+
+            float ro = -20f;
             if (properties.getStar().isBlackHole()) {
                 GL11.glDepthMask(true);
                 GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -68,7 +67,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 GL11.glDisable(GL11.GL_BLEND);
                 GL11.glPushMatrix();
                 //GL11.glRotatef(50, 1, 0, 0);
-                GL11.glRotatef(120, -1, 0, 0);
+                GL11.glRotatef(140, -1, 0, 0);
                 GL11.glRotatef(180, 0, 1, 0);
                 //GL11.glRotatef(180, 0, 1, 0);
 
@@ -185,6 +184,11 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 Tessellator.getInstance().draw();
                 GL11.glPopMatrix();
             }
+            GlStateManager.depthMask(true);
+            GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
+            GlStateManager.depthMask(false);
+
+
             return;
         }
         if (Objects.equals(properties.customIcon, "void"))

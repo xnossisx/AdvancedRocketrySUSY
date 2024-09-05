@@ -309,11 +309,11 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
            checkjam();
            checkCanRun();
             //update clients on new data
-           PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos, 128);
+           PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos, 2048);
        }
         else if (id == 13)
             //update clients on new data
-            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos, 128);
+            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos, 2048);
 
         markDirty();
     }
