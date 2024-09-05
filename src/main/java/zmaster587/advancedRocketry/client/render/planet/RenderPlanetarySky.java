@@ -914,10 +914,20 @@ GL11.glPopMatrix();
         GlStateManager.enableTexture2D();
 
         //RocketEventHandler.onPostWorldRender(partialTicks);
-        float target_texture_v = 200;
-        float fade_out = 250;
+
+        //hide texture bug by removing it while rocket is fireing engines
+        //rocket fires engine about at this height:
+        //int ch = 300 + world.getHeight((int) posX, (int) posZ);
+
+
+        float fade_out = 50; // this bs does not work for t<0.5 so it really starts only half way in
+
+        float target_texture_v = -20 + (float) (-mc.world.getHorizon() + mc.player.world.getHeight(mc.player.getPosition()).getY()+300 - fade_out/2); // because of this shit 0.5 alpha error
+
         if (d0 > target_texture_v && mc.player.dimension != ARConfiguration.getCurrentConfig().spaceDimId) {
             properties = DimensionManager.getInstance().getDimensionProperties(mc.player.dimension);
+
+
 
             // Calculate t using linear interpolation
             float t = (float) (d0 - target_texture_v) / fade_out;
@@ -963,7 +973,7 @@ GL11.glPopMatrix();
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 
         // Set planet size based on distance
-        float f10 = 100f * AstronomicalBodyHelper.getBodySizeMultiplier(dist);
+        float f10 = 10f * AstronomicalBodyHelper.getBodySizeMultiplier(dist);
 
         float Xoffset = (float) ((System.currentTimeMillis() / 1000000d % 1));
 
@@ -973,7 +983,7 @@ GL11.glPopMatrix();
 // THIS °§$%°§%$& DOES NOT WORK FOR T<0.5
         GlStateManager.color(1f, 1f, 1f, transparency);
 
-        double yo = -10;
+        double yo = -1;
 
         // Start rendering the quad with the texture
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
