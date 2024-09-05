@@ -52,12 +52,13 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
         if (properties.isStar()) {
             planetOrbitalDistance = 190F;
-            double target_distance = 120;
-            double tr_y = max(80, -32+ sqrt(clientRenderDistanceBlocks*clientRenderDistanceBlocks*2));
+            double target_distance = 150;
+            double tr_y = max(32,clientRenderDistanceBlocks*1.1);
 
             double px_size_scale = tr_y / target_distance;
-            size = (float) (10 * px_size_scale);
+            size = (float) (10);
 
+            float ro = -0f;
             if (properties.getStar().isBlackHole()) {
                 GL11.glDepthMask(true);
                 GL11.glEnable(GL11.GL_ALPHA_TEST);
@@ -66,7 +67,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 GL11.glDisable(GL11.GL_BLEND);
                 GL11.glPushMatrix();
                 //GL11.glRotatef(50, 1, 0, 0);
-                GL11.glRotatef(110, -1, 0, 0);
+                GL11.glRotatef(120, -1, 0, 0);
                 GL11.glRotatef(180, 0, 1, 0);
                 //GL11.glRotatef(180, 0, 1, 0);
 
@@ -84,62 +85,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 GL11.glDepthMask(false);
 
                 GL11.glPopMatrix();
-                /*
-                GL11.glPushMatrix();
-                mc.renderEngine.bindTexture(TextureResources.locationBlackHole);
-                GL11.glTranslatef(0, 100, 0);
-                //float phase =  -((float)System.currentTimeMillis()/(float)3000.0);
-                //phase *= 36f;
 
-                float scale = 1 ;
-                //GL11.glRotatef(phase, 0, 1, 0);
-
-                GL11.glScaled(scale, scale, scale);
-
-
-                //Set sun color and distance
-                GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                f10 = size * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance);
-
-                //multiplier = 2;
-                buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
-                buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
-                buffer.pos(f10, 0.0D, f10).tex(1.0D, 1.0D).endVertex();
-                buffer.pos(-f10, 0.0D, f10).tex(0.0D, 1.0D).endVertex();
-
-
-
-
-                Tessellator.getInstance().draw();
-                GL11.glPopMatrix();
-
-
-                GL11.glEnable(GL11.GL_BLEND);
-                GL11.glDepthMask(false);
-
-                GL11.glPushMatrix();
-                mc.renderEngine.bindTexture(TextureResources.locationBlackHoleBorder);
-                GL11.glTranslatef( 0, 99.8F, 0);
-
-                //GL11.glRotatef(phase, 0, 1, 0);
-
-                scale *= 1.1;
-                GL11.glScaled(scale, scale, scale);
-
-                //Set sun color and distance
-                GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                f10 = size * 2f * AstronomicalBodyHelper.getBodySizeMultiplier(planetOrbitalDistance);
-                //multiplier = 2;
-                buffer.pos(-f10, 0.0D, -f10).tex(0.0D, 0.0D).endVertex();
-                buffer.pos(f10, 0.0D, -f10).tex(1.0D, 0.0D).endVertex();
-                buffer.pos(f10, 0.0D, f10).tex(1.0D, 1.0D).endVertex();
-                buffer.pos(-f10, 0.0D, f10).tex(0.0D, 1.0D).endVertex();
-                Tessellator.getInstance().draw();
-                GL11.glPopMatrix();
-
-                 */
 
 
                 //Render accretion disk
@@ -174,7 +120,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                     mc.renderEngine.bindTexture(TextureResources.locationAccretionDisk);
 
                     GL11.glPushMatrix();
-                    GL11.glRotatef(60, 1, 0, 0);
+                    GL11.glRotatef(60+ro, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 360 * speedMult)) / (360f * speedMult), 0, 1, 0);
 
                     GlStateManager.color((float) 1, (float) .5, (float) .4, 1f);
@@ -190,7 +136,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                     GL11.glPushMatrix();
 
                     GL11.glTranslatef(0, -0.1f, 0);
-                    GL11.glRotatef(60, 1, 0, 0);
+                    GL11.glRotatef(60+ro, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (360 * 200 * speedMult)) / (200f * speedMult), 0, 1, 0);
 
                     GlStateManager.color((float) 0.8, (float) .7, (float) .4, 1f);
@@ -207,7 +153,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                     GL11.glPushMatrix();
 
                     GL11.glTranslatef(0, -0.2f, 0);
-                    GL11.glRotatef(60, 1, 0, 0);
+                    GL11.glRotatef(60+ro, 1, 0, 0);
                     GL11.glRotatef((System.currentTimeMillis() % (int) (36000 * speedMult)) / (100f * speedMult), 0, 1, 0);
 
                     GlStateManager.color((float) 0.2, (float) .4, (float) 1, 1f);
