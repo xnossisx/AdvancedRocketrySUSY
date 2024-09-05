@@ -648,14 +648,27 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
 
         if (orbitDimId != last_orbit_dim ||orbitWorld== null || t == null){
             last_orbit_dim = orbitDimId;
-            orbitWorld = DimensionManager.getWorld(orbitDimId);
-            t = terraformingDrill.get_my_helper(orbitWorld);
+            if (!DimensionManager.isDimensionRegistered(orbitDimId)) {
+                if (isRunning) {
+                    drill.deactivate();
+                    setRunning(false);
+                }
+                return;
+            }
+
+                orbitWorld = DimensionManager.getWorld(orbitDimId);
             if (orbitWorld == null) {
                 DimensionManager.initDimension(orbitDimId);
                 orbitWorld = DimensionManager.getWorld(orbitDimId);
-                if (orbitWorld == null)
+                if (orbitWorld == null) {
+                    if (isRunning) {
+                        drill.deactivate();
+                        setRunning(false);
+                    }
                     return;
+                }
             }
+            t = terraformingDrill.get_my_helper(orbitWorld);
         }
 
 

@@ -13,7 +13,7 @@ import org.lwjgl.opengl.GL11;
 
 public class RocketFx extends Particle {
 
-    public static final ResourceLocation icon = new ResourceLocation("advancedrocketry:textures/particle/soft.png");
+    public static final ResourceLocation icon = new ResourceLocation("advancedrocketry:textures/particle/soft2.png");
 
 
     public RocketFx(World world, double x,
@@ -42,7 +42,7 @@ public class RocketFx extends Particle {
 
     @Override
     public int getFXLayer() {
-        return 0;
+        return 2;
     }
 
     @Override
@@ -103,11 +103,30 @@ public class RocketFx extends Particle {
         this.prevPosZ = this.posZ;
 
         //Change color and alpha over lifespan
-        this.particleAlpha = 1 - this.particleAge / (float) this.particleMaxAge;
+        this.particleAlpha = 1 - (this.particleAge / (float) this.particleMaxAge);
         this.particleGreen -= this.particleGreen * this.particleAge / ((float) this.particleMaxAge * 2);
 
         if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
+        }
+
+        int ch = world.getHeight((int) this.posX, (int) this.posZ);
+        if (this.posY < ch  -0.8) {
+            this.motionY = 0;
+            this.posY = ch  -0.8 ;
+            //double particlespeed = 0.25* Math.sqrt(motionX*motionX+motionY*motionY+motionZ*motionZ);
+
+            this.motionX = (world.rand.nextFloat() - 0.5) / 2;
+            this.motionZ = (world.rand.nextFloat() - 0.5) / 2;
+            this.motionY = (world.rand.nextFloat()) / 6;
+
+            //double new_speed = Math.sqrt(motionX*motionX+motionY*motionY+motionZ*motionZ);
+            //if (new_speed < particlespeed) {
+            //    motionX *= particlespeed / new_speed;
+            //    motionY *= particlespeed / new_speed;
+            //    motionZ *= particlespeed / new_speed;
+            //}
+
         }
 
         this.setPosition(posX + this.motionX, posY + this.motionY, posZ + this.motionZ);

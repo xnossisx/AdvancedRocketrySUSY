@@ -74,12 +74,13 @@ public class TerraformingHelper {
         chunkDataMap = new HashMap<>();
         generator = new ChunkProviderPlanet(world, world.getSeed(), world.getWorldInfo().isMapFeaturesEnabled(), world.getWorldInfo().getGeneratorOptions());
 
+        System.out.println("register generated chunks...");
         for (ChunkPos i:generated_chunks){
             chunkdata data = new chunkdata(i.x,i.z,null, world, this);
             data.chunk_fully_generated = true;
             chunkDataMap.put(new ChunkPos(data.x,data.z), data);
         }
-
+        System.out.println("register biome changed chunks...");
         for (ChunkPos i:biomechanged_chunks){
 
             generate_new_chunkdata(new ChunkPos(i.x, i.z));
@@ -87,7 +88,9 @@ public class TerraformingHelper {
             data.chunk_fully_biomechanged = true;
         }
 
+        System.out.println("recalculate chunk types...");
         recalculate_chunk_status();
+        System.out.println("ok!");
     }
 
     //0 = no
@@ -332,18 +335,9 @@ public class TerraformingHelper {
     public void generate_new_chunkdata(ChunkPos cpos){
         chunkdata data;
 
-        ChunkPrimer primer = generator.getChunkPrimer(cpos.x, cpos.z, chunkMgrTerraformed);
 
-        IBlockState[][][] blockStates = new IBlockState[16][16][256];
-        for (int px = 0; px < 16; px++) {
-            for (int pz = 0; pz < 16; pz++) {
-                for (int py = 0; py < 256; py++) {
-                    blockStates[px][pz][py] = primer.getBlockState(px,py,pz);
-                }
-            }
-        }
 
-        data = new chunkdata(cpos.x,cpos.z, blockStates, world, this);
+        data = new chunkdata(cpos.x,cpos.z, null, world, this);
         data.type = get_chunk_type(data.x,data.z);
         chunkDataMap.put(new ChunkPos(data.x,data.z),data);
     }
@@ -354,6 +348,19 @@ public class TerraformingHelper {
         if (data == null){
             System.out.println("generate new chunk: "+cpos.x+":"+cpos.z);
             generate_new_chunkdata(new ChunkPos(cpos.x, cpos.z));
+        }
+        if (data.blockStates == null){
+            System.out.println("generate new blockstates: "+cpos.x+":"+cpos.z);
+            ChunkPrimer primer = generator.getChunkPrimer(cpos.x, cpos.z, chunkMgrTerraformed);
+            IBlockState[][][] blockStates = new IBlockState[16][16][256];
+            for (int px = 0; px < 16; px++) {
+                for (int pz = 0; pz < 16; pz++) {
+                    for (int py = 0; py < 256; py++) {
+                        blockStates[px][pz][py] = primer.getBlockState(px,py,pz);
+                    }
+                }
+            }
+            data.blockStates = blockStates;
         }
         int chunkx = ((x % 16) + 16) % 16;
         int chunkz = ((z % 16) + 16) % 16;

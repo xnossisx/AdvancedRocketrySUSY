@@ -256,11 +256,13 @@ public class DimensionProperties implements Cloneable, IDimensionProperties {
             System.out.println("num biomes: "+ getViableBiomes(false).size());
 
             Collection<Chunk> list = (net.minecraftforge.common.DimensionManager.getWorld(getId())).getChunkProvider().getLoadedChunks();
+            System.out.println("add chunks to tf list");
             if (!list.isEmpty()) {
                 for (Chunk chunk : list) {
                     add_chunk_to_terraforming_list(chunk);
                 }
             }
+            System.out.println("ok!");
         }
 
     }

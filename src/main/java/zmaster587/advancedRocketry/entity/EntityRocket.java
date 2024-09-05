@@ -728,7 +728,18 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     }
 
     public boolean isDescentPhase() {
-        return ARConfiguration.getCurrentConfig().automaticRetroRockets && isInOrbit() && ((this.posY < 500 && (this.motionY < -0.5f || world.isRemote)) || (this.posY < 200 && (this.motionY < -0.2f || world.isRemote)));
+        int ch = world.getHeight((int) posX, (int) posZ);
+        return ARConfiguration.getCurrentConfig().automaticRetroRockets &&
+                isInOrbit() &&
+                (
+                        (this.posY < ch + 300 && (this.motionY < -0.5f || world.isRemote)) ||
+                                (this.posY < ch + 150 && (this.motionY < -0.4f || world.isRemote)) ||
+                                (this.posY < ch + 100 && (this.motionY < -0.3f || world.isRemote)) ||
+                                (this.posY < ch + 50 && (this.motionY < -0.2f || world.isRemote)) ||
+                                (this.posY < ch + 20 && (this.motionY < -0.15f || world.isRemote)) ||
+                                (this.posY < ch + 10 && (this.motionY < -0.8f || world.isRemote))||
+                                (this.posY < ch + 5 && (this.motionY < -0.01f || world.isRemote))
+                );
     }
 
     public boolean isStartupPhase() {
@@ -764,11 +775,19 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 if (handler != null)
                     atmosphere = handler.getAtmosphereType(this);
 
-                if (Minecraft.getMinecraft().gameSettings.particleSetting < 1 && world.getTotalWorldTime() % 10 == 0 && (engineNum < 8 || ((world.getTotalWorldTime() / 10) % Math.max((stats.getEngineLocations().size() / 8), 1)) == (engineNum / 8)) && (handler == null || (atmosphere != null && atmosphere.allowsCombustion())))
-                    AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, this.posX + vec.x, this.posY + vec.y - 0.75, this.posZ + vec.z, 0, -0.5, 0);
 
-                for (int i = 0; i < 4; i++) {
-                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x, this.posY + vec.y - 0.75, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 8f, -0.75, (this.rand.nextFloat() - 0.5f) / 8f);
+
+
+                if (Minecraft.getMinecraft().gameSettings.particleSetting < 1  && (handler == null || (atmosphere != null && atmosphere.allowsCombustion()))) {
+                    double yo = 1.5;
+                    float xzv = 6f;
+                    if (motionY > 0)
+                        xzv = 32;
+                    AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, this.posX + vec.x, this.posY + vec.y - yo, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / xzv, -1.5-this.rand.nextFloat()/6.0, (this.rand.nextFloat() - 0.5f) / xzv);
+                }
+
+                for (int i = 0; i < 5; i++) {
+                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x, this.posY + vec.y - 1.25, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -0.9, (this.rand.nextFloat() - 0.5f) / 6f);
                 }
             }
         }
@@ -1117,12 +1136,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 //if the player holds the forward key then decelerate
                 if (isInOrbit() && (burningFuel || descentPhase)) {
                     float vel = descentPhase ? 1f : getPassengerMovingForward();
-                    this.motionY -= this.motionY * vel / 40f;
+                    this.motionY -= this.motionY * vel / 100f;
                 }
                 this.velocityChanged = true;
 
             } else if (isInOrbit() && descentPhase) { //For unmanned rockets
-                this.motionY -= this.motionY / 40f;
+                this.motionY -= this.motionY / 100f;
                 this.velocityChanged = true;
             }
 
@@ -1268,7 +1287,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     break;
                 }
             }
-            this.motionY = -this.motionY;
+            this.motionY = -2;
             setInOrbit(true);
         } else if (!stats.hasSeat()) {
             reachSpaceUnmanned();
@@ -1330,7 +1349,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             storage.setDestinationCoordinates(new Vector3F<>((float) this.posX, (float) this.posY, (float) this.posZ), this.world.provider.getDimension());
             if (pos != null) {
                 this.setInOrbit(true);
-                this.motionY = -this.motionY;
+                this.motionY = -2;
 
                 //unlink any connected tiles
                 Iterator<IInfrastructure> connectedTiles = connectedInfrastructure.iterator();
@@ -1349,7 +1368,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
                 }
                 this.setInOrbit(true);
-                this.motionY = -this.motionY;
+                this.motionY = -2;
                 //unlink any connected tiles
 
                 Iterator<IInfrastructure> connectedTiles = connectedInfrastructure.iterator();
@@ -1366,7 +1385,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             storage.setDestinationCoordinates(new Vector3F<>((float) this.posX, (float) this.posY, (float) this.posZ), this.world.provider.getDimension());
             if (pos != null) {
                 this.setInOrbit(true);
-                this.motionY = -this.motionY;
+                this.motionY = -2;
                 this.changeDimension(destinationDimId, pos.x, getEntryHeight(destinationDimId), pos.z);
             } else {
 
@@ -1377,7 +1396,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
                 }
                 this.setInOrbit(true);
-                this.motionY = -this.motionY;
+                this.motionY = -2;
 
                 this.changeDimension(destinationDimId, this.posX, getEntryHeight(destinationDimId), this.posZ);
             }
@@ -1386,7 +1405,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             int offX = (world.rand.nextInt() % 256) - 128;
             int offZ = (world.rand.nextInt() % 256) - 128;
             this.setInOrbit(true);
-            this.motionY = -this.motionY;
+            this.motionY = -2;
             this.setPosition(posX + offX, posY, posZ + offZ);
 
             //unlink any connected tiles
@@ -1441,7 +1460,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             }
 
         } else {
-            this.motionY = -this.motionY;
+            this.motionY = -2;
             setInOrbit(true);
             //If going to a station or something make sure to set coords accordingly
             //If in space land on the planet, if on the planet go to space
@@ -2157,13 +2176,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 //Conditional b/c for some reason client/server positions do not match
                 float xOffset = this.storage.getSizeX() % 2 == 0 ? 0.5f : 0f;
                 float zOffset = this.storage.getSizeZ() % 2 == 0 ? 0.5f : 0f;
-//                float halfy = storage.getSizeY() / 2f;
-//                float halfx = storage.getSizeX() / 2f;
-//                float halfz = storage.getSizeZ() / 2f;
+                float halfy = storage.getSizeY() / 2f;
+                float halfx = storage.getSizeX() / 2f;
+                float halfz = storage.getSizeZ() / 2f;
 
-                double xPos = seatPos.x + xOffset;
-                double yPos = seatPos.y - 0.5f - 0.5f;
-                double zPos = seatPos.z + zOffset;
+                double xPos = seatPos.x + xOffset - halfx+0.5;
+                double yPos = seatPos.y - 0.5f - 0.5f; // this does not work :(
+                double zPos = seatPos.z + zOffset - halfz+0.5;
                 float angle = (float) (getRCSRotateProgress() * 0.9f * Math.PI / 180f);
 
                 double yNew = (yPos) * MathHelper.cos(angle) + (-zPos - 0.5) * MathHelper.sin(angle);

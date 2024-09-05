@@ -412,6 +412,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             //Total stats, used to check if the user has tried to apply two or more types of thrust/fuel
             int totalFuel = fuelCapacityBipropellant + fuelCapacityNuclearWorkingFluid + fuelCapacityMonopropellant;
             int totalFuelUse = bipropellantfuelUse + nuclearWorkingFluidUse + monopropellantfuelUse;
+            //System.out.println("rocket fuel use:"+totalFuelUse);
 
             //Set status
             if (invalidBlock)
