@@ -787,7 +787,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 }
 
                 for (int i = 0; i < 5; i++) {
-                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x, this.posY + vec.y - 1.25, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -0.9, (this.rand.nextFloat() - 0.5f) / 6f);
+                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x, this.posY + vec.y - 1.25, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -1, (this.rand.nextFloat() - 0.5f) / 6f);
                 }
             }
         }
@@ -2176,13 +2176,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 //Conditional b/c for some reason client/server positions do not match
                 float xOffset = this.storage.getSizeX() % 2 == 0 ? 0.5f : 0f;
                 float zOffset = this.storage.getSizeZ() % 2 == 0 ? 0.5f : 0f;
-                float halfy = storage.getSizeY() / 2f;
-                float halfx = storage.getSizeX() / 2f;
-                float halfz = storage.getSizeZ() / 2f;
+                //float halfy = storage.getSizeY() / 2f;
+                //float halfx = storage.getSizeX() / 2f;
+                //float halfz = storage.getSizeZ() / 2f;
 
-                double xPos = seatPos.x + xOffset - halfx+0.5;
-                double yPos = seatPos.y - 0.5f - 0.5f; // this does not work :(
-                double zPos = seatPos.z + zOffset - halfz+0.5;
+                double xPos = seatPos.x + xOffset;// - halfx+0.5;
+                double yPos = seatPos.y - 0.5f;// - 0.5f; // this does not work :(
+                double zPos = seatPos.z + zOffset;// - halfz+0.5;
                 float angle = (float) (getRCSRotateProgress() * 0.9f * Math.PI / 180f);
 
                 double yNew = (yPos) * MathHelper.cos(angle) + (-zPos - 0.5) * MathHelper.sin(angle);
