@@ -494,8 +494,7 @@ GL11.glPopMatrix();
                     travelDirection = station.getForwardDirection();
                 }
             }
-        }
-        else if (DimensionManager.getInstance().isDimensionCreated(mc.world.provider.getDimension())) {
+        } else if (DimensionManager.getInstance().isDimensionCreated(mc.world.provider.getDimension())) {
 
             properties = DimensionManager.getInstance().getDimensionProperties(mc.world.provider.getDimension());
 
@@ -542,8 +541,7 @@ GL11.glPopMatrix();
                     travelDirection = station.getForwardDirection();
                 }
             }
-        }
-        else {
+        } else {
             children = new LinkedList<>();
             isMoon = false;
             atmosphere = DimensionManager.overworldProperties.getAtmosphereDensityAtHeight(mc.getRenderViewEntity().posY);
@@ -580,9 +578,9 @@ GL11.glPopMatrix();
         f2 = atmosphereInt < 1 ? 0 : (float) Math.pow(f2, Math.sqrt(Math.max(atmosphere, 0.0001)));
         f3 = atmosphereInt < 1 ? 0 : (float) Math.pow(f3, Math.sqrt(Math.max(atmosphere, 0.0001)));
 
-        f1*=Math.min(1,atmosphere);
-        f2*=Math.min(1,atmosphere);
-        f3*=Math.min(1,atmosphere);
+        f1 *= Math.min(1, atmosphere);
+        f2 *= Math.min(1, atmosphere);
+        f3 *= Math.min(1, atmosphere);
 
         skycolor[0] = f1;
         skycolor[1] = f2;
@@ -724,11 +722,11 @@ GL11.glPopMatrix();
         float f18 = mc.world.getStarBrightness(partialTicks) * f6;//((atmosphere == 0 || (f1 < 0.09 && f2 < 0.09 && f3 < 0.09)) ? 1 : 0);// - (atmosphere > 1 ? atmosphere - 1 : 0);
 
 
-        float starAlpha = 1-((1-f18)*atmosphere);
+        float starAlpha = 1 - ((1 - f18) * atmosphere);
         //System.out.println(starAlpha+":"+f18+":"+atmosphere);
 
         //if (f18 > 0.0F) {
-        if (true){
+        if (true) {
             GlStateManager.color(1, 1, 1, 1);
             GL11.glPushMatrix();
             if (isWarp) {
@@ -742,18 +740,18 @@ GL11.glPopMatrix();
                 //GL11.glTranslated(((System.currentTimeMillis()/10) + 50) % 100, 0, 0);
 
             } else {
-                GL11.glColor4f(1,1,1,starAlpha);
+                GL11.glColor4f(1, 1, 1, starAlpha);
                 GL11.glCallList(this.starGLCallList);
                 //Extra stars for low ATM
                 if (atmosphere < 0.5) {
-                    GL11.glColor4f(1,1,1,starAlpha/2);
+                    GL11.glColor4f(1, 1, 1, starAlpha / 2);
                     GL11.glPushMatrix();
                     GL11.glRotatef(-90, 0, 1, 0);
                     GL11.glCallList(this.starGLCallList);
                     GL11.glPopMatrix();
                 }
                 if (atmosphere < 0.25) {
-                    GL11.glColor4f(1,1,1,starAlpha/4);
+                    GL11.glColor4f(1, 1, 1, starAlpha / 4);
                     GL11.glPushMatrix();
                     GL11.glRotatef(90, 0, 1, 0);
                     GL11.glCallList(this.starGLCallList);
@@ -914,11 +912,15 @@ GL11.glPopMatrix();
         }
 
         GlStateManager.enableTexture2D();
-        GlStateManager.depthMask(true);
 
-        RocketEventHandler.onPostWorldRender(partialTicks);
+        //RocketEventHandler.onPostWorldRender(partialTicks);
+        if (d0 > 300 && mc.player.dimension != ARConfiguration.getCurrentConfig().spaceDimId) {
+            properties = DimensionManager.getInstance().getDimensionProperties(mc.player.dimension);
+            new RenderSpaceSky().renderPlanet2(buffer, properties, 0, 1, 0, properties.hasRings, new float[]{0, 0, 0}, 1, (float) d0 / 10f);
+        }
         //Fix player/items going transparent
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.depthMask(true);
     }
 
     protected ResourceLocation getTextureForPlanet(DimensionProperties properties) {

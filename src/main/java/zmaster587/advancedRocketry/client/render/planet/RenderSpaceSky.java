@@ -41,14 +41,20 @@ public class RenderSpaceSky extends RenderPlanetarySky {
 
     @Override
     public void renderPlanet2(BufferBuilder buffer, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2) {
+        renderPlanet2(buffer, properties, size, alphaMultiplier, shadowAngle, hasRing, shadowColorMultiplier, alphaMultiplier2, -1);
+    }
+    public void renderPlanet2(BufferBuilder buffer, DimensionProperties properties, float size, float alphaMultiplier, double shadowAngle, boolean hasRing, float[] shadowColorMultiplier, float alphaMultiplier2, float OrbitalDistance) {
         //ResourceLocation icon, int locationX, int locationY, double zLevel, float planetOrbitalDistance, float alphaMultiplier, double angle, boolean hasAtmosphere, float[] atmColor, float[] ringColor, boolean isGasgiant, boolean hasRings, boolean hasDecorators) {
         int clientRenderDistanceBlocks = mc.gameSettings.renderDistanceChunks * 16;
 
-        ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(mc.player.getPosition());
+        float planetOrbitalDistance = OrbitalDistance;
+        if (planetOrbitalDistance < 0) {
+            ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(mc.player.getPosition());
 
-        if (spaceObject == null)
-            return;
-        float planetOrbitalDistance = spaceObject.getOrbitalDistance();
+            if (spaceObject == null)
+                return;
+            planetOrbitalDistance = spaceObject.getOrbitalDistance();
+        }
 
         if (properties.isStar()) {
             planetOrbitalDistance = 190F;
@@ -191,6 +197,7 @@ public class RenderSpaceSky extends RenderPlanetarySky {
             return;
 
 
+
         float[] atmColor = properties.skyColor;
 
         GL11.glPushMatrix();
@@ -223,12 +230,12 @@ public class RenderSpaceSky extends RenderPlanetarySky {
         //TODO: draw sky planets
 
         GlStateManager.color(1f, 1f, 1f, alphaMultiplier);
-
+double yo = -10;
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        buffer.pos(-f10, -10.0D, f10).tex(f16, f17).endVertex();
-        buffer.pos(f10, -10.0D, f10).tex(f14, f17).endVertex();
-        buffer.pos(f10, -10.0D, -f10).tex(f14, f15).endVertex();
-        buffer.pos(-f10, -10.0D, -f10).tex(f16, f15).endVertex();
+        buffer.pos(-f10, yo, f10).tex(f16, f17).endVertex();
+        buffer.pos(f10, yo, f10).tex(f14, f17).endVertex();
+        buffer.pos(f10, yo, -f10).tex(f14, f15).endVertex();
+        buffer.pos(-f10, yo, -f10).tex(f16, f15).endVertex();
 
         Tessellator.getInstance().draw();
         GL11.glPopAttrib();
@@ -259,10 +266,10 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                     f16 = 0f + Xoffset;
                     f17 = i + Xoffset;
 
-                    RenderHelper.renderTopFaceWithUV(buffer, -10D + i * scalingMult, -f10, -f10, 0, 0, f14, f15, f16, f17);
-                    RenderHelper.renderTopFaceWithUV(buffer, -10D + i * scalingMult, 0, 0, f10, f10, f14, f15, f16, f17);
-                    RenderHelper.renderTopFaceWithUV(buffer, -10D + i * scalingMult, -f10, 0, 0, f10, f14, f15, f16, f17);
-                    RenderHelper.renderTopFaceWithUV(buffer, -10D + i * scalingMult, 0, -f10, f10, 0, f14, f15, f16, f17);
+                    RenderHelper.renderTopFaceWithUV(buffer, yo + i * scalingMult, -f10, -f10, 0, 0, f14, f15, f16, f17);
+                    RenderHelper.renderTopFaceWithUV(buffer, yo + i * scalingMult, 0, 0, f10, f10, f14, f15, f16, f17);
+                    RenderHelper.renderTopFaceWithUV(buffer, yo + i * scalingMult, -f10, 0, 0, f10, f14, f15, f16, f17);
+                    RenderHelper.renderTopFaceWithUV(buffer, yo + i * scalingMult, 0, -f10, f10, 0, f14, f15, f16, f17);
                 }
 
                 Tessellator.getInstance().draw();
@@ -299,10 +306,10 @@ public class RenderSpaceSky extends RenderPlanetarySky {
                 f16 = f15;
                 f17 = f14;
 
-                RenderHelper.renderTopFaceWithUV(buffer, -10D, -f10, -f10, 0, 0, f14, f15, f16, f17);
-                RenderHelper.renderTopFaceWithUV(buffer, -10D, 0, 0, f10, f10, f14, f15, f16, f17);
-                RenderHelper.renderTopFaceWithUV(buffer, -10D, -f10, 0, 0, f10, f14, f15, f16, f17);
-                RenderHelper.renderTopFaceWithUV(buffer, -10D, 0, -f10, f10, 0, f14, f15, f16, f17);
+                RenderHelper.renderTopFaceWithUV(buffer, yo, -f10, -f10, 0, 0, f14, f15, f16, f17);
+                RenderHelper.renderTopFaceWithUV(buffer, yo, 0, 0, f10, f10, f14, f15, f16, f17);
+                RenderHelper.renderTopFaceWithUV(buffer, yo, -f10, 0, 0, f10, f14, f15, f16, f17);
+                RenderHelper.renderTopFaceWithUV(buffer, yo, 0, -f10, f10, 0, f14, f15, f16, f17);
 
                 Tessellator.getInstance().draw();
 

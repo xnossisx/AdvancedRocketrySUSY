@@ -81,6 +81,7 @@ public class RocketEventHandler extends Gui {
         lastDisplayTime = endTime;
     }
 
+    /*
     @SideOnly(Side.CLIENT)
     public static void destroyOrbitalTextures(World world) {
         if (!ARConfiguration.getCurrentConfig().skyOverride && !(world.provider instanceof IPlanetaryProvider)) {
@@ -98,6 +99,7 @@ public class RocketEventHandler extends Gui {
     }
 
     //@SubscribeEvent
+
     public static void onPostWorldRender(float partialTicks) {
 
         if (!mapReady)
@@ -179,6 +181,7 @@ public class RocketEventHandler extends Gui {
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
     }
 
+
     @SubscribeEvent
     public void onRocketDeorbit(RocketEvent.RocketDeOrbitingEvent event) {
         if (event.world.isRemote) {
@@ -194,13 +197,6 @@ public class RocketEventHandler extends Gui {
             }
         }
     }
-
-    @SubscribeEvent
-    public void playerTeleportEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
-        //Fix O2, space elevator popup displaying after teleporting
-        lastDisplayTime = -1000;
-    }
-
     @SubscribeEvent
     public void onRocketLaunch(RocketEvent.RocketLaunchEvent event) {
         if (ARConfiguration.getCurrentConfig().planetSkyOverride && !DimensionManager.getInstance().getDimensionProperties(event.world.provider.getDimension()).skyRenderOverride && event.world.isRemote && !event.getEntity().getPassengers().isEmpty() && event.getEntity().getPassengers().contains(Minecraft.getMinecraft().player)) {
@@ -209,6 +205,7 @@ public class RocketEventHandler extends Gui {
             event.world.provider.setSkyRenderer(new RenderPlanetarySky());
         }
     }
+
 
     @SideOnly(Side.CLIENT)
     private void prepareOrbitalMap(RocketEvent event) {
@@ -333,6 +330,15 @@ public class RocketEventHandler extends Gui {
             thread.start();
         }
     }
+
+*/
+    @SubscribeEvent
+    public void playerTeleportEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
+        //Fix O2, space elevator popup displaying after teleporting
+        lastDisplayTime = -1000;
+    }
+
+
 
     @SubscribeEvent
     public void onScreenRender(RenderGameOverlayEvent.Post event) {

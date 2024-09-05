@@ -429,9 +429,9 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
 
 
         //Freaky janky crap to make sure the multiblock loads on chunkload etc
-        if(world.isRemote && client_first_loop){
+        if (world.isRemote && client_first_loop) {
             PacketHandler.sendToServer(new PacketMachine(this, (byte) 13));
-            client_first_loop=false;
+            client_first_loop = false;
         }
         if (timeAlive == 0 && !world.isRemote) {
             if (isComplete())
@@ -449,7 +449,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
                 checkjam();
             }
             checkCanRun();
-            if (this.hasPowerForOperation() && this.isReadyForOperation() && this.isRunning ) {
+            if (this.hasPowerForOperation() && this.isReadyForOperation() && this.isRunning) {
 
                 if (this.drill.needsRestart()) {
                     this.setRunning(false);
@@ -476,38 +476,38 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
                 outputItems();
             }
 
-        }
 
-        if (this.drill.isFinished()) {
-            setRunning(false);
-            this.drill.deactivate();
+            if (this.drill.isFinished()) {
+                setRunning(false);
+                this.drill.deactivate();
 
-            if (!this.isJammed) {
-                if (this.mode == MODE.SINGLE)
-                    this.finished = true;
+                if (!this.isJammed) {
+                    if (this.mode == MODE.SINGLE)
+                        this.finished = true;
 
-                if (this.world.getStrongPower(getPos()) != 0) {
-                    if (this.mode == MODE.SPIRAL) {
-                        this.numSteps++;
-                        if (this.radius < this.numSteps) {
-                            this.numSteps = 0;
-                            if (prevDir == EnumFacing.NORTH)
-                                prevDir = EnumFacing.EAST;
-                            else if (prevDir == EnumFacing.EAST) {
-                                prevDir = EnumFacing.SOUTH;
-                                radius++;
-                            } else if (prevDir == EnumFacing.SOUTH)
-                                prevDir = EnumFacing.WEST;
-                            else {
-                                prevDir = EnumFacing.NORTH;
-                                radius++;
+                    if (this.world.getStrongPower(getPos()) != 0) {
+                        if (this.mode == MODE.SPIRAL) {
+                            this.numSteps++;
+                            if (this.radius < this.numSteps) {
+                                this.numSteps = 0;
+                                if (prevDir == EnumFacing.NORTH)
+                                    prevDir = EnumFacing.EAST;
+                                else if (prevDir == EnumFacing.EAST) {
+                                    prevDir = EnumFacing.SOUTH;
+                                    radius++;
+                                } else if (prevDir == EnumFacing.SOUTH)
+                                    prevDir = EnumFacing.WEST;
+                                else {
+                                    prevDir = EnumFacing.NORTH;
+                                    radius++;
+                                }
                             }
+
+                            this.laserX += 3 * prevDir.getFrontOffsetX();
+                            this.laserZ += 3 * prevDir.getFrontOffsetZ();
+                            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 15), this.world.provider.getDimension(), pos, 128);
+
                         }
-
-                        this.laserX += 3 * prevDir.getFrontOffsetX();
-                        this.laserZ += 3 * prevDir.getFrontOffsetZ();
-                        PacketHandler.sendToNearby(new PacketMachine(this, (byte) 15), this.world.provider.getDimension(), pos,128);
-
                     }
                 }
             }
