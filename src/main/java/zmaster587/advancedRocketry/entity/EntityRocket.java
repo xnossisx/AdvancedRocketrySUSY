@@ -96,9 +96,9 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     // might be a temporary solution. Better be stuck 1 seconds than 25 seconds. but it needs 1 second to load
     private static final int DESCENT_TIMER = 1*20;
 
-    private Vec3d serverPos;
-    private Vec3d myMotion;
-    int tick_last_sync = 0;
+    //client sync stuff
+    private Vec3d poscorrection;
+    boolean first_position_update = true;
 
     private static final int BUTTON_ID_OFFSET = 25;
     private static final int STATION_LOC_OFFSET = 50;
@@ -140,9 +140,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     public EntityRocket(World p_i1582_1_) {
         super(p_i1582_1_);
 
-        // for smooth client update
-        this.serverPos = new Vec3d(this.posX, this.posY, this.posZ);
-        this.myMotion = new Vec3d(this.posX, this.posY, this.posZ);
+        poscorrection = new Vec3d(0,0,0);
+        first_position_update = true;
 
         isInOrbit = false;
         stats = new StatsRocket();
@@ -741,13 +740,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         return ARConfiguration.getCurrentConfig().automaticRetroRockets &&
                 isInOrbit() &&
                 (
-                        (this.posY < ch + 300 && (this.motionY < -0.5f || world.isRemote)) ||
+                        (this.posY < ch + 250 && (this.motionY < -0.5f || world.isRemote)) ||
                                 (this.posY < ch + 150 && (this.motionY < -0.4f || world.isRemote)) ||
                                 (this.posY < ch + 100 && (this.motionY < -0.3f || world.isRemote)) ||
                                 (this.posY < ch + 70 && (this.motionY < -0.2f || world.isRemote)) ||
-                                (this.posY < ch + 50 && (this.motionY < -0.15f || world.isRemote)) ||
-                                (this.posY < ch + 25 && (this.motionY < -0.8f || world.isRemote))||
-                                (this.posY < ch + 10 && (this.motionY < -0.01f || world.isRemote))
+                                (this.posY < ch + 50 && (this.motionY < -0.14f || world.isRemote)) ||
+                                (this.posY < ch + 20 && (this.motionY < -0.5f || world.isRemote))||
+                                (this.posY < ch + 10 && (this.motionY < -0.05f || world.isRemote))
                 );
     }
 
@@ -772,28 +771,19 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         return this.motionY > 0 || isDescentPhase() || (getPassengerMovingForward() > 0) || isStartupPhase();
     }
 
-    private void interpolatePosition() {
-        this.setPosition(posX + myMotion.x, posY + myMotion.y, posZ + myMotion.z);
-    }
+
+
     @Override
     public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
-        Vec3d new_pos = new Vec3d(x, y, z);
-        int tickdiff = this.ticksExisted - tick_last_sync;
-
-        this.serverPos = new_pos;
-
-        Vec3d positiondiff  = serverPos.subtract(new Vec3d(posX,posY,posZ));
-        this.myMotion = positiondiff.scale((double) 0.1 / tickdiff);
-
-        this.rotationPitch = pitch;
-        this.rotationYaw = yaw;
-
-        if(tick_last_sync == 0){
-            this.setPosition(serverPos.x,serverPos.y,serverPos.z);
+        if (first_position_update){
+            this.setPosition(x,y,z);
+            first_position_update = false;
+        }else {
+            Vec3d new_pos = new Vec3d(x, y, z);
+            poscorrection = new_pos.subtract(posX, posY, posZ);
         }
-
-        tick_last_sync = this.ticksExisted;
     }
+
 
 
     private void runEngines() {
@@ -924,14 +914,33 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         PacketHandler.sendToNearby(new PacketEntity(this, (byte) 0, nbtdata), world.provider.getDimension(), new BlockPos(this), 64);
     }
 
+
+    //stfu
+    /*
+    @Override
+    public void setVelocity(double p_70016_1_, double p_70016_3_, double p_70016_5_) {
+        //this.motionX = p_70016_1_;
+        //this.motionY = p_70016_3_;
+        //this.motionZ = p_70016_5_;
+    }
+     */
+
+
     @Override
     public void onUpdate() {
         super.onUpdate();
         long deltaTime = world.getTotalWorldTime() - lastWorldTickTicked;
         lastWorldTickTicked = world.getTotalWorldTime();
 
-        if (world.isRemote)
-            interpolatePosition();
+        if (world.isRemote) {
+            double ct = 100;
+            double cx = poscorrection.x / ct;
+            double cy = poscorrection.y / ct;
+            double cz = poscorrection.z / ct;
+            poscorrection = poscorrection.subtract(cx,cy,cz);
+
+            this.setPosition(posX+cx,posY+cy,posZ+cz);
+        }
 
         if (this.ticksExisted == 20) {
 
@@ -1177,26 +1186,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
                 runEngines();
             }
-
-            if (!this.getPassengers().isEmpty()) {
-
-                for (Entity entity : this.getPassengers()) {
-                    entity.fallDistance = 0;
-                    this.fallDistance = 0;
-                }
-
-                //if the player holds the forward key then decelerate
-                if (isInOrbit() && (burningFuel || descentPhase)) {
-                    float vel = descentPhase ? 1f : getPassengerMovingForward();
-                    this.motionY -= this.motionY * vel / 100f;
+            if (!world.isRemote) {
+                if (isInOrbit() && descentPhase) { //going down & slowing
+                    this.motionY -= this.motionY / 100f;
                     this.velocityChanged = true;
                 }
-
-
-            } else if (isInOrbit() && descentPhase) { //For unmanned rockets
-                this.motionY -= this.motionY / 100f;
-                this.velocityChanged = true;
-            }
 
 
                 //If out of fuel or descending then accelerate downwards
@@ -1204,13 +1198,13 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     //this.motionY = Math.min(this.motionY - 0.001, 1);
                     this.motionY = this.motionY - 0.0001;
                     this.velocityChanged = true;
-                } else{
+                } else {
                     //this.motionY = Math.min(this.motionY + 0.001, 1);
                     this.motionY += stats.getAcceleration(DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getGravitationalMultiplier()) * deltaTime;
-                this.velocityChanged = true;
-            }
+                    this.velocityChanged = true;
+                }
 
-            if (!world.isRemote) {
+
                 double lastPosY = this.posY;
                 double prevMotion = this.motionY;
                 this.move(MoverType.SELF, 0, prevMotion * deltaTime, 0);
@@ -1268,6 +1262,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 }
             } else {
                 this.move(MoverType.SELF, 0, this.motionY*deltaTime, 0);
+                //this.setPosition(posX, posY + this.motionY * deltaTime, posZ);
             }
         } else if (DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).isAsteroid() && getRCS()) {
 
