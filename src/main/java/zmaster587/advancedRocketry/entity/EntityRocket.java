@@ -96,6 +96,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     // might be a temporary solution. Better be stuck 2 seconds than 25 seconds.
     private static final int DESCENT_TIMER = 2*20;
 
+    private Vec3d serverPos;
+    private Vec3d myMotion;
+    int tick_last_sync = 0;
+
     private static final int BUTTON_ID_OFFSET = 25;
     private static final int STATION_LOC_OFFSET = 50;
     private static final int ENGINE_IGNITION_CNT = 100;
@@ -135,6 +139,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     private boolean rcs_mode = false;
     public EntityRocket(World p_i1582_1_) {
         super(p_i1582_1_);
+
+        // for smooth client update
+        this.serverPos = new Vec3d(this.posX, this.posY, this.posZ);
+        this.myMotion = new Vec3d(this.posX, this.posY, this.posZ);
+
         isInOrbit = false;
         stats = new StatsRocket();
         isInFlight = false;
@@ -763,6 +772,26 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         return this.motionY > 0 || isDescentPhase() || (getPassengerMovingForward() > 0) || isStartupPhase();
     }
 
+    private void interpolatePosition() {
+        this.setPosition(posX + myMotion.x, posY + myMotion.y, posZ + myMotion.z);
+    }
+    @Override
+    public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
+        Vec3d new_pos = new Vec3d(x, y, z);
+        int tickdiff = this.ticksExisted - tick_last_sync;
+
+        this.serverPos = new_pos;
+
+        Vec3d positiondiff  = serverPos.subtract(new Vec3d(posX,posY,posZ));
+        this.myMotion = positiondiff.scale((double) 1 / tickdiff);
+
+        this.rotationPitch = pitch;
+        this.rotationYaw = yaw;
+
+        tick_last_sync = this.ticksExisted;
+    }
+
+
     private void runEngines() {
         //Spawn in the particle effects for the engines
         int max_engine_for_smoke = 32;
@@ -897,6 +926,9 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         long deltaTime = world.getTotalWorldTime() - lastWorldTickTicked;
         lastWorldTickTicked = world.getTotalWorldTime();
 
+        if (world.isRemote)
+            interpolatePosition();
+
         if (this.ticksExisted == 20) {
 
             //problems with loading on other world then where the infrastructure was set?
@@ -977,6 +1009,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             if (ARConfiguration.getCurrentConfig().launchingDestroysBlocks && launchCount <= 100 && launchCount != 0 && this.getFuelCapacity(getRocketFuelType()) > 0)
                 damageGroundBelowRocket(world, (int) this.posX, (int) this.posY, (int) this.posZ, (int) Math.pow(stats.getThrust(), 0.4));
         }
+
 
         // When flying around in space
         if (getInSpaceFlight()) {
