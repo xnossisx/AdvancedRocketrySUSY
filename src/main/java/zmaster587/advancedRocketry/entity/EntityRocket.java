@@ -93,13 +93,15 @@ import java.util.*;
 public class EntityRocket extends EntityRocketBase implements INetworkEntity, IModularInventory, IProgressBar, IButtonInventory, ISelectionNotify, IPlanetDefiner {
 
     // set to 2 seconds because keyboard event is not sent to server
-    // might be a temporary solution. Better be stuck 1 seconds than 25 seconds. but it needs 1 second to load
-    private static final int DESCENT_TIMER = 1*20;
+    // might be a temporary solution. Better be stuck 2 seconds than 25 seconds. but it needs 1 second to load
+    private static final int DESCENT_TIMER = 2*20;
 
     //client sync stuff
     private Vec3d poscorrection;
     private Vec3d velcorrection;
-    boolean first_position_update = true;
+    boolean reset_position = true;
+    boolean reset_motion = true;
+    boolean last_was_in_orbit = false;
 
     private static final int BUTTON_ID_OFFSET = 25;
     private static final int STATION_LOC_OFFSET = 50;
@@ -143,7 +145,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         poscorrection = new Vec3d(0,0,0);
         velcorrection = new Vec3d(0,0,0);
-        first_position_update = true;
+        reset_position = true;
+        reset_motion = true;
 
         isInOrbit = false;
         stats = new StatsRocket();
@@ -349,8 +352,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 displayStr += "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.rcs") + ": " + getRCS();
         }
 
-        if (isInOrbit() && !isInFlight())
-            return LibVulpes.proxy.getLocalizedString("msg.entity.rocket.descend.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.descend.2") + ((DESCENT_TIMER - this.ticksExisted) / 20);
+        if (isInOrbit() && !isInFlight()) {
+            //return LibVulpes.proxy.getLocalizedString("msg.entity.rocket.descend.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.descend.2") + ((DESCENT_TIMER - this.ticksExisted) / 20);
+            return super.getTextOverlay();
+        }
         else if (!isInFlight())
             return LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.entity.rocket.ascend.2") + displayStr;
 
@@ -777,9 +782,16 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     @Override
     public void setPositionAndRotationDirect(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean teleport) {
-        if (first_position_update){
+
+        if(last_was_in_orbit != this.dataManager.get(INORBIT)){
+            last_was_in_orbit = this.dataManager.get(INORBIT);
+            reset_motion= true;
+            reset_position = true;
+        }
+
+        if (reset_position){
             this.setPosition(x,y,z);
-            first_position_update = false;
+            reset_position = false;
         }else {
             Vec3d new_pos = new Vec3d(x, y, z);
             poscorrection = new_pos.subtract(posX, posY, posZ);
@@ -921,11 +933,16 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     @Override
     public void setVelocity(double x, double y, double z) {
-        Vec3d new_vel = new Vec3d(x, y, z);
-        velcorrection = new_vel.subtract(motionX, motionY, motionZ);
-        //this.motionX = p_70016_1_;
-        //this.motionY = p_70016_3_;
-        //this.motionZ = p_70016_5_;
+        if (reset_motion){
+            velcorrection = new Vec3d(0,0,0);
+            this.motionX = x;
+            this.motionY = y;
+            this.motionZ = z;
+            reset_motion = false;
+        }else {
+            Vec3d new_vel = new Vec3d(x, y, z);
+            velcorrection = new_vel.subtract(motionX, motionY, motionZ);
+        }
     }
 
 
@@ -937,7 +954,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         lastWorldTickTicked = world.getTotalWorldTime();
 
         if (world.isRemote) {
-            double ct = 100;
+            double ct = 50;
             double cx = poscorrection.x / ct;
             double cy = poscorrection.y / ct;
             double cz = poscorrection.z / ct;
@@ -945,7 +962,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
             this.setPosition(posX+cx,posY+cy,posZ+cz);
 
-            double ct2 = 50;
+            double ct2 = 25;
             double vx = velcorrection.x / ct2;
             double vy = velcorrection.y / ct2;
             double vz = velcorrection.z / ct2;
