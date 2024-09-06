@@ -9,7 +9,7 @@ public class TrailFx extends InverseTrailFx {
 
     float max_speed_increase = 3.0f;
     float current_speed_increase = 1.0f;
-    int max_engines_for_calculation = 64;
+    int max_engines_for_calculation = 32;
 
     //increase x-z motion
     public void register_additional_engines(int n){
