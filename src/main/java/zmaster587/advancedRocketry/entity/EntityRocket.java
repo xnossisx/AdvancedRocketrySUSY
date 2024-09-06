@@ -93,8 +93,8 @@ import java.util.*;
 public class EntityRocket extends EntityRocketBase implements INetworkEntity, IModularInventory, IProgressBar, IButtonInventory, ISelectionNotify, IPlanetDefiner {
 
     // set to 2 seconds because keyboard event is not sent to server
-    // might be a temporary solution. Better be stuck 2 seconds than 25 seconds.
-    private static final int DESCENT_TIMER = 2*20;
+    // might be a temporary solution. Better be stuck 1 seconds than 25 seconds. but it needs 1 second to load
+    private static final int DESCENT_TIMER = 1*20;
 
     private Vec3d serverPos;
     private Vec3d myMotion;
@@ -783,10 +783,14 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         this.serverPos = new_pos;
 
         Vec3d positiondiff  = serverPos.subtract(new Vec3d(posX,posY,posZ));
-        this.myMotion = positiondiff.scale((double) 1 / tickdiff);
+        this.myMotion = positiondiff.scale((double) 0.1 / tickdiff);
 
         this.rotationPitch = pitch;
         this.rotationYaw = yaw;
+
+        if(tick_last_sync == 0){
+            this.setPosition(serverPos.x,serverPos.y,serverPos.z);
+        }
 
         tick_last_sync = this.ticksExisted;
     }
@@ -1185,24 +1189,28 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 if (isInOrbit() && (burningFuel || descentPhase)) {
                     float vel = descentPhase ? 1f : getPassengerMovingForward();
                     this.motionY -= this.motionY * vel / 100f;
+                    this.velocityChanged = true;
                 }
-                this.velocityChanged = true;
+
 
             } else if (isInOrbit() && descentPhase) { //For unmanned rockets
                 this.motionY -= this.motionY / 100f;
                 this.velocityChanged = true;
             }
 
-            if (!world.isRemote) {
+
                 //If out of fuel or descending then accelerate downwards
                 if (isInOrbit() || !burningFuel) {
                     //this.motionY = Math.min(this.motionY - 0.001, 1);
                     this.motionY = this.motionY - 0.0001;
-                } else
+                    this.velocityChanged = true;
+                } else{
                     //this.motionY = Math.min(this.motionY + 0.001, 1);
                     this.motionY += stats.getAcceleration(DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getGravitationalMultiplier()) * deltaTime;
+                this.velocityChanged = true;
+            }
 
-
+            if (!world.isRemote) {
                 double lastPosY = this.posY;
                 double prevMotion = this.motionY;
                 this.move(MoverType.SELF, 0, prevMotion * deltaTime, 0);
@@ -1259,7 +1267,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                         this.setDead();
                 }
             } else {
-                this.move(MoverType.SELF, 0, this.motionY, 0);
+                this.move(MoverType.SELF, 0, this.motionY*deltaTime, 0);
             }
         } else if (DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).isAsteroid() && getRCS()) {
 

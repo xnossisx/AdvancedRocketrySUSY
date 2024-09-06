@@ -1038,7 +1038,7 @@ GL11.glPopMatrix();
         GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 
         // Set planet size based on distance
-        float f10 = 5f * AstronomicalBodyHelper.getBodySizeMultiplier(dist);
+        float f10 = 300f * AstronomicalBodyHelper.getBodySizeMultiplier(dist);
 
         float Xoffset = (float) ((System.currentTimeMillis() / 1000000d % 1));
 
@@ -1048,7 +1048,7 @@ GL11.glPopMatrix();
 // THIS °§$%°§%$& DOES NOT WORK FOR T<0.5
         GlStateManager.color(1f, 1f, 1f, transparency);
 
-        double yo = -0.1;
+        double yo = -10;
 
         // Start rendering the quad with the texture
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
