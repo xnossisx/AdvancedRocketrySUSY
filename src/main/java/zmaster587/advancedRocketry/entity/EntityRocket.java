@@ -98,6 +98,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     //client sync stuff
     private Vec3d poscorrection;
+    private Vec3d velcorrection;
     boolean first_position_update = true;
 
     private static final int BUTTON_ID_OFFSET = 25;
@@ -141,6 +142,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         super(p_i1582_1_);
 
         poscorrection = new Vec3d(0,0,0);
+        velcorrection = new Vec3d(0,0,0);
         first_position_update = true;
 
         isInOrbit = false;
@@ -740,7 +742,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         return ARConfiguration.getCurrentConfig().automaticRetroRockets &&
                 isInOrbit() &&
                 (
-                        (this.posY < ch + 250 && (this.motionY < -0.5f || world.isRemote)) ||
+                        (this.posY < ch + 300 && (this.motionY < -0.5f || world.isRemote)) ||
                                 (this.posY < ch + 150 && (this.motionY < -0.4f || world.isRemote)) ||
                                 (this.posY < ch + 100 && (this.motionY < -0.3f || world.isRemote)) ||
                                 (this.posY < ch + 70 && (this.motionY < -0.2f || world.isRemote)) ||
@@ -916,14 +918,16 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
 
     //stfu
-    /*
+
     @Override
-    public void setVelocity(double p_70016_1_, double p_70016_3_, double p_70016_5_) {
+    public void setVelocity(double x, double y, double z) {
+        Vec3d new_vel = new Vec3d(x, y, z);
+        velcorrection = new_vel.subtract(motionX, motionY, motionZ);
         //this.motionX = p_70016_1_;
         //this.motionY = p_70016_3_;
         //this.motionZ = p_70016_5_;
     }
-     */
+
 
 
     @Override
@@ -940,6 +944,16 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             poscorrection = poscorrection.subtract(cx,cy,cz);
 
             this.setPosition(posX+cx,posY+cy,posZ+cz);
+
+            double ct2 = 50;
+            double vx = velcorrection.x / ct2;
+            double vy = velcorrection.y / ct2;
+            double vz = velcorrection.z / ct2;
+            velcorrection = velcorrection.subtract(vx,vy,vz);
+
+            motionX+=vx;
+            motionY+=vy;
+            motionZ+=vz;
         }
 
         if (this.ticksExisted == 20) {
