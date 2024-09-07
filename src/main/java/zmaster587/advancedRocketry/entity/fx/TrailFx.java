@@ -28,9 +28,9 @@ public class TrailFx extends InverseTrailFx {
         this.prevPosZ = this.posZ = z;
 
         float chroma = this.rand.nextFloat() * 0.2f;
-        this.particleRed = .4F + chroma;
-        this.particleGreen = .4F + chroma;
-        this.particleBlue = .4F + chroma;
+        this.particleRed = .8F + chroma;
+        this.particleGreen = .8F + chroma;
+        this.particleBlue = .8F + chroma;
         this.setSize(0.12F, 0.12F);
         this.particleScale = (this.rand.nextFloat() * 0.6F + 6F)*0.8f;
         this.motionX = motx;
@@ -43,7 +43,7 @@ public class TrailFx extends InverseTrailFx {
 
     @Override
     public int getFXLayer() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -67,24 +67,24 @@ public class TrailFx extends InverseTrailFx {
         if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
         }
-        int ch = world.getHeight((int) this.posX, (int) this.posZ);
-        if (this.posY < ch + 1) {
-            this.motionY = 0;
-            this.posY = ch +1 ;
+            int ch = world.getHeight((int) this.posX, (int) this.posZ);
+            if (this.posY < ch + 1) {
+                this.motionY = 0;
+                this.posY = ch + 1;
 
-            this.motionX = (world.rand.nextFloat() - 0.5) / 4;
-            this.motionZ = (world.rand.nextFloat() - 0.5) / 4;
+                this.motionX = (world.rand.nextFloat() - 0.5) / 4;
+                this.motionZ = (world.rand.nextFloat() - 0.5) / 4;
 
 
-        }
-        if (this.motionY < 0) {
-            //fast slowdown when near ground AND moving lower
-            if (this.posY - ch < 10) {
-                this.motionY *= 0.99;
             }
-        }
-        this.motionY *= 0.98;
-        this.motionY += 0.0005;
+            if (this.motionY < 0) {
+                //fast slowdown when near ground AND moving lower
+                if (this.posY - ch < 10) {
+                    this.motionY *= 0.99;
+                }
+            }
+            this.motionY *= 0.98;
+            this.motionY += 0.0005;
 
         this.setPosition(posX + this.motionX*current_speed_increase, posY + this.motionY, posZ + this.motionZ*current_speed_increase);
     }

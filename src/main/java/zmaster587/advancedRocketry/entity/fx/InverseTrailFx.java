@@ -29,6 +29,7 @@ public class InverseTrailFx extends Particle {
         this.motionY = -moty;
         this.motionZ = -motz;
 
+        this.particleAlpha = 0;
         icon = new ResourceLocation("advancedrocketry:textures/particle/soft.png");
 
 
@@ -68,7 +69,7 @@ public class InverseTrailFx extends Particle {
 
     @Override
     public int getFXLayer() {
-        return 2;
+        return 1;
     }
 
     @Override
