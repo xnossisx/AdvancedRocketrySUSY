@@ -130,7 +130,10 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         for (int x = 0; x < this.sizeX; x++) {
             for (int y = 0; y < this.sizeY; y++) {
                 for (int z = 0; z < this.sizeZ; z++) {
-                    this.weight += WeightEngine.INSTANCE.getWeight(null, this.blocks[x][y][z]);
+                    Block block = this.blocks[x][y][z];
+                    if (block != null) {
+                        this.weight += WeightEngine.INSTANCE.getWeight(null, block);
+                    }
                 }
             }
         }
@@ -167,7 +170,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         int fuelCapacityNuclearWorkingFluid = 0;
 
         float drillPower = 0f;
-        stats.reset();
+//        stats.reset();
 
         float weight = 0;
 
