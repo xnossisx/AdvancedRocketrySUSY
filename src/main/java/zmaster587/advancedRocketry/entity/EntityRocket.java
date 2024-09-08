@@ -2135,8 +2135,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
 
+        if(id==(byte)9987){
+            // F*ck you little bug
+        }
 
-        if (id == PacketType.RECIEVENBT.ordinal()) {
+        else if (id == PacketType.RECIEVENBT.ordinal()) {
             this.readEntityFromNBT(nbt);
             initFromBounds();
         } else if (id == PacketType.DECONSTRUCT.ordinal()) {
