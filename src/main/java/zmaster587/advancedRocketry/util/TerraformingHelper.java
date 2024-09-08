@@ -305,12 +305,17 @@ public class TerraformingHelper {
         Vec3i pos = terraformingqueue.remove(index);
         return new BlockPos(pos);
     }
-    public synchronized BlockPos get_next_position_biomechanging(boolean random){
-        if (biomechangingqueue.isEmpty())
+    public synchronized BlockPos get_next_position_biomechanging(boolean random) {
+        if (biomechangingqueue.isEmpty()) {
             return null;
-        int index = 0;
-        if (random)
-            index = nextInt(0,biomechangingqueue.size());
+        }
+
+        int index;
+        if (random) {
+            index = new Random().nextInt(Math.min(8192, biomechangingqueue.size()));
+        } else {
+            index = 0; // Default to the first element if not random mode
+        }
 
         Vec3i pos = biomechangingqueue.remove(index);
         return new BlockPos(pos);
@@ -348,6 +353,7 @@ public class TerraformingHelper {
         if (data == null){
             System.out.println("generate new chunk: "+cpos.x+":"+cpos.z);
             generate_new_chunkdata(new ChunkPos(cpos.x, cpos.z));
+            data = getChunkFromList(cpos.x,cpos.z);
         }
         if (data.blockStates == null){
             System.out.println("generate new blockstates: "+cpos.x+":"+cpos.z);

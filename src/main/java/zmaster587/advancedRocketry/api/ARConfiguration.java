@@ -89,9 +89,9 @@ public class ARConfiguration {
     public boolean enableNausea = true;
     @ConfigProperty
     public boolean enableOxygen = true;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public boolean launchingDestroysBlocks;
-    @ConfigProperty
+    @ConfigProperty(needsSync = true)
     public float buildSpeedMultiplier = 1f;
     @ConfigProperty
     public boolean generateCopper;

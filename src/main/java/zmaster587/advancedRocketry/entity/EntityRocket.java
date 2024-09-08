@@ -32,6 +32,7 @@ import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -99,9 +100,9 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
     //client sync stuff
     private Vec3d poscorrection;
     private Vec3d velcorrection;
-    boolean reset_position = true;
-    boolean reset_motion = true;
     boolean last_was_in_orbit = false;
+    boolean        reset_position = true;
+    boolean reset_motion = true;
 
     private static final int BUTTON_ID_OFFSET = 25;
     private static final int STATION_LOC_OFFSET = 50;
@@ -796,6 +797,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             Vec3d new_pos = new Vec3d(x, y, z);
             poscorrection = new_pos.subtract(posX, posY, posZ);
         }
+
+
+        //Vec3d new_pos = new Vec3d(x, y, z);
+        //poscorrection = new_pos.subtract(posX, posY, posZ);
     }
 
 
@@ -933,6 +938,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     @Override
     public void setVelocity(double x, double y, double z) {
+
         if (reset_motion){
             velcorrection = new Vec3d(0,0,0);
             this.motionX = x;
@@ -943,6 +949,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             Vec3d new_vel = new Vec3d(x, y, z);
             velcorrection = new_vel.subtract(motionX, motionY, motionZ);
         }
+
+
+        //Vec3d new_vel = new Vec3d(x, y, z);
+        //velcorrection = new_vel.subtract(motionX, motionY, motionZ);
     }
 
 
@@ -962,7 +972,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
             this.setPosition(posX+cx,posY+cy,posZ+cz);
 
-            double ct2 = 25;
+            double ct2 = 10;
             double vx = velcorrection.x / ct2;
             double vy = velcorrection.y / ct2;
             double vz = velcorrection.z / ct2;

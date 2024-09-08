@@ -192,7 +192,8 @@ public class TileTerraformingTerminal extends TileInventoriedRFConsumer implemen
 
                                     BiomeProvider chunkmgr = t.chunkMgrTerraformed;
                                     //BlockPos next_block_pos = t.get_next_position(false);
-                                    BlockPos next_block_pos = t.get_next_position_biomechanging(false);
+                                    //BlockPos next_block_pos = t.get_next_position_biomechanging(false);
+                                    BlockPos next_block_pos = t.get_next_position_biomechanging(true);
 
                                     if (next_block_pos != null) { // it is null when there is everything terraformed
                                         battery.extractEnergy(powerrequired, false);
