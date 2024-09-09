@@ -10,6 +10,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+import zmaster587.advancedRocketry.api.ARConfiguration;
 
 import java.io.File;
 import java.io.FileReader;
@@ -52,6 +53,9 @@ public enum WeightEngine {
     }
 
     public float getTEWeight(TileEntity te) {
+
+        if(!ARConfiguration.getCurrentConfig().advancedWeightSystem_Inventories) return 0;
+
         float weight = 0;
 
         if (te == null) {
