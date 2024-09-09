@@ -275,12 +275,13 @@ public class BiomeHandler {
                 int treegen = biomeId.decorator.treesPerChunk;
                 if (world.rand.nextInt(16 * 16) < treegen) {
                     biomeId.getRandomTreeFeature(world.rand).generate(world, world.rand, world.getHeight(pos.add(8, 0, 8)));
-
-                    //make a biome laser here
-                    // nah... looks ugly
-                    //Chunk chunk = world.getChunkFromBlockCoords(pos);
-                    //PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos.add(8, 0, 8))), world.provider.getDimension(), pos, 1024);
                 }
+
+                //some more flowers, grass, ....
+                BlockPos yy = world.getHeight(pos);
+                while (!world.getBlockState(yy.down()).isOpaqueCube() && yy.getY() > 0)
+                    yy = yy.down();
+                decorateBiome(world, yy, biomeId);
 
                 DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);
             }
