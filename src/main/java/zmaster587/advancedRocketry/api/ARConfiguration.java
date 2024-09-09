@@ -181,6 +181,10 @@ public class ARConfiguration {
     @ConfigProperty
     public float blockTankCapacity;
     @ConfigProperty
+    public float blockEnergyHatchCapacityMultiplier;
+    @ConfigProperty
+    public float blockLiquidHatchCapacityMultiplier;
+    @ConfigProperty
     public LinkedList<Integer> laserBlackListDims = new LinkedList<>();
     @ConfigProperty
     public LinkedList<String> standardLaserDrillOres = new LinkedList<>();
@@ -356,6 +360,9 @@ public class ARConfiguration {
         arConfig.jetPackThrust = (float) config.get(Configuration.CATEGORY_GENERAL, "jetPackForce", 1.3, "Amount of force the jetpack provides with respect to gravity, 1 is the same acceleration as caused by Earth's gravity, 2 is 2x the acceleration caused by Earth's gravity, etc.  To make jetpack only work on low gravity planets, simply set it to a value less than 1").getDouble();
         arConfig.buildSpeedMultiplier = (float) config.get(Configuration.CATEGORY_GENERAL, "buildSpeedMultiplier", 1f, "Multiplier for the build speed of the Rocket Builder (0.5 is twice as fast 2 is half as fast").getDouble();
         arConfig.blockTankCapacity = (float) config.get(Configuration.CATEGORY_GENERAL, "blockTankCapacity", 1.0f, "Multiplier for the pressurized tank's (block) capacity", 0, Float.MAX_VALUE).getDouble();
+        arConfig.blockEnergyHatchCapacityMultiplier = (float) config.get(Configuration.CATEGORY_GENERAL, "blockEnergyHatchCapacityMultiplier", 1.0f, "Multiplier for the energy hatch capacity", 0, Float.MAX_VALUE).getDouble();
+        arConfig.blockLiquidHatchCapacityMultiplier = (float) config.get(Configuration.CATEGORY_GENERAL, "blockLiquidHatchCapacityMultiplier", 1.0f, "Multiplier for the liquid hatch (in/out) capacity", 0, Float.MAX_VALUE).getDouble();
+
         //Enriched Lava in the centrifuge
         arConfig.lavaCentrifugeOutputs = config.getStringList("lavaCentrifugeOutputs", Configuration.CATEGORY_GENERAL, new String[]{"nuggetCopper:100", "nuggetIron:100", "nuggetTin:100", "nuggetLead:100", "nuggetSilver:100", "nuggetGold:75", "nuggetDiamond:10", "nuggetUranium:10", "nuggetIridium:1"}, "Outputs and chances of objects from Enriched Lava in the Centrifuge.  Format: <oredictionaryEntry>:<weight>.  Larger weights are more frequent");
         arConfig.lavaCentrifugePower = config.getInt("lavaCentrifugePower", Configuration.CATEGORY_GENERAL, 10,0,999999,"The power per tick required to process enriched lava");

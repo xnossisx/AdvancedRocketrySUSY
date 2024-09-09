@@ -127,7 +127,9 @@ import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketItemModifcation;
 import zmaster587.libVulpes.recipe.RecipesMachine;
 import zmaster587.libVulpes.tile.TileMaterial;
+import zmaster587.libVulpes.tile.energy.TilePlugBase;
 import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
+import zmaster587.libVulpes.tile.multiblock.hatch.TileFluidHatch;
 import zmaster587.libVulpes.util.FluidUtils;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.InputSyncHandler;
@@ -1124,6 +1126,9 @@ public class AdvancedRocketry {
 
         //Add the overworld as a discovered planet
         zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().initiallyKnownPlanets.add(0);
+
+        TilePlugBase.energy_multiplier =  zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig(). blockEnergyHatchCapacityMultiplier;
+        TileFluidHatch.capacityMultiplier =  zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().blockLiquidHatchCapacityMultiplier;
     }
 
     @EventHandler
