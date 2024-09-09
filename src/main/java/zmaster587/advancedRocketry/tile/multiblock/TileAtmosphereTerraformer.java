@@ -314,7 +314,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     @Override
     @SideOnly(Side.CLIENT)
     public double getMaxRenderDistanceSquared() {
-        return 160 * 160;
+        return 320 * 320;
     }
 
     @Override

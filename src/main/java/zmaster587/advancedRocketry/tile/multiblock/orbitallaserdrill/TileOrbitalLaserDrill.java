@@ -857,6 +857,12 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             return;
     }
 
+    @Override
+    @SideOnly(Side.CLIENT)
+    public double getMaxRenderDistanceSquared() {
+        return 320 * 320;
+    }
+
 
     public enum MODE {
         SINGLE,

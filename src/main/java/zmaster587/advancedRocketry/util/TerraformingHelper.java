@@ -107,8 +107,10 @@ public class TerraformingHelper {
             if (currentchunk.type == TerraformingType.PROTECTED || currentchunkz1.type == TerraformingType.PROTECTED ||currentchunkx1.type == TerraformingType.PROTECTED ||currentchunkx1z1.type == TerraformingType.PROTECTED)
                 return -1; // chunks contain a protected chunk
 
-            if (currentchunkz1.terrain_fully_generated && currentchunkx1.terrain_fully_generated && currentchunkx1z1.terrain_fully_generated && currentchunk.terrain_fully_generated)
-                    return 1;
+            if (currentchunkz1.terrain_fully_generated && currentchunkx1.terrain_fully_generated && currentchunkx1z1.terrain_fully_generated && currentchunk.terrain_fully_generated) {
+                currentchunk.populate_chunk_if_not_already_done();
+                return 1;
+            }
         }
         return 0;
     }

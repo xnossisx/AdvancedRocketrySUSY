@@ -27,6 +27,8 @@ public class chunkdata {
     // as long as the atmosphere does not change, chunks that are fully generated will not register their blocks in the terraforming queue
     public boolean chunk_fully_generated;
 
+    public boolean chunk_populated;
+
     public boolean chunk_fully_biomechanged;
 
     // if the y values of new chunk and chunk in world match, terrain at this position is considered fully generated
@@ -53,6 +55,7 @@ public class chunkdata {
         this.type = TerraformingType.ALLOWED;
         chunk_fully_generated = false;
         terrain_fully_generated = false;
+        chunk_populated = false;
         fully_generated = new boolean[16][16];
         fully_decorated = new boolean[16][16];
         fully_biomechanged = new boolean[16][16];
@@ -103,6 +106,27 @@ public class chunkdata {
         }
     }
 
+    public void populate_chunk_if_not_already_done() {
+        // populate uses the biome at blockpos 0,0, in the chunk x+1,z+1, that's why we need the chunks next to it generated
+        if (!chunk_fully_generated && !chunk_populated) {
+
+            //2 times i want more population!
+            world.provider.createChunkGenerator().populate(this.x, this.z);
+            world.provider.createChunkGenerator().populate(this.x, this.z);
+
+            System.out.println("populate chunk " + this.x + ":" + this.z);
+            chunk_populated = true;
+            //make a biome lasers here
+            // no - looks bad
+            //for (int i = 0; i < 32; i++) {
+            //    int bx = world.rand.nextInt(16);
+            //    int bz = world.rand.nextInt(16);
+            //    BlockPos pos = new BlockPos(this.x*16+bx,0,this.z*16+bz);
+            //    PacketHandler.sendToNearby(new PacketBiomeIDChange(world.getChunkFromChunkCoords(this.x,this.z), world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
+            //}
+        }
+    }
+
     public void set_position_decorated(int x, int z){
 
         fully_decorated[x][z] = true;
@@ -115,22 +139,7 @@ public class chunkdata {
             }
         }
         if (all_decorated){
-            // populate uses the biome at blockpos 0,0, in the chunk x+1,z+1, that's why we need the chunks next to it generated
-            if (!chunk_fully_generated)
-                if (helper.can_populate(this.x, this.z) == 1){
-                    world.provider.createChunkGenerator().populate(this.x, this.z);
-                    System.out.println("populate chunk "+this.x+":"+this.z);
 
-                    //make a biome lasers here
-                    // no - looks bad
-                    //for (int i = 0; i < 32; i++) {
-                    //    int bx = world.rand.nextInt(16);
-                    //    int bz = world.rand.nextInt(16);
-                    //    BlockPos pos = new BlockPos(this.x*16+bx,0,this.z*16+bz);
-                    //    PacketHandler.sendToNearby(new PacketBiomeIDChange(world.getChunkFromChunkCoords(this.x,this.z), world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
-                    //}
-
-                }
             helper.setChunkFullyGenerated(this.x,this.z);
         }
 

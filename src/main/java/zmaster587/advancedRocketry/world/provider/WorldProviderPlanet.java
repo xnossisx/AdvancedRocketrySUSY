@@ -280,7 +280,7 @@ public class WorldProviderPlanet extends WorldProvider implements IPlanetaryProv
     //No clouds
     @Override
     public float getCloudHeight() {
-        return getAtmosphereDensity(new BlockPos(0, 0, 0)) > .75f ? 128 : -2000;
+        return getAtmosphereDensity(new BlockPos(0, 0, 0)) > .75f ? 128 : -200000;
     }
 
     @Override
