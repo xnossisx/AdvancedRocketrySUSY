@@ -329,6 +329,15 @@ public class ClientProxy extends CommonProxy {
         Minecraft.getMinecraft().effectRenderer.addEffect(fx);
 
     }
+    @Override
+    public void spawnDynamicRocketFlame(World world, double x, double y,
+                                        double z, double motionX, double motionY, double motionZ, int engineNum) {
+
+        RocketFx fx = new RocketFx(world, x, y, z, motionX, motionY, motionZ);
+        fx.register_additional_engines(engineNum);
+        Minecraft.getMinecraft().effectRenderer.addEffect(fx);
+
+    }
 
     @Override
     public void spawnParticle(String particle, World world, double x, double y, double z, double motionX, double motionY, double motionZ) {

@@ -552,6 +552,16 @@ public class StatsRocket {
         passengerSeats.clear();
         statTags.clear();
     }
+    public void reset_no_fuel() {
+        thrust = 0;
+        weight = 0;
+        drillingPower = 0f;
+
+        pilotSeatPos.x = INVALID_SEAT;
+        clearEngineLocations();
+        passengerSeats.clear();
+        statTags.clear();
+    }
 
     public void setStatTag(String str, float value) {
         statTags.put(str, value);
@@ -658,7 +668,7 @@ public class StatsRocket {
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
-
+this.reset();
         if (nbt.hasKey(TAGNAME)) {
             NBTTagCompound stats = nbt.getCompoundTag(TAGNAME);
             this.thrust = stats.getInteger("thrust");

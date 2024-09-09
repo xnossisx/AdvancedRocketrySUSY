@@ -91,6 +91,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
 
+import static java.lang.Math.min;
+
 public class EntityRocket extends EntityRocketBase implements INetworkEntity, IModularInventory, IProgressBar, IButtonInventory, ISelectionNotify, IPlanetDefiner {
 
     // set to 2 seconds because keyboard event is not sent to server
@@ -807,8 +809,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     private void runEngines() {
         //Spawn in the particle effects for the engines
-        int max_engine_for_smoke = 32;
+        int max_engine_for_smoke = 64;
         int engineNum = stats.getEngineLocations().size();
+        //System.out.println("engine locs:"+engineNum);
+
+
         if (world.isRemote && Minecraft.getMinecraft().gameSettings.particleSetting < 2 && areEnginesRunning()) {
             for (Vector3F<Float> vec : stats.getEngineLocations()) {
 
@@ -819,12 +824,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     atmosphere = handler.getAtmosphereType(this);
 
 
-
                 boolean can_smoke = true;
-                if (engineNum > max_engine_for_smoke){
+                if (engineNum > max_engine_for_smoke) {
                     can_smoke = rand.nextInt(engineNum) <= max_engine_for_smoke;
                 }
-                if (can_smoke && Minecraft.getMinecraft().gameSettings.particleSetting < 1  && (handler == null || (atmosphere != null && atmosphere.allowsCombustion()))) {
+
+                if (can_smoke && Minecraft.getMinecraft().gameSettings.particleSetting < 1 && (handler == null || (atmosphere != null && atmosphere.allowsCombustion()))) {
                     double yo = 1 + this.rand.nextFloat();
                     float xzv = 6f;
                     if (motionY > 0)
@@ -833,16 +838,17 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     double motionz = (this.rand.nextFloat() - 0.5f);
                     double motionx = (this.rand.nextFloat() - 0.5f);
                     double speed = (this.rand.nextFloat()) / xzv;
-                    double speedxz = Math.sqrt(motionx*motionx+motionz*motionz);
-                    motionx *= speed /speedxz;
-                    motionz *= speed /speedxz;
+                    double speedxz = Math.sqrt(motionx * motionx + motionz * motionz);
+                    motionx *= speed / speedxz;
+                    motionz *= speed / speedxz;
 
 
                     AdvancedRocketry.proxy.spawnDynamicRocketSmoke(world, this.posX + vec.x, this.posY + vec.y - yo, this.posZ + vec.z, motionx, -1.5 - this.rand.nextFloat() / 6.0, motionz, engineNum);
                 }
 
                 for (int i = 0; i < 3; i++) {
-                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x, this.posY + vec.y - 0.75, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -0.75, (this.rand.nextFloat() - 0.5f) / 6f);
+//                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x-0.25f, this.posY + vec.y - 0.75+(rand.nextFloat()-0.5)*0.25, this.posZ + vec.z-0.25f, (this.rand.nextFloat() - 0.5f) / 6f*current_speed_increase, -0.5*current_speed_increase+(rand.nextFloat()-0.5)*0.1, (this.rand.nextFloat() - 0.5f) / 6f*current_speed_increase);
+                        AdvancedRocketry.proxy.spawnDynamicRocketFlame(world, this.posX + vec.x, this.posY + vec.y - 0.9 + (rand.nextFloat() - 0.5) * 0.125, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -0.75 + (rand.nextFloat() - 0.5) * 0.1, (this.rand.nextFloat() - 0.5f) / 6f, engineNum);
                 }
             }
         }
@@ -1228,11 +1234,6 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 runEngines();
             }
             if (!world.isRemote) {
-                if (isInOrbit() && descentPhase) { //going down & slowing
-                    this.motionY -= this.motionY / 100f;
-                    this.velocityChanged = true;
-                }
-
 
                 //If out of fuel or descending then accelerate downwards
                 if (isInOrbit() || !burningFuel) {
@@ -1242,6 +1243,11 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 } else {
                     //this.motionY = Math.min(this.motionY + 0.001, 1);
                     this.motionY += stats.getAcceleration(DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getGravitationalMultiplier()) * deltaTime;
+                    this.velocityChanged = true;
+                }
+
+                if (isInOrbit() && descentPhase) { //going down & slowing
+                    this.motionY -= this.motionY / 120f;
                     this.velocityChanged = true;
                 }
 
@@ -1734,6 +1740,8 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
         NBTTagCompound nbtdata = new NBTTagCompound();
         writeToNBT(nbtdata);
+        // Can this be done without sending the entity packet again?
+        // It causes rocket to skip rendering a few frames when launching
         PacketHandler.sendToNearby(new PacketEntity(this, (byte) 0, nbtdata), this.world.provider.getDimension(), this.getPosition(), 64);
 
 
@@ -2071,7 +2079,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                 storage.readtiles(in);
         }
         if (packetId == PacketType.RECIEVENBT.ordinal()) {
-            storage = new StorageChunk();
+            storage = new StorageChunk(); //this re-loading makes the rocket not render for a tick or two when launching
             storage.setEntity(this);
             storage.readFromNetwork(in);
         } else if (packetId == PacketType.SENDPLANETDATA.ordinal()) {

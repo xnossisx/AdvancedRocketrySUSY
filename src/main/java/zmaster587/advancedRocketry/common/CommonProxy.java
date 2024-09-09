@@ -31,7 +31,12 @@ public class CommonProxy {
     }
 
     public void spawnDynamicRocketSmoke(World world, double x, double y,
-                              double z, double motionX, double motionY, double motionZ, int engineNum) {
+                                        double z, double motionX, double motionY, double motionZ, int engineNum) {
+
+    }
+
+    public void spawnDynamicRocketFlame(World world, double x, double y,
+                                        double z, double motionX, double motionY, double motionZ, int engineNum) {
 
     }
 
