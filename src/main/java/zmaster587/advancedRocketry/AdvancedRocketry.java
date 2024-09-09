@@ -53,6 +53,7 @@ import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
 import zmaster587.advancedRocketry.armor.ItemSpaceArmor;
 import zmaster587.advancedRocketry.armor.ItemSpaceChest;
 import zmaster587.advancedRocketry.block.*;
+import zmaster587.advancedRocketry.block.inventory.BlockInvHatch;
 import zmaster587.advancedRocketry.block.multiblock.BlockARHatch;
 import zmaster587.advancedRocketry.block.plant.BlockLightwoodLeaves;
 import zmaster587.advancedRocketry.block.plant.BlockLightwoodPlanks;
@@ -128,6 +129,7 @@ import zmaster587.libVulpes.network.PacketItemModifcation;
 import zmaster587.libVulpes.recipe.RecipesMachine;
 import zmaster587.libVulpes.tile.TileMaterial;
 import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
+import zmaster587.libVulpes.tile.multiblock.hatch.TileInventoryHatch;
 import zmaster587.libVulpes.util.FluidUtils;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.InputSyncHandler;
@@ -365,6 +367,7 @@ public class AdvancedRocketry {
         GameRegistry.registerTileEntity(TileCuttingMachine.class, "ARcuttingmachine");
         GameRegistry.registerTileEntity(TileDataBus.class, "ARdataBus");
         GameRegistry.registerTileEntity(TileSatelliteHatch.class, "ARsatelliteHatch");
+        GameRegistry.registerTileEntity(TileInventoryHatch.class, "ARinventoryHatch");
         GameRegistry.registerTileEntity(TileGuidanceComputerAccessHatch.class, "ARguidanceComputerHatch");
         GameRegistry.registerTileEntity(TileSatelliteBuilder.class, "ARsatelliteBuilder");
         GameRegistry.registerTileEntity(TileSatelliteTerminal.class, "ARTileEntitySatelliteControlCenter");
@@ -677,6 +680,7 @@ public class AdvancedRocketry {
         AdvancedRocketryBlocks.blockDrill = new BlockMiningDrill().setUnlocalizedName("drill").setCreativeTab(tabAdvRocketry).setHardness(3f);
         AdvancedRocketryBlocks.blockLandingFloat = new Block(Material.IRON).setUnlocalizedName("landingfloat").setCreativeTab(tabAdvRocketry).setHardness(1).setResistance(1f);
         AdvancedRocketryBlocks.blockServiceMonitor = new Block(Material.IRON).setUnlocalizedName("servicemonitor").setCreativeTab(tabAdvRocketry).setHardness(1).setResistance(1f);
+        AdvancedRocketryBlocks.blockInvHatch = new BlockInvHatch(Material.IRON).setUnlocalizedName("invhatch").setCreativeTab(tabAdvRocketry).setHardness(1).setResistance(1f);
         //Assembly machines
         AdvancedRocketryBlocks.blockRocketBuilder = new BlockTileWithMultitooltip(TileRocketAssemblingMachine.class, GuiHandler.guiId.MODULARNOINV.ordinal()).setUnlocalizedName("rocketAssembler").setCreativeTab(tabAdvRocketry).setHardness(3f);
         AdvancedRocketryBlocks.blockStationBuilder = new BlockTileWithMultitooltip(TileStationAssembler.class, GuiHandler.guiId.MODULAR.ordinal()).setUnlocalizedName("stationAssembler").setCreativeTab(tabAdvRocketry).setHardness(3f);
@@ -849,6 +853,7 @@ public class AdvancedRocketry {
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockDrill.setRegistryName("drill"));
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockLandingFloat.setRegistryName("landingfloat"));
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockServiceMonitor.setRegistryName("servicemonitor"));
+        LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockInvHatch.setRegistryName("invhatch"));
         //Assembly machines
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockRocketBuilder.setRegistryName("rocketBuilder"));
         LibVulpesBlocks.registerBlock(AdvancedRocketryBlocks.blockStationBuilder.setRegistryName("stationBuilder"));
