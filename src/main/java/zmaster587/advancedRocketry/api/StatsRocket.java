@@ -169,7 +169,8 @@ public class StatsRocket {
     }
 
     public float getAcceleration(float gravitationalMultiplier) {
-        return Math.min(0.01f, (getThrust() - (weight * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel) ? gravitationalMultiplier : 1))) / 10000f);
+        float N = getThrust() - (weight * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel) ? gravitationalMultiplier : 1));
+        return N/weight/20f;
     }
 
     public List<Vector3F<Float>> getEngineLocations() {

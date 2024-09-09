@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
@@ -11,6 +12,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import zmaster587.advancedRocketry.api.ARConfiguration;
+import zmaster587.advancedRocketry.block.BlockFuelTank;
+import zmaster587.advancedRocketry.block.BlockPressurizedFluidTank;
+import zmaster587.advancedRocketry.block.BlockRocketMotor;
+import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
+import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
+import zmaster587.libVulpes.block.BlockTile;
 
 import java.io.File;
 import java.io.FileReader;
@@ -32,13 +39,46 @@ public enum WeightEngine {
     }
 
     public float getWeight(ItemStack stack) {
-        if (stack.isEmpty()) {
+        if (stack.isEmpty() || stack.getItem().getRegistryName()==null) {
             return 0;
         }
         double weight = weights.getOrDefault(stack.getItem().getRegistryName().toString(), -1.0) * stack.getCount();
         if (weight >= 0) {
             return (float) weight;
         }
+
+        float tank_weight = 1.5f;
+        float motor_weight = 2f;
+        float guidance_computer_weight = 0.5f;
+
+        float pressuretank_weight = 3f;
+        float satellite_hatch_weight = 2f;
+
+            if (stack.getItem() instanceof ItemBlock) {
+                Block block = ((ItemBlock) stack.getItem()).getBlock();
+
+                if (block instanceof BlockFuelTank){
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) tank_weight);
+                    return tank_weight;
+                }
+                if (block instanceof BlockRocketMotor){
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) motor_weight);
+                    return motor_weight;
+                }
+                if (block instanceof BlockPressurizedFluidTank){
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) pressuretank_weight);
+                    return pressuretank_weight;
+                }
+                if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:guidancecomputer")){
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) guidance_computer_weight);
+                    return guidance_computer_weight;
+                }
+                if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:loader")){
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) satellite_hatch_weight);
+                    return satellite_hatch_weight;
+                }
+            }
+
         weights.put(stack.getItem().getRegistryName().toString(), 0.1);
         return 0.1F;
         // TODO Make weight selection by regular expressions
