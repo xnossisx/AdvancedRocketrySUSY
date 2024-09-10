@@ -47,35 +47,35 @@ public enum WeightEngine {
             return (float) weight;
         }
 
-        float tank_weight = 1f;
-        float motor_weight = 3f;
-        float guidance_computer_weight = 1f;
+        float tankWeight = 0.8f;
+        float motorWeight = 3f;
+        float guidanceComputerWeight = 2f;
 
-        float pressuretank_weight = 5f;
-        float satellite_hatch_weight = 5f;
+        float pressuretankWeight = 5f;
+        float satelliteHatchWeight = 5f;
 
             if (stack.getItem() instanceof ItemBlock) {
                 Block block = ((ItemBlock) stack.getItem()).getBlock();
 
                 if (block instanceof BlockFuelTank){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) tank_weight);
-                    return tank_weight;
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) tankWeight);
+                    return tankWeight;
                 }
                 if (block instanceof BlockRocketMotor){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) motor_weight);
-                    return motor_weight;
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) motorWeight);
+                    return motorWeight;
                 }
                 if (block instanceof BlockPressurizedFluidTank){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) pressuretank_weight);
-                    return pressuretank_weight;
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) pressuretankWeight);
+                    return pressuretankWeight;
                 }
                 if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:guidancecomputer")){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) guidance_computer_weight);
-                    return guidance_computer_weight;
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) guidanceComputerWeight);
+                    return guidanceComputerWeight;
                 }
                 if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:loader")){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) satellite_hatch_weight);
-                    return satellite_hatch_weight;
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) satelliteHatchWeight);
+                    return satelliteHatchWeight;
                 }
             }
 
@@ -94,7 +94,7 @@ public enum WeightEngine {
 
     public float getTEWeight(TileEntity te) {
 
-        if(!ARConfiguration.getCurrentConfig().advancedWeightSystem_Inventories) return 0;
+        if(!ARConfiguration.getCurrentConfig().advancedWeightSystemInventories) return 0;
 
         float weight = 0;
 

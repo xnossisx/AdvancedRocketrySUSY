@@ -1738,7 +1738,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
      * Launches the rocket post determining its height, checking whether it can launch to the selected planet and whether it can exist,
      * among other factors. Also handles orbital height calculations
      */
-    public void recalculate_stats(){
+    public void recalculateStats(){
         this.storage.recalculateStats(this.stats);
     }
 

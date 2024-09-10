@@ -164,7 +164,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         return getWeight();
     }
 
-    public boolean has_enough_fuel(@Nonnull FuelType fuelType) {
+    public boolean hasEnoughFuel(@Nonnull FuelType fuelType) {
         //return getAcceleration(getGravityMultiplier()) > 0 ? 2 * stats.getBaseFuelRate(fuelType) * MathHelper.sqrt((2 * (ARConfiguration.getCurrentConfig().orbit - this.getPos().getY())) / getAcceleration(getGravityMultiplier())) : 0;
         float a = getAcceleration(getGravityMultiplier());
         float fueltime = (float) stats.getFuelCapacity(fuelType) / stats.getBaseFuelRate(fuelType);
@@ -260,7 +260,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             AxisAlignedBB bufferedBB = bbCache.grow(buffer, buffer, buffer);
             List<EntityRocket> rockets = world.getEntitiesWithinAABB(EntityRocket.class, bufferedBB);
             if (rockets.size() == 1){ // only if axactly one rocket is here
-                rockets.get(0).recalculate_stats();
+                rockets.get(0).recalculateStats();
                 this.stats = rockets.get(0).stats;
                 status = ErrorCodes.ALREADY_ASSEMBLED; // to prevent assembly
                 return null;
@@ -453,7 +453,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                 status = ErrorCodes.NOGUIDANCE;
             else if (getThrust() <= getNeededThrust())
                 status = ErrorCodes.NOENGINES;
-            else if (((thrustBipropellant > 0) && !has_enough_fuel(FuelType.LIQUID_BIPROPELLANT)) || ((thrustMonopropellant > 0) && !has_enough_fuel(FuelType.LIQUID_MONOPROPELLANT)) || ((thrustNuclearTotalLimit > 0) && !has_enough_fuel(FuelType.NUCLEAR_WORKING_FLUID)))
+            else if (((thrustBipropellant > 0) && !hasEnoughFuel(FuelType.LIQUID_BIPROPELLANT)) || ((thrustMonopropellant > 0) && !hasEnoughFuel(FuelType.LIQUID_MONOPROPELLANT)) || ((thrustNuclearTotalLimit > 0) && !hasEnoughFuel(FuelType.NUCLEAR_WORKING_FLUID)))
                 status = ErrorCodes.NOFUEL;
             else
                 status = ErrorCodes.SUCCESS;
