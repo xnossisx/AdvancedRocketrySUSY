@@ -976,7 +976,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     public boolean onLinkComplete(@Nonnull ItemStack item, TileEntity entity,
                                   EntityPlayer player, World world) {
         TileEntity tile = world.getTileEntity(ItemLinker.getMasterCoords(item));
-        float maxlinkDistance = 5;
+        float maxlinkDistance = 15;
 
         if (tile instanceof IInfrastructure) {
             HashedBlockPosition pos = new HashedBlockPosition(tile.getPos());
