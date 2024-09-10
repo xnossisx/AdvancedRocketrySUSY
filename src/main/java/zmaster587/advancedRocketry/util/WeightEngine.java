@@ -51,7 +51,7 @@ public enum WeightEngine {
         double motorWeight = 3;
         double guidanceComputerWeight = 1.8;
 
-        double pressuretankWeight = 5;
+        double pressureTankWeight = 5;
         double satelliteHatchWeight = 5;
 
             if (stack.getItem() instanceof ItemBlock) {
@@ -66,8 +66,8 @@ public enum WeightEngine {
                     return (float) motorWeight;
                 }
                 if (block instanceof BlockPressurizedFluidTank){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) pressuretankWeight);
-                    return (float) pressuretankWeight;
+                    weights.put(stack.getItem().getRegistryName().toString(), (double) pressureTankWeight);
+                    return (float) pressureTankWeight;
                 }
                 if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:guidancecomputer")){
                     weights.put(stack.getItem().getRegistryName().toString(), (double) guidanceComputerWeight);
