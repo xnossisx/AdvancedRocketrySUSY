@@ -47,12 +47,12 @@ public enum WeightEngine {
             return (float) weight;
         }
 
-        float tank_weight = 1.5f;
-        float motor_weight = 2f;
-        float guidance_computer_weight = 0.5f;
+        float tank_weight = 1f;
+        float motor_weight = 3f;
+        float guidance_computer_weight = 1f;
 
-        float pressuretank_weight = 3f;
-        float satellite_hatch_weight = 2f;
+        float pressuretank_weight = 5f;
+        float satellite_hatch_weight = 5f;
 
             if (stack.getItem() instanceof ItemBlock) {
                 Block block = ((ItemBlock) stack.getItem()).getBlock();

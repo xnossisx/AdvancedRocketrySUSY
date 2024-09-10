@@ -447,7 +447,7 @@ public class ARConfiguration {
         //Rockets
         arConfig.rocketRequireFuel = config.get(ROCKET, "rocketsRequireFuel", true, "Set to false if rockets should not require fuel to fly").getBoolean();
         arConfig.canBeFueledByHand = config.get(ROCKET, "canBeFueledByHand", true, "Set to false if rockets should not be able to be fueled by and and will require a fueling station").getBoolean();
-        liquidMonopropellant = config.get(ROCKET, "rocketFuels", new String[]{"rocketfuel;2"}, "List of fluid names for fluids that can be used as rocket monopropellants").getStringList();
+        liquidMonopropellant = config.get(ROCKET, "rocketFuels", new String[]{"rocketfuel;10"}, "List of fluid names for fluids that can be used as rocket monopropellants").getStringList();
         liquidBipropellantFuel = config.get(ROCKET, "rocketBipropellants", new String[]{"hydrogen"}, "List of fluid names for fluids that can be used as rocket bipropellant fuels").getStringList();
         liquidBipropellantOxidizer = config.get(ROCKET, "rocketOxidizers", new String[]{"oxygen"}, "List of fluid names for fluids that can be used as rocket bipropellant oxidizers").getStringList();
         liquidNuclearWorkingFluid = config.get(ROCKET, "rocketNuclearWorkingFluids", new String[]{"hydrogen"}, "List of fluid names for fluids that can be used as rocket nuclear working fluids").getStringList();
