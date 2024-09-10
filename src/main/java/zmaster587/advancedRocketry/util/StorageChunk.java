@@ -274,7 +274,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         stats.setFuelCapacity(FuelRegistry.FuelType.NUCLEAR_WORKING_FLUID, fuelCapacityNuclearWorkingFluid);
 
         //Non-fuel stats
-        stats.setWeight((int) weight);
+        stats.setWeight(weight);
         stats.setThrust(Math.max(Math.max(thrustMonopropellant, thrustBipropellant), thrustNuclearTotalLimit));
         stats.setDrillingPower(drillPower);
     }
