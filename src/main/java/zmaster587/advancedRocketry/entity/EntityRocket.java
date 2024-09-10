@@ -1760,7 +1760,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
 
         if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-            this.stats.setWeight((int) storage.recalculateWeight());
+            this.stats.setWeight(storage.recalculateWeight());
             for (HashedBlockPosition pos : this.infrastructureCoords) {
                 TileEntity te = world.getTileEntity(pos.getBlockPos());
                 if (te instanceof TileRocketAssemblingMachine) {

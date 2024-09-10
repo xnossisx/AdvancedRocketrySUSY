@@ -47,35 +47,35 @@ public enum WeightEngine {
             return (float) weight;
         }
 
-        float tankWeight = 0.8f;
-        float motorWeight = 3f;
-        float guidanceComputerWeight = 2f;
+        double tankWeight = 0.8;
+        double motorWeight = 3;
+        double guidanceComputerWeight = 1.8;
 
-        float pressuretankWeight = 5f;
-        float satelliteHatchWeight = 5f;
+        double pressuretankWeight = 5;
+        double satelliteHatchWeight = 5;
 
             if (stack.getItem() instanceof ItemBlock) {
                 Block block = ((ItemBlock) stack.getItem()).getBlock();
 
                 if (block instanceof BlockFuelTank){
                     weights.put(stack.getItem().getRegistryName().toString(), (double) tankWeight);
-                    return tankWeight;
+                    return (float) tankWeight;
                 }
                 if (block instanceof BlockRocketMotor){
                     weights.put(stack.getItem().getRegistryName().toString(), (double) motorWeight);
-                    return motorWeight;
+                    return (float) motorWeight;
                 }
                 if (block instanceof BlockPressurizedFluidTank){
                     weights.put(stack.getItem().getRegistryName().toString(), (double) pressuretankWeight);
-                    return pressuretankWeight;
+                    return (float) pressuretankWeight;
                 }
                 if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:guidancecomputer")){
                     weights.put(stack.getItem().getRegistryName().toString(), (double) guidanceComputerWeight);
-                    return guidanceComputerWeight;
+                    return (float) guidanceComputerWeight;
                 }
                 if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:loader")){
                     weights.put(stack.getItem().getRegistryName().toString(), (double) satelliteHatchWeight);
-                    return satelliteHatchWeight;
+                    return (float) satelliteHatchWeight;
                 }
             }
 

@@ -152,7 +152,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         return stats.getAcceleration(gravitationalMultiplier);
     }
 
-    public int getWeight() {
+    public float getWeight() {
         return stats.getWeight();
     }
 
@@ -433,7 +433,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             stats.setFuelCapacity(FuelType.NUCLEAR_WORKING_FLUID, fuelCapacityNuclearWorkingFluid);
 
             //Non-fuel stats
-            stats.setWeight((int) weight);
+            stats.setWeight(weight);
             stats.setThrust(Math.max(Math.max(thrustMonopropellant, thrustBipropellant), thrustNuclearTotalLimit));
             stats.setDrillingPower(drillPower);
 
@@ -903,7 +903,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     public void setData(int id, int value) {
         switch (id) {
             case 0:
-                getRocketStats().setWeight(value);
+                getRocketStats().setWeight(value/1000f);
                 break;
             case 1:
                 getRocketStats().setThrust(value);
@@ -931,7 +931,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         switch (id) {
 
             case 0:
-                return getRocketStats().getWeight();
+                return (int)(getRocketStats().getWeight()*1000);// because it is a float really so take it *1000
             case 1:
                 return getRocketStats().getThrust();
             case 2:

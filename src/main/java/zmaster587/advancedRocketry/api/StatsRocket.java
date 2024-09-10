@@ -24,7 +24,7 @@ public class StatsRocket {
     public float injectionBurnLenghtMult;
     HashedBlockPosition pilotSeatPos;
     private int thrust;
-    private int weight;
+    private float weight;
     private float drillingPower;
     private String fuelFluid;
     private String oxidizerFluid;
@@ -128,11 +128,11 @@ public class StatsRocket {
         this.thrust = thrust;
     }
 
-    public int getWeight() {
+    public float getWeight() {
         return weight;
     }
 
-    public void setWeight(int weight) {
+    public void setWeight(float weight) {
         this.weight = weight;
     }
 
@@ -585,7 +585,7 @@ public class StatsRocket {
         NBTTagCompound stats = new NBTTagCompound();
 
         stats.setInteger("thrust", this.thrust);
-        stats.setInteger("weight", this.weight);
+        stats.setFloat("weight", this.weight);
         stats.setFloat("drillingPower", this.drillingPower);
         stats.setString("fuelFluid", this.fuelFluid);
         stats.setString("oxidizerFluid", this.oxidizerFluid);
@@ -673,7 +673,7 @@ this.reset();
         if (nbt.hasKey(TAGNAME)) {
             NBTTagCompound stats = nbt.getCompoundTag(TAGNAME);
             this.thrust = stats.getInteger("thrust");
-            this.weight = stats.getInteger("weight");
+            this.weight = stats.getFloat("weight");
             this.fuelFluid = stats.getString("fuelFluid");
             this.oxidizerFluid = stats.getString("oxidizerFluid");
             this.workingFluid = stats.getString("workingFluid");
