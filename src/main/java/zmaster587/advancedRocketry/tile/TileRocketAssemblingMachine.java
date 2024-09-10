@@ -683,7 +683,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         super.readFromNBT(nbt);
 
         stats.readFromNBT(nbt);
-        updateText();
 
         prevProgress = progress = nbt.getInteger("scanTime");
         totalProgress = nbt.getInteger("scanTotalBlocks");
