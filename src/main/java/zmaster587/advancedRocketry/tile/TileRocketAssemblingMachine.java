@@ -247,7 +247,28 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     }
 
     public AxisAlignedBB scanRocket(World world, BlockPos pos2, AxisAlignedBB bb) {
-        int thrustMonopropellant = 0;
+
+
+        //if already a rocket exists, output their stats
+
+        if (getBBCache() == null) {
+            bbCache = getRocketPadBounds(world, pos);
+        }
+
+        if (getBBCache() != null) {
+            double buffer = 0.0001;
+            AxisAlignedBB bufferedBB = bbCache.grow(buffer, buffer, buffer);
+            List<EntityRocket> rockets = world.getEntitiesWithinAABB(EntityRocket.class, bufferedBB);
+            if (rockets.size() == 1){ // only if axactly one rocket is here
+                rockets.get(0).recalculate_stats();
+                this.stats = rockets.get(0).stats;
+                status = ErrorCodes.ALREADY_ASSEMBLED; // to prevent assembly
+                return null;
+            }
+        }
+
+
+            int thrustMonopropellant = 0;
         int thrustBipropellant = 0;
         int thrustNuclearNozzleLimit = 0;
         int thrustNuclearReactorLimit = 0;
@@ -917,6 +938,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             case 2:
                 return getStatus().ordinal();
 
+                //I think this is missing the other fuel types...
             case 3:
                 return getRocketStats().getBaseFuelRate(FuelType.LIQUID_MONOPROPELLANT);
             case 4:
@@ -1076,7 +1098,8 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         NOSATELLITECHIP(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.nosatellitechip")),
         OUTPUTBLOCKED(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.outputblocked")),
         INVALIDBLOCK(LibVulpes.proxy.getLocalizedString("msg.rocketbuild.invalidblock")),
-        COMBINEDTHRUST(LibVulpes.proxy.getLocalizedString("msg.rocketbuild.combinedthrust"));
+        COMBINEDTHRUST(LibVulpes.proxy.getLocalizedString("msg.rocketbuild.combinedthrust")),
+        ALREADY_ASSEMBLED("rocket already assembled");
 
         String code;
 

@@ -5,7 +5,9 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -130,7 +132,15 @@ public class RocketFx extends Particle {
         int ch = world.getHeight((int) this.posX, (int) this.posZ);
         if (this.posY < ch  -0.8) {
             this.motionY = 0;
-            this.posY = ch  -0.8 ;
+            //this.posY = ch  -0.8 ;
+
+            for (int i = 0; i < 3; i++) {
+                BlockPos p = new BlockPos(posX,posY+i,posZ);
+                if (world.getBlockState(p).equals(Blocks.AIR.getDefaultState())){
+                    this.posY = p.getY()-0.8;
+                    break;
+                }
+            }
 
             this.motionX = (world.rand.nextFloat() - 0.5) / 2;
             this.motionZ = (world.rand.nextFloat() - 0.5) / 2;

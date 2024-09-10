@@ -1,6 +1,8 @@
 package zmaster587.advancedRocketry.entity.fx;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 import static java.lang.Math.min;
@@ -69,7 +71,14 @@ public class TrailFx extends InverseTrailFx {
             int ch = world.getHeight((int) this.posX, (int) this.posZ);
             if (this.posY < ch + 1) {
                 this.motionY = 0;
-                this.posY = ch + 1;
+
+                for (int i = 0; i < 3; i++) {
+                    if (world.getBlockState(new BlockPos(posX,posY+i,posZ)).equals(Blocks.AIR.getDefaultState())){
+                        this.posY += i;
+                        break;
+                    }
+                }
+
 
                 this.motionX = (world.rand.nextFloat() - 0.5) / 4;
                 this.motionZ = (world.rand.nextFloat() - 0.5) / 4;
