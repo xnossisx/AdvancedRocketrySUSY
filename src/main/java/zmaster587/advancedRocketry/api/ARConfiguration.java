@@ -450,7 +450,7 @@ public class ARConfiguration {
         liquidMonopropellant = config.get(ROCKET, "rocketFuels", new String[]{"rocketfuel;10"}, "List of fluid names for fluids that can be used as rocket monopropellants").getStringList();
         liquidBipropellantFuel = config.get(ROCKET, "rocketBipropellants", new String[]{"hydrogen;10"}, "List of fluid names for fluids that can be used as rocket bipropellant fuels").getStringList();
         liquidBipropellantOxidizer = config.get(ROCKET, "rocketOxidizers", new String[]{"oxygen;10"}, "List of fluid names for fluids that can be used as rocket bipropellant oxidizers").getStringList();
-        liquidNuclearWorkingFluid = config.get(ROCKET, "rocketNuclearWorkingFluids", new String[]{"hydrogen"}, "List of fluid names for fluids that can be used as rocket nuclear working fluids").getStringList();
+        liquidNuclearWorkingFluid = config.get(ROCKET, "rocketNuclearWorkingFluids", new String[]{"hydrogen;10"}, "List of fluid names for fluids that can be used as rocket nuclear working fluids").getStringList();
         arConfig.rocketThrustMultiplier = config.get(ROCKET, "thrustMultiplier", 1f, "Multiplier for per-engine thrust").getDouble();
         arConfig.fuelCapacityMultiplier = config.get(ROCKET, "fuelCapacityMultiplier", 1f, "Multiplier for per-tank capacity").getDouble();
         arConfig.nuclearCoreThrustRatio = config.get(ROCKET, "nuclearCoreThrustRatio", 1.0, "The multiplier for the thrust of the nuclear core block. With default configuration, this value provides a (max) thrust of 1000 per core.").getDouble();
