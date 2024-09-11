@@ -6,6 +6,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -28,7 +29,6 @@ public class EntityLaserNode extends Entity {
         ignoreFrustumCheck = true;
         noClip = true;
         poscorrection = new Vec3d(0,0,0);
-
     }
 
     public EntityLaserNode(World world, double x, double y, double z) {

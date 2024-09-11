@@ -325,9 +325,9 @@ public class TileUnmannedVehicleAssembler extends TileRocketAssemblingMachine {
         return new AxisAlignedBB(actualMinX, actualMinY, actualMinZ, actualMaxX, actualMaxY, actualMaxZ);
     }
 
-    @Override
+
     public float getNeededFuel(@Nonnull FuelType fuelType) {
-        return getAcceleration(DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getGravitationalMultiplier()) > 0 ? stats.getFuelRate(fuelType) : 0;
+        return 1;
     }
 
     //No additional scanning is needed

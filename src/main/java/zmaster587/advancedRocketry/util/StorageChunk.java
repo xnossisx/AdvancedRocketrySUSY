@@ -170,7 +170,8 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         int fuelCapacityNuclearWorkingFluid = 0;
 
         float drillPower = 0f;
-        stats.reset_no_fuel();
+        //stats.reset_no_fuel();
+        stats.reset_no_fuel();// Oh Quarter... you can not keep adding engine and seat locations every launch
 
         float weight = 0;
 
@@ -272,7 +273,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         stats.setFuelCapacity(FuelRegistry.FuelType.NUCLEAR_WORKING_FLUID, fuelCapacityNuclearWorkingFluid);
 
         //Non-fuel stats
-        stats.setWeight((int) weight);
+        stats.setWeight(weight);
         stats.setThrust(Math.max(Math.max(thrustMonopropellant, thrustBipropellant), thrustNuclearTotalLimit));
         stats.setDrillingPower(drillPower);
     }

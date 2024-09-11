@@ -32,6 +32,7 @@ import net.minecraft.world.Teleporter;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
@@ -89,6 +90,8 @@ import zmaster587.libVulpes.util.*;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.*;
+
+import static java.lang.Math.min;
 
 public class EntityRocket extends EntityRocketBase implements INetworkEntity, IModularInventory, IProgressBar, IButtonInventory, ISelectionNotify, IPlanetDefiner {
 
@@ -967,23 +970,32 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         lastWorldTickTicked = world.getTotalWorldTime();
 
         if (world.isRemote) {
+
             double ct = 50;
-            double cx = poscorrection.x / ct;
-            double cy = poscorrection.y / ct;
-            double cz = poscorrection.z / ct;
-            poscorrection = poscorrection.subtract(cx,cy,cz);
 
-            this.setPosition(posX+cx,posY+cy,posZ+cz);
+            if (!this.dataManager.get(INORBIT) && poscorrection.y < -0.01) {
+                // if this code runs, rocket is out of fuel and will have a hard crash. no smooth syncing!
+                ct = 1;
+            }
 
-            double ct2 = 10;
-            double vx = velcorrection.x / ct2;
-            double vy = velcorrection.y / ct2;
-            double vz = velcorrection.z / ct2;
-            velcorrection = velcorrection.subtract(vx,vy,vz);
 
-            motionX+=vx;
-            motionY+=vy;
-            motionZ+=vz;
+                double cx = poscorrection.x / ct;
+                double cy = poscorrection.y / ct;
+                double cz = poscorrection.z / ct;
+                poscorrection = poscorrection.subtract(cx, cy, cz);
+                this.setPosition(posX + cx, posY + cy, posZ + cz);
+
+
+                double ct2 = 10;
+                double vx = velcorrection.x / ct2;
+                double vy = velcorrection.y / ct2;
+                double vz = velcorrection.z / ct2;
+                velcorrection = velcorrection.subtract(vx, vy, vz);
+
+                motionX += vx;
+                motionY += vy;
+                motionZ += vz;
+
         }
 
         if (this.ticksExisted == 20) {
@@ -1232,15 +1244,21 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
             }
             if (!world.isRemote) {
 
-                //If out of fuel or descending then accelerate downwards
-                if (isInOrbit() || !burningFuel) {
-                    //this.motionY = Math.min(this.motionY - 0.001, 1);
-                    this.motionY = this.motionY - 0.0001;
+                if (isInOrbit() && descentPhase) { //going down & slowing
+                    this.motionY -= this.motionY / 120f;
                     this.velocityChanged = true;
                 } else {
-                    //this.motionY = Math.min(this.motionY + 0.001, 1);
-                    this.motionY += stats.getAcceleration(DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getGravitationalMultiplier()) * deltaTime;
-                    this.velocityChanged = true;
+                    //If out of fuel or descending then accelerate downwards
+                    if (isInOrbit() || !burningFuel) {
+                        //this.motionY = Math.min(this.motionY - 0.001, 1);
+                        this.motionY = this.motionY - 0.1f * 1 / 20f * 9.81 * (DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getGravitationalMultiplier());
+                        motionY = Math.max(-2, motionY);
+                        this.velocityChanged = true;
+                    } else {
+                        //this.motionY = Math.min(this.motionY + 0.001, 1);
+                        this.motionY += stats.getAcceleration(DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getGravitationalMultiplier()) * deltaTime;
+                        this.velocityChanged = true;
+                    }
                 }
 
                 if (isInOrbit() && descentPhase) { //going down & slowing
@@ -1725,6 +1743,10 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
      * Launches the rocket post determining its height, checking whether it can launch to the selected planet and whether it can exist,
      * among other factors. Also handles orbital height calculations
      */
+    public void recalculateStats(){
+        this.storage.recalculateStats(this.stats);
+    }
+
     @Override
     public void launch() {
 
@@ -1743,7 +1765,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
 
         if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-            this.stats.setWeight((int) storage.recalculateWeight());
+            this.stats.setWeight(storage.recalculateWeight());
             for (HashedBlockPosition pos : this.infrastructureCoords) {
                 TileEntity te = world.getTileEntity(pos.getBlockPos());
                 if (te instanceof TileRocketAssemblingMachine) {

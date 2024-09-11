@@ -280,6 +280,8 @@ public class ARConfiguration {
 
     @ConfigProperty
     public boolean advancedWeightSystem;
+    @ConfigProperty
+    public boolean advancedWeightSystemInventories;
 
     @ConfigProperty
     public boolean partsWearSystem;
@@ -445,7 +447,7 @@ public class ARConfiguration {
         //Rockets
         arConfig.rocketRequireFuel = config.get(ROCKET, "rocketsRequireFuel", true, "Set to false if rockets should not require fuel to fly").getBoolean();
         arConfig.canBeFueledByHand = config.get(ROCKET, "canBeFueledByHand", true, "Set to false if rockets should not be able to be fueled by and and will require a fueling station").getBoolean();
-        liquidMonopropellant = config.get(ROCKET, "rocketFuels", new String[]{"rocketfuel;2"}, "List of fluid names for fluids that can be used as rocket monopropellants").getStringList();
+        liquidMonopropellant = config.get(ROCKET, "rocketFuels", new String[]{"rocketfuel;10"}, "List of fluid names for fluids that can be used as rocket monopropellants").getStringList();
         liquidBipropellantFuel = config.get(ROCKET, "rocketBipropellants", new String[]{"hydrogen"}, "List of fluid names for fluids that can be used as rocket bipropellant fuels").getStringList();
         liquidBipropellantOxidizer = config.get(ROCKET, "rocketOxidizers", new String[]{"oxygen"}, "List of fluid names for fluids that can be used as rocket bipropellant oxidizers").getStringList();
         liquidNuclearWorkingFluid = config.get(ROCKET, "rocketNuclearWorkingFluids", new String[]{"hydrogen"}, "List of fluid names for fluids that can be used as rocket nuclear working fluids").getStringList();
@@ -463,6 +465,7 @@ public class ARConfiguration {
         arConfig.launchingDestroysBlocks = config.get(ROCKET, "launchBlockDestruction", false, "If true rocket launches will kill plants, glass soil, turn rock into lava, and more").getBoolean();
         blackListRocketBlocksStr = config.getStringList("rocketBlockBlackList", ROCKET, new String[]{"minecraft:portal", "minecraft:bedrock", "minecraft:snow_layer", "minecraft:water", "minecraft:flowing_water", "minecraft:lava", "minecraft:flowing_lava", "minecraft:fire", "advancedrocketry:rocketfire"}, "Mod:Blockname  for example \"minecraft:chest\"");
         arConfig.advancedWeightSystem = config.get(ROCKET, "advancedWeightSystem", true, "Enables advanced weight system which computes rocket weight, including the handled inventories. Block weights are stores in weights.json").getBoolean();
+        arConfig.advancedWeightSystemInventories = config.get(ROCKET, "advancedWeightSystemInventories", false, "Enables advanced weight system for inventories - may not work with modded inventories (eg IE storage chests)").getBoolean();
         arConfig.partsWearSystem = config.get(ROCKET, "partsWearSystem", true, "Enables rocket parts wear subsystem. Every rocket start it has probability to explode based on parts' wear intensities").getBoolean();
         arConfig.increaseWearIntensityProb = config.get(ROCKET, "increaseWearIntensityProb", 0.025, "Every rocket usage every part has this probability to increase wear intensity").getDouble();
 
