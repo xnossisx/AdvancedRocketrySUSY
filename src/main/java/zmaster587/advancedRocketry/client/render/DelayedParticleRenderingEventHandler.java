@@ -25,10 +25,21 @@ public class DelayedParticleRenderingEventHandler {
         InverseTrailFx.renderAll(TrailFxParticles);
         RocketFx.renderAll(RocketFxParticles);
 
+
+
+    }
+    @SubscribeEvent
+    public void onTick(TickEvent.ClientTickEvent event) {
+
+        for (RocketFx p: RocketFxParticles){
+            p.onUpdate2();
+        }
+        for (InverseTrailFx p: TrailFxParticles){
+            p.onUpdate2();
+        }
+
         RocketFxParticles.removeIf(particle -> !particle.isAlive());
         TrailFxParticles.removeIf(particle -> !particle.isAlive());
-        if(!TrailFxParticles.isEmpty()){
-            System.out.println("registered trail particles:"+TrailFxParticles.size());
-        }
+
     }
 }

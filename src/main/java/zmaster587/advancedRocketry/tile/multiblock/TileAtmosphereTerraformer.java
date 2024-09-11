@@ -269,6 +269,8 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     boolean client_contructed = false;
 
     public TileAtmosphereTerraformer() {
+        super();
+
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
         buttonIncrease = new ModuleToggleSwitch(40, 20, 1, LibVulpes.proxy.getLocalizedString("msg.terraformer.atminc"), this, TextureResources.buttonScan, 80, 16, true);
         buttonDecrease = new ModuleToggleSwitch(40, 38, 2, LibVulpes.proxy.getLocalizedString("msg.terraformer.atmdec"), this, TextureResources.buttonScan, 80, 16, false);
@@ -302,7 +304,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-        List<ModuleBase> modules = super.getModules(ID, player);
+        List<ModuleBase> modules =  super.getModules(ID, player);
 
         //Backgrounds
         if (world.isRemote) {
@@ -467,17 +469,22 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     public void setOOF(boolean x) {
         if (!x && outOfFluid) {
             outOfFluid = false;
-            markDirty();
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+
+            System.out.println("s oof false");
         } else if (x && !outOfFluid) {
             outOfFluid = true;
-            markDirty();
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+
+            System.out.println("s oof true");
         }
     }
 
     @Override
     public void setMachineRunning(boolean running) {
         super.setMachineRunning(running);
-        markDirty();
+        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+
     }
 
 
@@ -495,6 +502,8 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                     this.setMachineEnabled(false);
                     this.setMachineRunning(false);
                     markDirty();
+                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+
                 }
             }
             if (buttonDecrease.getState() && properties.getAtmosphereDensity() > 0) {
@@ -503,6 +512,8 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                     this.setMachineEnabled(false);
                     this.setMachineRunning(false);
                     markDirty();
+                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+
                 }
             }
         }
@@ -539,7 +550,12 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
         super.useNetworkData(player, side, id, nbt);
-        markDirty();
+        if(!world.isRemote) {
+            setOOF(false);
+            markDirty();
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+
+        }
     }
 
     @Override
@@ -557,6 +573,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         super.writeNetworkData(nbt);
         nbt.setInteger("selected", radioButton.getOptionSelected());
         nbt.setBoolean("oofluid", outOfFluid);
+        System.out.println("write oof:"+outOfFluid);
     }
 
     @Override
@@ -564,11 +581,11 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         super.readNetworkData(nbt);
         radioButton.setOptionSelected(nbt.getInteger("selected"));
         outOfFluid = nbt.getBoolean("oofluid");
-
+        System.out.println("oof:"+outOfFluid);
 
         if (world !=null && world.isRemote){
-            if (!client_contructed)
-                client_contructed = this.completeStructure(this.world.getBlockState(this.pos));
+            //if (!client_contructed)
+                //client_contructed = this.completeStructure(this.world.getBlockState(this.pos));
 
             setText();
         }
@@ -583,6 +600,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
+        outOfFluid = false;
     }
 
     @Override

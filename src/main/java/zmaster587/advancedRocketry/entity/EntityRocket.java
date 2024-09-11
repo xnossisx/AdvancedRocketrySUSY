@@ -809,12 +809,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     private void runEngines() {
         //Spawn in the particle effects for the engines
-        int max_engine_for_smoke = 64;
+        int max_engine_for_smoke = 16;
         int engineNum = stats.getEngineLocations().size();
         //System.out.println("engine locs:"+engineNum);
 
 
-        if (world.isRemote && Minecraft.getMinecraft().gameSettings.particleSetting < 2 && areEnginesRunning()) {
+        if (world.isRemote && areEnginesRunning()) {
             for (Vector3F<Float> vec : stats.getEngineLocations()) {
 
                 AtmosphereHandler handler = AtmosphereHandler.getOxygenHandler(world.provider.getDimension());
@@ -829,26 +829,29 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
                     can_smoke = rand.nextInt(engineNum) <= max_engine_for_smoke;
                 }
 
-                if (can_smoke && Minecraft.getMinecraft().gameSettings.particleSetting < 1 && (handler == null || (atmosphere != null && atmosphere.allowsCombustion()))) {
-                    double yo = 1 + this.rand.nextFloat();
-                    float xzv = 6f;
-                    if (motionY > 0)
-                        xzv = 32;
-
-                    double motionz = (this.rand.nextFloat() - 0.5f);
-                    double motionx = (this.rand.nextFloat() - 0.5f);
-                    double speed = (this.rand.nextFloat()) / xzv;
-                    double speedxz = Math.sqrt(motionx * motionx + motionz * motionz);
-                    motionx *= speed / speedxz;
-                    motionz *= speed / speedxz;
+                if (Minecraft.getMinecraft().gameSettings.particleSetting < 2 && can_smoke && Minecraft.getMinecraft().gameSettings.particleSetting < 1 && (handler == null || (atmosphere != null && atmosphere.allowsCombustion()))) {
+                    for (int i = 0; i < 3; i++) {
 
 
-                    AdvancedRocketry.proxy.spawnDynamicRocketSmoke(world, this.posX + vec.x, this.posY + vec.y - yo, this.posZ + vec.z, motionx, -1.5 - this.rand.nextFloat() / 6.0, motionz, engineNum);
+                        double yo = 1 + this.rand.nextFloat();
+                        float xzv = 16f;
+                        if (motionY > 0)
+                            xzv = 32;
+
+                        double motionz = (this.rand.nextFloat() - 0.5f);
+                        double motionx = (this.rand.nextFloat() - 0.5f);
+                        double speed = (this.rand.nextFloat()) / xzv;
+                        double speedxz = Math.sqrt(motionx * motionx + motionz * motionz);
+                        motionx *= speed / speedxz;
+                        motionz *= speed / speedxz;
+
+
+                        AdvancedRocketry.proxy.spawnDynamicRocketSmoke(world, this.posX + vec.x, this.posY + vec.y - yo, this.posZ + vec.z, motionx, -0.75 - this.rand.nextFloat() / 6.0, motionz, engineNum);
+                    }
                 }
+                for (float i = 0; i < 15; i++) {
+                        AdvancedRocketry.proxy.spawnDynamicRocketFlame(world, this.posX + vec.x, this.posY + vec.y - 0.9 - (i*0.1f), this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -0.75, (this.rand.nextFloat() - 0.5f) / 6f, engineNum);
 
-                for (int i = 0; i < 3; i++) {
-//                    AdvancedRocketry.proxy.spawnParticle("rocketFlame", world, this.posX + vec.x-0.25f, this.posY + vec.y - 0.75+(rand.nextFloat()-0.5)*0.25, this.posZ + vec.z-0.25f, (this.rand.nextFloat() - 0.5f) / 6f*current_speed_increase, -0.5*current_speed_increase+(rand.nextFloat()-0.5)*0.1, (this.rand.nextFloat() - 0.5f) / 6f*current_speed_increase);
-                        AdvancedRocketry.proxy.spawnDynamicRocketFlame(world, this.posX + vec.x, this.posY + vec.y - 0.9 + (rand.nextFloat() - 0.5) * 0.125, this.posZ + vec.z, (this.rand.nextFloat() - 0.5f) / 6f, -0.75 + (rand.nextFloat() - 0.5) * 0.1, (this.rand.nextFloat() - 0.5f) / 6f, engineNum);
                 }
             }
         }

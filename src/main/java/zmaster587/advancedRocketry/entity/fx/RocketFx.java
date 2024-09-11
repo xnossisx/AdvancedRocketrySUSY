@@ -27,7 +27,7 @@ public class RocketFx extends Particle {
 
     public static final ResourceLocation icon = new ResourceLocation("advancedrocketry:textures/particle/soft2.png");
 
-    float alpha = 0.75f;
+    float alpha = 0.45f;
 
 
     float max_lt_increase = 20.0f;
@@ -51,8 +51,8 @@ public class RocketFx extends Particle {
         this.prevPosZ = this.posZ = z;
         this.particleAlpha = alpha;
         this.particleRed = 0.9F + this.rand.nextFloat() / 10f;
-        this.particleGreen = 0.6F + this.rand.nextFloat() / 5f;
-        this.particleBlue = 0.2F;
+        this.particleGreen = 0.8F + this.rand.nextFloat() / 5f;
+        this.particleBlue = 0.6F;
         this.setSize(0.12F * scale, 0.12F * scale);
         this.particleScale *= (this.rand.nextFloat() * 0.6F + 6F) * scale;
         this.motionX = motx;
@@ -105,7 +105,7 @@ public class RocketFx extends Particle {
         float f5 = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - interpPosX);
         float f6 = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - interpPosY);
         float f7 = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) partialTicks - interpPosZ);
-        int i = 240;//this.getBrightnessForRender(partialTicks);
+        int i = (240+this.getBrightnessForRender(partialTicks))/2;
         int j = i >> 16 & 65535;
         int k = i & 65535;
         Vec3d[] avec3d = new Vec3d[]{new Vec3d(-rotationX * f4 - rotationXY * f4, -rotationZ * f4, -rotationYZ * f4 - rotationXZ * f4), new Vec3d(-rotationX * f4 + rotationXY * f4, rotationZ * f4, -rotationYZ * f4 + rotationXZ * f4), new Vec3d(rotationX * f4 + rotationXY * f4, rotationZ * f4, rotationYZ * f4 + rotationXZ * f4), new Vec3d(rotationX * f4 - rotationXY * f4, -rotationZ * f4, rotationYZ * f4 - rotationXZ * f4)};
@@ -170,14 +170,17 @@ public class RocketFx extends Particle {
 
     @Override
     public void onUpdate() {
+    }
+
+    public void onUpdate2() {
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
 
         //Change color and alpha over lifespan
         this.particleAlpha = alpha-alpha*(this.particleAge / (float) this.particleMaxAge); //1 - (this.particleAge / (float) this.particleMaxAge);
-        this.particleGreen -= this.particleGreen * this.particleAge / ((float) this.particleMaxAge * 2);
-        this.particleBlue -= this.particleBlue * this.particleAge / ((float) this.particleMaxAge * 2);
+        this.particleGreen -= 0.6f / ((float) this.particleMaxAge);
+        this.particleBlue -= 0.6f / ((float) this.particleMaxAge);
 
         if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();

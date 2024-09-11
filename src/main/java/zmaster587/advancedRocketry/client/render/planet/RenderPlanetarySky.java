@@ -984,7 +984,7 @@ GL11.glPopMatrix();
         //int ch = 300 + world.getHeight((int) posX, (int) posZ);
 
 
-        float fade_out = 150;
+        float fade_out = 50;
 
         float target_texture_v = -20 + (float) (-mc.world.getHorizon() + mc.player.world.getHeight(mc.player.getPosition()).getY()+300 - fade_out);
 

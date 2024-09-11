@@ -21,9 +21,9 @@ public class BlockAtmosphereTerraformer extends BlockMultiblockMachine {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (!world.isRemote) {
-            super.onBlockActivated(world,pos,state,player,hand, facing,hitX,hitY,hitZ);
+        boolean r = super.onBlockActivated(world,pos,state,player,hand, facing,hitX,hitY,hitZ);
 
+        if (!world.isRemote) {
             if (world.getTileEntity(pos) instanceof TileAtmosphereTerraformer) {
                 if (((TileAtmosphereTerraformer) world.getTileEntity(pos)).isComplete()) {
                     ARAdvancements.ATM_TERRAFORMER.trigger((EntityPlayerMP) player);
@@ -32,7 +32,7 @@ public class BlockAtmosphereTerraformer extends BlockMultiblockMachine {
 
         }
 
-        return true;
+        return r;
     }
 
 
