@@ -4,6 +4,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
@@ -11,7 +13,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import org.lwjgl.opengl.GL11;
+import zmaster587.advancedRocketry.client.render.DelayedParticleRenderingEventHandler;
+import zmaster587.advancedRocketry.event.RocketEventHandler;
+
+import java.util.List;
 
 import static java.lang.Math.min;
 
@@ -36,6 +44,8 @@ public class RocketFx extends Particle {
                     double y, double z, double motx, double moty, double motz, float scale) {
         super(world, x, y, z, motx, moty, motz);
 
+        DelayedParticleRenderingEventHandler.RocketFxParticles.add(this);
+
         this.prevPosX = this.posX = x;
         this.prevPosY = this.posY = y;
         this.prevPosZ = this.posZ = z;
@@ -58,13 +68,34 @@ public class RocketFx extends Particle {
 
     @Override
     public int getFXLayer() {
-        return 2;
+        return 0;
     }
+
+    float partialTicks;
+    float rotationX;
+    float rotationZ;
+    float rotationYZ;
+    float rotationXY;
+    float rotationXZ;
+
 
     @Override
     public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn,
                                float partialTicks, float rotationX, float rotationZ,
                                float rotationYZ, float rotationXY, float rotationXZ) {
+
+        this. partialTicks = partialTicks;
+        this. rotationX = rotationX;
+        this. rotationZ = rotationZ;
+        this. rotationYZ = rotationYZ;
+        this. rotationXY = rotationXY;
+        this. rotationXZ = rotationXZ;
+
+    }
+
+    public void renderParticle2(BufferBuilder worldRendererIn) {
+
+
         float f;
         float f1;
         float f2;
@@ -93,7 +124,8 @@ public class RocketFx extends Particle {
         }
 
 
-        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+
         Minecraft.getMinecraft().renderEngine.bindTexture(icon);
         f = 0f;
         f1 = 1f;
@@ -105,7 +137,31 @@ public class RocketFx extends Particle {
         worldRendererIn.pos((double) f5 + avec3d[2].x, (double) f6 + avec3d[2].y, (double) f7 + avec3d[2].z).tex(f, f2).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
         worldRendererIn.pos((double) f5 + avec3d[3].x, (double) f6 + avec3d[3].y, (double) f7 + avec3d[3].z).tex(f, f3).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
 
+
+
+    }
+
+    public static void renderAll(List<RocketFx> RocketFxParticles){
+        // Get the BufferBuilder for rendering
+        BufferBuilder buffer = Tessellator.getInstance().getBuffer();
+
+        GlStateManager.disableAlpha(); // Ensure alpha test is disabled
+
+        GlStateManager.depthMask(false);
+        GlStateManager.enableBlend();
         GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        //GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
+
+        // Render custom particles
+        for (RocketFx particle : RocketFxParticles) {
+            particle.renderParticle2(buffer);
+        }
+
+        Tessellator.getInstance().draw();
+        GlStateManager.enableDepth();
+        GlStateManager.depthMask(true);
     }
 
     public boolean shouldDisableDepth() {

@@ -291,7 +291,7 @@ public class ClientProxy extends CommonProxy {
     public void registerEventHandlers() {
         super.registerEventHandlers();
         MinecraftForge.EVENT_BUS.register(new RocketEventHandler());
-
+        MinecraftForge.EVENT_BUS.register(new DelayedParticleRenderingEventHandler());
         MinecraftForge.EVENT_BUS.register(ModuleContainerPan.class);
         MinecraftForge.EVENT_BUS.register(new RenderComponents());
     }

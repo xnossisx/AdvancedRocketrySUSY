@@ -984,9 +984,9 @@ GL11.glPopMatrix();
         //int ch = 300 + world.getHeight((int) posX, (int) posZ);
 
 
-        float fade_out = 50; // this bs does not work for t<0.5 so it really starts only half way in
+        float fade_out = 150;
 
-        float target_texture_v = -20 + (float) (-mc.world.getHorizon() + mc.player.world.getHeight(mc.player.getPosition()).getY()+300 - fade_out/2); // because of this shit 0.5 alpha error
+        float target_texture_v = -20 + (float) (-mc.world.getHorizon() + mc.player.world.getHeight(mc.player.getPosition()).getY()+300 - fade_out);
 
         if (d0 > target_texture_v && mc.player.dimension != ARConfiguration.getCurrentConfig().spaceDimId && !isWarp) {
             properties = DimensionManager.getInstance().getDimensionProperties(mc.player.dimension);
@@ -1017,9 +1017,8 @@ GL11.glPopMatrix();
         GL11.glPushMatrix();
         GlStateManager.depthMask(true);
 
-        // Save current OpenGL state
-        GL11.glPushAttrib(GL11.GL_ALL_ATTRIB_BITS);
         GlStateManager.disableFog();
+        GlStateManager.disableAlpha();
 
         // Enable blending for transparency
         GL11.glEnable(GL11.GL_BLEND);
@@ -1045,7 +1044,7 @@ GL11.glPopMatrix();
         float f14 = 1f + Xoffset;
         float f15 = 0f + Xoffset;
 
-// THIS °§$%°§%$& DOES NOT WORK FOR T<0.5
+
         GlStateManager.color(1f, 1f, 1f, transparency);
 
         double yo = -10;
@@ -1060,8 +1059,7 @@ GL11.glPopMatrix();
         // Draw the texture
         Tessellator.getInstance().draw();
 
-        // Restore the previous OpenGL state
-        GL11.glPopAttrib();
+
         GL11.glPopMatrix();
 
         //GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT);
