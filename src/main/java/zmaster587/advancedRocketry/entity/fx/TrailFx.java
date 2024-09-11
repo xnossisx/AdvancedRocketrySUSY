@@ -4,6 +4,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import zmaster587.advancedRocketry.client.render.DelayedParticleRenderingEventHandler;
+import zmaster587.advancedRocketry.event.RocketEventHandler;
 
 import static java.lang.Math.min;
 
@@ -23,6 +25,8 @@ public class TrailFx extends InverseTrailFx {
     public TrailFx(World world, double x,
                    double y, double z, double motx, double moty, double motz) {
         super(world, x, y, z, motx, moty, motz);
+
+        //DelayedParticleRenderingEventHandler.fxManager.addParticle(this);
 
         this.prevPosX = this.posX = x;
         this.prevPosY = this.posY = y;
@@ -44,7 +48,7 @@ public class TrailFx extends InverseTrailFx {
 
     @Override
     public int getFXLayer() {
-        return 1;
+        return 0;
     }
 
     @Override
