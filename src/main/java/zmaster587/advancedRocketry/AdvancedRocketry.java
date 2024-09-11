@@ -679,7 +679,7 @@ public class AdvancedRocketry {
         AdvancedRocketryBlocks.blockIntake = new BlockIntake(Material.IRON).setUnlocalizedName("gasIntake").setCreativeTab(tabAdvRocketry).setHardness(3f);
         AdvancedRocketryBlocks.blockDrill = new BlockMiningDrill().setUnlocalizedName("drill").setCreativeTab(tabAdvRocketry).setHardness(3f);
         AdvancedRocketryBlocks.blockLandingFloat = new Block(Material.IRON).setUnlocalizedName("landingfloat").setCreativeTab(tabAdvRocketry).setHardness(1).setResistance(1f);
-        AdvancedRocketryBlocks.blockServiceMonitor = new Block(Material.IRON).setUnlocalizedName("servicemonitor").setCreativeTab(tabAdvRocketry).setHardness(1).setResistance(1f);
+        AdvancedRocketryBlocks.blockServiceMonitor = new RotatableBlock(Material.IRON).setUnlocalizedName("servicemonitor").setCreativeTab(tabAdvRocketry).setHardness(1).setResistance(1f);
         AdvancedRocketryBlocks.blockInvHatch = new BlockInvHatch(Material.IRON).setUnlocalizedName("invhatch").setCreativeTab(tabAdvRocketry).setHardness(1).setResistance(1f);
         //Assembly machines
         AdvancedRocketryBlocks.blockRocketBuilder = new BlockTileWithMultitooltip(TileRocketAssemblingMachine.class, GuiHandler.guiId.MODULARNOINV.ordinal()).setUnlocalizedName("rocketAssembler").setCreativeTab(tabAdvRocketry).setHardness(3f);

@@ -1,38 +1,22 @@
 package zmaster587.advancedRocketry.util;
 
 import net.minecraft.block.*;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Biomes;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeDecorator;
-import net.minecraft.world.biome.BiomeProvider;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.ChunkPrimer;
-import net.minecraft.world.gen.ChunkGeneratorOverworld;
-import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.common.BiomeDictionary;
-import net.minecraftforge.fml.common.Loader;
-import org.lwjgl.Sys;
-import zmaster587.advancedRocketry.api.IPlanetaryProvider;
-import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.network.PacketBiomeIDChange;
-import zmaster587.advancedRocketry.world.ChunkProviderPlanet;
-import zmaster587.advancedRocketry.world.provider.WorldProviderPlanet;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
-import java.lang.reflect.Field;
-import java.util.*;
-
-import static zmaster587.advancedRocketry.util.AstronomicalBodyHelper.getAverageTemperature;
-import static zmaster587.advancedRocketry.util.AstronomicalBodyHelper.getOrbitalPeriod;
+import java.util.Random;
 
 
 public class BiomeHandler {
@@ -275,12 +259,13 @@ public class BiomeHandler {
                 int treegen = biomeId.decorator.treesPerChunk;
                 if (world.rand.nextInt(16 * 16) < treegen) {
                     biomeId.getRandomTreeFeature(world.rand).generate(world, world.rand, world.getHeight(pos.add(8, 0, 8)));
-
-                    //make a biome laser here
-                    // nah... looks ugly
-                    //Chunk chunk = world.getChunkFromBlockCoords(pos);
-                    //PacketHandler.sendToNearby(new PacketBiomeIDChange(chunk, world, new HashedBlockPosition(pos.add(8, 0, 8))), world.provider.getDimension(), pos, 1024);
                 }
+
+                //some more flowers, grass, ....
+                BlockPos yy = world.getHeight(pos);
+                while (!world.getBlockState(yy.down()).isOpaqueCube() && yy.getY() > 0)
+                    yy = yy.down();
+                decorateBiome(world, yy, biomeId);
 
                 DimensionProperties.proxylists.gethelper(props.getId()).getChunkFromList(cpos.x, cpos.z).set_position_decorated(inchunkx, inchunkz);
             }

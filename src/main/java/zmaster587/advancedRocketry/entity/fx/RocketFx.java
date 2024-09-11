@@ -11,14 +11,24 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.lwjgl.opengl.GL11;
 
-import static java.lang.Math.max;
 import static java.lang.Math.min;
 
 public class RocketFx extends Particle {
 
     public static final ResourceLocation icon = new ResourceLocation("advancedrocketry:textures/particle/soft2.png");
 
-    float alpha = 0.8f;
+    float alpha = 0.75f;
+
+
+    float max_lt_increase = 20.0f;
+    int max_engines_for_calculation = 32;
+
+    //increase x-z motion
+    public void register_additional_engines(int n){
+        float enginepx = min(1,n/(float)max_engines_for_calculation);
+        this.particleMaxAge += (int) (enginepx * max_lt_increase *(rand.nextFloat()));
+        //System.out.println("px:"+enginepx+":"+n);
+    }
 
     public RocketFx(World world, double x,
                     double y, double z, double motx, double moty, double motz, float scale) {
@@ -30,13 +40,13 @@ public class RocketFx extends Particle {
         this.particleAlpha = alpha;
         this.particleRed = 0.9F + this.rand.nextFloat() / 10f;
         this.particleGreen = 0.6F + this.rand.nextFloat() / 5f;
-        this.particleBlue = 0.0F;
+        this.particleBlue = 0.2F;
         this.setSize(0.12F * scale, 0.12F * scale);
         this.particleScale *= (this.rand.nextFloat() * 0.6F + 6F) * scale;
         this.motionX = motx;
         this.motionY = moty;
         this.motionZ = motz;
-        this.particleMaxAge = (int) ((int) (8.0D / (Math.random() * 0.8D + 0.6D))*1.3);
+        this.particleMaxAge = (int) ((int) (8.0D / (Math.random() * 0.8D + 0.6D))*1.0);
     }
 
     public RocketFx(World world, double x,
@@ -109,6 +119,7 @@ public class RocketFx extends Particle {
         //Change color and alpha over lifespan
         this.particleAlpha = alpha-alpha*(this.particleAge / (float) this.particleMaxAge); //1 - (this.particleAge / (float) this.particleMaxAge);
         this.particleGreen -= this.particleGreen * this.particleAge / ((float) this.particleMaxAge * 2);
+        this.particleBlue -= this.particleBlue * this.particleAge / ((float) this.particleMaxAge * 2);
 
         if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();

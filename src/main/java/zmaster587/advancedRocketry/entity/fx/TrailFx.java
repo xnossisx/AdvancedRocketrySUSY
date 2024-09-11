@@ -7,16 +7,15 @@ import static java.lang.Math.min;
 
 public class TrailFx extends InverseTrailFx {
 
-    float max_speed_increase = 3.0f;
+    float max_speed_increase = 1.5f;
     float current_speed_increase = 1.0f;
-    int max_engines_for_calculation = 32;
+    int max_engines_for_calculation = 64;
 
     //increase x-z motion
     public void register_additional_engines(int n){
         float enginepx = min(1,n/(float)max_engines_for_calculation);
         float d = max_speed_increase - current_speed_increase;
         current_speed_increase = current_speed_increase+d*enginepx;
-
     }
 
     public TrailFx(World world, double x,
@@ -58,7 +57,7 @@ public class TrailFx extends InverseTrailFx {
         this.prevPosZ = this.posZ;
 
         //Change color and alpha over lifespan
-        this.particleAlpha = 1 - (this.particleAge / (float) this.particleMaxAge);
+        this.particleAlpha = min(1 - (this.particleAge / (float) this.particleMaxAge), particleAge/20f);
         double initial_expansion = 1.006;
         double final_expansion = 1.004;
         double current_expansion = initial_expansion - (initial_expansion - final_expansion) * (this.particleAge / (float) this.particleMaxAge);
@@ -83,8 +82,11 @@ public class TrailFx extends InverseTrailFx {
                     this.motionY *= 0.99;
                 }
             }
-            this.motionY *= 0.98;
+            this.motionY *= 1-(0.02/(current_speed_increase));
             this.motionY += 0.0005;
+
+        //this.motionX *= 1-(0.02/(current_speed_increase));
+        //this.motionZ *= 1-(0.02/(current_speed_increase));
 
         this.setPosition(posX + this.motionX*current_speed_increase, posY + this.motionY, posZ + this.motionZ*current_speed_increase);
     }

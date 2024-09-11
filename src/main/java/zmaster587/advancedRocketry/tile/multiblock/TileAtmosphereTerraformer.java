@@ -2,37 +2,25 @@ package zmaster587.advancedRocketry.tile.multiblock;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import zmaster587.advancedRocketry.AdvancedRocketry;
-import zmaster587.advancedRocketry.api.*;
-import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
+import zmaster587.advancedRocketry.api.ARConfiguration;
+import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
+import zmaster587.advancedRocketry.api.AdvancedRocketryFluids;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
-import zmaster587.advancedRocketry.network.PacketBiomeIDChange;
-import zmaster587.advancedRocketry.satellite.SatelliteBiomeChanger;
 import zmaster587.advancedRocketry.util.AudioRegistry;
-import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
 import zmaster587.advancedRocketry.world.provider.WorldProviderPlanet;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
@@ -44,16 +32,11 @@ import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerConsumer;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
-import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine.NetworkPackets;
-import zmaster587.libVulpes.util.EmbeddedInventory;
-import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.INetworkMachine;
 import zmaster587.libVulpes.util.IconResource;
 
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Logger;
 
 //This code is a complete mess. it should be rewritten just like the space laser, but it kinda works, so I'll leave it with this for now
 
@@ -314,7 +297,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     @Override
     @SideOnly(Side.CLIENT)
     public double getMaxRenderDistanceSquared() {
-        return 160 * 160;
+        return 320 * 320;
     }
 
     @Override

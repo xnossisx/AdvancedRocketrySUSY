@@ -1,17 +1,13 @@
 package zmaster587.advancedRocketry.util;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraftforge.common.BiomeManager;
-import org.lwjgl.Sys;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.world.ChunkManagerPlanet;
@@ -107,8 +103,10 @@ public class TerraformingHelper {
             if (currentchunk.type == TerraformingType.PROTECTED || currentchunkz1.type == TerraformingType.PROTECTED ||currentchunkx1.type == TerraformingType.PROTECTED ||currentchunkx1z1.type == TerraformingType.PROTECTED)
                 return -1; // chunks contain a protected chunk
 
-            if (currentchunkz1.terrain_fully_generated && currentchunkx1.terrain_fully_generated && currentchunkx1z1.terrain_fully_generated && currentchunk.terrain_fully_generated)
-                    return 1;
+            if (currentchunkz1.terrain_fully_generated && currentchunkx1.terrain_fully_generated && currentchunkx1z1.terrain_fully_generated && currentchunk.terrain_fully_generated) {
+                currentchunk.populate_chunk_if_not_already_done();
+                return 1;
+            }
         }
         return 0;
     }
@@ -305,12 +303,17 @@ public class TerraformingHelper {
         Vec3i pos = terraformingqueue.remove(index);
         return new BlockPos(pos);
     }
-    public synchronized BlockPos get_next_position_biomechanging(boolean random){
-        if (biomechangingqueue.isEmpty())
+    public synchronized BlockPos get_next_position_biomechanging(boolean random) {
+        if (biomechangingqueue.isEmpty()) {
             return null;
-        int index = 0;
-        if (random)
-            index = nextInt(0,biomechangingqueue.size());
+        }
+
+        int index;
+        if (random) {
+            index = new Random().nextInt(Math.min(8192, biomechangingqueue.size()));
+        } else {
+            index = 0; // Default to the first element if not random mode
+        }
 
         Vec3i pos = biomechangingqueue.remove(index);
         return new BlockPos(pos);
@@ -348,6 +351,7 @@ public class TerraformingHelper {
         if (data == null){
             System.out.println("generate new chunk: "+cpos.x+":"+cpos.z);
             generate_new_chunkdata(new ChunkPos(cpos.x, cpos.z));
+            data = getChunkFromList(cpos.x,cpos.z);
         }
         if (data.blockStates == null){
             System.out.println("generate new blockstates: "+cpos.x+":"+cpos.z);

@@ -1,11 +1,9 @@
 package zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill;
 
 import io.netty.buffer.ByteBuf;
-import micdoodle8.mods.galacticraft.core.client.render.tile.TileEntityEmergencyBoxRenderer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ISidedInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -14,29 +12,20 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.DimensionManager;
-import net.minecraftforge.common.ForgeChunkManager;
-import net.minecraftforge.common.ForgeChunkManager.Ticket;
-import net.minecraftforge.common.ForgeChunkManager.Type;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
-import org.lwjgl.opencl.CL;
-import zmaster587.advancedRocketry.AdvancedRocketry;
+import net.minecraftforge.items.IItemHandler;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
-import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
-import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.util.TerraformingHelper;
 import zmaster587.advancedRocketry.world.provider.WorldProviderSpace;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.LibVulpesBlocks;
-import zmaster587.libVulpes.compat.InventoryCompat;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
@@ -45,13 +34,8 @@ import zmaster587.libVulpes.util.MultiInventory;
 import zmaster587.libVulpes.util.ZUtils;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.LinkedList;
 import java.util.List;
-
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.items.IItemHandler;
 
 public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGuiCallback, IButtonInventory {
 
@@ -855,6 +839,12 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             return;
         } else
             return;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public double getMaxRenderDistanceSquared() {
+        return 320 * 320;
     }
 
 
