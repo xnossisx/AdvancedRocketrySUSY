@@ -39,7 +39,6 @@ import zmaster587.advancedRocketry.api.RocketEvent;
 import zmaster587.advancedRocketry.api.armor.IFillableArmor;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.advancedRocketry.client.render.ClientDynamicTexture;
-import zmaster587.advancedRocketry.client.render.RocketFxManager;
 import zmaster587.advancedRocketry.client.render.planet.RenderPlanetarySky;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.entity.EntityRocket;

@@ -12,6 +12,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import zmaster587.advancedRocketry.api.ARConfiguration;
+import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
 import zmaster587.advancedRocketry.block.BlockFuelTank;
 import zmaster587.advancedRocketry.block.BlockPressurizedFluidTank;
 import zmaster587.advancedRocketry.block.BlockRocketMotor;
@@ -61,7 +62,7 @@ public enum WeightEngine {
                     weights.put(stack.getItem().getRegistryName().toString(), (double) tankWeight);
                     return (float) tankWeight;
                 }
-                if (block instanceof BlockRocketMotor){
+                if (block instanceof BlockRocketMotor || block instanceof BlockBipropellantRocketMotor){
                     weights.put(stack.getItem().getRegistryName().toString(), (double) motorWeight);
                     return (float) motorWeight;
                 }

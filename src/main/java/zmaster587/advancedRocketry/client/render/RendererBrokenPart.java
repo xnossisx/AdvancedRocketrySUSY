@@ -20,7 +20,7 @@ public class RendererBrokenPart extends TileEntitySpecialRenderer<TileBrokenPart
         ResourceLocation res = tile.getBlockType().getRegistryName();
         Block blk = tile.getBlockType();
 
-        if (!(blk instanceof IBrokenPartBlock)) {
+        if ((blk instanceof IBrokenPartBlock)) {
             GlStateManager.pushMatrix();
             GlStateManager.translate((float) x, (float) y, (float) z);
 

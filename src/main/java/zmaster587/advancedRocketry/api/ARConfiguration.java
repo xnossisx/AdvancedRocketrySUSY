@@ -448,8 +448,8 @@ public class ARConfiguration {
         arConfig.rocketRequireFuel = config.get(ROCKET, "rocketsRequireFuel", true, "Set to false if rockets should not require fuel to fly").getBoolean();
         arConfig.canBeFueledByHand = config.get(ROCKET, "canBeFueledByHand", true, "Set to false if rockets should not be able to be fueled by and and will require a fueling station").getBoolean();
         liquidMonopropellant = config.get(ROCKET, "rocketFuels", new String[]{"rocketfuel;10"}, "List of fluid names for fluids that can be used as rocket monopropellants").getStringList();
-        liquidBipropellantFuel = config.get(ROCKET, "rocketBipropellants", new String[]{"hydrogen"}, "List of fluid names for fluids that can be used as rocket bipropellant fuels").getStringList();
-        liquidBipropellantOxidizer = config.get(ROCKET, "rocketOxidizers", new String[]{"oxygen"}, "List of fluid names for fluids that can be used as rocket bipropellant oxidizers").getStringList();
+        liquidBipropellantFuel = config.get(ROCKET, "rocketBipropellants", new String[]{"hydrogen;10"}, "List of fluid names for fluids that can be used as rocket bipropellant fuels").getStringList();
+        liquidBipropellantOxidizer = config.get(ROCKET, "rocketOxidizers", new String[]{"oxygen;10"}, "List of fluid names for fluids that can be used as rocket bipropellant oxidizers").getStringList();
         liquidNuclearWorkingFluid = config.get(ROCKET, "rocketNuclearWorkingFluids", new String[]{"hydrogen"}, "List of fluid names for fluids that can be used as rocket nuclear working fluids").getStringList();
         arConfig.rocketThrustMultiplier = config.get(ROCKET, "thrustMultiplier", 1f, "Multiplier for per-engine thrust").getDouble();
         arConfig.fuelCapacityMultiplier = config.get(ROCKET, "fuelCapacityMultiplier", 1f, "Multiplier for per-tank capacity").getDouble();
