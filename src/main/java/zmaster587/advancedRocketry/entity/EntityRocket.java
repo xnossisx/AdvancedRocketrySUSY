@@ -2447,13 +2447,12 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
         if (id == 0 && fuelType != null) {
             switch (fuelType) {
                 case LIQUID_BIPROPELLANT:
-                    return (getFuelAmount(FuelType.LIQUID_OXIDIZER) / (float) getFuelCapacity(FuelType.LIQUID_OXIDIZER) +
-                            getFuelAmount(fuelType)) / (float) getFuelCapacity(fuelType);
                 case LIQUID_MONOPROPELLANT:
                 case NUCLEAR_WORKING_FLUID:
                     return getFuelAmount(fuelType) / (float) getFuelCapacity(fuelType);
             }
         }
+
 
         return 0;
     }
