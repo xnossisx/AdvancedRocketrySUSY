@@ -52,8 +52,7 @@ public class RendererBrokenPart extends TileEntitySpecialRenderer<TileBrokenPart
             }
 
             WavefrontObject model = ClientProxy.getModel(new ResourceLocation(res.getResourceDomain(), "models/block/models/" + name + ".obj"));
-            if(model!=null)
-                model.renderAll();
+            model.renderAll();
 
             if (destroyStage >= 0) {
                 GlStateManager.matrixMode(5890);
