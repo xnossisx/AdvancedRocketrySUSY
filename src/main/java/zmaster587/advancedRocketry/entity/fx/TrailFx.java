@@ -79,12 +79,12 @@ public class TrailFx extends InverseTrailFx {
             this.setExpired();
         }
             int ch = world.getHeight((int) this.posX, (int) this.posZ);
-            if (this.posY < ch-1) {
+            if (this.posY+0.0001 < ch) {
                 this.motionY = 0;
 
                 for (int i = 1; i < 3; i++) {
                     if (world.getBlockState(new BlockPos(posX,posY+i,posZ)).equals(Blocks.AIR.getDefaultState())){
-                        this.posY = (int)(posY+i)-0.8f;
+                        this.posY = (int)(posY+i);
                         break;
                     }
                 }
