@@ -161,6 +161,10 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     implementation ("net.minecraftforge:mergetool:0.2.3.3")
+    implementation ("curse.maven:gregtech-ce-unofficial-557242:5519022")
+    implementation ("curse.maven:susycore-846224:5701974")
+    implementation ("codechicken:CodeChickenLib:1.12.2-3.2.3.358:universal")
+    implementation ("curse.maven:gregicality-multiblocks-564858:5619513")
 }
 
 tasks.processResources {
