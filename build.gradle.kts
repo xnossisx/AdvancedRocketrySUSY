@@ -9,8 +9,9 @@ import java.util.*
 
 plugins {
     idea
-    id("net.minecraftforge.gradle") version "6.+"
     id("wtf.gofancy.fancygradle") version "1.+"
+    id("com.gtnewhorizons.retrofuturagradle") version "1.4.0"
+    id("net.darkhax.curseforgegradle") version "1.1.24" apply false
     id("org.ajoberstar.grgit") version "4.1.1"
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("se.bjurr.gitchangelog.git-changelog-gradle-plugin") version "1.72.0"
@@ -131,6 +132,10 @@ repositories {
         name = "ModMaven"
         url = uri("https://modmaven.k-4u.nl")
     }
+    maven {
+        name = "GTNH Maven"
+        url = uri("https://nexus.gtnewhorizons.com/repository/public/")
+    }
     //maven {
     //    name = "Galacticraft"
     //    url = uri("https://maven.galacticraft.dev/repository/legacy-releases/")
@@ -147,7 +152,7 @@ repositories {
 
 
 dependencies {
-    minecraft(group = "net.minecraftforge", name = "forge", version = "$mcVersion-14.23.5.2847")
+    minecraft(group = "net.minecraftforge", name = "forge", version = "$mcVersion-14.23.5.2860")
 
 //    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
     //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
