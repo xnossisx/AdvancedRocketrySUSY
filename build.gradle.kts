@@ -145,8 +145,9 @@ repositories {
     }
 }
 
+
 dependencies {
-    minecraft(group = "net.minecraftforge", name = "forge", version = "$mcVersion-$forgeVersion")
+    minecraft(group = "net.minecraftforge", name = "forge", version = "$mcVersion-14.23.5.2847")
 
 //    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
     //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
@@ -162,8 +163,8 @@ dependencies {
 
     implementation ("net.minecraftforge:mergetool:0.2.3.3")
     implementation ("curse.maven:gregtech-ce-unofficial-557242:5519022")
-    implementation ("curse.maven:susycore-846224:5701974")
-    implementation ("codechicken:CodeChickenLib:1.12.2-3.2.3.358:universal")
+    implementation (fg.deobf("curse.maven:susycore-846224:5701974"))
+    implementation ("curse.maven:codechicken-lib-1-8-242818:2779848")
     implementation ("curse.maven:gregicality-multiblocks-564858:5619513")
 }
 
