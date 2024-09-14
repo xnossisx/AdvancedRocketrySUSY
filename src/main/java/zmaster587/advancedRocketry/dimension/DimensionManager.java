@@ -1068,7 +1068,7 @@ public class DimensionManager implements IGalaxy {
         //Load SolarSystems first
         NBTTagCompound solarSystem = nbt.getCompoundTag("starSystems");
 
-        if (solarSystem.hasNoTags()) return loadedDimProps;
+        if (solarSystem.isEmpty()) return loadedDimProps;
 
         NBTTagCompound stats = nbt.getCompoundTag("stat");
         hasReachedMoon = stats.getBoolean("hasReachedMoon");

@@ -17,7 +17,6 @@ import zmaster587.advancedRocketry.entity.EntityDummy;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNullableByDefault;
 import java.util.List;
 
 public class BlockSeat extends Block {
@@ -50,7 +49,6 @@ public class BlockSeat extends Block {
     }
 
     @Override
-    @ParametersAreNullableByDefault
     public boolean isSideSolid(IBlockState base_state, IBlockAccess world,
                                BlockPos pos, EnumFacing side) {
         return side == EnumFacing.DOWN;

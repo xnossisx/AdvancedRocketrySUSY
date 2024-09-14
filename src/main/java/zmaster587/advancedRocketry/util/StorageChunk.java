@@ -231,7 +231,7 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
                             drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
                         }
 
-                        if (block.getUnlocalizedName().contains("servicemonitor")) {
+                        if (block.getTranslationKey().contains("servicemonitor")) {
                             hasServiceMonitor = true;
                         }
 
@@ -832,12 +832,12 @@ public class StorageChunk implements IBlockAccess, IStorageChunk, IWeighted, IBr
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        if (x < 0 || x >= sizeX || y < 0 || y >= sizeY || z < 0 || z >= sizeZ || x + side.getFrontOffsetX() < 0
-                || x + side.getFrontOffsetX() >= sizeX || y + side.getFrontOffsetY() < 0 || y + side.getFrontOffsetY() >= sizeY
-                || z + side.getFrontOffsetZ() < 0 || z + side.getFrontOffsetZ() >= sizeZ)
+        if (x < 0 || x >= sizeX || y < 0 || y >= sizeY || z < 0 || z >= sizeZ || x + side.getXOffset() < 0
+                || x + side.getXOffset() >= sizeX || y + side.getYOffset() < 0 || y + side.getYOffset() >= sizeY
+                || z + side.getZOffset() < 0 || z + side.getZOffset() >= sizeZ)
             return false;
 
-        return blocks[x + side.getFrontOffsetX()][y + side.getFrontOffsetY()][z + side.getFrontOffsetZ()].isSideSolid(blocks[x + side.getFrontOffsetX()][y + side.getFrontOffsetY()][z + side.getFrontOffsetZ()].getStateFromMeta(metas[x + side.getFrontOffsetX()][y + side.getFrontOffsetY()][z + side.getFrontOffsetZ()]), this, pos.offset(side), side.getOpposite());
+        return blocks[x + side.getXOffset()][y + side.getYOffset()][z + side.getZOffset()].isSideSolid(blocks[x + side.getXOffset()][y + side.getYOffset()][z + side.getZOffset()].getStateFromMeta(metas[x + side.getXOffset()][y + side.getYOffset()][z + side.getZOffset()]), this, pos.offset(side), side.getOpposite());
 
     }
 

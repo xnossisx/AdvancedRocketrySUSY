@@ -859,7 +859,7 @@ public class EntityRocket extends EntityRocketBase implements INetworkEntity, IM
 
     private BlockPos getTopBlock(BlockPos pos) {
         //Yeah... because minecraft's World.getTopSolidOrLiquidBlock does not actually check for liquids like lava
-        Chunk chunk = world.getChunkFromBlockCoords(pos);
+        Chunk chunk = world.getChunk(pos);
         BlockPos blockpos;
         BlockPos blockpos1;
 

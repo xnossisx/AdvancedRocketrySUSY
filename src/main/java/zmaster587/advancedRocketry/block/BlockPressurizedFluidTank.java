@@ -29,7 +29,6 @@ import zmaster587.libVulpes.util.FluidUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.ParametersAreNullableByDefault;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -60,14 +59,12 @@ public class BlockPressurizedFluidTank extends Block {
     }
 
     @Override
-    @ParametersAreNullableByDefault
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileFluidTank((int) (64000 * ARConfiguration.getCurrentConfig().blockTankCapacity));
     }
 
     @Override
     @Nonnull
-    @ParametersAreNullableByDefault
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos,
                                     IBlockState state, int fortune) {
         return new LinkedList<>();
@@ -113,7 +110,7 @@ public class BlockPressurizedFluidTank extends Block {
     public boolean shouldSideBeRendered(IBlockState blockState,
                                         IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
 
-        if (side.getFrontOffsetY() != 0) {
+        if (side.getYOffset() != 0) {
             if (blockAccess.getBlockState(pos).getBlock() == this)
                 return true;
         }
@@ -141,7 +138,6 @@ public class BlockPressurizedFluidTank extends Block {
             ((TileFluidTank) tile).onAdjacentBlockUpdated(EnumFacing.getFacingFromVector(neighbor.getX() - pos.getX(), neighbor.getY() - pos.getY(), neighbor.getZ() - pos.getZ()));
     }
 
-    @Override
     @Nonnull
     public BlockRenderLayer getBlockLayer() {
         return BlockRenderLayer.CUTOUT;

@@ -17,7 +17,6 @@ import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.GuiHandler;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNullableByDefault;
 
 public class BlockRedstoneEmitter extends Block {
 
@@ -69,7 +68,6 @@ public class BlockRedstoneEmitter extends Block {
     }
 
     @Override
-    @ParametersAreNullableByDefault
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileAtmosphereDetector();
     }

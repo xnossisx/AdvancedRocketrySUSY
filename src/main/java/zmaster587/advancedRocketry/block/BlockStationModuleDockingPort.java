@@ -18,7 +18,6 @@ import zmaster587.libVulpes.inventory.GuiHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.ParametersAreNullableByDefault;
 
 public class BlockStationModuleDockingPort extends BlockFullyRotatable {
 
@@ -32,7 +31,6 @@ public class BlockStationModuleDockingPort extends BlockFullyRotatable {
     }
 
     @Override
-    @ParametersAreNullableByDefault
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileDockingPort();
     }

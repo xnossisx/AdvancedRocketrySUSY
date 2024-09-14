@@ -2,21 +2,44 @@ import com.matthewprenger.cursegradle.CurseArtifact
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseRelation
 import org.ajoberstar.grgit.Grgit
+import org.jetbrains.gradle.ext.Gradle
 import org.gradle.internal.jvm.Jvm
+import org.gradle.kotlin.dsl.internal.sharedruntime.codegen.generateKotlinDslApiExtensionsSourceTo
 import se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask
 import java.text.SimpleDateFormat
 import java.util.*
 
 plugins {
-    idea
-    id("wtf.gofancy.fancygradle") version "1.+"
-    id("com.gtnewhorizons.retrofuturagradle") version "1.4.0"
-    id("net.darkhax.curseforgegradle") version "1.1.24" apply false
+    id("java")
+    id("java-library")
+    id("net.minecraftforge.gradle") version "6.+"
+    id("maven-publish")
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
+    id("eclipse")
+    //id("com.gtnewhorizons.retrofuturagradle") version "1.3.27"
+    id("com.matthewprenger.cursegradle") version "1.4.0"
     id("org.ajoberstar.grgit") version "4.1.1"
+    id("se.bjurr.gitchangelog.git-changelog-gradle-plugin") version "1.72.0"
+    id("wtf.gofancy.fancygradle") version "1.+"
+    /*
+    idea
+    id("com.google.devtools.ksp") version "1.8.10-1.0.9" apply false
+    id("com.gtnewhorizons.retrofuturagradle") version "1.3.27"
+    //
+
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.1.7"
     id("com.matthewprenger.cursegradle") version "1.4.0"
     id("se.bjurr.gitchangelog.git-changelog-gradle-plugin") version "1.72.0"
-    `maven-publish`
+    // Common:
+    //ksp ("org.ow2.asm:asm-debug-all:5.2")
+
+    `maven-publish`*/
 }
+
+repositories {
+
+}
+
 
 val mcVersion: String by project
 val forgeVersion: String by project
@@ -30,7 +53,7 @@ val gcVersion: String by project
 
 val startGitRev: String by project
 
-group = "zmaster587.advancedRocketry"
+
 setProperty("archivesBaseName", archiveBase)
 
 val buildNumber: String by lazy { System.getenv("BUILD_NUMBER") ?: getDate() }
@@ -114,63 +137,8 @@ fancyGradle {
     }
 }
 
-repositories {
-    mavenCentral()
-    maven {
-        name = "mezz.jei"
-        url = uri("https://dvs1.progwml6.com/files/maven/")
-    }
-    maven {
-        url = uri("https://cursemaven.com")
-    }
-    //ivy {
-    //    name = "industrialcraft-2"
-    //    artifactPattern("http://jenkins.ic2.player.to/job/IC2_111/39/artifact/build/libs/[module]-[revision].[ext]")
-    //}
-    maven {
-        // location of a maven mirror for JEI files, as a fallback
-        name = "ModMaven"
-        url = uri("https://modmaven.k-4u.nl")
-    }
-    maven {
-        name = "GTNH Maven"
-        url = uri("https://nexus.gtnewhorizons.com/repository/public/")
-    }
-    //maven {
-    //    name = "Galacticraft"
-    //    url = uri("https://maven.galacticraft.dev/repository/legacy-releases/")
-    //}
-//    maven {
-//        name = "LibVulpes"
-//        url = uri("http://maven.dmodoomsirius.me/")
-//        isAllowInsecureProtocol = true
-//    }
-    flatDir {
-        dirs("libs")
-    }
-}
-
-
 dependencies {
-    minecraft(group = "net.minecraftforge", name = "forge", version = "$mcVersion-14.23.5.2860")
 
-//    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
-    //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
-    //implementation("zmaster587.libVulpes:LibVulpes:$mcVersion-$libVulpesVersion-$libVulpesBuildNum-deobf")
-
-    //compileOnly(fg.deobf("dev.galacticraft:galacticraft-legacy:$gcVersion"))
-    compileOnly(fg.deobf("curse.maven:galacticraft-legacy-564236:4671122"))
-    compileOnly(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}:api"))
-    implementation(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}")) // Sorry but it won't start wihout jei...
-    //runtimeOnly(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}")) // I think this crashes the game for me when running from IntelliJ
-
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
-    implementation ("net.minecraftforge:mergetool:0.2.3.3")
-    implementation ("curse.maven:gregtech-ce-unofficial-557242:5519022")
-    implementation (fg.deobf("curse.maven:susycore-846224:5701974"))
-    implementation ("curse.maven:codechicken-lib-1-8-242818:2779848")
-    implementation ("curse.maven:gregicality-multiblocks-564858:5619513")
 }
 
 tasks.processResources {

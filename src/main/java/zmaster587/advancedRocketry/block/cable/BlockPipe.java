@@ -15,7 +15,6 @@ import zmaster587.advancedRocketry.tile.cables.TileDataPipe;
 import zmaster587.advancedRocketry.tile.cables.TilePipe;
 
 import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNullableByDefault;
 import java.util.Random;
 
 public class BlockPipe extends Block {
@@ -56,7 +55,6 @@ public class BlockPipe extends Block {
     }
 
     @Override
-    @ParametersAreNullableByDefault
     public boolean shouldSideBeRendered(IBlockState blockState,
                                         IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
         return true;
@@ -82,7 +80,6 @@ public class BlockPipe extends Block {
 
 
     @Override
-    @ParametersAreNullableByDefault
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileDataPipe();
     }

@@ -20,7 +20,6 @@ import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.ParametersAreNullableByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -42,7 +41,6 @@ public class BlockTorchUnlit extends BlockTorch {
 
     @Override
     @Nonnull
-    @ParametersAreNullableByDefault
     public List<ItemStack> getDrops(IBlockAccess world, BlockPos pos,
                                     IBlockState state, int fortune) {
         ArrayList<ItemStack> ret = new ArrayList<>();

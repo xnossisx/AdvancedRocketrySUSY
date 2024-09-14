@@ -18,7 +18,6 @@ import zmaster587.advancedRocketry.world.gen.WorldGenAlienTree;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import javax.annotation.ParametersAreNullableByDefault;
 import java.util.List;
 import java.util.Random;
 
@@ -54,7 +53,6 @@ public class BlockLightwoodSapling extends BlockBush implements IGrowable {
         }
     }
 
-    @ParametersAreNullableByDefault
     public boolean canGrow(World worldIn, BlockPos pos, IBlockState state, boolean isClient) {
         return true;
     }

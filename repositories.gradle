@@ -1,0 +1,43 @@
+// Add any additional repositories for your dependencies here
+
+repositories {
+
+    mavenCentral()
+    maven {
+        name = "mezz.jei"
+        url = uri("https://dvs1.progwml6.com/files/maven/")
+    }
+    maven {
+        url = uri("https://cursemaven.com")
+    }
+    //ivy {
+    //    name = "industrialcraft-2"
+    //    artifactPattern("http://jenkins.ic2.player.to/job/IC2_111/39/artifact/build/libs/[module]-[revision].[ext]")
+    //}
+    maven {
+        // location of a maven mirror for JEI files, as a fallback
+        name = "ModMaven"
+        url = uri("https://modmaven.k-4u.nl")
+    }
+    maven {
+        name = "GTNH Maven"
+        url = uri("https://nexus.gtnewhorizons.com/repository/public/")
+    }
+    maven {
+        name = "CleanroomMC Maven"
+        url = uri("https://maven.cleanroommc.com")
+    }
+    //maven {
+    //    name = "Galacticraft"
+    //    url = uri("https://maven.galacticraft.dev/repository/legacy-releases/")
+    //}
+//    maven {
+//        name = "LibVulpes"
+//        url = uri("http://maven.dmodoomsirius.me/")
+//        isAllowInsecureProtocol = true
+//    }
+    flatDir {
+        dirs("libs")
+    }
+
+}
