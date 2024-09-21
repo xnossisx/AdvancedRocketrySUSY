@@ -4,7 +4,9 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.tile.multiblock.machine.TileCentrifuge;
@@ -35,18 +37,17 @@ public class RenderCentrifuge extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Initial setup
+        // Initial setup
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos()));
         GL11.glTranslated(x + 0.5, y, z + 0.5);
-        GL11.glRotatef((front.getFrontOffsetZ() == 1 ? 180 : 0) - front.getFrontOffsetX() * 90f, 0, 1, 0);
+        GL11.glRotatef((front.getZOffset() == 1 ? 180 : 0) - front.getXOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(-0.5f, -1f, 1.5f);
 
         bindTexture(texture);
 
         model.renderOnly("Hull");
-
 
         if (multiBlockTile.hadPowerLastTick && multiBlockTile.isRunning()) {
             GL11.glPushMatrix();
@@ -62,7 +63,5 @@ public class RenderCentrifuge extends TileEntitySpecialRenderer {
             GL11.glPopMatrix();
         }
         GL11.glPopMatrix();
-
-
     }
 }

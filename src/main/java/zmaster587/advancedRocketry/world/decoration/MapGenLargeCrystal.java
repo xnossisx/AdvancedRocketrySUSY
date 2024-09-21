@@ -6,6 +6,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.MapGenBase;
+
 import zmaster587.advancedRocketry.block.BlockCrystal;
 
 public class MapGenLargeCrystal extends MapGenBase {
@@ -30,7 +31,8 @@ public class MapGenLargeCrystal extends MapGenBase {
     protected void recursiveGenerate(World worldIn, int rangeX,
                                      int rangeZ, int chunkX, int chunkZ, ChunkPrimer blocks) {
         int chancePerChunk = 6;
-        if (rand.nextInt(chancePerChunk) == Math.abs(rangeX) % chancePerChunk && rand.nextInt(chancePerChunk) == Math.abs(rangeZ) % chancePerChunk) {
+        if (rand.nextInt(chancePerChunk) == Math.abs(rangeX) % chancePerChunk &&
+                rand.nextInt(chancePerChunk) == Math.abs(rangeZ) % chancePerChunk) {
             int x = 16 * (-chunkX + rangeX);
             int z = 16 * (-chunkZ + rangeZ);
             int y;
@@ -41,48 +43,52 @@ public class MapGenLargeCrystal extends MapGenBase {
             int height = rand.nextInt(40) + 10;
             int edgeRadius = rand.nextInt(4) + 2;
             int numDiag = edgeRadius + 1;
-            int xShear = 1 - (rand.nextInt(6) + 3) / 4; //1/6 lean right, 1/6 lean left, 4/6 no lean
-            int zShear = 1 - (rand.nextInt(6) + 3) / 4; //1/6 lean right, 1/6 lean left, 4/6 no lean
+            int xShear = 1 - (rand.nextInt(6) + 3) / 4; // 1/6 lean right, 1/6 lean left, 4/6 no lean
+            int zShear = 1 - (rand.nextInt(6) + 3) / 4; // 1/6 lean right, 1/6 lean left, 4/6 no lean
 
-            IBlockState usedState = crystalBlock.withProperty(BlockCrystal.CRYSTALPROPERTY, BlockCrystal.EnumCrystal.values()[rand.nextInt(BlockCrystal.EnumCrystal.values().length)]);
+            IBlockState usedState = crystalBlock.withProperty(BlockCrystal.CRYSTALPROPERTY,
+                    BlockCrystal.EnumCrystal.values()[rand.nextInt(BlockCrystal.EnumCrystal.values().length)]);
 
             int currentEdgeRadius;
 
             final float SHAPE = 0.01f + rand.nextFloat() * 0.2f;
 
-            y = 80;//getHeightValue(x, z, blocks) - 2;
+            y = 80;// getHeightValue(x, z, blocks) - 2;
 
             final int startingCurrentEdgeRadius = (int) ((SHAPE * (edgeRadius * height)) + ((1f - SHAPE) * edgeRadius));
             currentEdgeRadius = startingCurrentEdgeRadius;
 
-            //Make the base of the crystal
-            //Generate the top trapezoid
+            // Make the base of the crystal
+            // Generate the top trapezoid
             for (int zOff = -numDiag - currentEdgeRadius / 2; zOff <= -currentEdgeRadius / 2; zOff++) {
 
                 for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
 
-                    for (int yOff = getHeightValue(x + xOff, z + zOff, blocks); yOff < y; yOff++) //Fills the gaps under the crystal
+                    for (int yOff = getHeightValue(x + xOff, z + zOff, blocks); yOff < y; yOff++) // Fills the gaps
+                                                                                                  // under the crystal
                         setBlock(x + xOff, yOff, z + zOff, usedState, blocks);
                     setBlock(x + xOff, y, z + zOff, fillerBlock.getDefaultState(), blocks);
                 }
                 currentEdgeRadius++;
             }
 
-            //Generate square segment
+            // Generate square segment
             for (int zOff = -currentEdgeRadius / 2; zOff <= currentEdgeRadius / 2; zOff++) {
                 for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
 
-                    for (int yOff = getHeightValue(x + xOff, z + zOff, blocks); yOff < y; yOff++) //Fills the gaps under the crystal
+                    for (int yOff = getHeightValue(x + xOff, z + zOff, blocks); yOff < y; yOff++) // Fills the gaps
+                                                                                                  // under the crystal
                         setBlock(x + xOff, yOff, z + zOff, fillerBlock.getDefaultState(), blocks);
                     setBlock(x + xOff, y, z + zOff, fillerBlock.getDefaultState(), blocks);
                 }
             }
 
-            //Generate the bottom trapezoid
+            // Generate the bottom trapezoid
             for (int zOff = currentEdgeRadius / 2; zOff <= numDiag + currentEdgeRadius / 2; zOff++) {
                 currentEdgeRadius--;
                 for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
-                    for (int yOff = getHeightValue(x + xOff, z + zOff, blocks); yOff < y; yOff++) //Fills the gaps under the crystal
+                    for (int yOff = getHeightValue(x + xOff, z + zOff, blocks); yOff < y; yOff++) // Fills the gaps
+                                                                                                  // under the crystal
                         setBlock(x + xOff, yOff, z + zOff, fillerBlock.getDefaultState(), blocks);
                     setBlock(x + xOff, y, z + zOff, fillerBlock.getDefaultState(), blocks);
                 }
@@ -90,12 +96,11 @@ public class MapGenLargeCrystal extends MapGenBase {
 
             y++;
 
-
             for (int yOff = 0; yOff < height; yOff++) {
 
                 currentEdgeRadius = (int) ((SHAPE * (edgeRadius * (height - yOff))) + ((1f - SHAPE) * edgeRadius));
 
-                //Generate the top trapezoid
+                // Generate the top trapezoid
                 for (int zOff = -numDiag - currentEdgeRadius / 2; zOff <= -currentEdgeRadius / 2; zOff++) {
 
                     for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
@@ -104,14 +109,14 @@ public class MapGenLargeCrystal extends MapGenBase {
                     currentEdgeRadius++;
                 }
 
-                //Generate square segment
+                // Generate square segment
                 for (int zOff = -currentEdgeRadius / 2; zOff <= currentEdgeRadius / 2; zOff++) {
                     for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
                         setBlock(x + xOff + xShear * yOff, y + yOff, z + zOff + zShear * yOff, usedState, blocks);
                     }
                 }
 
-                //Generate the bottom trapezoid
+                // Generate the bottom trapezoid
                 for (int zOff = currentEdgeRadius / 2; zOff <= numDiag + currentEdgeRadius / 2; zOff++) {
                     currentEdgeRadius--;
                     for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
@@ -120,10 +125,9 @@ public class MapGenLargeCrystal extends MapGenBase {
                 }
             }
 
-
             currentEdgeRadius = startingCurrentEdgeRadius;
-            //Make some rand noise in the base
-            //Generate the top trapezoid
+            // Make some rand noise in the base
+            // Generate the top trapezoid
             for (int zOff = -numDiag - currentEdgeRadius / 2; zOff <= -currentEdgeRadius / 2; zOff++) {
 
                 for (int xOff = -currentEdgeRadius / 2; xOff <= currentEdgeRadius / 2; xOff++) {
@@ -133,7 +137,7 @@ public class MapGenLargeCrystal extends MapGenBase {
                 currentEdgeRadius++;
             }
 
-            //Generate square segment
+            // Generate square segment
             for (int zOff = -currentEdgeRadius / 2; zOff <= currentEdgeRadius / 2; zOff++) {
                 for (int xOff = -currentEdgeRadius / 2; xOff <= currentEdgeRadius / 2; xOff++) {
                     if (rand.nextInt(3) < 1)
@@ -141,7 +145,7 @@ public class MapGenLargeCrystal extends MapGenBase {
                 }
             }
 
-            //Generate the bottom trapezoid
+            // Generate the bottom trapezoid
             for (int zOff = currentEdgeRadius / 2; zOff <= numDiag + currentEdgeRadius / 2; zOff++) {
                 currentEdgeRadius--;
                 for (int xOff = -currentEdgeRadius / 2; xOff <= currentEdgeRadius / 2; xOff++) {
@@ -153,7 +157,6 @@ public class MapGenLargeCrystal extends MapGenBase {
     }
 
     private void setBlock(int x, int y, int z, IBlockState block, ChunkPrimer blocks) {
-
         if (x > 15 || x < 0 || z > 15 || z < 0 || y < 0 || y > 255)
             return;
         blocks.setBlockState(x, y, z, block);
@@ -164,7 +167,7 @@ public class MapGenLargeCrystal extends MapGenBase {
         if (x > 15 || x < 0 || z > 15 || z < 0)
             return 0;
         for (y = 255; blocks.getBlockState(x, y, z).getBlock() == Blocks.AIR && y > 0; y--) {
-            //System.out.println(y);
+            // System.out.println(y);
         }
         return y;
     }

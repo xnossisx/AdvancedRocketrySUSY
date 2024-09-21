@@ -1,6 +1,8 @@
 package zmaster587.advancedRocketry.tile.multiblock;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
@@ -15,6 +17,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.inventory.TextureResources;
@@ -28,18 +32,15 @@ import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerConsumer;
 import zmaster587.libVulpes.util.ZUtils.RedstoneState;
 
-import java.util.LinkedList;
-import java.util.List;
-
 public class TileAreaGravityController extends TileMultiPowerConsumer implements ISliderBar, IGuiCallback {
 
     private static final Object[][][] structure = {
-            {{null, null, null},
-                    {null, 'c', null},
-                    {null, null, null}},
-            {{null, LibVulpesBlocks.blockAdvStructureBlock, null},
-                    {LibVulpesBlocks.blockAdvStructureBlock, 'P', LibVulpesBlocks.blockAdvStructureBlock},
-                    {null, LibVulpesBlocks.blockAdvStructureBlock, null}}
+            { { null, null, null },
+                    { null, 'c', null },
+                    { null, null, null } },
+            { { null, LibVulpesBlocks.blockAdvStructureBlock, null },
+                    { LibVulpesBlocks.blockAdvStructureBlock, 'P', LibVulpesBlocks.blockAdvStructureBlock },
+                    { null, LibVulpesBlocks.blockAdvStructureBlock, null } }
     };
     int gravity;
     int progress;
@@ -52,10 +53,15 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
     private ModuleBlockSideSelector sideSelectorModule;
 
     public TileAreaGravityController() {
-        //numGravPylons = new ModuleText(10, 25, "Number Of Thrusters: ", 0xaa2020);
-        textRadius = new ModuleText(6, 82, LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.radius") + "5", 0x202020);
-        targetGrav = new ModuleText(6, 110, LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.targetgrav"), 0x202020);
-        sideSelectorModule = new ModuleBlockSideSelector(90, 15, this, LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.none"), LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.activeset"), LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.activeadd"));
+        // numGravPylons = new ModuleText(10, 25, "Number Of Thrusters: ", 0xaa2020);
+        textRadius = new ModuleText(6, 82, LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.radius") + "5",
+                0x202020);
+        targetGrav = new ModuleText(6, 110, LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.targetgrav"),
+                0x202020);
+        sideSelectorModule = new ModuleBlockSideSelector(90, 15, this,
+                LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.none"),
+                LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.activeset"),
+                LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.activeadd"));
 
         redstoneControl = new ModuleRedstoneOutputButton(174, 4, 1, "", this);
         state = RedstoneState.OFF;
@@ -75,18 +81,19 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
 
     @Override
     public List<ModuleBase> getModules(int id, EntityPlayer player) {
-        List<ModuleBase> modules = new LinkedList<>();//super.getModules(id, player);
-        modules.add(toggleSwitch = new ModuleToggleSwitch(160, 5, 0, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage, 11, 26, getMachineEnabled()));
+        List<ModuleBase> modules = new LinkedList<>();// super.getModules(id, player);
+        modules.add(toggleSwitch = new ModuleToggleSwitch(160, 5, 0, "", this,
+                zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage, 11, 26, getMachineEnabled()));
         modules.add(new ModulePower(18, 20, getBatteries()));
         modules.add(sideSelectorModule);
 
         modules.add(redstoneControl);
 
-
         modules.add(new ModuleSlider(6, 120, 0, TextureResources.doubleWarningSideBarIndicator, this));
         modules.add(new ModuleSlider(6, 90, 1, TextureResources.doubleWarningSideBarIndicator, this));
 
-        modules.add(new ModuleText(42, 20, LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.targetdir.1") + "\n" + LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.targetdir.2"), 0x202020));
+        modules.add(new ModuleText(42, 20, LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.targetdir.1") +
+                "\n" + LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.targetdir.2"), 0x202020));
         modules.add(targetGrav);
         modules.add(textRadius);
         updateText();
@@ -120,9 +127,12 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
 
     private void updateText() {
         if (world.isRemote) {
-            textRadius.setText(String.format("%s%d", LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.radius"), getRadius()));
+            textRadius.setText(String.format("%s%d", LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.radius"),
+                    getRadius()));
 
-            targetGrav.setText(String.format("%s %.2f/%.2f", LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.targetgrav"), currentProgress, gravity / 100f));
+            targetGrav.setText(String.format("%s %.2f/%.2f",
+                    LibVulpes.proxy.getLocalizedString("msg.gravitycontroller.targetgrav"), currentProgress,
+                    gravity / 100f));
         }
     }
 
@@ -133,13 +143,12 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
 
     @Override
     public boolean isRunning() {
-        return getMachineEnabled() && isStateActive(state, world.isBlockIndirectlyGettingPowered(getPos()) > 0);
+        return getMachineEnabled() && isStateActive(state, world.getRedstonePowerFromNeighbors(getPos()) > 0);
     }
 
     @Override
     public void update() {
-
-        //Freaky jenky crap to make sure the multiblock loads on chunkload etc
+        // Freaky jenky crap to make sure the multiblock loads on chunkload etc
         if (timeAlive == 0) {
             if (!world.isRemote) {
                 if (isComplete())
@@ -181,8 +190,8 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
             } else
                 updateText();
 
-            List<Entity> entities = world.getEntitiesWithinAABB(Entity.class, new AxisAlignedBB(getPos()).grow(getRadius(), getRadius(), getRadius()));
-
+            List<Entity> entities = world.getEntitiesWithinAABB(Entity.class,
+                    new AxisAlignedBB(getPos()).grow(getRadius(), getRadius(), getRadius()));
 
             for (Entity e : entities) {
                 boolean additive = true;
@@ -199,30 +208,36 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
 
                             if (e instanceof EntityLivingBase) {
                                 {
-                                    e.motionX += dir.getFrontOffsetX() * GravityHandler.LIVING_OFFSET * currentProgress;
-                                    e.motionY += dir.getFrontOffsetY() * GravityHandler.LIVING_OFFSET * currentProgress;
-                                    e.motionZ += dir.getFrontOffsetZ() * GravityHandler.LIVING_OFFSET * currentProgress;
+                                    e.motionX += dir.getXOffset() * GravityHandler.LIVING_OFFSET * currentProgress;
+                                    e.motionY += dir.getYOffset() * GravityHandler.LIVING_OFFSET * currentProgress;
+                                    e.motionZ += dir.getZOffset() * GravityHandler.LIVING_OFFSET * currentProgress;
                                 }
                             } else if (e instanceof EntityItem || e instanceof EntityArrow) {
-                                e.motionX += dir.getFrontOffsetX() * GravityHandler.OTHER_OFFSET * currentProgress;
-                                e.motionY += dir.getFrontOffsetY() * GravityHandler.OTHER_OFFSET * currentProgress;
-                                e.motionZ += dir.getFrontOffsetZ() * GravityHandler.OTHER_OFFSET * currentProgress;
+                                e.motionX += dir.getXOffset() * GravityHandler.OTHER_OFFSET * currentProgress;
+                                e.motionY += dir.getYOffset() * GravityHandler.OTHER_OFFSET * currentProgress;
+                                e.motionZ += dir.getZOffset() * GravityHandler.OTHER_OFFSET * currentProgress;
                             }
 
-                            //Spawn particle effect
-                            //TODO: tornados for planets
+                            // Spawn particle effect
+                            // TODO: tornados for planets
                             if (world.isRemote) {
-                                if (Minecraft.getMinecraft().gameSettings.particleSetting == 0 && !(Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 && Minecraft.getMinecraft().player == e))
-                                    AdvancedRocketry.proxy.spawnParticle("gravityEffect", world, e.posX, e.posY, e.posZ, .2f * dir.getFrontOffsetX() * currentProgress, .2f * dir.getFrontOffsetY() * currentProgress, .2f * dir.getFrontOffsetZ() * currentProgress);
+                                if (Minecraft.getMinecraft().gameSettings.particleSetting == 0 &&
+                                        !(Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 &&
+                                                Minecraft.getMinecraft().player == e))
+                                    AdvancedRocketry.proxy.spawnParticle("gravityEffect", world, e.posX, e.posY, e.posZ,
+                                            .2f * dir.getXOffset() * currentProgress,
+                                            .2f * dir.getYOffset() * currentProgress,
+                                            .2f * dir.getZOffset() * currentProgress);
                             }
 
                         }
                     }
                 }
 
-                //Only apply gravity if none of the directions are set and it's not a player in flight
+                // Only apply gravity if none of the directions are set and it's not a player in flight
                 if (allowApply && !additive)
-                    e.motionY += (e instanceof EntityItem) ? GravityHandler.OTHER_OFFSET : (e instanceof EntityArrow) ? GravityHandler.ARROW_OFFSET : GravityHandler.LIVING_OFFSET + 0.005;
+                    e.motionY += (e instanceof EntityItem) ? GravityHandler.OTHER_OFFSET : (e instanceof EntityArrow) ?
+                            GravityHandler.ARROW_OFFSET : GravityHandler.LIVING_OFFSET + 0.005;
             }
         } else if (currentProgress > 0) {
             currentProgress -= 0.01f;
@@ -233,7 +248,7 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
                 updateText();
         } else
             currentProgress = 0;
-        //}
+        // }
     }
 
     @Override
@@ -300,7 +315,6 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
         }
     }
 
-
     @Override
     protected void writeNetworkData(NBTTagCompound nbt) {
         super.writeNetworkData(nbt);
@@ -321,7 +335,6 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
         sideSelectorModule.readFromNBT(nbt);
         state = RedstoneState.values()[nbt.getByte("redstoneState")];
         redstoneControl.setRedstoneState(state);
-
     }
 
     @Override
@@ -340,7 +353,6 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
 
     @Override
     public void setProgress(int id, int progress) {
-
         if (id == 0) {
             this.progress = progress;
             gravity = progress + 5;
@@ -365,9 +377,7 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
     }
 
     @Override
-    public void setTotalProgress(int id, int progress) {
-
-    }
+    public void setTotalProgress(int id, int progress) {}
 
     @Override
     public void setProgressByUser(int id, int progress) {
@@ -379,5 +389,4 @@ public class TileAreaGravityController extends TileMultiPowerConsumer implements
     public void onModuleUpdated(ModuleBase module) {
         PacketHandler.sendToServer(new PacketMachine(this, (byte) 4));
     }
-
 }

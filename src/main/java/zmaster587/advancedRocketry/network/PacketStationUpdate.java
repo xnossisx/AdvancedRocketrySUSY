@@ -1,12 +1,16 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+import java.util.logging.Logger;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.event.PlanetEventHandler;
@@ -14,10 +18,8 @@ import zmaster587.advancedRocketry.stations.SpaceObjectManager;
 import zmaster587.advancedRocketry.stations.SpaceStationObject;
 import zmaster587.libVulpes.network.BasePacket;
 
-import java.io.IOException;
-import java.util.logging.Logger;
-
 public class PacketStationUpdate extends BasePacket {
+
     ISpaceObject spaceObject;
     int stationNumber;
     Type type;
@@ -28,8 +30,7 @@ public class PacketStationUpdate extends BasePacket {
     float orbitalDistance;
     NBTTagCompound nbt;
 
-    public PacketStationUpdate() {
-    }
+    public PacketStationUpdate() {}
 
     public PacketStationUpdate(ISpaceObject dimProperties, Type type) {
         this.spaceObject = dimProperties;
@@ -72,7 +73,8 @@ public class PacketStationUpdate extends BasePacket {
                     packetBuffer.writeCompoundTag(nbt);
                 } catch (NullPointerException e) {
                     out.writeBoolean(true);
-                    Logger.getLogger("advancedRocketry").warning("Dimension " + stationNumber + " has thrown an exception trying to write NBT, deleting!");
+                    Logger.getLogger("advancedRocketry").warning(
+                            "Dimension " + stationNumber + " has thrown an exception trying to write NBT, deleting!");
                     DimensionManager.getInstance().deleteDimension(stationNumber);
                 }
             default:
@@ -83,7 +85,6 @@ public class PacketStationUpdate extends BasePacket {
     public void readClient(ByteBuf in) {
         stationNumber = in.readInt();
         type = Type.values()[in.readInt()];
-
 
         switch (type) {
             case DEST_ORBIT_UPDATE:
@@ -122,7 +123,7 @@ public class PacketStationUpdate extends BasePacket {
 
     @Override
     public void read(ByteBuf in) {
-        //Should never be read on the server!
+        // Should never be read on the server!
     }
 
     @Override
@@ -162,8 +163,7 @@ public class PacketStationUpdate extends BasePacket {
     }
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-    }
+    public void executeServer(EntityPlayerMP player) {}
 
     public enum Type {
         DEST_ORBIT_UPDATE,

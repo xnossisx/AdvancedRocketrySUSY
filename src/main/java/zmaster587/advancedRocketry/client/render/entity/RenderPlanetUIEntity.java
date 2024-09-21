@@ -10,7 +10,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.client.render.multiblocks.RendererWarpCore;
@@ -20,8 +22,10 @@ import zmaster587.libVulpes.render.RenderHelper;
 
 public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRenderFactory<EntityUIPlanet> {
 
-    public static ResourceLocation planetUIBG = new ResourceLocation("advancedrocketry:textures/gui/planetUIOverlay.png");
-    public static ResourceLocation planetUIFG = new ResourceLocation("advancedrocketry:textures/gui/planetUIOverlayFG.png");
+    public static ResourceLocation planetUIBG = new ResourceLocation(
+            "advancedrocketry:textures/gui/planetUIOverlay.png");
+    public static ResourceLocation planetUIFG = new ResourceLocation(
+            "advancedrocketry:textures/gui/planetUIOverlayFG.png");
     private static WavefrontObject sphere;
 
     static {
@@ -38,7 +42,7 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
 
     @Override
     public Render<? super EntityUIPlanet> createRenderFor(
-            RenderManager manager) {
+                                                          RenderManager manager) {
         return new RenderPlanetUIEntity(manager);
     }
 
@@ -50,16 +54,16 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
     @Override
     public void doRender(EntityUIPlanet entity, double x, double y, double z,
                          float entityYaw, float partialTicks) {
-
         DimensionProperties properties = entity.getProperties();
         if (properties == null)
             return;
 
-        float sizeScale = Math.max(properties.gravitationalMultiplier * properties.gravitationalMultiplier * entity.getScale(), .5f);
+        float sizeScale = Math
+                .max(properties.gravitationalMultiplier * properties.gravitationalMultiplier * entity.getScale(), .5f);
 
         GL11.glPushMatrix();
         GL11.glTranslatef((float) x, (float) y + sizeScale * 0.03f, (float) z);
-        //Max because moon was too small to be visible
+        // Max because moon was too small to be visible
 
         GL11.glScalef(.1f * sizeScale, .1f * sizeScale, .1f * sizeScale);
         GlStateManager.disableLighting();
@@ -75,8 +79,7 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
         sphere.renderAll();
         GL11.glPopMatrix();
 
-
-        //Render shadow
+        // Render shadow
         GL11.glPushMatrix();
         GL11.glScalef(1.1f, 1.1f, 1.1f);
         GL11.glRotatef(90, 0, 0, 1);
@@ -89,11 +92,11 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
         if (properties.hasRings) {
-            //Rotate for rings
+            // Rotate for rings
             GL11.glRotatef(90, 1, 0, 0);
             GL11.glRotatef(-90, 0, 0, 1);
 
-            //Draw ring
+            // Draw ring
             GlStateManager.color(properties.ringColor[0], properties.ringColor[1], properties.ringColor[2], 0.5f);
             Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRings);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -101,7 +104,7 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
             RenderHelper.renderBottomFaceWithUV(buffer, 0, -1, -1, 1, 1, 0, 1, 0, 1);
             Tessellator.getInstance().draw();
 
-            //Draw ring shadow
+            // Draw ring shadow
             Minecraft.getMinecraft().renderEngine.bindTexture(DimensionProperties.planetRingShadow);
             GlStateManager.color(1, 1, 1, 0.5f);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
@@ -112,7 +115,7 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
 
         GL11.glPopMatrix();
 
-        //Render ATM
+        // Render ATM
         if (properties.hasAtmosphere()) {
             GL11.glPushMatrix();
             GlStateManager.disableTexture2D();
@@ -128,7 +131,7 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
             GL11.glPopMatrix();
         }
 
-        //Render hololines
+        // Render hololines
         GL11.glPushMatrix();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
@@ -150,7 +153,7 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
         GlStateManager.enableTexture2D();
         GL11.glPopMatrix();
 
-        //RenderSelection
+        // RenderSelection
         if (entity.isSelected()) {
             GlStateManager.disableTexture2D();
             double speedRotate = 0.025d;
@@ -179,39 +182,44 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
             sizeScale = .1f * sizeScale;
             GL11.glScaled(sizeScale, sizeScale, sizeScale);
 
-            //Render atmosphere UI/planet info
+            // Render atmosphere UI/planet info
 
-            RenderHelper.setupPlayerFacingMatrix(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.z, hitObj.hitVec.y, hitObj.hitVec.x), 0, 0, 0);
+            RenderHelper.setupPlayerFacingMatrix(
+                    Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.z, hitObj.hitVec.y, hitObj.hitVec.x), 0,
+                    0, 0);
             buffer = Tessellator.getInstance().getBuffer();
 
-            //Draw Mass indicator
+            // Draw Mass indicator
             Minecraft.getMinecraft().renderEngine.bindTexture(planetUIFG);
             GlStateManager.color(1, 1, 1, 0.8f);
             renderMassIndicator(buffer, Math.min(properties.gravitationalMultiplier / 2f, 1f));
 
-            //Draw background
+            // Draw background
             GlStateManager.color(1, 1, 1, 1);
             Minecraft.getMinecraft().renderEngine.bindTexture(planetUIBG);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             RenderHelper.renderNorthFaceWithUV(buffer, 1, -40, -25, 40, 55, 1, 0, 1, 0);
             Tessellator.getInstance().draw();
 
-
-            //Render ATM
+            // Render ATM
             Minecraft.getMinecraft().renderEngine.bindTexture(planetUIFG);
             renderATMIndicator(buffer, Math.min(properties.getAtmosphereDensity() / 200f, 1f));
-            //Render Temp
+            // Render Temp
             renderTemperatureIndicator(buffer, Math.min(properties.getAverageTemp() / 400f, 1f));
 
-            //Render planet name
+            // Render planet name
             RenderHelper.cleanupPlayerFacingMatrix();
-            RenderHelper.renderTag(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.z, hitObj.hitVec.y, hitObj.hitVec.x), properties.getName(), 0, .9, 0, 5);
-            RenderHelper.renderTag(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.z, hitObj.hitVec.y, hitObj.hitVec.x), "NumMoons: " + properties.getChildPlanets().size(), 0, .6, 0, 5);
+            RenderHelper.renderTag(
+                    Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.z, hitObj.hitVec.y, hitObj.hitVec.x),
+                    properties.getName(), 0, .9, 0, 5);
+            RenderHelper.renderTag(
+                    Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.z, hitObj.hitVec.y, hitObj.hitVec.x),
+                    "NumMoons: " + properties.getChildPlanets().size(), 0, .6, 0, 5);
 
             GL11.glPopMatrix();
         }
 
-        //Clean up and make player not transparent
+        // Clean up and make player not transparent
         GlStateManager.color(1, 1, 1);
         GlStateManager.disableBlend();
         GlStateManager.enableLighting();
@@ -231,7 +239,7 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
         float maxUV = (1 - percent) * 0.406f + .578f;
-        //Offset by 15 for Y
+        // Offset by 15 for Y
         RenderHelper.renderNorthFaceWithUV(buffer, 0, 6, 20 + (1 - percent) * 33, 39, 53, .5624f, .984f, .984f, maxUV);
         Tessellator.getInstance().draw();
     }
@@ -240,8 +248,9 @@ public class RenderPlanetUIEntity extends Render<EntityUIPlanet> implements IRen
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
         float maxUV = (1 - percent) * 0.406f + .578f;
-        //Offset by 15 for Y
-        RenderHelper.renderNorthFaceWithUV(buffer, 0, -38, 21.4f + (1 - percent) * 33, -4, 53, .016f, .4376f, .984f, maxUV);
+        // Offset by 15 for Y
+        RenderHelper.renderNorthFaceWithUV(buffer, 0, -38, 21.4f + (1 - percent) * 33, -4, 53, .016f, .4376f, .984f,
+                maxUV);
         Tessellator.getInstance().draw();
     }
 }

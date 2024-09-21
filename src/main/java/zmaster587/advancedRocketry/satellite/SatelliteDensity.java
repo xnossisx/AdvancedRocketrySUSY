@@ -19,5 +19,4 @@ public class SatelliteDensity extends SatelliteData {
     public double failureChance() {
         return 0;
     }
-
 }

@@ -16,7 +16,7 @@ public class InventoryUtil {
 
     public static boolean hasItemInInventory(IInventory inv, String substr, boolean consume) {
         for (int i = 0; i < inv.getSizeInventory(); i++) {
-            if (inv.getStackInSlot(i).getUnlocalizedName().toLowerCase().contains(substr.toLowerCase())) {
+            if (inv.getStackInSlot(i).getTranslationKey().toLowerCase().contains(substr.toLowerCase())) {
                 if (consume) {
                     inv.setInventorySlotContents(i, ItemStack.EMPTY);
                 }

@@ -77,7 +77,8 @@ public class GenLayerVoronoiExtended extends GenLayer {
         int[] aint2 = IntCache.getIntCache(p_75904_3_ * p_75904_4_);
 
         for (l2 = 0; l2 < p_75904_4_; ++l2) {
-            System.arraycopy(aint1, (l2 + (p_75904_2_ & 3)) * i2 + (p_75904_1_ & 3), aint2, l2 * p_75904_3_, p_75904_3_);
+            System.arraycopy(aint1, (l2 + (p_75904_2_ & 3)) * i2 + (p_75904_1_ & 3), aint2, l2 * p_75904_3_,
+                    p_75904_3_);
         }
 
         return aint2;

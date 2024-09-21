@@ -1,5 +1,12 @@
 package zmaster587.advancedRocketry.block;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -7,17 +14,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.AreaBlob;
 import zmaster587.advancedRocketry.api.util.IBlobHandler;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.advancedRocketry.tile.atmosphere.TileSeal;
 import zmaster587.libVulpes.util.HashedBlockPosition;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.HashMap;
-import java.util.LinkedList;
 
 public class BlockSeal extends Block {
 
@@ -79,7 +81,7 @@ public class BlockSeal extends Block {
             BlobHandler handler = blobList.remove(new HashedBlockPosition(pos.offset(dir)));
             if (handler != null) atmhandler.unregisterBlob(handler);
 
-            //fireCheckAllDirections(worldIn, pos.offset(dir), dir);
+            // fireCheckAllDirections(worldIn, pos.offset(dir), dir);
         }
     }
 
@@ -94,7 +96,8 @@ public class BlockSeal extends Block {
         }
     }
 
-    public void fireCheckAllDirections(@Nonnull World worldIn, @Nonnull BlockPos startBlock, @Nonnull EnumFacing directionFrom) {
+    public void fireCheckAllDirections(@Nonnull World worldIn, @Nonnull BlockPos startBlock,
+                                       @Nonnull EnumFacing directionFrom) {
         for (EnumFacing dir : EnumFacing.VALUES) {
             if (directionFrom.getOpposite() != dir)
                 fireCheck(worldIn, startBlock.offset(dir));

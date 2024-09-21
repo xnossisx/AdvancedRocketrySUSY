@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.tile.multiblock.machine;
 
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -7,6 +9,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
@@ -15,18 +18,21 @@ import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.inventory.modules.ModuleProgress;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
-import java.util.List;
-
 public class TileRollingMachine extends TileMultiblockMachine {
 
-    public static final Object[][][] structure = new Object[][][]{
-            {{Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, "blockSteel", LibVulpesBlocks.blockStructureBlock}},
+    public static final Object[][][] structure = new Object[][][] {
+            { { Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, "blockSteel", LibVulpesBlocks.blockStructureBlock } },
 
-            {{'P', 'c', 'I', Blocks.AIR, Blocks.AIR},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.motors, LibVulpesBlocks.motors, "blockSteel", LibVulpesBlocks.blockStructureBlock},
-                    {LibVulpesBlocks.blockStructureBlock, 'L', 'O', "blockSteel", LibVulpesBlocks.blockStructureBlock}}
+            { { 'P', 'c', 'I', Blocks.AIR, Blocks.AIR },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.motors, LibVulpesBlocks.motors, "blockSteel",
+                            LibVulpesBlocks.blockStructureBlock },
+                    { LibVulpesBlocks.blockStructureBlock, 'L', 'O', "blockSteel",
+                            LibVulpesBlocks.blockStructureBlock } }
     };
 
     @Override
@@ -41,7 +47,6 @@ public class TileRollingMachine extends TileMultiblockMachine {
         modules.add(new ModuleProgress(70, 20, 0, TextureResources.rollingMachineProgressBar, this));
         return modules;
     }
-
 
     @Override
     public SoundEvent getSound() {
@@ -65,8 +70,6 @@ public class TileRollingMachine extends TileMultiblockMachine {
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-
         return new AxisAlignedBB(pos.add(-4, -4, -4), pos.add(4, 4, 4));
     }
-
 }

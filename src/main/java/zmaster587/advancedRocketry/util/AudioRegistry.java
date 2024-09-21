@@ -7,6 +7,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public class AudioRegistry {
+
     public static final SoundEvent electricShockSmall = createSoundEvent("ElectricShockSmall");
     public static final SoundEvent laserDrill = createSoundEvent("laserDrill");
     public static final SoundEvent airHissLoop = createSoundEvent("airHissLoop");
@@ -30,6 +31,7 @@ public class AudioRegistry {
 
     @Mod.EventBusSubscriber
     public static class RegistrationHandler {
+
         @SubscribeEvent
         public static void registerSoundEvents(RegistryEvent.Register<SoundEvent> event) {
             event.getRegistry().registerAll(electricShockSmall);

@@ -5,10 +5,8 @@ import net.minecraft.world.WorldProvider;
 
 public class ProviderDummy extends WorldProvider {
 
-
     @Override
     public DimensionType getDimensionType() {
         return DimensionType.NETHER;
     }
-
 }

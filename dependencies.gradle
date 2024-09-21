@@ -42,7 +42,7 @@ dependencies {
     runtimeOnly(rfg.deobf("com.cleanroommc:strip-latest-forge-requirements:1.0"))
 //    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
     //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
-    implementation(rfg.deobf("curse.maven:library-for-ar-reworked-1038780:5703677"))
+    implementation(rfg.deobf("curse.maven:library-for-ar-reworked-1038780:5732205"))
 
     compileOnly(rfg.deobf("curse.maven:galacticraft-legacy-564236:4671122"))
     //compileOnly(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}:api"))
@@ -66,6 +66,8 @@ dependencies {
     implementation (rfg.deobf("curse.maven:gregicality-multiblocks-564858:5508050"))
     // AE2UEL 0.55.6 (transitive gt dep)
     //compileOnly (fg.deobf("curse.maven:ae2-extended-life-570458:4402048"))
+
+    implementation (rfg.deobf("curse.maven:susycore-846224:5732887"))
 
     //GeckoLib
     implementation (rfg.deobf("curse.maven:geckolib-388172:4020277"))

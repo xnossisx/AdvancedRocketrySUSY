@@ -5,20 +5,23 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 
 public class chunkdata {
+
     public int x;
     public int z;
     public TerraformingType type;
 
+    // chunk can be populated if itself and the 3 chunks with (x+1), (z+1) and (x+1,z+1) are fully generated in the
+    // world
 
-    // chunk can be populated if itself and the 3 chunks with (x+1), (z+1) and (x+1,z+1) are fully generated in the world
-
-
-    // if a chunks terrain is fully generated and does not need any future updates - causes it to set the IBlockState[][][] to null to free memory
+    // if a chunks terrain is fully generated and does not need any future updates - causes it to set the
+    // IBlockState[][][] to null to free memory
     // if the terrain is fully generated it allows for calling populate()
     public boolean terrain_fully_generated;
 
-    // will be set by BiomeHandler after calling the populate method, makes the chunk fully generated and it does not need any future updates
-    // as long as the atmosphere does not change, chunks that are fully generated will not register their blocks in the terraforming queue
+    // will be set by BiomeHandler after calling the populate method, makes the chunk fully generated and it does not
+    // need any future updates
+    // as long as the atmosphere does not change, chunks that are fully generated will not register their blocks in the
+    // terraforming queue
     public boolean chunk_fully_generated;
 
     public boolean chunk_populated;
@@ -33,7 +36,6 @@ public class chunkdata {
 
     // if all positions have been biomechanged
     public boolean[][] fully_biomechanged;
-
 
     public IBlockState[][][] blockStates;
 
@@ -56,10 +58,10 @@ public class chunkdata {
     }
 
     /*
-    sets if a blockpos is fully generated and computed if the chunk is fully generated
-    called from BiomeHandler
+     * sets if a blockpos is fully generated and computed if the chunk is fully generated
+     * called from BiomeHandler
      */
-    public void set_position_fully_generated(int x, int z){
+    public void set_position_fully_generated(int x, int z) {
         fully_generated[x][z] = true;
         boolean all_generated = true;
         for (int i = 0; i < 16; i++) {
@@ -69,18 +71,18 @@ public class chunkdata {
                 }
             }
         }
-        if (all_generated){
-            System.out.println("chunk fully generated: "+this.x+":"+this.z);
+        if (all_generated) {
+            System.out.println("chunk fully generated: " + this.x + ":" + this.z);
             terrain_fully_generated = true;
             this.blockStates = null; // no longer needed, gc should collect them now
-            helper.check_next_border_chunk_fully_generated(this.x,this.z); // update border chunks next to this one to check if they can decorate
-            helper.check_can_decorate(this.x,this.z);
+            helper.check_next_border_chunk_fully_generated(this.x, this.z); // update border chunks next to this one to
+                                                                            // check if they can decorate
+            helper.check_can_decorate(this.x, this.z);
 
         }
     }
 
-
-    public void set_position_biomechanged(int x, int z){
+    public void set_position_biomechanged(int x, int z) {
         fully_biomechanged[x][z] = true;
         boolean all_generated = true;
         for (int i = 0; i < 16; i++) {
@@ -90,8 +92,8 @@ public class chunkdata {
                 }
             }
         }
-        if (all_generated){
-            System.out.println("chunk fully biomechanged: "+this.x+":"+this.z);
+        if (all_generated) {
+            System.out.println("chunk fully biomechanged: " + this.x + ":" + this.z);
             chunk_fully_biomechanged = true;
 
             /// add chunk to terraforming queue now
@@ -101,28 +103,29 @@ public class chunkdata {
     }
 
     public void populate_chunk_if_not_already_done() {
-        // populate uses the biome at blockpos 0,0, in the chunk x+1,z+1, that's why we need the chunks next to it generated
+        // populate uses the biome at blockpos 0,0, in the chunk x+1,z+1, that's why we need the chunks next to it
+        // generated
         if (!chunk_fully_generated && !chunk_populated) {
 
-            //2 times i want more population!
+            // 2 times i want more population!
             world.provider.createChunkGenerator().populate(this.x, this.z);
             world.provider.createChunkGenerator().populate(this.x, this.z);
 
             System.out.println("populate chunk " + this.x + ":" + this.z);
             chunk_populated = true;
-            //make a biome lasers here
+            // make a biome lasers here
             // no - looks bad
-            //for (int i = 0; i < 32; i++) {
-            //    int bx = world.rand.nextInt(16);
-            //    int bz = world.rand.nextInt(16);
-            //    BlockPos pos = new BlockPos(this.x*16+bx,0,this.z*16+bz);
-            //    PacketHandler.sendToNearby(new PacketBiomeIDChange(world.getChunkFromChunkCoords(this.x,this.z), world, new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
-            //}
+            // for (int i = 0; i < 32; i++) {
+            // int bx = world.rand.nextInt(16);
+            // int bz = world.rand.nextInt(16);
+            // BlockPos pos = new BlockPos(this.x*16+bx,0,this.z*16+bz);
+            // PacketHandler.sendToNearby(new PacketBiomeIDChange(world.getChunkFromChunkCoords(this.x,this.z), world,
+            // new HashedBlockPosition(pos)), world.provider.getDimension(), pos, 1024);
+            // }
         }
     }
 
-    public void set_position_decorated(int x, int z){
-
+    public void set_position_decorated(int x, int z) {
         fully_decorated[x][z] = true;
         boolean all_decorated = true;
         for (int i = 0; i < 16; i++) {
@@ -132,12 +135,9 @@ public class chunkdata {
                 }
             }
         }
-        if (all_decorated){
+        if (all_decorated) {
 
-            helper.setChunkFullyGenerated(this.x,this.z);
+            helper.setChunkFullyGenerated(this.x, this.z);
         }
-
-
     }
-
 }

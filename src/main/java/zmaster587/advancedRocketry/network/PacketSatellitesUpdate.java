@@ -1,11 +1,12 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
@@ -16,8 +17,7 @@ public class PacketSatellitesUpdate extends BasePacket {
     private int dimNumber;
     private DimensionProperties dimProperties;
 
-    public PacketSatellitesUpdate() {
-    }
+    public PacketSatellitesUpdate() {}
 
     public PacketSatellitesUpdate(int dimNumber, DimensionProperties dimProperties) {
         this.dimProperties = dimProperties;
@@ -39,12 +39,12 @@ public class PacketSatellitesUpdate extends BasePacket {
 
     @Override
     public void readClient(final ByteBuf byteBuf) {
-
-        if (FMLCommonHandler.instance().getEffectiveSide().isServer()){
+        if (FMLCommonHandler.instance().getEffectiveSide().isServer()) {
             System.out.println("readclient was called on server side (this should never happen) - returning");
-            return;}
+            return;
+        }
 
-        //System.out.println("readclient was called on client");
+        // System.out.println("readclient was called on client");
         int dimNumber = byteBuf.readInt();
 
         NBTTagCompound compound = ByteBufUtils.readTag(byteBuf);
@@ -57,17 +57,11 @@ public class PacketSatellitesUpdate extends BasePacket {
     }
 
     @Override
-    public void read(final ByteBuf byteBuf) {
-
-    }
+    public void read(final ByteBuf byteBuf) {}
 
     @Override
-    public void executeClient(final EntityPlayer entityPlayer) {
-
-    }
+    public void executeClient(final EntityPlayer entityPlayer) {}
 
     @Override
-    public void executeServer(final EntityPlayerMP entityPlayerMP) {
-
-    }
+    public void executeServer(final EntityPlayerMP entityPlayerMP) {}
 }

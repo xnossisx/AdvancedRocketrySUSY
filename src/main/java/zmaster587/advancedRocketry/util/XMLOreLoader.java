@@ -1,26 +1,29 @@
 package zmaster587.advancedRocketry.util;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import net.minecraft.block.Block;
 import net.minecraft.util.math.MathHelper;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
+
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.dimension.DimensionProperties.AtmosphereTypes;
 import zmaster587.advancedRocketry.dimension.DimensionProperties.Temps;
 import zmaster587.advancedRocketry.util.OreGenProperties.OreEntry;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.SingleEntry;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
 
 public class XMLOreLoader {
 
@@ -148,7 +151,6 @@ public class XMLOreLoader {
     }
 
     public static String writeXML(OreGenProperties gen, int numTabs) {
-
         String outputString;
 
         StringBuilder tabLen = new StringBuilder();
@@ -181,14 +183,14 @@ public class XMLOreLoader {
     }
 
     public static Node writeOreEntryXML(Document doc, OreGenProperties gen) {
-
         Element oreGen = doc.createElement("oreGen");
 
         for (OreEntry ore : gen.getOreEntries()) {
             int meta = ore.getBlockState().getBlock().getMetaFromState(ore.getBlockState());
 
             Element oreElement = doc.createElement("ore");
-            oreElement.appendChild(createTextNode(doc, "block", ore.getBlockState().getBlock().getRegistryName().toString()));
+            oreElement.appendChild(
+                    createTextNode(doc, "block", ore.getBlockState().getBlock().getRegistryName().toString()));
             oreElement.appendChild(createTextNode(doc, "minHeight", ore.getMinHeight()));
             oreElement.appendChild(createTextNode(doc, "maxHeight", ore.getMaxHeight()));
             oreElement.appendChild(createTextNode(doc, "clumpSize", ore.getClumpSize()));
@@ -202,7 +204,6 @@ public class XMLOreLoader {
     }
 
     public static String writeOreEntryXML(OreGenProperties gen, int numTabs) {
-
         StringBuilder outputString = new StringBuilder();
 
         StringBuilder tabLen = new StringBuilder();
@@ -212,7 +213,11 @@ public class XMLOreLoader {
 
         for (OreEntry ore : gen.getOreEntries()) {
             int meta = ore.getBlockState().getBlock().getMetaFromState(ore.getBlockState());
-            outputString.append(tabLen).append("<ore block=\"").append(ore.getBlockState().getBlock().getRegistryName()).append(meta == 0 ? "" : "\" meta=\"" + meta).append("\" minHeight=\"").append(ore.getMinHeight()).append("\" maxHeight=\"").append(ore.getMaxHeight()).append("\" clumpSize=\"").append(ore.getClumpSize()).append("\"").append(" chancePerChunk=\"").append(ore.getChancePerChunk()).append("\" />\n");
+            outputString.append(tabLen).append("<ore block=\"").append(ore.getBlockState().getBlock().getRegistryName())
+                    .append(meta == 0 ? "" : "\" meta=\"" + meta).append("\" minHeight=\"").append(ore.getMinHeight())
+                    .append("\" maxHeight=\"").append(ore.getMaxHeight()).append("\" clumpSize=\"")
+                    .append(ore.getClumpSize()).append("\"").append(" chancePerChunk=\"")
+                    .append(ore.getChancePerChunk()).append("\" />\n");
 
         }
 
@@ -273,9 +278,11 @@ public class XMLOreLoader {
 
                 if (node != null) {
                     try {
-                        pressure = MathHelper.clamp(Integer.parseInt(node.getTextContent()), 0, AtmosphereTypes.values().length);
+                        pressure = MathHelper.clamp(Integer.parseInt(node.getTextContent()), 0,
+                                AtmosphereTypes.values().length);
                     } catch (NumberFormatException e) {
-                        AdvancedRocketry.logger.warn("Invalid format for pressure: \"" + node.getTextContent() + "\" Only numbers are allowed(" + doc.getDocumentURI() + ")");
+                        AdvancedRocketry.logger.warn("Invalid format for pressure: \"" + node.getTextContent() +
+                                "\" Only numbers are allowed(" + doc.getDocumentURI() + ")");
                         childNode = childNode.getNextSibling();
                         continue;
                     }
@@ -287,14 +294,16 @@ public class XMLOreLoader {
                     try {
                         temp = MathHelper.clamp(Integer.parseInt(node.getTextContent()), 0, Temps.values().length);
                     } catch (NumberFormatException e) {
-                        AdvancedRocketry.logger.warn("Invalid format for temp: \"" + node.getTextContent() + "\" Only numbers are allowed(" + doc.getDocumentURI() + ")");
+                        AdvancedRocketry.logger.warn("Invalid format for temp: \"" + node.getTextContent() +
+                                "\" Only numbers are allowed(" + doc.getDocumentURI() + ")");
                         childNode = childNode.getNextSibling();
                         continue;
                     }
                 }
 
                 if (pressure == -1 && temp == -1) {
-                    AdvancedRocketry.logger.warn("Invalid format for temp: \"" + node.getTextContent() + "\" Only numbers are allowed(" + doc.getDocumentURI() + ")");
+                    AdvancedRocketry.logger.warn("Invalid format for temp: \"" + node.getTextContent() +
+                            "\" Only numbers are allowed(" + doc.getDocumentURI() + ")");
                     childNode = childNode.getNextSibling();
                     continue;
                 }

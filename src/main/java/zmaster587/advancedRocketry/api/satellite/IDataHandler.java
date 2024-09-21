@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.api.satellite;
 
 import net.minecraft.util.EnumFacing;
+
 import zmaster587.advancedRocketry.api.DataStorage;
 
 public interface IDataHandler {
@@ -28,5 +29,5 @@ public interface IDataHandler {
      * @param type data type
      * @return the amount of data on the object
      */
-    //int getDataAmount(DataStorage.DataType type);
+    // int getDataAmount(DataStorage.DataType type);
 }

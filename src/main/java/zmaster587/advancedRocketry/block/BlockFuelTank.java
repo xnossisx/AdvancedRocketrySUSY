@@ -1,6 +1,11 @@
 package zmaster587.advancedRocketry.block;
 
-import net.minecraft.block.Block;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
@@ -12,14 +17,10 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.IFuelTank;
 import zmaster587.advancedRocketry.api.IRocketEngine;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
-
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Locale;
 
 public class BlockFuelTank extends BlockFullyRotatable implements IFuelTank {
 
@@ -27,36 +28,49 @@ public class BlockFuelTank extends BlockFullyRotatable implements IFuelTank {
 
     public BlockFuelTank(Material mat) {
         super(mat);
-        this.setDefaultState(this.getDefaultState().withProperty(TANKSTATES, TankStates.MIDDLE).withProperty(FACING, EnumFacing.DOWN));
+        this.setDefaultState(this.getDefaultState().withProperty(TANKSTATES, TankStates.MIDDLE).withProperty(FACING,
+                EnumFacing.DOWN));
     }
 
     @Override
     @Nonnull
     public IBlockState getStateFromMeta(int meta) {
-        int tankstate = meta%3;
-        int rotationstate = meta/3;
+        int tankstate = meta % 3;
+        int rotationstate = meta / 3;
 
         IBlockState state;
         state = this.getDefaultState().withProperty(TANKSTATES, TankStates.values()[tankstate]);
-        if (rotationstate == 0) {state = state.withProperty(FACING, EnumFacing.UP);}
-        if (rotationstate == 1) {state = state.withProperty(FACING, EnumFacing.SOUTH);}
-        if (rotationstate == 2) {state = state.withProperty(FACING, EnumFacing.EAST);}
-        //System.out.println("####");
-        //System.out.println("rotation:"+rotationstate);
-        //System.out.println("meta"+meta);
-        //System.out.println("----");
+        if (rotationstate == 0) {
+            state = state.withProperty(FACING, EnumFacing.UP);
+        }
+        if (rotationstate == 1) {
+            state = state.withProperty(FACING, EnumFacing.SOUTH);
+        }
+        if (rotationstate == 2) {
+            state = state.withProperty(FACING, EnumFacing.EAST);
+        }
+        // System.out.println("####");
+        // System.out.println("rotation:"+rotationstate);
+        // System.out.println("meta"+meta);
+        // System.out.println("----");
         return state;
     }
 
     @Override
     public int getMetaFromState(IBlockState state) {
         int i = 0;
-        if (state.getValue(FACING) == EnumFacing.UP) {i=0;}
-        if (state.getValue(FACING) == EnumFacing.SOUTH) {i=1;}
-        if (state.getValue(FACING) == EnumFacing.EAST) {i=2;}
+        if (state.getValue(FACING) == EnumFacing.UP) {
+            i = 0;
+        }
+        if (state.getValue(FACING) == EnumFacing.SOUTH) {
+            i = 1;
+        }
+        if (state.getValue(FACING) == EnumFacing.EAST) {
+            i = 2;
+        }
 
-        int v = state.getValue(TANKSTATES).ordinal() + i*3;
-                //System.out.println("v:"+v);
+        int v = state.getValue(TANKSTATES).ordinal() + i * 3;
+        // System.out.println("v:"+v);
 
         return v;
     }
@@ -71,11 +85,6 @@ public class BlockFuelTank extends BlockFullyRotatable implements IFuelTank {
     @Nonnull
     public IBlockState getActualState(@Nonnull IBlockState state, IBlockAccess world,
                                       BlockPos pos) {
-
-
-
-
-
         if (world.getBlockState(pos).getValue(FACING) == EnumFacing.DOWN)
             state = state.withProperty(FACING, EnumFacing.UP);
         if (world.getBlockState(pos).getValue(FACING) == EnumFacing.NORTH)
@@ -83,55 +92,69 @@ public class BlockFuelTank extends BlockFullyRotatable implements IFuelTank {
         if (world.getBlockState(pos).getValue(FACING) == EnumFacing.WEST)
             state = state.withProperty(FACING, EnumFacing.EAST);
 
-        if (world.getBlockState(pos).getValue(FACING) == EnumFacing.DOWN || world.getBlockState(pos).getValue(FACING) == EnumFacing.UP) {
-            int i = (world.getBlockState(pos.add(0, 1, 0)).getBlock() == this && world.getBlockState(pos.add(0, 1, 0)).getValue(FACING) == EnumFacing.UP) ? 1 : 0;
-            i += (world.getBlockState(pos.add(0, -1, 0)).getBlock() == this && world.getBlockState(pos.add(0, -1, 0)).getValue(FACING) == EnumFacing.UP) || world.getBlockState(pos.add(0, -1, 0)).getBlock() instanceof IRocketEngine ? 2 : 0;
+        if (world.getBlockState(pos).getValue(FACING) == EnumFacing.DOWN ||
+                world.getBlockState(pos).getValue(FACING) == EnumFacing.UP) {
+            int i = (world.getBlockState(pos.add(0, 1, 0)).getBlock() == this &&
+                    world.getBlockState(pos.add(0, 1, 0)).getValue(FACING) == EnumFacing.UP) ? 1 : 0;
+            i += (world.getBlockState(pos.add(0, -1, 0)).getBlock() == this &&
+                    world.getBlockState(pos.add(0, -1, 0)).getValue(FACING) == EnumFacing.UP) ||
+                    world.getBlockState(pos.add(0, -1, 0)).getBlock() instanceof IRocketEngine ? 2 : 0;
 
-            //If there is no tank below this one and no engine below
+            // If there is no tank below this one and no engine below
             if (i == 1) {
                 return state.withProperty(TANKSTATES, TankStates.BOTTOM);
             }
-            //If there is no tank above this one
+            // If there is no tank above this one
             else if (i == 2) {
                 return state.withProperty(TANKSTATES, TankStates.TOP);
             }
-            //If there is a tank above and below this one
+            // If there is a tank above and below this one
             else {
                 return state.withProperty(TANKSTATES, TankStates.MIDDLE);
             }
         }
 
-        if (world.getBlockState(pos).getValue(FACING) == EnumFacing.EAST || world.getBlockState(pos).getValue(FACING) == EnumFacing.WEST) {
-            int i = (world.getBlockState(pos.add(1, 0, 0)).getBlock() == this && world.getBlockState(pos.add(1, 0, 0)).getValue(FACING) == EnumFacing.EAST) || world.getBlockState(pos.add(1, 0, 0)).getBlock() instanceof IRocketEngine ? 1 : 0;
-            i += (world.getBlockState(pos.add(-1, 0, 0)).getBlock() == this && world.getBlockState(pos.add(-1, 0, 0)).getValue(FACING) == EnumFacing.EAST) || world.getBlockState(pos.add(-1, 0, 0)).getBlock() instanceof IRocketEngine ? 2 : 0;
+        if (world.getBlockState(pos).getValue(FACING) == EnumFacing.EAST ||
+                world.getBlockState(pos).getValue(FACING) == EnumFacing.WEST) {
+            int i = (world.getBlockState(pos.add(1, 0, 0)).getBlock() == this &&
+                    world.getBlockState(pos.add(1, 0, 0)).getValue(FACING) == EnumFacing.EAST) ||
+                    world.getBlockState(pos.add(1, 0, 0)).getBlock() instanceof IRocketEngine ? 1 : 0;
+            i += (world.getBlockState(pos.add(-1, 0, 0)).getBlock() == this &&
+                    world.getBlockState(pos.add(-1, 0, 0)).getValue(FACING) == EnumFacing.EAST) ||
+                    world.getBlockState(pos.add(-1, 0, 0)).getBlock() instanceof IRocketEngine ? 2 : 0;
 
-            //If there is no tank below this one and no engine below
+            // If there is no tank below this one and no engine below
             if (i == 1) {
                 return state.withProperty(TANKSTATES, TankStates.BOTTOM);
             }
-            //If there is no tank above this one
+            // If there is no tank above this one
             else if (i == 2) {
                 return state.withProperty(TANKSTATES, TankStates.TOP);
             }
-            //If there is a tank above and below this one
+            // If there is a tank above and below this one
             else {
                 return state.withProperty(TANKSTATES, TankStates.MIDDLE);
             }
         }
 
-        if (world.getBlockState(pos).getValue(FACING) == EnumFacing.NORTH || world.getBlockState(pos).getValue(FACING) == EnumFacing.SOUTH) {
-            int i = (world.getBlockState(pos.add(0, 0, 1)).getBlock() == this && world.getBlockState(pos.add(0, 0, 1)).getValue(FACING) == EnumFacing.SOUTH) || world.getBlockState(pos.add(0, 0, 1)).getBlock() instanceof IRocketEngine ? 1 : 0;
-            i += (world.getBlockState(pos.add(0, 0, -1)).getBlock() == this && world.getBlockState(pos.add(0, 0, -1)).getValue(FACING) == EnumFacing.SOUTH) || world.getBlockState(pos.add(0, 0, -1)).getBlock() instanceof IRocketEngine ? 2 : 0;
+        if (world.getBlockState(pos).getValue(FACING) == EnumFacing.NORTH ||
+                world.getBlockState(pos).getValue(FACING) == EnumFacing.SOUTH) {
+            int i = (world.getBlockState(pos.add(0, 0, 1)).getBlock() == this &&
+                    world.getBlockState(pos.add(0, 0, 1)).getValue(FACING) == EnumFacing.SOUTH) ||
+                    world.getBlockState(pos.add(0, 0, 1)).getBlock() instanceof IRocketEngine ? 1 : 0;
+            i += (world.getBlockState(pos.add(0, 0, -1)).getBlock() == this &&
+                    world.getBlockState(pos.add(0, 0, -1)).getValue(FACING) == EnumFacing.SOUTH) ||
+                    world.getBlockState(pos.add(0, 0, -1)).getBlock() instanceof IRocketEngine ? 2 : 0;
 
-            //If there is no tank below this one and no engine below
+            // If there is no tank below this one and no engine below
             if (i == 1) {
                 return state.withProperty(TANKSTATES, TankStates.BOTTOM);
             }
-            //If there is no tank above this one
+            // If there is no tank above this one
             else if (i == 2) {
                 return state.withProperty(TANKSTATES, TankStates.TOP);
             }
-            //If there is a tank above and below this one
+            // If there is a tank above and below this one
             else {
                 return state.withProperty(TANKSTATES, TankStates.MIDDLE);
             }
@@ -146,40 +169,46 @@ public class BlockFuelTank extends BlockFullyRotatable implements IFuelTank {
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, @Nonnull ItemStack stack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer,
+                                @Nonnull ItemStack stack) {
         if (Math.abs(placer.rotationPitch) > 50.0F) {
-            world.setBlockState(pos, state.withProperty(FACING, placer.rotationPitch > 0.0F ? EnumFacing.UP : EnumFacing.DOWN), 2);
+            world.setBlockState(pos,
+                    state.withProperty(FACING, placer.rotationPitch > 0.0F ? EnumFacing.UP : EnumFacing.DOWN), 2);
         } else {
             world.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 2);
         }
         state = world.getBlockState(pos);
 
         if (state.getValue(FACING) == EnumFacing.DOWN)
-            world.setBlockState(pos,state.withProperty(FACING, EnumFacing.UP));
+            world.setBlockState(pos, state.withProperty(FACING, EnumFacing.UP));
         if (state.getValue(FACING) == EnumFacing.NORTH)
-            world.setBlockState(pos,state.withProperty(FACING, EnumFacing.SOUTH));
+            world.setBlockState(pos, state.withProperty(FACING, EnumFacing.SOUTH));
         if (state.getValue(FACING) == EnumFacing.WEST)
-            world.setBlockState(pos,state.withProperty(FACING, EnumFacing.EAST));
-
+            world.setBlockState(pos, state.withProperty(FACING, EnumFacing.EAST));
 
         List<EnumFacing> nextblocks = new LinkedList<>();
-        if (world.getBlockState(pos.add(0, 1, 0)).getBlock() == this && world.getBlockState(pos.add(0, 1, 0)).getValue(FACING) == EnumFacing.UP)
-            nextblocks.add (world.getBlockState(pos.add(0, 1, 0)).getValue(FACING));
-        if (world.getBlockState(pos.add(0, -1, 0)).getBlock() == this  && world.getBlockState(pos.add(0, -1, 0)).getValue(FACING) == EnumFacing.UP)
-            nextblocks.add (world.getBlockState(pos.add(0, -1, 0)).getValue(FACING));
-        if (world.getBlockState(pos.add(-1, 0, 0)).getBlock() == this && world.getBlockState(pos.add(-1, 0, 0)).getValue(FACING) == EnumFacing.EAST)
-            nextblocks.add (world.getBlockState(pos.add(-1, 0, 0)).getValue(FACING));
-        if (world.getBlockState(pos.add(1, 0, 0)).getBlock() == this && world.getBlockState(pos.add(1, 0, 0)).getValue(FACING) == EnumFacing.EAST)
-            nextblocks.add (world.getBlockState(pos.add(1, 0, 0)).getValue(FACING));
-        if (world.getBlockState(pos.add(0, 0, 1)).getBlock() == this && world.getBlockState(pos.add(0, 0, 1)).getValue(FACING) == EnumFacing.SOUTH)
-            nextblocks.add (world.getBlockState(pos.add(0, 0, 1)).getValue(FACING));
-        if (world.getBlockState(pos.add(0, 0, -1)).getBlock() == this && world.getBlockState(pos.add(0, 0, -1)).getValue(FACING) == EnumFacing.SOUTH)
-            nextblocks.add (world.getBlockState(pos.add(0, 0, -1)).getValue(FACING));
+        if (world.getBlockState(pos.add(0, 1, 0)).getBlock() == this &&
+                world.getBlockState(pos.add(0, 1, 0)).getValue(FACING) == EnumFacing.UP)
+            nextblocks.add(world.getBlockState(pos.add(0, 1, 0)).getValue(FACING));
+        if (world.getBlockState(pos.add(0, -1, 0)).getBlock() == this &&
+                world.getBlockState(pos.add(0, -1, 0)).getValue(FACING) == EnumFacing.UP)
+            nextblocks.add(world.getBlockState(pos.add(0, -1, 0)).getValue(FACING));
+        if (world.getBlockState(pos.add(-1, 0, 0)).getBlock() == this &&
+                world.getBlockState(pos.add(-1, 0, 0)).getValue(FACING) == EnumFacing.EAST)
+            nextblocks.add(world.getBlockState(pos.add(-1, 0, 0)).getValue(FACING));
+        if (world.getBlockState(pos.add(1, 0, 0)).getBlock() == this &&
+                world.getBlockState(pos.add(1, 0, 0)).getValue(FACING) == EnumFacing.EAST)
+            nextblocks.add(world.getBlockState(pos.add(1, 0, 0)).getValue(FACING));
+        if (world.getBlockState(pos.add(0, 0, 1)).getBlock() == this &&
+                world.getBlockState(pos.add(0, 0, 1)).getValue(FACING) == EnumFacing.SOUTH)
+            nextblocks.add(world.getBlockState(pos.add(0, 0, 1)).getValue(FACING));
+        if (world.getBlockState(pos.add(0, 0, -1)).getBlock() == this &&
+                world.getBlockState(pos.add(0, 0, -1)).getValue(FACING) == EnumFacing.SOUTH)
+            nextblocks.add(world.getBlockState(pos.add(0, 0, -1)).getValue(FACING));
 
-
-        if (!nextblocks.isEmpty()){
+        if (!nextblocks.isEmpty()) {
             boolean rotate = true;
-            EnumFacing targetfacing =null;
+            EnumFacing targetfacing = null;
             targetfacing = nextblocks.get(0);
 
             for (int i = 0; i < nextblocks.size(); i++) {
@@ -187,11 +216,9 @@ public class BlockFuelTank extends BlockFullyRotatable implements IFuelTank {
                     rotate = false;
             }
             if (rotate)
-                world.setBlockState(pos,state.withProperty(FACING, targetfacing));
+                world.setBlockState(pos, state.withProperty(FACING, targetfacing));
         }
-
     }
-
 
     @Override
     public int getMaxFill(World world, BlockPos pos, IBlockState state) {
@@ -199,6 +226,7 @@ public class BlockFuelTank extends BlockFullyRotatable implements IFuelTank {
     }
 
     public enum TankStates implements IStringSerializable {
+
         TOP,
         BOTTOM,
         MIDDLE;
@@ -207,6 +235,5 @@ public class BlockFuelTank extends BlockFullyRotatable implements IFuelTank {
         public String getName() {
             return name().toLowerCase(Locale.ENGLISH);
         }
-
     }
 }

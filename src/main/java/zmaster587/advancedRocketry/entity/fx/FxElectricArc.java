@@ -8,7 +8,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public class FxElectricArc extends Particle {
-    public static final ResourceLocation icon = new ResourceLocation("advancedrocketry:textures/particle/hardSquare.png");
+
+    public static final ResourceLocation icon = new ResourceLocation(
+            "advancedrocketry:textures/particle/hardSquare.png");
     int numRecursions;
 
     public FxElectricArc(World world, double x,
@@ -32,7 +34,6 @@ public class FxElectricArc extends Particle {
                                float x1,
                                float rotX, float rotXZ, float rotZ,
                                float rotYZ, float rotXY) {
-
         Minecraft.getMinecraft().getTextureManager().bindTexture(icon);
 
         float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) x1 - interpPosX);
@@ -40,8 +41,7 @@ public class FxElectricArc extends Particle {
         float z = (float) (this.prevPosZ + (this.posZ - this.prevPosZ) * (double) x1 - interpPosZ);
         float f10 = 0.1F * this.particleScale;
 
-
-        //GL11.glEnable(GL11.GL_BLEND);
+        // GL11.glEnable(GL11.GL_BLEND);
         render(worldRendererIn, x, y + f10 * 2, z, f10, rotX, rotXZ, rotZ, rotYZ, rotXY, 0);
         render(worldRendererIn, x, y, z, f10, rotX, rotXZ, rotZ, rotYZ, rotXY, 0);
     }
@@ -49,15 +49,21 @@ public class FxElectricArc extends Particle {
     private void render(BufferBuilder tess, float x, float y, float z, float scale,
                         float rotX, float rotXZ, float rotZ,
                         float rotYZ, float rotXY, float shearX) {
-
         int i = this.getBrightnessForRender(0);
         int j = i >> 16 & 65535;
         int k = i & 65535;
-        tess.pos(x - scale * (rotX + rotYZ), y - rotXZ * scale, z - rotZ * scale - rotXY * scale).tex(1, 1).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-        tess.pos(x + scale * (rotYZ - rotX), y + rotXZ * scale, z - rotZ * scale + rotXY * scale).tex(1, 0).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-        tess.pos(x + scale * (rotX + rotYZ), y + rotXZ * scale, z + rotZ * scale + rotXY * scale).tex(0, 0).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-        tess.pos(x + scale * (rotX - rotYZ), y - rotXZ * scale, z + rotZ * scale - rotXY * scale).tex(0, 1).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-
+        tess.pos(x - scale * (rotX + rotYZ), y - rotXZ * scale, z - rotZ * scale - rotXY * scale).tex(1, 1)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k)
+                .endVertex();
+        tess.pos(x + scale * (rotYZ - rotX), y + rotXZ * scale, z - rotZ * scale + rotXY * scale).tex(1, 0)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k)
+                .endVertex();
+        tess.pos(x + scale * (rotX + rotYZ), y + rotXZ * scale, z + rotZ * scale + rotXY * scale).tex(0, 0)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k)
+                .endVertex();
+        tess.pos(x + scale * (rotX - rotYZ), y - rotXZ * scale, z + rotZ * scale - rotXY * scale).tex(0, 1)
+                .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k)
+                .endVertex();
     }
 
     @Override
@@ -71,14 +77,13 @@ public class FxElectricArc extends Particle {
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
 
-        //Change color and alpha over lifespan
+        // Change color and alpha over lifespan
         this.particleAlpha = 1 - this.particleAge / (float) this.particleMaxAge;
-        //this.particleGreen -= this.particleGreen * this.particleAge/ ((float)this.particleMaxAge*20);
-        //this.particleRed -= this.particleRed * this.particleAge/ ((float)this.particleMaxAge*20);
+        // this.particleGreen -= this.particleGreen * this.particleAge/ ((float)this.particleMaxAge*20);
+        // this.particleRed -= this.particleRed * this.particleAge/ ((float)this.particleMaxAge*20);
 
         if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
         }
-
     }
 }

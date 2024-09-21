@@ -8,5 +8,4 @@ public class PrecisionLaserEtcherWrapper extends MachineRecipe {
     PrecisionLaserEtcherWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

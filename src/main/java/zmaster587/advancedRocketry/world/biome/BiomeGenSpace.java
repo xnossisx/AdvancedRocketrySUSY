@@ -1,18 +1,20 @@
 package zmaster587.advancedRocketry.world.biome;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.biome.Biome;
 
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
-
 public class BiomeGenSpace extends Biome {
+
     public BiomeGenSpace(BiomeProperties properties) {
         super(properties);
 
-        //cold and dry
+        // cold and dry
         this.decorator.generateFalls = false;
         this.decorator.flowersPerChunk = 0;
         this.decorator.grassPerChunk = 0;
@@ -29,6 +31,6 @@ public class BiomeGenSpace extends Biome {
 
     @Override
     public float getSpawningChance() {
-        return 0f; //Nothing spawns
+        return 0f; // Nothing spawns
     }
 }

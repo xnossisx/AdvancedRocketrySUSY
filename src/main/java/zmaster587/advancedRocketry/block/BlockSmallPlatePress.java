@@ -1,7 +1,10 @@
 package zmaster587.advancedRocketry.block;
 
-import com.google.common.collect.Lists;
-import com.mojang.realmsclient.gui.ChatFormatting;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.block.*;
 import net.minecraft.block.state.BlockPistonStructureHelper;
 import net.minecraft.block.state.IBlockState;
@@ -19,13 +22,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import com.google.common.collect.Lists;
+import com.mojang.realmsclient.gui.ChatFormatting;
+
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.interfaces.IRecipe;
 import zmaster587.libVulpes.recipe.RecipesMachine;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 public class BlockSmallPlatePress extends BlockPistonBase {
 
@@ -39,7 +42,6 @@ public class BlockSmallPlatePress extends BlockPistonBase {
             this.checkForMove(world, pos, state);
         }
     }
-
 
     @Override
     public IBlockState getStateForPlacement(World worldIn, BlockPos pos,
@@ -69,7 +71,8 @@ public class BlockSmallPlatePress extends BlockPistonBase {
             BlockPos blockpos = pos.up();
 
             for (EnumFacing enumfacing1 : EnumFacing.values()) {
-                if (enumfacing1 != EnumFacing.DOWN && worldIn.isSidePowered(blockpos.offset(enumfacing1), enumfacing1)) {
+                if (enumfacing1 != EnumFacing.DOWN &&
+                        worldIn.isSidePowered(blockpos.offset(enumfacing1), enumfacing1)) {
                     return true;
                 }
             }
@@ -87,7 +90,8 @@ public class BlockSmallPlatePress extends BlockPistonBase {
             worldIn.setBlockToAir(pos.down());
 
             if (!worldIn.isRemote)
-                worldIn.spawnEntity(new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() - 0.5, pos.getZ() + 0.5, stack));
+                worldIn.spawnEntity(
+                        new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() - 0.5, pos.getZ() + 0.5, stack));
             if ((new BlockPistonStructureHelper(worldIn, pos, enumfacing, true)).canMove()) {
                 worldIn.addBlockEvent(pos, this, 0, enumfacing.getIndex());
             }
@@ -123,13 +127,13 @@ public class BlockSmallPlatePress extends BlockPistonBase {
         ItemStack stack = ItemStack.EMPTY;
 
         for (IRecipe recipe : recipes) {
-            for (@Nonnull ItemStack stack2 : recipe.getIngredients().get(0))
+            for (@Nonnull
+            ItemStack stack2 : recipe.getIngredients().get(0))
                 if (stack2.isItemEqual(stackInWorld)) {
                     stack = recipe.getOutput().get(0);
                     break;
                 }
         }
-
 
         if (world.getBlockState(pos.add(0, -2, 0)).getBlock() == Blocks.OBSIDIAN)
             return stack;
@@ -142,7 +146,8 @@ public class BlockSmallPlatePress extends BlockPistonBase {
             worldIn.setBlockToAir(pos.offset(direction));
         }
 
-        BlockPistonStructureHelper blockpistonstructurehelper = new BlockPistonStructureHelper(worldIn, pos, direction, extending);
+        BlockPistonStructureHelper blockpistonstructurehelper = new BlockPistonStructureHelper(worldIn, pos, direction,
+                extending);
 
         if (!blockpistonstructurehelper.canMove()) {
             return false;
@@ -175,8 +180,10 @@ public class BlockSmallPlatePress extends BlockPistonBase {
                 IBlockState iblockstate2 = worldIn.getBlockState(blockpos3);
                 worldIn.setBlockState(blockpos3, Blocks.AIR.getDefaultState(), 2);
                 blockpos3 = blockpos3.offset(enumfacing);
-                worldIn.setBlockState(blockpos3, Blocks.PISTON_EXTENSION.getDefaultState().withProperty(FACING, direction), 4);
-                worldIn.setTileEntity(blockpos3, BlockPistonMoving.createTilePiston(list1.get(l), direction, extending, false));
+                worldIn.setBlockState(blockpos3,
+                        Blocks.PISTON_EXTENSION.getDefaultState().withProperty(FACING, direction), 4);
+                worldIn.setTileEntity(blockpos3,
+                        BlockPistonMoving.createTilePiston(list1.get(l), direction, extending, false));
                 --k;
                 aiblockstate[k] = iblockstate2;
             }
@@ -185,10 +192,15 @@ public class BlockSmallPlatePress extends BlockPistonBase {
 
             if (extending) {
                 BlockPistonExtension.EnumPistonType blockpistonextension$enumpistontype = BlockPistonExtension.EnumPistonType.DEFAULT;
-                IBlockState iblockstate3 = Blocks.PISTON_HEAD.getDefaultState().withProperty(BlockPistonExtension.FACING, direction).withProperty(BlockPistonExtension.TYPE, blockpistonextension$enumpistontype);
-                IBlockState iblockstate1 = Blocks.PISTON_EXTENSION.getDefaultState().withProperty(BlockPistonMoving.FACING, direction).withProperty(BlockPistonMoving.TYPE, BlockPistonExtension.EnumPistonType.DEFAULT);
+                IBlockState iblockstate3 = Blocks.PISTON_HEAD.getDefaultState()
+                        .withProperty(BlockPistonExtension.FACING, direction)
+                        .withProperty(BlockPistonExtension.TYPE, blockpistonextension$enumpistontype);
+                IBlockState iblockstate1 = Blocks.PISTON_EXTENSION.getDefaultState()
+                        .withProperty(BlockPistonMoving.FACING, direction)
+                        .withProperty(BlockPistonMoving.TYPE, BlockPistonExtension.EnumPistonType.DEFAULT);
                 worldIn.setBlockState(blockpos2, iblockstate1, 4);
-                worldIn.setTileEntity(blockpos2, BlockPistonMoving.createTilePiston(iblockstate3, direction, true, false));
+                worldIn.setTileEntity(blockpos2,
+                        BlockPistonMoving.createTilePiston(iblockstate3, direction, true, false));
             }
 
             for (int i1 = list2.size() - 1; i1 >= 0; --i1) {
@@ -230,14 +242,19 @@ public class BlockSmallPlatePress extends BlockPistonBase {
             }
 
             worldIn.setBlockState(pos, state.withProperty(EXTENDED, Boolean.TRUE), 2);
-            worldIn.playSound(null, pos, SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.5F, worldIn.rand.nextFloat() * 0.25F + 0.6F);
+            worldIn.playSound(null, pos, SoundEvents.BLOCK_PISTON_EXTEND, SoundCategory.BLOCKS, 0.5F,
+                    worldIn.rand.nextFloat() * 0.25F + 0.6F);
         } else if (id == 1) {
 
-            worldIn.setBlockState(pos, Blocks.PISTON_EXTENSION.getDefaultState().withProperty(BlockPistonMoving.FACING, enumfacing).withProperty(BlockPistonMoving.TYPE, BlockPistonExtension.EnumPistonType.DEFAULT), 3);
-            worldIn.setTileEntity(pos, BlockPistonMoving.createTilePiston(this.getStateFromMeta(param), enumfacing, false, true));
+            worldIn.setBlockState(pos,
+                    Blocks.PISTON_EXTENSION.getDefaultState().withProperty(BlockPistonMoving.FACING, enumfacing)
+                            .withProperty(BlockPistonMoving.TYPE, BlockPistonExtension.EnumPistonType.DEFAULT),
+                    3);
+            worldIn.setTileEntity(pos,
+                    BlockPistonMoving.createTilePiston(this.getStateFromMeta(param), enumfacing, false, true));
 
-
-            worldIn.playSound(null, pos, SoundEvents.BLOCK_PISTON_CONTRACT, SoundCategory.BLOCKS, 0.5F, worldIn.rand.nextFloat() * 0.15F + 0.6F);
+            worldIn.playSound(null, pos, SoundEvents.BLOCK_PISTON_CONTRACT, SoundCategory.BLOCKS, 0.5F,
+                    worldIn.rand.nextFloat() * 0.15F + 0.6F);
         }
 
         return true;
@@ -246,7 +263,7 @@ public class BlockSmallPlatePress extends BlockPistonBase {
     @SideOnly(Side.CLIENT)
     public void addInformation(@Nonnull ItemStack stack, World player, List<String> tooltip, ITooltipFlag advanced) {
         super.addInformation(stack, player, tooltip, advanced);
-        tooltip.add(ChatFormatting.DARK_GRAY + "" + ChatFormatting.ITALIC + LibVulpes.proxy.getLocalizedString("machine.tooltip.smallplatepress"));
+        tooltip.add(ChatFormatting.DARK_GRAY + "" + ChatFormatting.ITALIC +
+                LibVulpes.proxy.getLocalizedString("machine.tooltip.smallplatepress"));
     }
-
 }

@@ -10,7 +10,8 @@ import net.minecraft.util.IStringSerializable;
 
 public class BlockLightwoodPlanks extends Block {
 
-    public static final PropertyEnum<BlockLightwoodPlanks.EnumType> VARIANT = PropertyEnum.create("variant", BlockLightwoodPlanks.EnumType.class);
+    public static final PropertyEnum<BlockLightwoodPlanks.EnumType> VARIANT = PropertyEnum.create("variant",
+            BlockLightwoodPlanks.EnumType.class);
 
     public BlockLightwoodPlanks() {
         super(Material.WOOD);
@@ -52,6 +53,7 @@ public class BlockLightwoodPlanks extends Block {
     }
 
     public enum EnumType implements IStringSerializable {
+
         ALIEN(0, "alien", "alien", MapColor.LAPIS);
 
         private static final BlockLightwoodPlanks.EnumType[] META_LOOKUP = new BlockLightwoodPlanks.EnumType[values().length];
@@ -104,7 +106,7 @@ public class BlockLightwoodPlanks extends Block {
             return this.name;
         }
 
-        public String getUnlocalizedName() {
+        public String getTranslationKey() {
             return this.unlocalizedName;
         }
     }

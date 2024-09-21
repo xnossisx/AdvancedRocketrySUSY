@@ -26,5 +26,4 @@ public class PrecisionLaserEtcherCategory extends MachineCategoryTemplate<Precis
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

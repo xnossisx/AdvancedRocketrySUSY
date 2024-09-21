@@ -1,15 +1,16 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.util.Asteroid;
 import zmaster587.libVulpes.network.BasePacket;
-
-import java.io.IOException;
 
 public class PacketAsteroidInfo extends BasePacket {
 
@@ -34,9 +35,9 @@ public class PacketAsteroidInfo extends BasePacket {
         packetBuffer.writeInt(asteroid.mass);
         packetBuffer.writeInt(asteroid.minLevel);
         packetBuffer.writeFloat(asteroid.massVariability);
-        packetBuffer.writeFloat(asteroid.richness);                    //factor of the ratio of ore to stone
-        packetBuffer.writeFloat(asteroid.richnessVariability);        //variability of richness
-        packetBuffer.writeFloat(asteroid.probability);                //probability of the asteroid spawning
+        packetBuffer.writeFloat(asteroid.richness);                    // factor of the ratio of ore to stone
+        packetBuffer.writeFloat(asteroid.richnessVariability);        // variability of richness
+        packetBuffer.writeFloat(asteroid.probability);                // probability of the asteroid spawning
         packetBuffer.writeFloat(asteroid.timeMultiplier);
 
         packetBuffer.writeInt(asteroid.stackProbabilities.size());
@@ -55,9 +56,9 @@ public class PacketAsteroidInfo extends BasePacket {
         asteroid.mass = packetBuffer.readInt();
         asteroid.minLevel = packetBuffer.readInt();
         asteroid.massVariability = packetBuffer.readFloat();
-        asteroid.richness = packetBuffer.readFloat();                    //factor of the ratio of ore to stone
-        asteroid.richnessVariability = packetBuffer.readFloat();        //variability of richness
-        asteroid.probability = packetBuffer.readFloat();                //probability of the asteroid spawning
+        asteroid.richness = packetBuffer.readFloat();                    // factor of the ratio of ore to stone
+        asteroid.richnessVariability = packetBuffer.readFloat();        // variability of richness
+        asteroid.probability = packetBuffer.readFloat();                // probability of the asteroid spawning
         asteroid.timeMultiplier = packetBuffer.readFloat();
 
         int size = packetBuffer.readInt();
@@ -73,7 +74,7 @@ public class PacketAsteroidInfo extends BasePacket {
 
     @Override
     public void read(ByteBuf in) {
-        //Should never be read on the server!
+        // Should never be read on the server!
     }
 
     @Override
@@ -82,7 +83,5 @@ public class PacketAsteroidInfo extends BasePacket {
     }
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-    }
-
+    public void executeServer(EntityPlayerMP player) {}
 }

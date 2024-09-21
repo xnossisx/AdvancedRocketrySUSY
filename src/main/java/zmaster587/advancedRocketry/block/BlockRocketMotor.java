@@ -1,5 +1,8 @@
 package zmaster587.advancedRocketry.block;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -13,14 +16,12 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.IRocketEngine;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
 import zmaster587.advancedRocketry.util.IBrokenPartBlock;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngine, IBrokenPartBlock {
 
@@ -77,24 +78,28 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
     }
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, @Nonnull ItemStack stack) {
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer,
+                                @Nonnull ItemStack stack) {
         world.setBlockState(pos, state.withProperty(FACING, EnumFacing.DOWN));
 
         TileEntity te = world.getTileEntity(pos);
         ((TileBrokenPart) te).setStage(stack.getItemDamage());
     }
 
-//    @Override
-//    public boolean onBlockActivated(final World worldIn, final BlockPos pos, final IBlockState state, final EntityPlayer playerIn, final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-//        if (!worldIn.isRemote) {
-//            TileEntity te = worldIn.getTileEntity(pos);
-//            ((TileBrokenPart) te).transition();
-//        }
-//        return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
-//    }
+    // @Override
+    // public boolean onBlockActivated(final World worldIn, final BlockPos pos, final IBlockState state, final
+    // EntityPlayer playerIn, final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final
+    // float hitZ) {
+    // if (!worldIn.isRemote) {
+    // TileEntity te = worldIn.getTileEntity(pos);
+    // ((TileBrokenPart) te).transition();
+    // }
+    // return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
+    // }
 
     @Override
-    public void harvestBlock(final World world, final EntityPlayer player, final BlockPos pos, final IBlockState state, @Nullable final TileEntity te, final ItemStack stack) {
+    public void harvestBlock(final World world, final EntityPlayer player, final BlockPos pos, final IBlockState state,
+                             @Nullable final TileEntity te, final ItemStack stack) {
         if (!world.isRemote && !player.isCreative()) {
             TileBrokenPart tile = (TileBrokenPart) te;
 
@@ -114,7 +119,8 @@ public class BlockRocketMotor extends BlockFullyRotatable implements IRocketEngi
     }
 
     @Override
-    public void getDrops(final NonNullList<ItemStack> drops, final IBlockAccess world, final BlockPos pos, final IBlockState state, final int fortune) {
+    public void getDrops(final NonNullList<ItemStack> drops, final IBlockAccess world, final BlockPos pos,
+                         final IBlockState state, final int fortune) {
         // no drops here
     }
 

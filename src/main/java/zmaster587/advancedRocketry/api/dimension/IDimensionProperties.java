@@ -1,25 +1,27 @@
 package zmaster587.advancedRocketry.api.dimension;
 
+import java.util.Collection;
+import java.util.Set;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.IAtmosphere;
 import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.util.SpacePosition;
 
-import java.util.Collection;
-import java.util.Set;
-
 public interface IDimensionProperties {
+
     /**
      * @return the DIMID of the planet
      */
     int getId();
 
     /**
-     * @return the color of the sun as an array of floats represented as  {r,g,b}
+     * @return the color of the sun as an array of floats represented as {r,g,b}
      */
     float[] getSunColor();
 
@@ -46,7 +48,8 @@ public interface IDimensionProperties {
     /**
      * Range 0 < value <= 200
      *
-     * @return if the planet is a moon, then the distance from the host planet where the earth's moon is 100, higher is farther, if planet, distance from the star, 100 is earthlike, higher value is father
+     * @return if the planet is a moon, then the distance from the host planet where the earth's moon is 100, higher is
+     *         farther, if planet, distance from the star, 100 is earthlike, higher value is father
      */
     int getParentOrbitalDistance();
 
@@ -186,7 +189,7 @@ public interface IDimensionProperties {
      * @return true if terraforming activity has changed the planet properties
      */
     // F*ck you
-    //boolean isTerraformed();
+    // boolean isTerraformed();
 
     /**
      * @return reource location of the planet
@@ -209,7 +212,8 @@ public interface IDimensionProperties {
     int getAverageTemp();
 
     /**
-     * @return depth in the tree planet is.  If the planet orbits the star directly, the result is 0, the moon 1, the moon of a moon 2, etc
+     * @return depth in the tree planet is. If the planet orbits the star directly, the result is 0, the moon 1, the
+     *         moon of a moon 2, etc
      */
     int getPathLengthToStar();
 
@@ -224,5 +228,4 @@ public interface IDimensionProperties {
     float getRenderSizePlanetView();
 
     float getRenderSizeSolarView();
-
 }

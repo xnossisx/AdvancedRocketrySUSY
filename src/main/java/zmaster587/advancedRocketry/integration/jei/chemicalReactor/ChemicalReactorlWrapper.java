@@ -8,5 +8,4 @@ public class ChemicalReactorlWrapper extends MachineRecipe {
     ChemicalReactorlWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

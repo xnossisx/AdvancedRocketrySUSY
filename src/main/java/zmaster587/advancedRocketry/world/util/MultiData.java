@@ -1,17 +1,19 @@
 package zmaster587.advancedRocketry.world.util;
 
+import java.util.HashMap;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
+
 import zmaster587.advancedRocketry.api.DataStorage;
 import zmaster587.advancedRocketry.api.DataStorage.DataType;
 import zmaster587.advancedRocketry.api.satellite.IDataHandler;
-
-import java.util.HashMap;
 
 /**
  * Object to store "data" and can track multiple different types
  */
 public class MultiData implements IDataHandler {
+
     private HashMap<DataStorage.DataType, DataStorage> dataStorages;
 
     public MultiData() {
@@ -32,7 +34,6 @@ public class MultiData implements IDataHandler {
 
     @Override
     public int extractData(int maxAmount, DataType type, EnumFacing dir, boolean commit) {
-
         DataStorage storage = dataStorages.get(type);
 
         if (storage == null)

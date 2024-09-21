@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.block;
 
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.BlockCauldron;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,10 +15,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 
-import javax.annotation.Nonnull;
-import java.util.Random;
+import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 
 public class BlockQuartzCrucible extends BlockCauldron {
 
@@ -22,17 +24,16 @@ public class BlockQuartzCrucible extends BlockCauldron {
         super();
     }
 
-
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos,
-                                    IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY,
+                                    IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side,
+                                    float hitX, float hitY,
                                     float hitZ) {
         return false;
     }
 
     @Override
-    public void fillWithRain(World worldIn, BlockPos pos) {
-    }
+    public void fillWithRain(World worldIn, BlockPos pos) {}
 
     @Override
     @Nonnull
@@ -43,8 +44,7 @@ public class BlockQuartzCrucible extends BlockCauldron {
     @Override
     @Nonnull
     public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state) {
-
-        return new ItemStack(AdvancedRocketryItems.itemQuartzCrucible);//getItemPicked(worldIn, pos, ar3, par4)
+        return new ItemStack(AdvancedRocketryItems.itemQuartzCrucible);// getItemPicked(worldIn, pos, ar3, par4)
     }
 
     @SideOnly(Side.CLIENT)

@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.entity;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -9,23 +11,25 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.tile.station.TileHolographicPlanetSelector;
 
-import javax.annotation.Nullable;
-
 public class EntityUIPlanet extends Entity {
 
-    protected static final DataParameter<Integer> planetID = EntityDataManager.createKey(EntityUIPlanet.class, DataSerializers.VARINT);
-    protected static final DataParameter<Float> scale = EntityDataManager.createKey(EntityUIPlanet.class, DataSerializers.FLOAT);
-    protected static final DataParameter<Boolean> selected = EntityDataManager.createKey(EntityUIPlanet.class, DataSerializers.BOOLEAN);
+    protected static final DataParameter<Integer> planetID = EntityDataManager.createKey(EntityUIPlanet.class,
+            DataSerializers.VARINT);
+    protected static final DataParameter<Float> scale = EntityDataManager.createKey(EntityUIPlanet.class,
+            DataSerializers.FLOAT);
+    protected static final DataParameter<Boolean> selected = EntityDataManager.createKey(EntityUIPlanet.class,
+            DataSerializers.BOOLEAN);
     protected TileHolographicPlanetSelector tile;
     DimensionProperties properties;
 
-
-    public EntityUIPlanet(World worldIn, DimensionProperties properties, TileHolographicPlanetSelector tile, double x, double y, double z) {
+    public EntityUIPlanet(World worldIn, DimensionProperties properties, TileHolographicPlanetSelector tile, double x,
+                          double y, double z) {
         this(worldIn);
         setPosition(x, y, z);
         setProperties(properties);
@@ -51,7 +55,7 @@ public class EntityUIPlanet extends Entity {
     @Override
     @Nullable
     public NBTTagCompound writeToNBT(NBTTagCompound p_189511_1_) {
-        //DO not save
+        // DO not save
         return null;
     }
 
@@ -60,7 +64,6 @@ public class EntityUIPlanet extends Entity {
         this.dataManager.register(planetID, properties == null ? Constants.INVALID_PLANET : properties.getId());
         this.dataManager.register(scale, 1f);
         this.dataManager.register(selected, false);
-
     }
 
     @Override
@@ -83,9 +86,7 @@ public class EntityUIPlanet extends Entity {
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound compound) {
-
-    }
+    protected void writeEntityToNBT(NBTTagCompound compound) {}
 
     @Override
     public boolean writeToNBTOptional(@Nullable NBTTagCompound compound) {
@@ -93,11 +94,11 @@ public class EntityUIPlanet extends Entity {
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound compound) {
-    }
+    protected void readEntityFromNBT(NBTTagCompound compound) {}
 
     public DimensionProperties getProperties() {
-        if ((properties == null && getPlanetID() != Constants.INVALID_PLANET) || (properties != null && getPlanetID() != properties.getId())) {
+        if ((properties == null && getPlanetID() != Constants.INVALID_PLANET) ||
+                (properties != null && getPlanetID() != properties.getId())) {
             properties = DimensionManager.getInstance().getDimensionProperties(getPlanetID());
         }
 
@@ -113,7 +114,7 @@ public class EntityUIPlanet extends Entity {
     }
 
     public int getPlanetID() {
-        //this.dataManager.set(planetID, 256);
+        // this.dataManager.set(planetID, 256);
 
         if (!world.isRemote)
             return properties == null ? Constants.INVALID_PLANET : properties.getId();
@@ -144,5 +145,4 @@ public class EntityUIPlanet extends Entity {
 
         setPosition(originX, originY, originZ);
     }
-
 }

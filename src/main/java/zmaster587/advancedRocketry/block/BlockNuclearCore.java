@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.IRocketNuclearCore;
 
@@ -17,6 +18,4 @@ public class BlockNuclearCore extends Block implements IRocketNuclearCore {
     public int getMaxThrust(World world, BlockPos pos) {
         return (int) (1000 * ARConfiguration.getCurrentConfig().nuclearCoreThrustRatio);
     }
-
-
 }

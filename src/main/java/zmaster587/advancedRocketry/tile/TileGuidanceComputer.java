@@ -1,5 +1,11 @@
 package zmaster587.advancedRocketry.tile;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -7,6 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.Constants.NBT;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.Constants;
@@ -30,11 +37,6 @@ import zmaster587.libVulpes.items.ItemLinker;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileInventoryHatch;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.Vector3F;
-
-import javax.annotation.Nonnull;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class TileGuidanceComputer extends TileInventoryHatch implements IModularInventory {
 
@@ -81,8 +83,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
     }
 
     public StationLandingLocation getLandingLocation(int stationId) {
-
-        //Due to the fact that stations are not guaranteed to be loaded on startup, we get a real reference now
+        // Due to the fact that stations are not guaranteed to be loaded on startup, we get a real reference now
         ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(stationId);
         if (spaceObject == null) {
             landingLoc.remove(stationId);
@@ -132,7 +133,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
             } else if (itemType instanceof ItemAsteroidChip) {
                 destinationId = currentDimension;
 
-                //Caution Side-Effect: Updates landingPos.
+                // Caution Side-Effect: Updates landingPos.
                 landingPos = new Vector3F<>((float) pos.getX(), (float) pos.getY(), (float) pos.getZ());
                 return currentDimension;
             } else if (itemType instanceof ItemSatelliteIdentificationChip) {
@@ -143,14 +144,15 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
                     if (sat != null)
                         return sat.getDimensionId();
                 }
-            } else if (stack.getItem() == LibVulpesItems.itemLinker && ItemLinker.getDimId(stack) != Constants.INVALID_PLANET) {
-                //Use the destination the Linker in the Guidance computer directs.
-                return ItemLinker.getDimId(stack);
-            }
+            } else if (stack.getItem() == LibVulpesItems.itemLinker &&
+                    ItemLinker.getDimId(stack) != Constants.INVALID_PLANET) {
+                        // Use the destination the Linker in the Guidance computer directs.
+                        return ItemLinker.getDimId(stack);
+                    }
 
         }
 
-        //Almost always the Override setting (Linker in Docking Pad)
+        // Almost always the Override setting (Linker in Docking Pad)
         return destinationId;
     }
 
@@ -160,20 +162,21 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
      * @return
      */
     public Vector3F<Float> getLandingLocation(int landingDimension, boolean commit) {
-        //Caution Side-Effect dependency: May require a call to getDestinationDimId to populate correct coordinates.
+        // Caution Side-Effect dependency: May require a call to getDestinationDimId to populate correct coordinates.
         ItemStack stack = getStackInSlot(0);
-        //TODO: replace all nulls with current coordinates of the ship.
-        //Make the if tree match the destination if tree:
+        // TODO: replace all nulls with current coordinates of the ship.
+        // Make the if tree match the destination if tree:
         if (!stack.isEmpty()) {
             Item itemType = stack.getItem();
             if (itemType instanceof ItemPlanetIdentificationChip) {
-                //This could be the location of the rocket.
+                // This could be the location of the rocket.
                 return null;
             } else if (itemType instanceof ItemStationChip) {
                 ItemStationChip chip = (ItemStationChip) stack.getItem();
                 if (landingDimension == ARConfiguration.getCurrentConfig().spaceDimId) {
-                    //TODO: handle Exception
-                    ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(stack));
+                    // TODO: handle Exception
+                    ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager()
+                            .getSpaceStation(ItemStationChip.getUUID(stack));
                     return getStationLocation(spaceObject, commit);
                 } else {
                     LandingLocation loc = chip.getTakeoffCoords(stack, landingDimension);
@@ -183,23 +186,25 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
                     return null;
                 }
             } else if (itemType instanceof ItemAsteroidChip) {
-                //Caution Side-Effect dependency: landingPos from getDim.
+                // Caution Side-Effect dependency: landingPos from getDim.
                 return landingPos;
             } else if (itemType instanceof ItemSatelliteIdentificationChip) {
-                //You can't actually go to the satellites.
+                // You can't actually go to the satellites.
                 return null;
-            } else if (stack.getItem() == LibVulpesItems.itemLinker && ItemLinker.getDimId(stack) != Constants.INVALID_PLANET) {
-                //Use the destination the Linker in the Guidance computer directs.
-                BlockPos landingBlock = ItemLinker.getMasterCoords(stack);
-                return new Vector3F<>(landingBlock.getX() + 0.5f, (float) ARConfiguration.getCurrentConfig().orbit, landingBlock.getZ() + 0.5f);
-            }
+            } else if (stack.getItem() == LibVulpesItems.itemLinker &&
+                    ItemLinker.getDimId(stack) != Constants.INVALID_PLANET) {
+                        // Use the destination the Linker in the Guidance computer directs.
+                        BlockPos landingBlock = ItemLinker.getMasterCoords(stack);
+                        return new Vector3F<>(landingBlock.getX() + 0.5f,
+                                (float) ARConfiguration.getCurrentConfig().orbit, landingBlock.getZ() + 0.5f);
+                    }
 
         } else if (destinationId != Constants.INVALID_PLANET) {
-            //Use the override coordinates from a Linker in a Docking Pad.
+            // Use the override coordinates from a Linker in a Docking Pad.
             return landingPos;
         }
 
-        //We got nothing.
+        // We got nothing.
         return null;
     }
 
@@ -210,7 +215,8 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
                 vec = landingLoc.get(spaceObject.getId());
 
                 if (commit)
-                    ((SpaceStationObject) spaceObject).getPadAtLocation(landingLoc.get(spaceObject.getId())).setOccupied(true);
+                    ((SpaceStationObject) spaceObject).getPadAtLocation(landingLoc.get(spaceObject.getId()))
+                            .setOccupied(true);
             } else
                 vec = spaceObject.getNextLandingPad(commit);
         }
@@ -248,32 +254,48 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
     }
 
     public int getLaunchSequence(int currentDimensionID, BlockPos currentPosition) {
-        int totalBurn = (currentDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) ? ARConfiguration.getCurrentConfig().stationClearanceHeight : ARConfiguration.getCurrentConfig().orbit;
+        int totalBurn = (currentDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) ?
+                ARConfiguration.getCurrentConfig().stationClearanceHeight : ARConfiguration.getCurrentConfig().orbit;
         int destinationDimensionID = getDestinationDimId(currentDimensionID, currentPosition);
 
-        totalBurn += (currentDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) ? getTransBodyInjection(currentDimensionID, destinationDimensionID, currentPosition) : getTransBodyInjection(currentDimensionID, destinationDimensionID);
+        totalBurn += (currentDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) ?
+                getTransBodyInjection(currentDimensionID, destinationDimensionID, currentPosition) :
+                getTransBodyInjection(currentDimensionID, destinationDimensionID);
         return totalBurn;
     }
 
     public int getTransBodyInjection(int currentDimensionID, int destinationDimensionID) {
-        ISpaceObject destinationSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
-        destinationDimensionID = ((destinationDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) && (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() : destinationDimensionID;
+        ISpaceObject destinationSpaceStation = SpaceObjectManager.getSpaceManager()
+                .getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
+        destinationDimensionID = ((destinationDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) &&
+                (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() :
+                        destinationDimensionID;
 
         if (destinationDimensionID == Constants.INVALID_PLANET) {
             return 0;
         }
-        return (PlanetaryTravelHelper.isTravelWithinOrbit(currentDimensionID, destinationDimensionID) && !isAsteroidMission()) ? 0 : PlanetaryTravelHelper.getTransbodyInjectionBurn(currentDimensionID, destinationDimensionID, isAsteroidMission());
+        return (PlanetaryTravelHelper.isTravelWithinOrbit(currentDimensionID, destinationDimensionID) &&
+                !isAsteroidMission()) ? 0 :
+                        PlanetaryTravelHelper.getTransbodyInjectionBurn(currentDimensionID, destinationDimensionID,
+                                isAsteroidMission());
     }
 
     public int getTransBodyInjection(int currentDimensionID, int destinationDimensionID, BlockPos currentPosition) {
-        ISpaceObject currentSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(currentPosition);
-        ISpaceObject destinationSpaceStation = SpaceObjectManager.getSpaceManager().getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
-        destinationDimensionID = ((destinationDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) && (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() : destinationDimensionID;
+        ISpaceObject currentSpaceStation = SpaceObjectManager.getSpaceManager()
+                .getSpaceStationFromBlockCoords(currentPosition);
+        ISpaceObject destinationSpaceStation = SpaceObjectManager.getSpaceManager()
+                .getSpaceStation(ItemStationChip.getUUID(getStackInSlot(0)));
+        destinationDimensionID = ((destinationDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) &&
+                (destinationSpaceStation != null)) ? destinationSpaceStation.getOrbitingPlanetId() :
+                        destinationDimensionID;
 
         if (destinationDimensionID == Constants.INVALID_PLANET) {
             return 0;
         }
-        return (PlanetaryTravelHelper.isTravelWithinOrbit(currentSpaceStation.getOrbitingPlanetId(), destinationDimensionID) && !isAsteroidMission()) ? 0 : PlanetaryTravelHelper.getTransbodyInjectionBurn(currentSpaceStation.getOrbitingPlanetId(), destinationDimensionID, isAsteroidMission());
+        return (PlanetaryTravelHelper.isTravelWithinOrbit(currentSpaceStation.getOrbitingPlanetId(),
+                destinationDimensionID) && !isAsteroidMission()) ? 0 :
+                        PlanetaryTravelHelper.getTransbodyInjectionBurn(currentSpaceStation.getOrbitingPlanetId(),
+                                destinationDimensionID, isAsteroidMission());
     }
 
     public boolean isAsteroidMission() {
@@ -295,7 +317,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
             NBTTagCompound tag = new NBTTagCompound();
             HashedBlockPosition loc = landingLoc.get(locationID);
 
-            tag.setIntArray("pos", new int[]{loc.x, loc.y, loc.z});
+            tag.setIntArray("pos", new int[] { loc.x, loc.y, loc.z });
             tag.setInteger("id", locationID);
             stationList.appendTag(tag);
         }
@@ -327,7 +349,7 @@ public class TileGuidanceComputer extends TileInventoryHatch implements IModular
     public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
         super.setInventorySlotContents(slot, stack);
 
-        //If the item in the slot is modified then reset dimid
+        // If the item in the slot is modified then reset dimid
         if (!stack.isEmpty())
             destinationId = Constants.INVALID_PLANET;
     }

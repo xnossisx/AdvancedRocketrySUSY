@@ -10,6 +10,7 @@ import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.hatch.TileDataBus;
 import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
 import zmaster587.advancedRocketry.tile.infrastructure.*;
@@ -37,21 +38,19 @@ public class BlockARHatch extends BlockHatch {
     @Override
     public boolean shouldSideBeRendered(IBlockState blockState,
                                         IBlockAccess blockAccess, BlockPos pos, EnumFacing direction) {
-
-
         boolean isPointer = blockAccess.getTileEntity(pos.offset(direction.getOpposite())) instanceof TilePointer;
         if (blockState.getValue(VARIANT) == 8)
             return false;
         if (isPointer || blockState.getValue(VARIANT) < 2)
             return super.shouldSideBeRendered(blockState, blockAccess, pos, direction);
         return true;
-
     }
 
     @Override
     public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess,
                             BlockPos pos, EnumFacing side) {
-        if (blockAccess.getTileEntity(pos) instanceof TilePointer && !((TilePointer) blockAccess.getTileEntity(pos)).allowRedstoneOutputOnSide(side))
+        if (blockAccess.getTileEntity(pos) instanceof TilePointer &&
+                !((TilePointer) blockAccess.getTileEntity(pos)).allowRedstoneOutputOnSide(side))
             return 0;
 
         return blockState.getValue(VARIANT) >= 2 ? 15 : 0;
@@ -78,7 +77,7 @@ public class BlockARHatch extends BlockHatch {
     public TileEntity createTileEntity(World world, IBlockState state) {
         int metadata = state.getValue(VARIANT);
 
-        //TODO: multiple sized Hatches
+        // TODO: multiple sized Hatches
         if ((metadata & 7) == 0)
             return new TileDataBus(2);
         else if ((metadata & 7) == 1)

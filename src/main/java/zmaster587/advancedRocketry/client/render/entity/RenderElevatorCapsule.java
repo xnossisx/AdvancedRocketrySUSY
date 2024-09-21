@@ -5,12 +5,15 @@ import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.entity.EntityElevatorCapsule;
 
-public class RenderElevatorCapsule extends Render<EntityElevatorCapsule> implements IRenderFactory<EntityElevatorCapsule> {
+public class RenderElevatorCapsule extends Render<EntityElevatorCapsule>
+                                   implements IRenderFactory<EntityElevatorCapsule> {
 
     private static WavefrontObject sphere;
 
@@ -23,7 +26,8 @@ public class RenderElevatorCapsule extends Render<EntityElevatorCapsule> impleme
         }
     }
 
-    public ResourceLocation capsuleTexture = new ResourceLocation("advancedRocketry:textures/models/spaceElevatorCapsule.png");
+    public ResourceLocation capsuleTexture = new ResourceLocation(
+            "advancedRocketry:textures/models/spaceElevatorCapsule.png");
 
     public RenderElevatorCapsule(RenderManager renderManager) {
         super(renderManager);
@@ -31,7 +35,7 @@ public class RenderElevatorCapsule extends Render<EntityElevatorCapsule> impleme
 
     @Override
     public Render<? super EntityElevatorCapsule> createRenderFor(
-            RenderManager manager) {
+                                                                 RenderManager manager) {
         return new RenderElevatorCapsule(manager);
     }
 
@@ -44,7 +48,7 @@ public class RenderElevatorCapsule extends Render<EntityElevatorCapsule> impleme
     public boolean shouldRender(EntityElevatorCapsule livingEntity,
                                 ICamera camera, double camX, double camY, double camZ) {
         // TODO Auto-generated method stub
-        //return super.shouldRender(livingEntity, camera, camX, camY, camZ);
+        // return super.shouldRender(livingEntity, camera, camX, camY, camZ);
         return true;
     }
 

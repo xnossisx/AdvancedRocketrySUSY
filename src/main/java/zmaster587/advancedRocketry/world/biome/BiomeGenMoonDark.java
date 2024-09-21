@@ -1,19 +1,21 @@
 package zmaster587.advancedRocketry.world.biome;
 
-import net.minecraft.entity.EnumCreatureType;
-import net.minecraft.world.biome.Biome;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
-
-import javax.annotation.Nonnull;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
+
+import net.minecraft.entity.EnumCreatureType;
+import net.minecraft.world.biome.Biome;
+
+import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 
 public class BiomeGenMoonDark extends Biome {
 
     public BiomeGenMoonDark(BiomeProperties properties) {
         super(properties);
 
-        //cold and dry
+        // cold and dry
         this.decorator.generateFalls = false;
         this.decorator.flowersPerChunk = 0;
         this.decorator.grassPerChunk = 0;
@@ -21,7 +23,6 @@ public class BiomeGenMoonDark extends Biome {
         this.decorator.mushroomsPerChunk = 0;
         this.fillerBlock = this.topBlock = AdvancedRocketryBlocks.blockMoonTurfDark.getDefaultState();
     }
-
 
     @Override
     @Nonnull
@@ -31,6 +32,6 @@ public class BiomeGenMoonDark extends Biome {
 
     @Override
     public float getSpawningChance() {
-        return 0f; //Nothing spawns
+        return 0f; // Nothing spawns
     }
 }

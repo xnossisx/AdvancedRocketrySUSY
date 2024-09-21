@@ -1,10 +1,13 @@
 package zmaster587.advancedRocketry.event;
 // This code does not work - it should display the earth below rockets at start but it does not.
 // The detailed map is scaled too small and it is ugly even with correct scale
-// maybe just use leo as earth? 
+// maybe just use leo as earth?
 
-import net.minecraft.block.material.MapColor;
-import net.minecraft.block.state.IBlockState;
+import java.nio.IntBuffer;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
@@ -14,33 +17,24 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.IRenderHandler;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.api.IPlanetaryProvider;
-import zmaster587.advancedRocketry.api.RocketEvent;
 import zmaster587.advancedRocketry.api.armor.IFillableArmor;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.advancedRocketry.client.render.ClientDynamicTexture;
-import zmaster587.advancedRocketry.client.render.planet.RenderPlanetarySky;
-import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.ItemAirUtils;
@@ -48,15 +42,8 @@ import zmaster587.libVulpes.api.IArmorComponent;
 import zmaster587.libVulpes.api.IModularArmor;
 import zmaster587.libVulpes.client.ResourceIcon;
 import zmaster587.libVulpes.render.RenderHelper;
-import zmaster587.libVulpes.util.ZUtils;
-
-import javax.annotation.Nonnull;
-import java.nio.IntBuffer;
-import java.util.List;
-import java.util.Random;
 
 public class RocketEventHandler extends Gui {
-
 
     private static final int getImgSize = 512;
     private static final int outerImgSize = getImgSize / 8;
@@ -85,7 +72,7 @@ public class RocketEventHandler extends Gui {
 
     @SubscribeEvent
     public void playerTeleportEvent(PlayerEvent.PlayerChangedDimensionEvent event) {
-        //Fix O2, space elevator popup displaying after teleporting
+        // Fix O2, space elevator popup displaying after teleporting
         lastDisplayTime = -1000;
     }
 
@@ -97,23 +84,29 @@ public class RocketEventHandler extends Gui {
                 EntityRocket rocket = (EntityRocket) ride;
 
                 GlStateManager.enableBlend();
-                //GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+                // GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 
                 Minecraft.getMinecraft().renderEngine.bindTexture(background);
 
-                //Draw BG
+                // Draw BG
                 this.drawTexturedModalRect(0, 0, 0, 0, 17, 252);
 
-                //Draw altitude indicator
-                float percentOrbit = MathHelper.clamp((float) ((rocket.posY - rocket.world.provider.getAverageGroundLevel()) / (float) (ARConfiguration.getCurrentConfig().orbit - rocket.world.provider.getAverageGroundLevel())), 0f, 1f);
-                this.drawTexturedModalRect(3, 8 + (int) (79 * (1 - percentOrbit)), 17, 0, 6, 6); //6 to 83
+                // Draw altitude indicator
+                float percentOrbit = MathHelper
+                        .clamp((float) ((rocket.posY - rocket.world.provider.getAverageGroundLevel()) /
+                                (float) (ARConfiguration.getCurrentConfig().orbit -
+                                        rocket.world.provider.getAverageGroundLevel())),
+                                0f, 1f);
+                this.drawTexturedModalRect(3, 8 + (int) (79 * (1 - percentOrbit)), 17, 0, 6, 6); // 6 to 83
 
-                //Draw Velocity indicator
-                this.drawTexturedModalRect(3, 94 + (int) (69 * (0.5 - (MathHelper.clamp((float) (rocket.motionY), -1f, 1f) / 2f))), 17, 0, 6, 6); //94 to 161
+                // Draw Velocity indicator
+                this.drawTexturedModalRect(3,
+                        94 + (int) (69 * (0.5 - (MathHelper.clamp((float) (rocket.motionY), -1f, 1f) / 2f))), 17, 0, 6,
+                        6); // 94 to 161
 
-                //Draw fuel indicator
+                // Draw fuel indicator
                 int size = (int) (68 * rocket.getNormallizedProgress(0));
-                this.drawTexturedModalRect(3, 242 - size, 17, 75 - size, 3, size); //94 to 161
+                this.drawTexturedModalRect(3, 242 - size, 17, 75 - size, 3, size); // 94 to 161
 
                 GlStateManager.disableBlend();
                 String str = rocket.getTextOverlay();
@@ -127,9 +120,9 @@ public class RocketEventHandler extends Gui {
 
                         float scale = str.length() < 50 ? 1f : 0.5f;
 
-                        int screenX = (int) ((event.getResolution().getScaledWidth() / (scale * 6) - fontRenderer.getStringWidth(strPart) / 2));
+                        int screenX = (int) ((event.getResolution().getScaledWidth() / (scale * 6) -
+                                fontRenderer.getStringWidth(strPart) / 2));
                         int screenY = (int) ((event.getResolution().getScaledHeight() / 18) / scale) + 18 * vertPos;
-
 
                         GL11.glPushMatrix();
                         GL11.glScalef(scale * 3, scale * 3, scale * 3);
@@ -143,8 +136,9 @@ public class RocketEventHandler extends Gui {
                 }
             }
 
-            //Draw the O2 Bar if needed
-            if (!(Minecraft.getMinecraft().player.capabilities.isCreativeMode || Minecraft.getMinecraft().player.isSpectator())) {
+            // Draw the O2 Bar if needed
+            if (!(Minecraft.getMinecraft().player.capabilities.isCreativeMode ||
+                    Minecraft.getMinecraft().player.isSpectator())) {
                 ItemStack chestPiece = Minecraft.getMinecraft().player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
                 IFillableArmor fillable = null;
                 if (!chestPiece.isEmpty() && chestPiece.getItem() instanceof IFillableArmor)
@@ -159,27 +153,33 @@ public class RocketEventHandler extends Gui {
                     Minecraft.getMinecraft().renderEngine.bindTexture(background);
                     GlStateManager.color(1f, 1f, 1f);
                     int width = 83;
-                    int screenX = oxygenBar.getRenderX();//+ 8;
-                    int screenY = oxygenBar.getRenderY();//- 57;
+                    int screenX = oxygenBar.getRenderX();// + 8;
+                    int screenY = oxygenBar.getRenderY();// - 57;
 
-                    //Draw BG
+                    // Draw BG
                     this.drawTexturedModalRect(screenX, screenY, 23, 0, width, 17);
                     this.drawTexturedModalRect(screenX, screenY, 23, 17, (int) (width * size), 17);
                 }
             }
 
-            //Draw module icons
-            if (!(Minecraft.getMinecraft().player.capabilities.isCreativeMode || Minecraft.getMinecraft().player.isSpectator()) && !Minecraft.getMinecraft().player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).isEmpty() && Minecraft.getMinecraft().player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).getItem() instanceof IModularArmor) {
+            // Draw module icons
+            if (!(Minecraft.getMinecraft().player.capabilities.isCreativeMode ||
+                    Minecraft.getMinecraft().player.isSpectator()) &&
+                    !Minecraft.getMinecraft().player.getItemStackFromSlot(EntityEquipmentSlot.HEAD).isEmpty() &&
+                    Minecraft.getMinecraft().player.getItemStackFromSlot(EntityEquipmentSlot.HEAD)
+                            .getItem() instanceof IModularArmor) {
                 for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
-                    renderModuleSlots(Minecraft.getMinecraft().player.getItemStackFromSlot(slot), 4 - slot.getIndex(), event);
+                    renderModuleSlots(Minecraft.getMinecraft().player.getItemStackFromSlot(slot), 4 - slot.getIndex(),
+                            event);
                 }
             }
 
-            //In event of world change make sure the warning isn't displayed
+            // In event of world change make sure the warning isn't displayed
             if (Minecraft.getMinecraft().world.getTotalWorldTime() - AtmosphereHandler.lastSuffocationTime < 0)
                 AtmosphereHandler.lastSuffocationTime = 0;
-            //Tell the player he's suffocating if needed
-            if (Minecraft.getMinecraft().world.getTotalWorldTime() - AtmosphereHandler.lastSuffocationTime < numTicksToDisplay) {
+            // Tell the player he's suffocating if needed
+            if (Minecraft.getMinecraft().world.getTotalWorldTime() - AtmosphereHandler.lastSuffocationTime <
+                    numTicksToDisplay) {
                 FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
                 String str = "";
                 if (AtmosphereHandler.currentAtm != null) {
@@ -195,12 +195,13 @@ public class RocketEventHandler extends Gui {
                 fontRenderer.drawStringWithShadow(str, screenX, screenY, 0xFF5656);
                 GlStateManager.color(1f, 1f, 1f);
                 Minecraft.getMinecraft().getTextureManager().bindTexture(TextureResources.progressBars);
-                this.drawTexturedModalRect(screenX + fontRenderer.getStringWidth(str) / 2 - 8, screenY - 16, 0, 156, 16, 16);
+                this.drawTexturedModalRect(screenX + fontRenderer.getStringWidth(str) / 2 - 8, screenY - 16, 0, 156, 16,
+                        16);
 
                 GL11.glPopMatrix();
             }
 
-            //Draw arbitrary string
+            // Draw arbitrary string
             if (Minecraft.getMinecraft().world.getTotalWorldTime() <= lastDisplayTime) {
                 FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
                 GL11.glPushMatrix();
@@ -209,8 +210,8 @@ public class RocketEventHandler extends Gui {
                 for (String str : displayString.split("\n")) {
 
                     int screenX = event.getResolution().getScaledWidth() / 4 - fontRenderer.getStringWidth(str) / 2;
-                    int screenY = event.getResolution().getScaledHeight() / 12 + loc * (event.getResolution().getScaledHeight()) / 12;
-
+                    int screenY = event.getResolution().getScaledHeight() / 12 +
+                            loc * (event.getResolution().getScaledHeight()) / 12;
 
                     fontRenderer.drawStringWithShadow(str, screenX, screenY, 0xFF5656);
                     loc++;
@@ -224,13 +225,13 @@ public class RocketEventHandler extends Gui {
 
     private void renderModuleSlots(@Nonnull ItemStack armorStack, int slot, RenderGameOverlayEvent event) {
         int index = 1;
-        float color = 0.85f + 0.15F * MathHelper.sin(2f * (float) Math.PI * ((Minecraft.getMinecraft().world.getTotalWorldTime()) % 60) / 60f);
+        float color = 0.85f + 0.15F * MathHelper
+                .sin(2f * (float) Math.PI * ((Minecraft.getMinecraft().world.getTotalWorldTime()) % 60) / 60f);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         GlStateManager.enableBlend();
         GlStateManager.enableAlpha();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         float alpha = 0.6f;
-
 
         if (!armorStack.isEmpty()) {
 
@@ -242,23 +243,26 @@ public class RocketEventHandler extends Gui {
                 int screenY = suitPanel.getRenderY() + (slot - 1) * (size + 8);
                 int screenX = suitPanel.getRenderX();
 
-                //Draw BG
+                // Draw BG
                 GlStateManager.color(1f, 1f, 1f, 1f);
                 Minecraft.getMinecraft().renderEngine.bindTexture(TextureResources.frameHUDBG);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX - 4, screenY - 4, screenX + size, screenY + size + 4, 0d, 0.5d, 0d, 1d);
+                RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX - 4, screenY - 4, screenX + size,
+                        screenY + size + 4, 0d, 0.5d, 0d, 1d);
                 Tessellator.getInstance().draw();
 
                 Minecraft.getMinecraft().renderEngine.bindTexture(TextureResources.frameHUDBG);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX + size, screenY - 3, screenX + 2 + size, screenY + size + 3, 0.5d, 0.5d, 0d, 0d);
+                RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX + size, screenY - 3,
+                        screenX + 2 + size, screenY + size + 3, 0.5d, 0.5d, 0d, 0d);
                 Tessellator.getInstance().draw();
 
-                //Draw Icon
+                // Draw Icon
                 GlStateManager.color(color, color, color, color);
                 Minecraft.getMinecraft().renderEngine.bindTexture(TextureResources.armorSlots[slot - 1]);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX, screenY, screenX + size, screenY + size, 0d, 1d, 1d, 0d);
+                RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX, screenY, screenX + size,
+                        screenY + size, 0d, 1d, 1d, 0d);
                 Tessellator.getInstance().draw();
 
                 if (modularArmorFlag) {
@@ -272,24 +276,26 @@ public class RocketEventHandler extends Gui {
                         if (icon != null)
                             texture = icon.getResourceLocation();
 
-                        //if(texture != null) {
+                        // if(texture != null) {
 
                         screenX = suitPanel.getRenderX() + 4 + index * (size + 2);
 
-                        //Draw BG
+                        // Draw BG
 
                         Minecraft.getMinecraft().renderEngine.bindTexture(TextureResources.frameHUDBG);
                         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                        RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX - 4, screenY - 4, screenX + size - 2, screenY + size + 4, 0.5d, 0.5d, 0d, 1d);
+                        RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX - 4, screenY - 4,
+                                screenX + size - 2, screenY + size + 4, 0.5d, 0.5d, 0d, 1d);
                         Tessellator.getInstance().draw();
 
-
                         if (texture != null) {
-                            //Draw Icon
+                            // Draw Icon
                             Minecraft.getMinecraft().renderEngine.bindTexture(texture);
                             GlStateManager.color(color, color, color, alpha);
                             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                            RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX, screenY, screenX + size, screenY + size, icon.getMinU(), icon.getMaxU(), icon.getMaxV(), icon.getMinV());
+                            RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX, screenY,
+                                    screenX + size, screenY + size, icon.getMinU(), icon.getMaxU(), icon.getMaxV(),
+                                    icon.getMinV());
                             Tessellator.getInstance().draw();
                         } else {
                             GL11.glPushMatrix();
@@ -300,16 +306,17 @@ public class RocketEventHandler extends Gui {
                         }
 
                         index++;
-                        //}
+                        // }
                     }
                 }
 
                 screenX = (index) * (size + 2) + suitPanel.getRenderX() - 12;
-                //Draw BG
+                // Draw BG
                 GlStateManager.color(1, 1, 1, 1f);
                 Minecraft.getMinecraft().renderEngine.bindTexture(TextureResources.frameHUDBG);
                 buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-                RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX + 12, screenY - 4, screenX + size, screenY + size + 4, 0.75d, 1d, 0d, 1d);
+                RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel - 1, screenX + 12, screenY - 4, screenX + size,
+                        screenY + size + 4, 0.75d, 1d, 0d, 1d);
                 Tessellator.getInstance().draw();
             }
         }
@@ -318,6 +325,7 @@ public class RocketEventHandler extends Gui {
     }
 
     public static class GuiBox {
+
         int modeX = -1;
         int modeY = -1;
         int sizeX, sizeY;
@@ -333,7 +341,6 @@ public class RocketEventHandler extends Gui {
         }
 
         public int getX(int scaledW) {
-
             if (modeX == 1)
                 return scaledW - getRawX();
             else if (modeX == 0) {
@@ -343,7 +350,6 @@ public class RocketEventHandler extends Gui {
         }
 
         public int getY(int scaledH) {
-
             if (modeY == 1)
                 return scaledH - getRawY();
             else if (modeY == 0) {

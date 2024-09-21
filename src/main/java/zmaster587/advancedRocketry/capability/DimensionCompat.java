@@ -1,8 +1,8 @@
 package zmaster587.advancedRocketry.capability;
 
-import zmaster587.advancedRocketry.AdvancedRocketry;
-
 import java.lang.reflect.Field;
+
+import zmaster587.advancedRocketry.AdvancedRocketry;
 
 public class DimensionCompat {
 
@@ -10,8 +10,10 @@ public class DimensionCompat {
 
     static {
         try {
-            JEDSpawnID = Class.forName("fi.dy.masa.justenoughdimensions.config.Configs").getDeclaredField("initialSpawnDimensionId");
-            JEDEnableOverride = Class.forName("fi.dy.masa.justenoughdimensions.config.Configs").getDeclaredField("enableInitialSpawnDimensionOverride");
+            JEDSpawnID = Class.forName("fi.dy.masa.justenoughdimensions.config.Configs")
+                    .getDeclaredField("initialSpawnDimensionId");
+            JEDEnableOverride = Class.forName("fi.dy.masa.justenoughdimensions.config.Configs")
+                    .getDeclaredField("enableInitialSpawnDimensionOverride");
             AdvancedRocketry.logger.info("JED Found, compat loaded");
         } catch (Exception e) {
             AdvancedRocketry.logger.info("JED compat not loaded");
@@ -28,12 +30,10 @@ public class DimensionCompat {
 
             }
         } catch (Exception e) {
-            //No nonsense
+            // No nonsense
             return 0;
         }
 
-
         return 0;
     }
-
 }

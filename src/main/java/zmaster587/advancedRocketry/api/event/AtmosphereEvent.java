@@ -4,6 +4,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
+
 import zmaster587.advancedRocketry.api.IAtmosphere;
 
 public class AtmosphereEvent extends EntityEvent {
@@ -22,6 +23,7 @@ public class AtmosphereEvent extends EntityEvent {
      */
     @Cancelable
     public static class AtmosphereTickEvent extends AtmosphereEvent {
+
         public AtmosphereTickEvent(Entity entity, IAtmosphere atmosphere) {
             super(entity, atmosphere);
         }

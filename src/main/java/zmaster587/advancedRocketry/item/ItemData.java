@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.item;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
@@ -7,11 +11,9 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.api.DataStorage;
 import zmaster587.libVulpes.items.ItemIngredient;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 public class ItemData extends ItemIngredient {
 
@@ -40,7 +42,6 @@ public class ItemData extends ItemIngredient {
     }
 
     public DataStorage getDataStorage(@Nonnull ItemStack item) {
-
         DataStorage data = new DataStorage();
 
         if (!item.hasTagCompound()) {
@@ -96,7 +97,5 @@ public class ItemData extends ItemIngredient {
 
         list.add(data.getData() + " / " + data.getMaxData() + " Data");
         list.add(I18n.format(data.getDataType().toString()));
-
     }
-
 }

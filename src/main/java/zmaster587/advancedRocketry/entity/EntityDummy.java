@@ -9,13 +9,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityDummy extends Entity {
 
-
-    //Just a dummy so a player can sit on a chair
+    // Just a dummy so a player can sit on a chair
     public EntityDummy(World world) {
         super(world);
         this.noClip = true;
         this.height = 0f;
-
     }
 
     public EntityDummy(World world, double x, double y, double z) {
@@ -43,11 +41,8 @@ public class EntityDummy extends Entity {
         return false;
     }
 
-
     @Override
-    protected void entityInit() {
-
-    }
+    protected void entityInit() {}
 
     @Override
     public boolean shouldRiderSit() {
@@ -55,14 +50,8 @@ public class EntityDummy extends Entity {
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound p_70037_1_) {
-
-    }
+    protected void readEntityFromNBT(NBTTagCompound p_70037_1_) {}
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound p_70014_1_) {
-
-    }
-
-
+    protected void writeEntityToNBT(NBTTagCompound p_70014_1_) {}
 }

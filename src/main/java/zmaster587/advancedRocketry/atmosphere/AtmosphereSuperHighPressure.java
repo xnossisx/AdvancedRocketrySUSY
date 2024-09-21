@@ -4,6 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+
 import zmaster587.advancedRocketry.network.PacketOxygenState;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.network.PacketHandler;
@@ -14,7 +15,6 @@ public class AtmosphereSuperHighPressure extends AtmosphereNeedsSuit {
                                        String name) {
         super(canTick, isBreathable, allowsCombustion, name);
     }
-
 
     @Override
     public String getDisplayMessage() {

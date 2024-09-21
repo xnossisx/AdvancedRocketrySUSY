@@ -6,7 +6,9 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.tile.multiblock.TileObservatory;
@@ -39,7 +41,7 @@ public class RendererObservatory extends TileEntitySpecialRenderer {
         if (!multiBlockTile.canRender())
             return;
 
-        //Initial setup
+        // Initial setup
         int i = this.getWorld().getCombinedLight(tile.getPos().add(0, 1, 0), 0);
         int j = i % 65536;
         int k = i / 65536;
@@ -48,10 +50,14 @@ public class RendererObservatory extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Rotate and move the model into position
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));//tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
+        // Rotate and move the model into position
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));//tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
         GL11.glTranslated(x + .5, y, z + .5);
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        GL11.glRotatef((front.getXOffset() == 1 ? 180 : 0) + front.getZOffset() * 90f, 0, 1, 0);
 
         GL11.glTranslated(2, -1, 0);
 

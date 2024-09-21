@@ -11,7 +11,6 @@ public class MapGenRavineExt extends MapGenRavine {
     IBlockState fillerBlock;
     IBlockState oceanBlock;
 
-
     public void setFillerBlock(IBlockState state) {
         fillerBlock = state;
     }
@@ -33,7 +32,9 @@ public class MapGenRavineExt extends MapGenRavine {
         IBlockState top = isExceptionBiome(biome) ? Blocks.GRASS.getDefaultState() : biome.topBlock;
         IBlockState filler = isExceptionBiome(biome) ? Blocks.DIRT.getDefaultState() : biome.fillerBlock;
 
-        if (state.getBlock() == Blocks.STONE || state.getBlock() == top.getBlock() || state.getBlock() == filler.getBlock() || (fillerBlock != null && state.getBlock() == fillerBlock.getBlock())) {
+        if (state.getBlock() == Blocks.STONE || state.getBlock() == top.getBlock() ||
+                state.getBlock() == filler.getBlock() ||
+                (fillerBlock != null && state.getBlock() == fillerBlock.getBlock())) {
             if (y - 1 < 10) {
                 data.setBlockState(x, y, z, FLOWING_LAVA);
             } else {
@@ -45,5 +46,4 @@ public class MapGenRavineExt extends MapGenRavine {
             }
         }
     }
-
 }

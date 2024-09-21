@@ -26,5 +26,4 @@ public class CrystallizerCategory extends MachineCategoryTemplate<CrystallizerWr
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

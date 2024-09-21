@@ -1,9 +1,12 @@
 package zmaster587.advancedRocketry.tile.multiblock.machine;
 
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundEvent;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
@@ -14,45 +17,68 @@ import zmaster587.libVulpes.inventory.modules.ModuleProgress;
 import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
-import java.util.List;
-
 public class TileElectricArcFurnace extends TileMultiblockMachine implements IModularInventory {
 
-
     public static final Object[][][] structure = {
-            {{null, null, null, null, null},
-                    {null, 'P', AdvancedRocketryBlocks.blockBlastBrick, 'P', null},
-                    {null, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, null},
-                    {null, AdvancedRocketryBlocks.blockBlastBrick, 'P', AdvancedRocketryBlocks.blockBlastBrick, null},
-                    {null, null, null, null, null},
+            { { null, null, null, null, null },
+                    { null, 'P', AdvancedRocketryBlocks.blockBlastBrick, 'P', null },
+                    { null, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, null },
+                    { null, AdvancedRocketryBlocks.blockBlastBrick, 'P', AdvancedRocketryBlocks.blockBlastBrick, null },
+                    { null, null, null, null, null },
             },
 
-            {{null, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, null},
-                    {AdvancedRocketryBlocks.blockBlastBrick, "blockCoil", Blocks.AIR, "blockCoil", AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, Blocks.AIR, Blocks.AIR, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, "blockCoil", Blocks.AIR, AdvancedRocketryBlocks.blockBlastBrick},
-                    {null, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, null},
+            { { null, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                    AdvancedRocketryBlocks.blockBlastBrick, null },
+                    { AdvancedRocketryBlocks.blockBlastBrick, "blockCoil", Blocks.AIR, "blockCoil",
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, Blocks.AIR, Blocks.AIR,
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, "blockCoil", Blocks.AIR,
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { null, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, null },
             },
 
-            {{AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, Blocks.AIR, Blocks.AIR, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, Blocks.AIR, Blocks.AIR, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, Blocks.AIR, Blocks.AIR, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick},
+            { { AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                    AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                    AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, Blocks.AIR, Blocks.AIR,
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, Blocks.AIR, Blocks.AIR,
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, Blocks.AIR, Blocks.AIR, Blocks.AIR,
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick },
             },
 
-            {{AdvancedRocketryBlocks.blockBlastBrick, '*', 'c', '*', AdvancedRocketryBlocks.blockBlastBrick},
-                    {'*', AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, '*'},
-                    {'*', AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, '*'},
-                    {'*', AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, '*'},
-                    {AdvancedRocketryBlocks.blockBlastBrick, '*', '*', '*', AdvancedRocketryBlocks.blockBlastBrick},
+            { { AdvancedRocketryBlocks.blockBlastBrick, '*', 'c', '*', AdvancedRocketryBlocks.blockBlastBrick },
+                    { '*', AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, '*' },
+                    { '*', AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, '*' },
+                    { '*', AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, '*' },
+                    { AdvancedRocketryBlocks.blockBlastBrick, '*', '*', '*', AdvancedRocketryBlocks.blockBlastBrick },
             },
 
-            {{AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick},
-                    {AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick},
+            { { AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                    AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                    AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick },
+                    { AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick, AdvancedRocketryBlocks.blockBlastBrick,
+                            AdvancedRocketryBlocks.blockBlastBrick },
             }
 
     };

@@ -26,5 +26,4 @@ public class LatheCategory extends MachineCategoryTemplate<LatheWrapper> {
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

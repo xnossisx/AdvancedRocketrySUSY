@@ -1,23 +1,26 @@
 package zmaster587.advancedRocketry.api;
 
-import net.minecraft.util.EnumFacing;
-import net.minecraft.world.World;
-import zmaster587.advancedRocketry.api.util.IBlobHandler;
-import zmaster587.libVulpes.util.AdjacencyGraph;
-import zmaster587.libVulpes.util.HashedBlockPosition;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.World;
+
+import zmaster587.advancedRocketry.api.util.IBlobHandler;
+import zmaster587.libVulpes.util.AdjacencyGraph;
+import zmaster587.libVulpes.util.HashedBlockPosition;
+
 public class AreaBlob {
-    //Graph containing the acutal area enclosed
+
+    // Graph containing the acutal area enclosed
     protected final AdjacencyGraph<HashedBlockPosition> graph;
-    //Object to call back to when events happen, usually a tileentity
+    // Object to call back to when events happen, usually a tileentity
     protected IBlobHandler blobHandler;
-    //Data stored by this blob
+    // Data stored by this blob
     private Object data;
 
     public AreaBlob(@Nonnull IBlobHandler blobHandler) {
@@ -136,7 +139,7 @@ public class AreaBlob {
      * @param blockPos
      */
     public void removeBlock(@Nonnull HashedBlockPosition blockPos) {
-        //HashedBlockPosition blockPos = new HashedBlockPosition(x, y, z);
+        // HashedBlockPosition blockPos = new HashedBlockPosition(x, y, z);
         graph.remove(blockPos);
 
         for (EnumFacing direction : EnumFacing.values()) {
@@ -145,7 +148,6 @@ public class AreaBlob {
             if (graph.contains(newBlock) && !graph.doesPathExist(newBlock, blobHandler.getRootPosition()))
                 graph.removeAllNodesConnectedTo(newBlock);
         }
-
     }
 
     /**

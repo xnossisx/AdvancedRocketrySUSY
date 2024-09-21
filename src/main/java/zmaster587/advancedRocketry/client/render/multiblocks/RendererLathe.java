@@ -5,7 +5,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.libVulpes.api.material.MaterialRegistry;
@@ -13,6 +15,7 @@ import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
 public class RendererLathe extends TileEntitySpecialRenderer {
+
     WavefrontObject model;
 
     ResourceLocation texture = new ResourceLocation("advancedrocketry:textures/models/lathe.png");
@@ -39,12 +42,13 @@ public class RendererLathe extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         GL11.glTranslated(x + .5f, y, z + 0.5f);
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 0 : 180) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
+        GL11.glRotatef((front.getXOffset() == 1 ? 0 : 180) + front.getZOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(-.5f, -1f, -2.5f);
-
 
         ItemStack outputStack;
         if (multiBlockTile.isRunning()) {
@@ -71,7 +75,7 @@ public class RendererLathe extends TileEntitySpecialRenderer {
             GL11.glPopMatrix();
 
             int color;
-            //Check for rare bug when outputs is null, usually occurs if player opens machine within 1st tick
+            // Check for rare bug when outputs is null, usually occurs if player opens machine within 1st tick
             if (multiBlockTile.getOutputs() != null && !(outputStack = multiBlockTile.getOutputs().get(0)).isEmpty())
                 color = MaterialRegistry.getColorFromItemMaterial(outputStack);
             else
@@ -90,7 +94,7 @@ public class RendererLathe extends TileEntitySpecialRenderer {
             model.renderPart("Hull");
 
             model.renderPart("Tool");
-            //model.renderAllExcept("rod", "Cylinder");
+            // model.renderAllExcept("rod", "Cylinder");
 
             GL11.glPushMatrix();
             GL11.glTranslatef(0.375f, 0.9375f, 0f);

@@ -1,5 +1,11 @@
 package zmaster587.advancedRocketry.tile.atmosphere;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.inventory.IInventory;
@@ -9,6 +15,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryFluids;
 import zmaster587.advancedRocketry.api.armor.IFillableArmor;
@@ -20,12 +27,8 @@ import zmaster587.libVulpes.tile.TileInventoriedRFConsumerTank;
 import zmaster587.libVulpes.util.FluidUtils;
 import zmaster587.libVulpes.util.IconResource;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.List;
-
 public class TileGasChargePad extends TileInventoriedRFConsumerTank implements IModularInventory {
+
     public TileGasChargePad() {
         super(0, 2, 16000);
     }
@@ -33,7 +36,7 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
     @Override
     @Nonnull
     public int[] getSlotsForFace(@Nullable EnumFacing side) {
-        return new int[]{};
+        return new int[] {};
     }
 
     @Override
@@ -43,7 +46,8 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
 
     @Override
     public boolean canFill(Fluid fluid) {
-        return FluidUtils.areFluidsSameType(fluid, AdvancedRocketryFluids.fluidOxygen) || FluidUtils.areFluidsSameType(fluid, AdvancedRocketryFluids.fluidHydrogen);
+        return FluidUtils.areFluidsSameType(fluid, AdvancedRocketryFluids.fluidOxygen) ||
+                FluidUtils.areFluidsSameType(fluid, AdvancedRocketryFluids.fluidHydrogen);
     }
 
     @Override
@@ -54,7 +58,8 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
     @Override
     public boolean canPerformFunction() {
         if (!world.isRemote) {
-            for (EntityPlayer player : this.world.getEntitiesWithinAABB(EntityPlayer.class, new AxisAlignedBB(pos, pos.add(1, 2, 1)))) {
+            for (EntityPlayer player : this.world.getEntitiesWithinAABB(EntityPlayer.class,
+                    new AxisAlignedBB(pos, pos.add(1, 2, 1)))) {
                 ItemStack stack = player.getItemStackFromSlot(EntityEquipmentSlot.CHEST);
 
                 if (!stack.isEmpty()) {
@@ -65,12 +70,13 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
                     else if (ItemAirUtils.INSTANCE.isStackValidAirContainer(stack))
                         fillable = new ItemAirUtils.ItemAirWrapper(stack);
 
-                    //Check for O2 fill
+                    // Check for O2 fill
                     if (fillable != null) {
                         int amtFluid = fillable.getMaxAir(stack) - fillable.getAirRemaining(stack);
                         FluidStack fluidStack = this.drain(amtFluid, false);
 
-                        if (amtFluid > 0 && fluidStack != null && FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.fluidOxygen) && fluidStack.amount > 0) {
+                        if (amtFluid > 0 && fluidStack != null && FluidUtils.areFluidsSameType(fluidStack.getFluid(),
+                                AdvancedRocketryFluids.fluidOxygen) && fluidStack.amount > 0) {
                             FluidStack fstack = this.drain(amtFluid, true);
                             this.markDirty();
                             world.markChunkDirty(getPos(), this);
@@ -80,9 +86,12 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
                     }
                 }
 
-                //Check for H2 fill (possibly merge with O2 fill
-                //Fix conflict with O2 fill
-                if (this.tank.getFluid() != null && !FluidUtils.areFluidsSameType(this.tank.getFluid().getFluid(), AdvancedRocketryFluids.fluidOxygen) && !stack.isEmpty() && stack.getItem() instanceof IModularArmor) {
+                // Check for H2 fill (possibly merge with O2 fill
+                // Fix conflict with O2 fill
+                if (this.tank.getFluid() != null &&
+                        !FluidUtils.areFluidsSameType(this.tank.getFluid().getFluid(),
+                                AdvancedRocketryFluids.fluidOxygen) &&
+                        !stack.isEmpty() && stack.getItem() instanceof IModularArmor) {
                     IInventory inv = ((IModularArmor) stack.getItem()).loadModuleInventory(stack);
 
                     FluidStack fluidStack = this.drain(100, false);
@@ -94,7 +103,10 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
 
                             ItemStack module = inv.getStackInSlot(i);
                             if (FluidUtils.containsFluid(module)) {
-                                int amtFilled = module.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP).fill(fluidStack, true);
+                                int amtFilled = module
+                                        .getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY,
+                                                EnumFacing.UP)
+                                        .fill(fluidStack, true);
                                 if (amtFilled == 100) {
                                     this.drain(100, true);
 
@@ -117,9 +129,7 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
     }
 
     @Override
-    public void performFunction() {
-
-    }
+    public void performFunction() {}
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
@@ -130,10 +140,11 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
         if (world.isRemote)
             modules.add(new ModuleImage(49, 38, new IconResource(194, 0, 18, 18, CommonResources.genericBackground)));
 
-        //modules.add(new ModulePower(18, 20, this));
+        // modules.add(new ModulePower(18, 20, this));
         modules.add(new ModuleLiquidIndicator(32, 20, this));
 
-        //modules.add(toggleSwitch = new ModuleToggleSwitch(160, 5, 0, "", this, TextureResources.buttonToggleImage, 11, 26, getMachineEnabled()));
+        // modules.add(toggleSwitch = new ModuleToggleSwitch(160, 5, 0, "", this, TextureResources.buttonToggleImage,
+        // 11, 26, getMachineEnabled()));
         return modules;
     }
 
@@ -150,7 +161,7 @@ public class TileGasChargePad extends TileInventoriedRFConsumerTank implements I
     @Override
     public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
         super.setInventorySlotContents(slot, stack);
-        while (useBucket(0, getStackInSlot(0))) ;
+        while (useBucket(0, getStackInSlot(0)));
     }
 
     private boolean useBucket(int slot, @Nonnull ItemStack stack) {

@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.block;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.MapColor;
@@ -17,9 +19,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import zmaster587.libVulpes.block.INamedMetaBlock;
 
-import javax.annotation.Nonnull;
+import zmaster587.libVulpes.block.INamedMetaBlock;
 
 public class BlockCrystal extends Block implements INamedMetaBlock {
 
@@ -82,14 +83,13 @@ public class BlockCrystal extends Block implements INamedMetaBlock {
     @SideOnly(Side.CLIENT)
     public boolean shouldSideBeRendered(IBlockState blockState,
                                         IBlockAccess world, BlockPos pos, EnumFacing side) {
-
-        IBlockState blockState2 = world.getBlockState(pos.offset(side/*.getOpposite()*/));
+        IBlockState blockState2 = world.getBlockState(pos.offset(side/* .getOpposite() */));
 
         return !blockState.equals(blockState2) && super.shouldSideBeRendered(blockState, world, pos, side);
-
     }
 
     public enum EnumCrystal implements IStringSerializable {
+
         AMETHYST(0, 0xb23fff, "amethyst", MapColor.PURPLE),
         SAPPHIRE(1, 0x3333ff, "sapphire", MapColor.BLUE),
         EMERALD(2, 0x00ff00, "emerald", MapColor.GREEN),
@@ -113,7 +113,7 @@ public class BlockCrystal extends Block implements INamedMetaBlock {
             return this.meta;
         }
 
-        public String getUnlocalizedName() {
+        public String getTranslationKey() {
             return this.name;
         }
 

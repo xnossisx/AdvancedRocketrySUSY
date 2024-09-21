@@ -1,6 +1,10 @@
 package zmaster587.advancedRocketry.tile.multiblock.energy;
 
-import io.netty.buffer.ByteBuf;
+import java.util.List;
+import java.util.Map.Entry;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -13,6 +17,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
@@ -29,37 +35,34 @@ import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerProducer;
 import zmaster587.libVulpes.util.MultiBattery;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-import java.util.Map.Entry;
-
 public class TileBlackHoleGenerator extends TileMultiPowerProducer implements ITickable {
-    static final Object[][][] structure = new Object[][][]{
+
+    static final Object[][][] structure = new Object[][][] {
             {
-                    {null, null, null},
-                    {null, LibVulpesBlocks.blockAdvStructureBlock, null},
-                    {null, null, null}
+                    { null, null, null },
+                    { null, LibVulpesBlocks.blockAdvStructureBlock, null },
+                    { null, null, null }
             },
             {
-                    {null, 'c', null},
-                    {'*', LibVulpesBlocks.blockAdvStructureBlock, '*'},
-                    {null, '*', null},
+                    { null, 'c', null },
+                    { '*', LibVulpesBlocks.blockAdvStructureBlock, '*' },
+                    { null, '*', null },
             },
             {
-                    {null, LibVulpesBlocks.blockAdvStructureBlock, null},
-                    {null, LibVulpesBlocks.blockAdvStructureBlock, null},
-                    {null, null, null}
+                    { null, LibVulpesBlocks.blockAdvStructureBlock, null },
+                    { null, LibVulpesBlocks.blockAdvStructureBlock, null },
+                    { null, null, null }
             },
             {
-                    {null, null, null},
-                    {null, LibVulpesBlocks.blockAdvStructureBlock, null},
-                    {null, null, null}
+                    { null, null, null },
+                    { null, LibVulpesBlocks.blockAdvStructureBlock, null },
+                    { null, null, null }
             },
             {
-                    {null, null, null},
-                    {null, LibVulpesBlocks.blockAdvStructureBlock, null},
-                    {null, null, null}
-            }};
+                    { null, null, null },
+                    { null, LibVulpesBlocks.blockAdvStructureBlock, null },
+                    { null, null, null }
+            } };
 
     private int powerMadeLastTick, prevPowerMadeLastTick;
     private ModuleText textModule;
@@ -68,7 +71,8 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer implements IT
 
     public TileBlackHoleGenerator() {
         initialCheck = false;
-        textModule = new ModuleText(40, 20, LibVulpes.proxy.getLocalizedString("msg.microwaverec.notgenerating"), 0x2b2b2b);
+        textModule = new ModuleText(40, 20, LibVulpes.proxy.getLocalizedString("msg.microwaverec.notgenerating"),
+                0x2b2b2b);
     }
 
     @Override
@@ -109,7 +113,6 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer implements IT
     public String getMachineName() {
         return AdvancedRocketryBlocks.blockBlackHoleGenerator.getLocalizedName();
     }
-
 
     public int getPowerMadeLastTick() {
         return powerMadeLastTick;
@@ -164,11 +167,11 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer implements IT
     }
 
     private boolean isAroundBlackHole() {
-
         if (world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) {
             ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos);
             if (spaceObject != null) {
-                DimensionProperties properties = (DimensionProperties) spaceObject.getProperties().getParentProperties();
+                DimensionProperties properties = (DimensionProperties) spaceObject.getProperties()
+                        .getParentProperties();
                 return properties != null && (properties.isStar() && properties.getStarData().isBlackHole());
             }
         }
@@ -178,7 +181,6 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer implements IT
 
     @Override
     public void update() {
-
         if (!initialCheck && !world.isRemote) {
             completeStructure = attemptCompleteStructure(world.getBlockState(pos));
             onInventoryUpdated();
@@ -192,16 +194,17 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer implements IT
             if (isAroundBlackHole()) {
                 float energyReceived;
 
-
-                //Check to see if we're ready for another injection
+                // Check to see if we're ready for another injection
                 attemptFire();
 
                 energyReceived = last_usage > this.world.getTotalWorldTime() ? 500f : 0f;
-                powerMadeLastTick = (int) (energyReceived * ARConfiguration.getCurrentConfig().blackHolePowerMultiplier);
+                powerMadeLastTick = (int) (energyReceived *
+                        ARConfiguration.getCurrentConfig().blackHolePowerMultiplier);
 
                 if (powerMadeLastTick != prevPowerMadeLastTick) {
                     prevPowerMadeLastTick = powerMadeLastTick;
-                    PacketHandler.sendToNearby(new PacketMachine(this, (byte) 1), world.provider.getDimension(), pos, 128);
+                    PacketHandler.sendToNearby(new PacketMachine(this, (byte) 1), world.provider.getDimension(), pos,
+                            128);
 
                 }
                 producePower(powerMadeLastTick);
@@ -209,10 +212,10 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer implements IT
 
         }
         if (world.isRemote)
-            textModule.setText(LibVulpes.proxy.getLocalizedString("msg.microwaverec.generating") + ": " + powerMadeLastTick + " " + LibVulpes.proxy.getLocalizedString("msg.powerunit.rfpertick") +
+            textModule.setText(LibVulpes.proxy.getLocalizedString("msg.microwaverec.generating") + ": " +
+                    powerMadeLastTick + " " + LibVulpes.proxy.getLocalizedString("msg.powerunit.rfpertick") +
                     "\n\nStatus: " + (isAroundBlackHole() ? "ready" : "No black hole"));
     }
-
 
     @Override
     public SPacketUpdateTileEntity getUpdatePacket() {
@@ -247,7 +250,6 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer implements IT
         canRender = nbt.getBoolean("canRender");
         readNetworkData(nbt);
     }
-
 
     @Override
     public void writeDataToNetwork(ByteBuf out, byte id) {
@@ -287,6 +289,5 @@ public class TileBlackHoleGenerator extends TileMultiPowerProducer implements IT
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
-
     }
 }

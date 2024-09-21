@@ -1,17 +1,18 @@
 package zmaster587.advancedRocketry.enchant;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnumEnchantmentType;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
 
-import javax.annotation.Nonnull;
-
 public class EnchantmentSpaceBreathing extends Enchantment {
 
     public EnchantmentSpaceBreathing() {
-        super(Rarity.COMMON, EnumEnchantmentType.ARMOR, new EntityEquipmentSlot[]{EntityEquipmentSlot.CHEST, EntityEquipmentSlot.FEET, EntityEquipmentSlot.HEAD, EntityEquipmentSlot.LEGS});
+        super(Rarity.COMMON, EnumEnchantmentType.ARMOR, new EntityEquipmentSlot[] { EntityEquipmentSlot.CHEST,
+                EntityEquipmentSlot.FEET, EntityEquipmentSlot.HEAD, EntityEquipmentSlot.LEGS });
         this.setName("spaceBreathing");
     }
 

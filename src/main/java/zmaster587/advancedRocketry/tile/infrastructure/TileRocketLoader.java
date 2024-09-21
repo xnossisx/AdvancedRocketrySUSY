@@ -1,6 +1,9 @@
 package zmaster587.advancedRocketry.tile.infrastructure;
 
-import io.netty.buffer.ByteBuf;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -17,6 +20,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.EntityRocketBase;
 import zmaster587.advancedRocketry.api.IInfrastructure;
@@ -34,10 +39,8 @@ import zmaster587.libVulpes.tile.multiblock.hatch.TileInventoryHatch;
 import zmaster587.libVulpes.util.INetworkMachine;
 import zmaster587.libVulpes.util.ZUtils.RedstoneState;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-
-public class TileRocketLoader extends TileInventoryHatch implements IInfrastructure, ITickable, IButtonInventory, INetworkMachine, IGuiCallback {
+public class TileRocketLoader extends TileInventoryHatch
+                              implements IInfrastructure, ITickable, IButtonInventory, INetworkMachine, IGuiCallback {
 
     private final static int ALLOW_REDSTONEOUT = 2;
     EntityRocket rocket;
@@ -48,12 +51,17 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
     ModuleBlockSideSelector sideSelectorModule;
 
     public TileRocketLoader() {
-        redstoneControl = new ModuleRedstoneOutputButton(174, 4, 0, "", this, LibVulpes.proxy.getLocalizedString("msg.rocketLoader.loadingState"));
+        redstoneControl = new ModuleRedstoneOutputButton(174, 4, 0, "", this,
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.loadingState"));
         state = RedstoneState.ON;
-        inputRedstoneControl = new ModuleRedstoneOutputButton(174, 32, 1, "", this, LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowLoading"));
+        inputRedstoneControl = new ModuleRedstoneOutputButton(174, 32, 1, "", this,
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowLoading"));
         inputstate = RedstoneState.OFF;
         inputRedstoneControl.setRedstoneState(inputstate);
-        sideSelectorModule = new ModuleBlockSideSelector(90, 15, this, LibVulpes.proxy.getLocalizedString("msg.rocketLoader.none"), LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowredstoneoutput"), LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowredstoneinput"));
+        sideSelectorModule = new ModuleBlockSideSelector(90, 15, this,
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.none"),
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowredstoneoutput"),
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowredstoneinput"));
     }
 
     public TileRocketLoader(int size) {
@@ -66,13 +74,17 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
         inventory.setCanExtractSlot(1, false);
         inventory.setCanExtractSlot(2, false);
         inventory.setCanExtractSlot(3, false);
-        redstoneControl = new ModuleRedstoneOutputButton(174, 4, 0, "", this, LibVulpes.proxy.getLocalizedString("msg.rocketLoader.loadingState"));
+        redstoneControl = new ModuleRedstoneOutputButton(174, 4, 0, "", this,
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.loadingState"));
         state = RedstoneState.ON;
-        inputRedstoneControl = new ModuleRedstoneOutputButton(174, 32, 1, "", this, LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowLoading"));
+        inputRedstoneControl = new ModuleRedstoneOutputButton(174, 32, 1, "", this,
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowLoading"));
         inputstate = RedstoneState.OFF;
         inputRedstoneControl.setRedstoneState(inputstate);
-        sideSelectorModule = new ModuleBlockSideSelector(90, 15, this, LibVulpes.proxy.getLocalizedString("msg.rocketLoader.none"), LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowredstoneoutput"), LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowredstoneinput"));
-
+        sideSelectorModule = new ModuleBlockSideSelector(90, 15, this,
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.none"),
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowredstoneoutput"),
+                LibVulpes.proxy.getLocalizedString("msg.rocketLoader.allowredstoneinput"));
     }
 
     @Override
@@ -103,7 +115,8 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
 
     protected boolean getStrongPowerForSides(World world, BlockPos pos) {
         for (int i = 0; i < 6; i++) {
-            if (sideSelectorModule.getStateForSide(i) == ALLOW_REDSTONEOUT && world.getRedstonePower(pos.offset(EnumFacing.VALUES[i]), EnumFacing.VALUES[i]) > 0)
+            if (sideSelectorModule.getStateForSide(i) == ALLOW_REDSTONEOUT &&
+                    world.getRedstonePower(pos.offset(EnumFacing.VALUES[i]), EnumFacing.VALUES[i]) > 0)
                 return true;
         }
         return false;
@@ -111,16 +124,17 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
 
     @Override
     public void update() {
-        //Move a stack of items
+        // Move a stack of items
         if (!world.isRemote && rocket != null) {
 
-            boolean isAllowedToOperate = (inputstate == RedstoneState.OFF || isStateActive(inputstate, getStrongPowerForSides(world, getPos())));
+            boolean isAllowedToOperate = (inputstate == RedstoneState.OFF ||
+                    isStateActive(inputstate, getStrongPowerForSides(world, getPos())));
 
             List<TileEntity> tiles = rocket.storage.getInventoryTiles();
             boolean foundStack = false;
             boolean rocketContainsItems = false;
             out:
-            //Function returns if something can be moved
+            // Function returns if something can be moved
             for (TileEntity tile : tiles) {
                 if (tile.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP)) {
                     IItemHandler inv = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
@@ -129,7 +143,7 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
                         if (inv.getStackInSlot(i).isEmpty())
                             rocketContainsItems = true;
 
-                        //Loop though this inventory's slots and find a suitible one
+                        // Loop though this inventory's slots and find a suitible one
                         for (int j = 0; j < getSizeInventory(); j++) {
                             if ((inv.getStackInSlot(i).isEmpty()) && !inventory.getStackInSlot(j).isEmpty()) {
                                 if (isAllowedToOperate) {
@@ -138,19 +152,24 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
                                 }
                                 rocketContainsItems = true;
                                 break out;
-                            } else if (!getStackInSlot(j).isEmpty() && inv.getStackInSlot(i).getItem() == getStackInSlot(j).getItem() &&
-                                    ItemStack.areItemStackTagsEqual(inv.getStackInSlot(i), getStackInSlot(j)) && inv.getStackInSlot(i).getMaxStackSize() != inv.getStackInSlot(i).getCount()) {
-                                if (isAllowedToOperate) {
-                                    ItemStack stack2 = inventory.decrStackSize(j, inv.getStackInSlot(i).getMaxStackSize() - inv.getStackInSlot(i).getCount());
-                                    inv.getStackInSlot(i).setCount(inv.getStackInSlot(i).getCount() + stack2.getCount());
-                                }
-                                rocketContainsItems = true;
+                            } else if (!getStackInSlot(j).isEmpty() &&
+                                    inv.getStackInSlot(i).getItem() == getStackInSlot(j).getItem() &&
+                                    ItemStack.areItemStackTagsEqual(inv.getStackInSlot(i), getStackInSlot(j)) &&
+                                    inv.getStackInSlot(i).getMaxStackSize() != inv.getStackInSlot(i).getCount()) {
+                                        if (isAllowedToOperate) {
+                                            ItemStack stack2 = inventory.decrStackSize(j,
+                                                    inv.getStackInSlot(i).getMaxStackSize() -
+                                                            inv.getStackInSlot(i).getCount());
+                                            inv.getStackInSlot(i)
+                                                    .setCount(inv.getStackInSlot(i).getCount() + stack2.getCount());
+                                        }
+                                        rocketContainsItems = true;
 
-                                if (inventory.getStackInSlot(j).isEmpty())
-                                    break out;
+                                        if (inventory.getStackInSlot(j).isEmpty())
+                                            break out;
 
-                                foundStack = true;
-                            }
+                                        foundStack = true;
+                                    }
                         }
                         if (foundStack)
                             break out;
@@ -163,7 +182,7 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
                             if (inv.getStackInSlot(i).isEmpty())
                                 rocketContainsItems = true;
 
-                            //Loop though this inventory's slots and find a suitible one
+                            // Loop though this inventory's slots and find a suitible one
                             for (int j = 0; j < getSizeInventory(); j++) {
                                 if ((inv.getStackInSlot(i).isEmpty()) && !inventory.getStackInSlot(j).isEmpty()) {
                                     if (isAllowedToOperate) {
@@ -172,19 +191,25 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
                                     }
                                     rocketContainsItems = true;
                                     break out;
-                                } else if (!getStackInSlot(j).isEmpty() && inv.isItemValidForSlot(i, getStackInSlot(j)) && inv.getStackInSlot(i).getItem() == getStackInSlot(j).getItem() &&
-                                        ItemStack.areItemStackTagsEqual(inv.getStackInSlot(i), getStackInSlot(j)) && inv.getStackInSlot(i).getMaxStackSize() != inv.getStackInSlot(i).getCount()) {
-                                    if (isAllowedToOperate) {
-                                        ItemStack stack2 = inventory.decrStackSize(j, inv.getStackInSlot(i).getMaxStackSize() - inv.getStackInSlot(i).getCount());
-                                        inv.getStackInSlot(i).setCount(inv.getStackInSlot(i).getCount() + stack2.getCount());
-                                    }
-                                    rocketContainsItems = true;
+                                } else if (!getStackInSlot(j).isEmpty() &&
+                                        inv.isItemValidForSlot(i, getStackInSlot(j)) &&
+                                        inv.getStackInSlot(i).getItem() == getStackInSlot(j).getItem() &&
+                                        ItemStack.areItemStackTagsEqual(inv.getStackInSlot(i), getStackInSlot(j)) &&
+                                        inv.getStackInSlot(i).getMaxStackSize() != inv.getStackInSlot(i).getCount()) {
+                                            if (isAllowedToOperate) {
+                                                ItemStack stack2 = inventory.decrStackSize(j,
+                                                        inv.getStackInSlot(i).getMaxStackSize() -
+                                                                inv.getStackInSlot(i).getCount());
+                                                inv.getStackInSlot(i)
+                                                        .setCount(inv.getStackInSlot(i).getCount() + stack2.getCount());
+                                            }
+                                            rocketContainsItems = true;
 
-                                    if (inventory.getStackInSlot(j).isEmpty())
-                                        break out;
+                                            if (inventory.getStackInSlot(j).isEmpty())
+                                                break out;
 
-                                    foundStack = true;
-                                }
+                                            foundStack = true;
+                                        }
                             }
                             if (foundStack)
                                 break out;
@@ -193,7 +218,7 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
                 }
             }
 
-            //Update redstone state
+            // Update redstone state
             setRedstoneState(!rocketContainsItems);
 
         }
@@ -216,7 +241,8 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
 
     protected void setRedstoneState(boolean condition) {
         condition = isStateActive(state, condition);
-        ((BlockARHatch) AdvancedRocketryBlocks.blockLoader).setRedstoneState(world, world.getBlockState(pos), pos, condition);
+        ((BlockARHatch) AdvancedRocketryBlocks.blockLoader).setRedstoneState(world, world.getBlockState(pos), pos,
+                condition);
     }
 
     protected boolean isStateActive(RedstoneState state, boolean condition) {
@@ -230,7 +256,6 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
     @Override
     public boolean onLinkStart(@Nonnull ItemStack item, TileEntity entity,
                                EntityPlayer player, World world) {
-
         ItemLinker.setMasterCoords(item, this.pos);
 
         if (this.rocket != null) {
@@ -239,7 +264,9 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
         }
 
         if (player.world.isRemote)
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentTranslation("%s %s", new TextComponentTranslation("msg.rocketLoader.link"), ": " + getPos().getX() + " " + getPos().getY() + " " + getPos().getZ()));
+            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(
+                    new TextComponentTranslation("%s %s", new TextComponentTranslation("msg.rocketLoader.link"),
+                            ": " + getPos().getX() + " " + getPos().getY() + " " + getPos().getZ()));
         return true;
     }
 
@@ -247,18 +274,20 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
     public boolean onLinkComplete(@Nonnull ItemStack item, TileEntity entity,
                                   EntityPlayer player, World world) {
         if (player.world.isRemote)
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentTranslation("msg.linker.error.firstMachine"));
+            Minecraft.getMinecraft().ingameGUI.getChatGUI()
+                    .printChatMessage(new TextComponentTranslation("msg.linker.error.firstMachine"));
         return false;
     }
 
     @Override
     public void unlinkRocket() {
         rocket = null;
-        ((BlockARHatch) AdvancedRocketryBlocks.blockLoader).setRedstoneState(world, world.getBlockState(pos), pos, false);
-        //On unlink prevent the tile from ticking anymore
+        ((BlockARHatch) AdvancedRocketryBlocks.blockLoader).setRedstoneState(world, world.getBlockState(pos), pos,
+                false);
+        // On unlink prevent the tile from ticking anymore
 
-        //if(!worldObj.isRemote)
-        //worldObj.loadedTileEntityList.remove(this);
+        // if(!worldObj.isRemote)
+        // worldObj.loadedTileEntityList.remove(this);
     }
 
     @Override
@@ -268,9 +297,9 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
 
     @Override
     public boolean linkRocket(EntityRocketBase rocket) {
-        //On linked allow the tile to tick
-        //if(!worldObj.isRemote)
-        //worldObj.loadedTileEntityList.add(this);
+        // On linked allow the tile to tick
+        // if(!worldObj.isRemote)
+        // worldObj.loadedTileEntityList.add(this);
         this.rocket = (EntityRocket) rocket;
         return true;
     }
@@ -286,9 +315,7 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
     }
 
     @Override
-    public void unlinkMission() {
-
-    }
+    public void unlinkMission() {}
 
     @Override
     public int getMaxLinkDistance() {
@@ -366,7 +393,6 @@ public class TileRocketLoader extends TileInventoryHatch implements IInfrastruct
         markDirty();
         world.markChunkDirty(getPos(), this);
     }
-
 
     @Override
     public void onModuleUpdated(ModuleBase module) {

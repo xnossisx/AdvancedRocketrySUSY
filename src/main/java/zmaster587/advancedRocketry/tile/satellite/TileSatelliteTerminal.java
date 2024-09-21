@@ -1,11 +1,18 @@
 package zmaster587.advancedRocketry.tile.satellite;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.DataStorage;
 import zmaster587.advancedRocketry.api.DataStorage.DataType;
@@ -17,7 +24,6 @@ import zmaster587.advancedRocketry.inventory.modules.ModuleData;
 import zmaster587.advancedRocketry.inventory.modules.ModuleSatellite;
 import zmaster587.advancedRocketry.item.ItemData;
 import zmaster587.advancedRocketry.item.ItemSatelliteIdentificationChip;
-import zmaster587.advancedRocketry.network.PacketSatellite;
 import zmaster587.advancedRocketry.satellite.SatelliteData;
 import zmaster587.advancedRocketry.util.IDataInventory;
 import zmaster587.advancedRocketry.util.PlanetaryTravelHelper;
@@ -28,16 +34,10 @@ import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.TileInventoriedRFConsumer;
 import zmaster587.libVulpes.util.INetworkMachine;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.LinkedList;
-import java.util.List;
+public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements INetworkMachine, IModularInventory,
+                                   IButtonInventory, IDataInventory, IDataHandler {
 
-
-public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements INetworkMachine, IModularInventory, IButtonInventory, IDataInventory, IDataHandler {
-
-
-    //private ModuleText satelliteText;
+    // private ModuleText satelliteText;
     private SatelliteBase satellite;
     private ModuleText moduleText;
     private DataStorage data;
@@ -89,8 +89,9 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
                 if (getUniversalEnergyStored() < getPowerPerOperation()) {
                     out.writeInt(1); // no power
                 } else {
-                    if (!PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(satellite.getDimensionId(), DimensionManager.getEffectiveDimId(world, pos).getId())) {
-                        out.writeInt(2);//out of range
+                    if (!PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(satellite.getDimensionId(),
+                            DimensionManager.getEffectiveDimId(world, pos).getId())) {
+                        out.writeInt(2);// out of range
                     } else {
                         out.writeInt(3);
                         out.writeInt(((SatelliteData) satellite).getPowerPerTick());
@@ -109,7 +110,7 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
                                     NBTTagCompound nbt) {
         if (packetId == (byte) 22) {
             int status = in.readInt();
-            if (status == 3){
+            if (status == 3) {
                 nbt.setInteger("ppt", in.readInt());
                 nbt.setInteger("data", in.readInt());
                 nbt.setInteger("maxdata", in.readInt());
@@ -123,7 +124,7 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
         super.update();
 
         if (!world.isRemote) {
-            //update satellite for players nearby
+            // update satellite for players nearby
             if ((world.getTotalWorldTime() % 20) == 0) {
                 PacketHandler.sendToNearby(new PacketMachine(this, (byte) 22), world.provider.getDimension(), pos, 16);
             }
@@ -136,7 +137,8 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
             storeData(0);
         } else if (id == 100) {
 
-            if (satellite != null && PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(satellite.getDimensionId(), DimensionManager.getEffectiveDimId(world, pos).getId())) {
+            if (satellite != null && PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(satellite.getDimensionId(),
+                    DimensionManager.getEffectiveDimId(world, pos).getId())) {
                 satellite.performAction(player, world, pos);
             }
         } else if (id == 101) {
@@ -147,20 +149,22 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
             if (world.isRemote) { // 22 should never arrive at the server
                 int status = nbt.getInteger("status");
                 satellite = getSatelliteFromSlot(0);
-                if (moduleText != null){
-                if (status != 0 && satellite != null) {
-                    if (status == 1)
-                        moduleText.setText(LibVulpes.proxy.getLocalizedString("msg.notenoughpower"));
+                if (moduleText != null) {
+                    if (status != 0 && satellite != null) {
+                        if (status == 1)
+                            moduleText.setText(LibVulpes.proxy.getLocalizedString("msg.notenoughpower"));
 
-                    else if (status == 2) {
-                        moduleText.setText(satellite.getName() + "\n\n" + LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.toofar"));
-                    } else if (status == 3) {
-                        moduleText.setText(satellite.getName() + "\n\n" + LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.info") + "\n" +
-                                "Power gen.: "+nbt.getInteger("ppt")+"\n"+
-                                "Data: "+nbt.getInteger("data") +"/"+nbt.getInteger("maxdata"));
-                    }
-                } else
-                    moduleText.setText(LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.nolink"));
+                        else if (status == 2) {
+                            moduleText.setText(satellite.getName() + "\n\n" +
+                                    LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.toofar"));
+                        } else if (status == 3) {
+                            moduleText.setText(satellite.getName() + "\n\n" +
+                                    LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.info") + "\n" +
+                                    "Power gen.: " + nbt.getInteger("ppt") + "\n" +
+                                    "Data: " + nbt.getInteger("data") + "/" + nbt.getInteger("maxdata"));
+                        }
+                    } else
+                        moduleText.setText(LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.nolink"));
                 }
             }
         }
@@ -173,13 +177,9 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
         updateInventoryInfo();
     }
 
-    public void updateInventoryInfo() {
-
-    }
-
+    public void updateInventoryInfo() {}
 
     public SatelliteBase getSatelliteFromSlot(int slot) {
-
         ItemStack stack = getStackInSlot(slot);
         if (!stack.isEmpty() && stack.getItem() instanceof ItemSatelliteIdentificationChip) {
             return ItemSatelliteIdentificationChip.getSatellite(stack);
@@ -190,18 +190,19 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-
         List<ModuleBase> modules = new LinkedList<>();
         modules.add(new ModulePower(18, 20, this.energy));
-        modules.add(new ModuleButton(116, 70, 0, LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.connect"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild));
-        modules.add(new ModuleButton(173, 3, 1, "", this, TextureResources.buttonKill, LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.destroysat"), 24, 24));
+        modules.add(new ModuleButton(116, 70, 0, LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.connect"), this,
+                zmaster587.libVulpes.inventory.TextureResources.buttonBuild));
+        modules.add(new ModuleButton(173, 3, 1, "", this, TextureResources.buttonKill,
+                LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.destroysat"), 24, 24));
         modules.add(new ModuleData(28, 20, 1, this, data));
         ModuleSatellite moduleSatellite = new ModuleSatellite(152, 10, this, 0);
         moduleSatellite.setSatellite(satellite);
         modules.add(moduleSatellite);
 
-        //Try to assign a satellite ASAP
-        //moduleSatellite.setSatellite(getSatelliteFromSlot(0));
+        // Try to assign a satellite ASAP
+        // moduleSatellite.setSatellite(getSatelliteFromSlot(0));
 
         moduleText = new ModuleText(60, 20, LibVulpes.proxy.getLocalizedString("msg.satctrlcenter.nolink"), 0x404040);
         modules.add(moduleText);
@@ -212,7 +213,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
-
         if (buttonId == 0) {
             PacketHandler.sendToServer(new PacketMachine(this, (byte) (100 + buttonId)));
 
@@ -224,16 +224,16 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
 
                 SatelliteBase satellite = idchip.getSatellite(stack);
 
-                //Somebody might want to erase the chip of an already existing satellite
+                // Somebody might want to erase the chip of an already existing satellite
                 if (satellite != null)
-                    DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId()).removeSatellite(satellite.getId());
+                    DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId())
+                            .removeSatellite(satellite.getId());
 
                 idchip.erase(stack);
                 setInventorySlotContents(0, stack);
                 PacketHandler.sendToServer(new PacketMachine(this, (byte) (100 + buttonId)));
             }
         }
-
     }
 
     @Override
@@ -256,8 +256,7 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
     }
 
     @Override
-    public void loadData(int id) {
-    }
+    public void loadData(int id) {}
 
     @Override
     public void storeData(int id) {
@@ -274,10 +273,11 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
 
     @Override
     public int extractData(int maxAmount, DataType type, EnumFacing dir, boolean commit) {
-        //TODO
+        // TODO
 
         SatelliteBase satellite = getSatelliteFromSlot(0);
-        if (satellite instanceof SatelliteData && PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(satellite.getDimensionId(), DimensionManager.getEffectiveDimId(world, pos).getId())) {
+        if (satellite instanceof SatelliteData && PlanetaryTravelHelper.isTravelAnywhereInPlanetarySystem(
+                satellite.getDimensionId(), DimensionManager.getEffectiveDimId(world, pos).getId())) {
             satellite.performAction(null, world, pos);
         }
 
@@ -290,7 +290,6 @@ public class TileSatelliteTerminal extends TileInventoriedRFConsumer implements 
 
     @Override
     public int addData(int maxAmount, DataType type, EnumFacing dir, boolean commit) {
-
         return data.addData(maxAmount, type, commit);
     }
 

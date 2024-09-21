@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.tile;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -8,11 +10,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.world.util.WorldDummy;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileFluidHatch;
-
-import javax.annotation.Nonnull;
 
 public class TileFluidTank extends TileFluidHatch {
 
@@ -51,13 +52,12 @@ public class TileFluidTank extends TileFluidHatch {
 
     @Override
     public int fill(FluidStack resource, boolean doFill) {
-
         if (resource == null)
             return 0;
 
         TileFluidTank handler2 = this.getFluidTankInDirection(EnumFacing.UP);
 
-        //Move up, check if we can fill there, do top down
+        // Move up, check if we can fill there, do top down
         if (handler2 != null && handler2.canFill(resource)) {
             return handler2.fill(resource, doFill);
         }
@@ -65,7 +65,6 @@ public class TileFluidTank extends TileFluidHatch {
     }
 
     private int fillInternal2(FluidStack resource, boolean doFill) {
-
         TileFluidTank handler = this.getFluidTankInDirection(EnumFacing.DOWN);
 
         int amt = 0;
@@ -73,7 +72,7 @@ public class TileFluidTank extends TileFluidHatch {
         if (handler != null) {
             amt = handler.fillInternal2(resource, doFill);
         }
-        //Copy to avoid modifying the passed one
+        // Copy to avoid modifying the passed one
         FluidStack resource2 = resource.copy();
         resource2.amount -= amt;
         if (resource2.amount > 0)
@@ -99,7 +98,7 @@ public class TileFluidTank extends TileFluidHatch {
         FluidStack fStack = null;
         if (handler != null && handler.getTankProperties()[0].getContents() != null &&
                 fluidTank.getFluid() != null && fluidTank.getFluid().getFluid() ==
-                handler.getTankProperties()[0].getContents().getFluid()) {
+                        handler.getTankProperties()[0].getContents().getFluid()) {
 
             fStack = handler.drain(maxDrain, doDrain);
         }
@@ -112,7 +111,6 @@ public class TileFluidTank extends TileFluidHatch {
             fluidChanged = true;
         }
         checkForUpdate();
-
 
         return fStack2;
     }

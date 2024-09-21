@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.tile;
 
+import java.util.*;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayer;
@@ -15,14 +17,13 @@ import net.minecraftforge.fluids.IFluidBlock;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidTankProperties;
+
 import zmaster587.advancedRocketry.network.PacketFluidParticle;
 import zmaster587.libVulpes.cap.FluidCapability;
 import zmaster587.libVulpes.inventory.modules.IModularInventory;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.tile.TileEntityRFConsumer;
-
-import java.util.*;
 
 public class TilePump extends TileEntityRFConsumer implements IFluidHandler, IModularInventory {
 
@@ -59,19 +60,21 @@ public class TilePump extends TileEntityRFConsumer implements IFluidHandler, IMo
     public void update() {
         super.update();
 
-        //Attempt fluid Eject
+        // Attempt fluid Eject
         if (!world.isRemote && tank.getFluid() != null) {
             for (EnumFacing direction : EnumFacing.values()) {
                 BlockPos newBlock = getPos().offset(direction);
                 TileEntity tile = world.getTileEntity(newBlock);
-                if (tile != null && tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite())) {
-                    IFluidHandler cap = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite());
+                if (tile != null &&
+                        tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, direction.getOpposite())) {
+                    IFluidHandler cap = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
+                            direction.getOpposite());
                     FluidStack stack = tank.getFluid().copy();
                     stack.amount = Math.min(tank.getFluid().amount, 1000);
-                    //Perform the drain
+                    // Perform the drain
                     cap.fill(tank.drain(cap.fill(stack, false), true), true);
 
-                    //Abort if we run out of fluid
+                    // Abort if we run out of fluid
                     if (tank.getFluid() == null)
                         break;
                 }
@@ -88,9 +91,8 @@ public class TilePump extends TileEntityRFConsumer implements IFluidHandler, IMo
 
     @Override
     public void performFunction() {
-
         if (!world.isRemote) {
-            //Do we have room?
+            // Do we have room?
             if (tank.getCapacity() - 1000 < tank.getFluidAmount())
                 return;
 
@@ -108,7 +110,8 @@ public class TilePump extends TileEntityRFConsumer implements IFluidHandler, IMo
                         if (mat == Material.LAVA)
                             colour = 0xFFbd3718;
 
-                        PacketHandler.sendToNearby(new PacketFluidParticle(nextPos, this.pos, 200, colour), world.provider.getDimension(), this.pos, 128);
+                        PacketHandler.sendToNearby(new PacketFluidParticle(nextPos, this.pos, 200, colour),
+                                world.provider.getDimension(), this.pos, 128);
                     }
                 }
             }
@@ -125,7 +128,6 @@ public class TilePump extends TileEntityRFConsumer implements IFluidHandler, IMo
     }
 
     private BlockPos getNextBlockLocation() {
-
         if (!cache.isEmpty())
             return cache.remove(0);
 
@@ -151,13 +153,14 @@ public class TilePump extends TileEntityRFConsumer implements IFluidHandler, IMo
 
         while (!queue.isEmpty()) {
             BlockPos nextElement = queue.poll();
-            if (visited.contains(nextElement) || nextElement.getDistance(pos.getX(), nextElement.getY(), pos.getZ()) > RANGE)
+            if (visited.contains(nextElement) ||
+                    nextElement.getDistance(pos.getX(), nextElement.getY(), pos.getZ()) > RANGE)
                 continue;
 
             Block worldBlock = world.getBlockState(nextElement).getBlock();
             if (worldBlock instanceof IFluidBlock) {
                 if (fluid == null || ((IFluidBlock) worldBlock).getFluid() == fluid) {
-                    //only add drainable fluids, allow chaining along flowing fluid tho
+                    // only add drainable fluids, allow chaining along flowing fluid tho
                     if (((IFluidBlock) worldBlock).canDrain(world, nextElement))
                         cache.add(0, nextElement);
                     visited.add(nextElement);
@@ -211,5 +214,4 @@ public class TilePump extends TileEntityRFConsumer implements IFluidHandler, IMo
     public boolean canInteractWithContainer(EntityPlayer entity) {
         return false;
     }
-
 }

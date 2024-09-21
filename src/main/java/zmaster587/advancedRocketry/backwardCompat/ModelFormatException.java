@@ -15,5 +15,4 @@ public class ModelFormatException extends Exception {
     public ModelFormatException(String msg) {
         super(msg);
     }
-
 }

@@ -1,5 +1,15 @@
 package zmaster587.advancedRocketry.client.model;
 
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -10,15 +20,6 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelPart;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Function;
 
 public class ModelRocket implements IModel {
 
@@ -43,7 +44,6 @@ public class ModelRocket implements IModel {
     @ParametersAreNonnullByDefault
     public IBakedModel bake(IModelState state, VertexFormat format,
                             Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
-
         IModel subComponent;
         try {
             subComponent = ModelLoaderRegistry.getModel(resource);
@@ -61,16 +61,14 @@ public class ModelRocket implements IModel {
         return State.myState;
     }
 
-
     private final static class State implements IModelState {
 
         static State myState = new State();
 
         @Override
         public Optional<TRSRTransformation> apply(
-                Optional<? extends IModelPart> part) {
+                                                  Optional<? extends IModelPart> part) {
             return Optional.empty();
         }
-
     }
 }

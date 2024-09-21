@@ -1,9 +1,12 @@
 package zmaster587.advancedRocketry.tile.cables;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
+
 import zmaster587.advancedRocketry.cable.EnergyNetwork;
 import zmaster587.advancedRocketry.cable.HandlerCableNetwork;
 import zmaster587.advancedRocketry.cable.NetworkRegistry;
@@ -11,30 +14,27 @@ import zmaster587.libVulpes.api.IUniversalEnergy;
 import zmaster587.libVulpes.cap.ForgePowerCapability;
 import zmaster587.libVulpes.cap.TeslaHandler;
 
-import javax.annotation.Nullable;
-
 public class TileEnergyPipe extends TilePipe implements IUniversalEnergy {
 
     @Override
     public boolean canExtract(EnumFacing dir, TileEntity e) {
-
-        return e.hasCapability(CapabilityEnergy.ENERGY, dir) && e.getCapability(CapabilityEnergy.ENERGY, dir).canExtract() && !(e instanceof TileEnergyPipe);
+        return e.hasCapability(CapabilityEnergy.ENERGY, dir) &&
+                e.getCapability(CapabilityEnergy.ENERGY, dir).canExtract() && !(e instanceof TileEnergyPipe);
     }
 
     @Override
     public boolean canInject(EnumFacing dir, TileEntity e) {
-        return e.hasCapability(CapabilityEnergy.ENERGY, dir) && e.getCapability(CapabilityEnergy.ENERGY, dir).canReceive() && !(e instanceof TileEnergyPipe);
+        return e.hasCapability(CapabilityEnergy.ENERGY, dir) &&
+                e.getCapability(CapabilityEnergy.ENERGY, dir).canReceive() && !(e instanceof TileEnergyPipe);
     }
 
     @Override
     public boolean hasCapability(@Nullable Capability<?> capability, EnumFacing facing) {
-
         return capability == CapabilityEnergy.ENERGY || TeslaHandler.hasTeslaCapability(this, capability);
     }
 
     @Override
     public <T> T getCapability(@Nullable Capability<T> capability, EnumFacing facing) {
-
         if (capability == CapabilityEnergy.ENERGY)
             return (T) (new ForgePowerCapability(this));
         else if (TeslaHandler.hasTeslaCapability(this, capability))
@@ -48,11 +48,11 @@ public class TileEnergyPipe extends TilePipe implements IUniversalEnergy {
     }
 
     protected void attemptLink(EnumFacing dir, TileEntity tile) {
-        //If the pipe can inject or extract, add to the cache
-        //if(!(tile instanceof IFluidHandler))
-        //return;
-        //if(world.isRemote && tile instanceof TileEnergyPipe)
-        //	connectedSides[dir.ordinal()]=true;
+        // If the pipe can inject or extract, add to the cache
+        // if(!(tile instanceof IFluidHandler))
+        // return;
+        // if(world.isRemote && tile instanceof TileEnergyPipe)
+        // connectedSides[dir.ordinal()]=true;
 
         if (canExtract(dir, tile)) {
             if (!world.isRemote) {
@@ -72,9 +72,7 @@ public class TileEnergyPipe extends TilePipe implements IUniversalEnergy {
     }
 
     @Override
-    public void setEnergyStored(int amt) {
-
-    }
+    public void setEnergyStored(int amt) {}
 
     @Override
     public int extractEnergy(int amt, boolean simulate) {
@@ -92,9 +90,7 @@ public class TileEnergyPipe extends TilePipe implements IUniversalEnergy {
     }
 
     @Override
-    public void setMaxEnergyStored(int max) {
-
-    }
+    public void setMaxEnergyStored(int max) {}
 
     @Override
     public int acceptEnergy(int amt, boolean simulate) {

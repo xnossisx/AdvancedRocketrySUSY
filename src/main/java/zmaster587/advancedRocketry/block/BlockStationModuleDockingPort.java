@@ -1,5 +1,8 @@
 package zmaster587.advancedRocketry.block;
 
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
@@ -10,14 +13,12 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.station.TileDockingPort;
 import zmaster587.advancedRocketry.tile.station.TileLandingPad;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
 import zmaster587.libVulpes.inventory.GuiHandler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
 
 public class BlockStationModuleDockingPort extends BlockFullyRotatable {
 
@@ -37,10 +38,12 @@ public class BlockStationModuleDockingPort extends BlockFullyRotatable {
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos,
-                                    IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY,
+                                    IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side,
+                                    float hitX, float hitY,
                                     float hitZ) {
         if (!worldIn.isRemote)
-            playerIn.openGui(LibVulpes.instance, GuiHandler.guiId.MODULAR.ordinal(), worldIn, pos.getX(), pos.getY(), pos.getZ());
+            playerIn.openGui(LibVulpes.instance, GuiHandler.guiId.MODULAR.ordinal(), worldIn, pos.getX(), pos.getY(),
+                    pos.getZ());
         return true;
     }
 
@@ -63,5 +66,4 @@ public class BlockStationModuleDockingPort extends BlockFullyRotatable {
         }
         super.breakBlock(world, pos, state);
     }
-
 }

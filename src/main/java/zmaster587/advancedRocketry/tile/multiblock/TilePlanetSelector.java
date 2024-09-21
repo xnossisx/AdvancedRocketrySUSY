@@ -1,13 +1,18 @@
 package zmaster587.advancedRocketry.tile.multiblock;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.relauncher.Side;
+
 import org.apache.commons.lang3.ArrayUtils;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
@@ -23,10 +28,8 @@ import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.TilePointer;
 import zmaster587.libVulpes.util.INetworkMachine;
 
-import java.util.LinkedList;
-import java.util.List;
-
-public class TilePlanetSelector extends TilePointer implements ISelectionNotify, IModularInventory, IProgressBar, INetworkMachine {
+public class TilePlanetSelector extends TilePointer
+                                implements ISelectionNotify, IModularInventory, IProgressBar, INetworkMachine {
 
     public static final int certaintyDataValue = 5000;
     protected ModulePlanetSelector container;
@@ -35,13 +38,12 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
     int[] cachedProgressValues;
 
     public TilePlanetSelector() {
-        cachedProgressValues = new int[]{-1, -1, -1};
+        cachedProgressValues = new int[] { -1, -1, -1 };
     }
 
     @Override
     public void onSelectionConfirmed(Object sender) {
-
-        //Container Cannot be null at this time
+        // Container Cannot be null at this time
         TileEntity tile = getMasterBlock();
         if (tile instanceof ITilePlanetSystemSelectable) {
             ((ITilePlanetSystemSelectable) tile).setSelectedPlanetId(container.getSelectedSystem());
@@ -51,7 +53,6 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
 
     @Override
     public void onSelected(Object sender) {
-
         selectSystem(container.getSelectedSystem());
 
         PacketHandler.sendToServer(new PacketMachine(this, (byte) 0));
@@ -66,15 +67,15 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-
         List<ModuleBase> modules = new LinkedList<>();
 
         DimensionProperties props = DimensionManager.getEffectiveDimId(player.world, player.getPosition());
-        container = new ModulePlanetSelector((props != null ? props.getStarId() : 0), TextureResources.starryBG, this, true);
+        container = new ModulePlanetSelector((props != null ? props.getStarId() : 0), TextureResources.starryBG, this,
+                true);
         container.setOffset(1000, 1000);
         modules.add(container);
 
-        //Transfer discovery values
+        // Transfer discovery values
         if (!world.isRemote) {
             markDirty();
         }
@@ -104,35 +105,36 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
 
     @Override
     public int getProgress(int id) {
-
         if (!world.isRemote) {
             return 25; /*
-			if(getMasterBlock() != null) {
-
-				ItemStack stack = ((ITilePlanetSystemSelectable)getMasterBlock()).getChipWithId(container.getSelectedSystem());
-
-				if(!stack.isEmpty()) {
-
-					DataType data;
-					if(id == 0)
-						data = DataType.ATMOSPHEREDENSITY;
-					else if(id == 1)
-						data = DataType.DISTANCE;
-					else //if(id == 2)
-						data = DataType.MASS;
-
-
-					int dataAmt = ((ItemPlanetIdentificationChip)stack.getItem()).getData(stack, data);
-
-					if(dataAmt != 0)
-						return (int)(certaintyDataValue/(float)dataAmt);
-				}
-			}*/
+                        * if(getMasterBlock() != null) {
+                        * 
+                        * ItemStack stack =
+                        * ((ITilePlanetSystemSelectable)getMasterBlock()).getChipWithId(container.getSelectedSystem());
+                        * 
+                        * if(!stack.isEmpty()) {
+                        * 
+                        * DataType data;
+                        * if(id == 0)
+                        * data = DataType.ATMOSPHEREDENSITY;
+                        * else if(id == 1)
+                        * data = DataType.DISTANCE;
+                        * else //if(id == 2)
+                        * data = DataType.MASS;
+                        * 
+                        * 
+                        * int dataAmt = ((ItemPlanetIdentificationChip)stack.getItem()).getData(stack, data);
+                        * 
+                        * if(dataAmt != 0)
+                        * return (int)(certaintyDataValue/(float)dataAmt);
+                        * }
+                        * }
+                        */
         } else {
             return cachedProgressValues[id];
         }
 
-        //return 400;
+        // return 400;
     }
 
     @Override
@@ -143,7 +145,7 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
             return dimCache.getAtmosphereDensity() / 16;
         else if (id == 1)
             return dimCache.orbitalDist / 16;
-        else //if(id == 2)
+        else // if(id == 2)
             return (int) (dimCache.gravitationalMultiplier * 50);
     }
 
@@ -158,7 +160,6 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-
         super.onDataPacket(net, pkt);
         readAdditionalNBT(pkt.getNbtCompound());
     }
@@ -171,7 +172,6 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
 
             nbt.setIntArray("visiblePlanets", ArrayUtils.toPrimitive(list.toArray(intList)));
         }
-
     }
 
     public void readAdditionalNBT(NBTTagCompound nbt) {
@@ -183,9 +183,7 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
     }
 
     @Override
-    public void setTotalProgress(int id, int progress) {
-
-    }
+    public void setTotalProgress(int id, int progress) {}
 
     @Override
     public void writeDataToNetwork(ByteBuf out, byte id) {
@@ -208,7 +206,7 @@ public class TilePlanetSelector extends TilePointer implements ISelectionNotify,
             container.setSelectedSystem(dimId);
             selectSystem(dimId);
 
-            //Update known planets
+            // Update known planets
             markDirty();
         }
     }

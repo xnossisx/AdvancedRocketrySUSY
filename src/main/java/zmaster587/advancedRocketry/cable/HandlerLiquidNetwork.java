@@ -13,7 +13,6 @@ public class HandlerLiquidNetwork extends HandlerCableNetwork {
         return net.networkID;
     }
 
-
     public void tickAllNetworks() {
         for (Entry<Integer, CableNetwork> integerCableNetworkEntry : networks.entrySet()) {
             integerCableNetworkEntry.getValue().tick();

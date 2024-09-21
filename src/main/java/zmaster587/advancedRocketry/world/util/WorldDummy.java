@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.world.util;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.entity.Entity;
@@ -17,10 +19,9 @@ import net.minecraftforge.common.capabilities.CapabilityDispatcher;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
 import zmaster587.advancedRocketry.util.StorageChunk;
-
-import javax.annotation.Nullable;
 
 public class WorldDummy extends World {
 
@@ -34,7 +35,6 @@ public class WorldDummy extends World {
         dummyProvider.setWorld(this);
         this.storage = storage;
         this.chunkProvider = new ChunkProviderDummy(this, storage);
-
     }
 
     @Override
@@ -46,13 +46,15 @@ public class WorldDummy extends World {
     }
 
     @Override
-    public boolean hasCapability(net.minecraftforge.common.capabilities.Capability<?> capability, @Nullable EnumFacing facing) {
+    public boolean hasCapability(net.minecraftforge.common.capabilities.Capability<?> capability,
+                                 @Nullable EnumFacing facing) {
         return capabilities != null && capabilities.hasCapability(capability, facing);
     }
 
     @Override
     @Nullable
-    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability, @Nullable EnumFacing facing) {
+    public <T> T getCapability(net.minecraftforge.common.capabilities.Capability<T> capability,
+                               @Nullable EnumFacing facing) {
         return capabilities == null ? null : capabilities.getCapability(capability, facing);
     }
 
@@ -85,17 +87,17 @@ public class WorldDummy extends World {
 
     @Override
     public void updateEntities() {
-        //Dummy out
+        // Dummy out
     }
 
     @Override
     public void tick() {
-        //Dont tick
+        // Dont tick
     }
 
     @Override
     public boolean tickUpdates(boolean p_72955_1_) {
-        //Dont tick
+        // Dont tick
         return false;
     }
 
@@ -128,7 +130,7 @@ public class WorldDummy extends World {
         return 15;
     }
 
-    //No entities exist
+    // No entities exist
     @Override
     public Entity getEntityByID(int p_73045_1_) {
         return null;
@@ -136,8 +138,7 @@ public class WorldDummy extends World {
 
     @Override
     protected boolean isChunkLoaded(int x, int z, boolean allowEmpty) {
-        //Dummy out
+        // Dummy out
         return false;
     }
-
 }

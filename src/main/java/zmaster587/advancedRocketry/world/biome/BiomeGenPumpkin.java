@@ -8,11 +8,11 @@ import net.minecraft.world.biome.Biome;
 public class BiomeGenPumpkin extends Biome {
 
     public BiomeGenPumpkin(int biomeId, boolean register) {
-        super(new BiomeProperties("Pumpkin").setBaseHeight(1f).setHeightVariation(0.1f).setTemperature(0.9f).setRainDisabled());
+        super(new BiomeProperties("Pumpkin").setBaseHeight(1f).setHeightVariation(0.1f).setTemperature(0.9f)
+                .setRainDisabled());
 
-        //cold and dry
+        // cold and dry
         registerBiome(biomeId, "Pumpkin", this);
-
 
         this.decorator.generateFalls = false;
         this.decorator.flowersPerChunk = 0;
@@ -42,6 +42,6 @@ public class BiomeGenPumpkin extends Biome {
 
     @Override
     public float getSpawningChance() {
-        return 0.7f; //Nothing spawns
+        return 0.7f; // Nothing spawns
     }
 }

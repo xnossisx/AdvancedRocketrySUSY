@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.backwardCompat;
 
 public class Vertex {
+
     public float x, y, z;
 
     public Vertex(float x, float y) {

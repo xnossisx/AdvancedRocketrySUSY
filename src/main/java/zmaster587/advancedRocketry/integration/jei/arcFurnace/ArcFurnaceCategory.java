@@ -1,12 +1,12 @@
 package zmaster587.advancedRocketry.integration.jei.arcFurnace;
 
+import javax.annotation.Nonnull;
+
 import mezz.jei.api.IGuiHelper;
 import zmaster587.advancedRocketry.integration.jei.ARPlugin;
 import zmaster587.advancedRocketry.integration.jei.MachineCategoryTemplate;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.LibVulpes;
-
-import javax.annotation.Nonnull;
 
 public class ArcFurnaceCategory extends MachineCategoryTemplate<ArcFurnaceWrapper> {
 
@@ -31,5 +31,4 @@ public class ArcFurnaceCategory extends MachineCategoryTemplate<ArcFurnaceWrappe
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

@@ -9,6 +9,7 @@ import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraftforge.client.IRenderHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
@@ -24,6 +25,7 @@ import zmaster587.advancedRocketry.util.AstronomicalBodyHelper;
 import zmaster587.advancedRocketry.world.ChunkProviderSpace;
 
 public class WorldProviderSpace extends WorldProviderPlanet {
+
     private IRenderHandler skyRender;
 
     @Override
@@ -31,13 +33,12 @@ public class WorldProviderSpace extends WorldProviderPlanet {
         return 0;
     }
 
-    //TODO: figure out celestial angle from coords
+    // TODO: figure out celestial angle from coords
 
     @Override
     public boolean isPlanet() {
         return false;
     }
-
 
     public int getAverageGroundLevel() {
         return 0;
@@ -51,8 +52,7 @@ public class WorldProviderSpace extends WorldProviderPlanet {
     @Override
     @SideOnly(Side.CLIENT)
     public IRenderHandler getSkyRenderer() {
-
-        //Maybe a little hacky
+        // Maybe a little hacky
         EntityPlayerSP player = Minecraft.getMinecraft().player;
         if (player != null) {
             Entity e = player.getRidingEntity();
@@ -65,9 +65,9 @@ public class WorldProviderSpace extends WorldProviderPlanet {
             }
         }
 
-
         if (ARConfiguration.getCurrentConfig().stationSkyOverride)
-            return (skyRender == null || !(skyRender instanceof RenderSpaceSky)) ? skyRender = new RenderSpaceSky() : skyRender;
+            return (skyRender == null || !(skyRender instanceof RenderSpaceSky)) ? skyRender = new RenderSpaceSky() :
+                    skyRender;
 
         return super.getSkyRenderer();
     }
@@ -85,14 +85,18 @@ public class WorldProviderSpace extends WorldProviderPlanet {
     @Override
     public float getSunBrightness(float partialTicks) {
         DimensionProperties properties = getDimensionProperties(Minecraft.getMinecraft().player.getPosition());
-        SpaceStationObject spaceStation = (SpaceStationObject) getSpaceObject(Minecraft.getMinecraft().player.getPosition());
+        SpaceStationObject spaceStation = (SpaceStationObject) getSpaceObject(
+                Minecraft.getMinecraft().player.getPosition());
 
         if (spaceStation != null) {
-            //Vary brightness depending upon sun luminosity and planet distance
-            //This takes into account how eyes work, that they're not linear in sensing light
-            float preWarpBrightnessMultiplier = (float) AstronomicalBodyHelper.getPlanetaryLightLevelMultiplier(AstronomicalBodyHelper.getStellarBrightness(properties.getStar(), properties.getSolarOrbitalDistance()));
-            //Warp is no light, because there are no stars
-            return (spaceStation.isWarping()) ? (float) 0.0 : preWarpBrightnessMultiplier * world.getSunBrightnessBody(partialTicks);
+            // Vary brightness depending upon sun luminosity and planet distance
+            // This takes into account how eyes work, that they're not linear in sensing light
+            float preWarpBrightnessMultiplier = (float) AstronomicalBodyHelper
+                    .getPlanetaryLightLevelMultiplier(AstronomicalBodyHelper.getStellarBrightness(properties.getStar(),
+                            properties.getSolarOrbitalDistance()));
+            // Warp is no light, because there are no stars
+            return (spaceStation.isWarping()) ? (float) 0.0 :
+                    preWarpBrightnessMultiplier * world.getSunBrightnessBody(partialTicks);
         }
         return 0;
     }
@@ -102,8 +106,10 @@ public class WorldProviderSpace extends WorldProviderPlanet {
         this.hasSkyLight = true;
         world.getWorldInfo().setTerrainType(AdvancedRocketry.spaceWorldType);
 
-        this.biomeProvider = new BiomeProviderSingle(AdvancedRocketryBiomes.spaceBiome);//new ChunkManagerPlanet(worldObj, worldObj.getWorldInfo().getGeneratorOptions(), DimensionManager.getInstance().getDimensionProperties(worldObj.provider.getDimension()).getBiomes());
-
+        this.biomeProvider = new BiomeProviderSingle(AdvancedRocketryBiomes.spaceBiome);// new
+                                                                                        // ChunkManagerPlanet(worldObj,
+                                                                                        // worldObj.getWorldInfo().getGeneratorOptions(),
+                                                                                        // DimensionManager.getInstance().getDimensionProperties(worldObj.provider.getDimension()).getBiomes());
     }
 
     public ISpaceObject getSpaceObject(BlockPos pos) {

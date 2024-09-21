@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.client.render.multiblocks;
 
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
@@ -7,23 +9,24 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.render.RenderHelper;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
-import java.util.List;
-
 public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
+
     WavefrontObject model;
 
     ResourceLocation texture = new ResourceLocation("advancedrocketry:textures/models/precisionassembler.png");
 
-    //private final RenderItem dummyItem = Minecraft.getMinecraft().getRenderItem();
+    // private final RenderItem dummyItem = Minecraft.getMinecraft().getRenderItem();
 
-    //Model Names:
+    // Model Names:
     // Tray
     // Hull
     // ProcessA
@@ -41,7 +44,6 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
     @Override
     public void render(TileEntity tile, double x,
                        double y, double z, float f, int damage, float a) {
-
         TileMultiblockMachine multiBlockTile = (TileMultiblockMachine) tile;
 
         if (!multiBlockTile.canRender())
@@ -49,10 +51,12 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         GL11.glTranslated(x + .5f, y, z + .5f);
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
+        GL11.glRotatef((front.getXOffset() == 1 ? 180 : 0) + front.getZOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(-.5f, 0, -.5f);
 
         if (multiBlockTile.isRunning()) {
@@ -60,7 +64,6 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
             float progress = multiBlockTile.getProgress(0) / (float) multiBlockTile.getTotalProgress(0);
             float process, tray;
             tray = process = 3 * progress;
-
 
             List<ItemStack> outputList = multiBlockTile.getOutputs();
             if (outputList != null && !outputList.isEmpty()) {
@@ -98,7 +101,6 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
             } else
                 model.renderPart("ProcessA");
 
-
             process -= 6;
             if (process > 2 && process < 4) {
                 // 0 -> -.25
@@ -129,15 +131,11 @@ public class RendererPrecisionAssembler extends TileEntitySpecialRenderer {
             } else
                 model.renderPart("ProcessC");
 
-
         } else {
             bindTexture(texture);
             model.renderAll();
         }
 
-
         GL11.glPopMatrix();
-
     }
-
 }

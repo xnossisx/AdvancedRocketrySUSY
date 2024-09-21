@@ -1,6 +1,8 @@
 package zmaster587.advancedRocketry.tile.multiblock;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -14,6 +16,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
@@ -35,229 +39,714 @@ import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 import zmaster587.libVulpes.util.INetworkMachine;
 import zmaster587.libVulpes.util.IconResource;
 
-import java.util.LinkedList;
-import java.util.List;
-
-//This code is a complete mess. it should be rewritten just like the space laser, but it kinda works, so I'll leave it with this for now
+// This code is a complete mess. it should be rewritten just like the space laser, but it kinda works, so I'll leave it
+// with this for now
 
 public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements INetworkMachine {
 
-    private static final Object[][][] structure = new Object[][][]{
-            {{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockOxygenVent, null, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockOxygenVent, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockOxygenVent, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}},
+    private static final Object[][][] structure = new Object[][][] {
+            { { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent, null,
+                            null, null, null, null, null, null, null },
+                    { null, null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockOxygenVent, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockOxygenVent, null, null,
+                            null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockOxygenVent, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, null, AdvancedRocketryBlocks.blockOxygenVent, null,
+                            null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null } },
 
-            {{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, null,
+                            null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, null,
+                            null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null } },
 
-            {{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null } },
 
-            {{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY,
+                            LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock,
+                            null, null, null, null, null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY,
+                            Blocks.CLAY, Blocks.CLAY, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY,
+                            Blocks.CLAY, Blocks.CLAY, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY,
+                            LibVulpesBlocks.blockAdvStructureBlock, Blocks.CLAY, LibVulpesBlocks.blockAdvStructureBlock,
+                            null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null } },
 
-            {{null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {Blocks.CLAY, Blocks.CLAY, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, Blocks.CLAY, Blocks.CLAY},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {Blocks.CLAY, Blocks.CLAY, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, Blocks.CLAY, Blocks.CLAY},
-                    {null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null},
-                    {null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null,
+                    null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { Blocks.CLAY, Blocks.CLAY, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null,
+                            Blocks.CLAY, Blocks.CLAY },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { Blocks.CLAY, Blocks.CLAY, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null,
+                            Blocks.CLAY, Blocks.CLAY },
+                    { null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null },
+                    { null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null } },
 
-            {{null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {Blocks.CLAY, Blocks.CLAY, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, Blocks.CLAY, Blocks.CLAY},
-                    {null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null},
-                    {Blocks.CLAY, Blocks.CLAY, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, Blocks.CLAY, Blocks.CLAY},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null,
+                    null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { Blocks.CLAY, Blocks.CLAY, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, Blocks.CLAY, Blocks.CLAY },
+                    { null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null, null },
+                    { Blocks.CLAY, Blocks.CLAY, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, Blocks.CLAY, Blocks.CLAY },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null } },
 
-            {{null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, Blocks.CLAY},
-                    {null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null},
-                    {Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, Blocks.CLAY},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null,
+                    null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null, Blocks.CLAY },
+                    { null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null, null },
+                    { Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null, Blocks.CLAY },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null } },
 
-            {{null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, 'c', LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, Blocks.CLAY},
-                    {null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null},
-                    {Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, Blocks.CLAY},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null,
+                    null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, 'c',
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, Blocks.CLAY },
+                    { null, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null, null },
+                    { Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null, Blocks.CLAY },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null } },
 
-            {{null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, Blocks.CLAY},
-                    {null, null, null, null, null, null, null, 'P', LibVulpesBlocks.blockAdvStructureBlock, 'P', null, null, null, null, null, null, null},
-                    {Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, 'P', LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, Blocks.CLAY},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null,
+                    null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null,
+                            null, null, null, null, Blocks.CLAY },
+                    { null, null, null, null, null, null, null, 'P', LibVulpesBlocks.blockAdvStructureBlock, 'P', null,
+                            null, null, null, null, null, null },
+                    { Blocks.CLAY, null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, 'P',
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, Blocks.CLAY },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null } },
 
-            {{null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null, null},
-                    {null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null},
-                    {null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null},
-                    {null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null},
-                    {Blocks.CLAY, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, null, null, Blocks.CLAY},
-                    {null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, null, null, null},
-                    {Blocks.CLAY, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, null, null, Blocks.CLAY},
-                    {null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null},
-                    {null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null},
-                    {null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null},
-                    {null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null,
+                    null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null },
+                    { null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null },
+                    { null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, null, null, null },
+                    { Blocks.CLAY, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            Blocks.CLAY },
+                    { null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, null, null, null },
+                    { Blocks.CLAY, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            Blocks.CLAY },
+                    { null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, null, null, null },
+                    { null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null },
+                    { null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null } },
 
-            {{null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null, null},
-                    {null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null},
-                    {null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null},
-                    {null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null},
-                    {Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY},
-                    {null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, null, null, null},
-                    {Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY},
-                    {null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null},
-                    {null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null},
-                    {null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null},
-                    {null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null}},
+            { { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null,
+                    null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null },
+                    { null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null },
+                    { null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, null, null, null },
+                    { Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, Blocks.CLAY,
+                            Blocks.CLAY, Blocks.CLAY },
+                    { null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, null, null, null },
+                    { Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, Blocks.CLAY,
+                            Blocks.CLAY, Blocks.CLAY },
+                    { null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, null, null, null },
+                    { null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null },
+                    { null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null } },
 
-            {{null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, Blocks.CLAY, 'L', Blocks.CLAY, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null, null},
-                    {null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null},
-                    {null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null},
-                    {null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null},
-                    {null, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, null},
-                    {null, null, null, 'L', AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, 'L', null, null, null},
-                    {null, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, null},
-                    {null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null},
-                    {null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null},
-                    {null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null},
-                    {null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, Blocks.CLAY, 'L', Blocks.CLAY, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null}}};
+            { { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, Blocks.CLAY, 'L',
+                            Blocks.CLAY, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null, null },
+                    { null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null },
+                    { null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null },
+                    { null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, null, null, null },
+                    { null, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, Blocks.CLAY,
+                            Blocks.CLAY, Blocks.CLAY, null },
+                    { null, null, null, 'L', AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, 'L', null, null, null },
+                    { null, Blocks.CLAY, Blocks.CLAY, Blocks.CLAY, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank, Blocks.CLAY,
+                            Blocks.CLAY, Blocks.CLAY, null },
+                    { null, null, null, AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, null, null, null },
+                    { null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null },
+                    { null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockFuelTank, AdvancedRocketryBlocks.blockFuelTank,
+                            AdvancedRocketryBlocks.blockConcrete, AdvancedRocketryBlocks.blockConcrete, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, AdvancedRocketryBlocks.blockConcrete, Blocks.CLAY, 'L',
+                            Blocks.CLAY, AdvancedRocketryBlocks.blockConcrete, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, Blocks.CLAY, null, Blocks.CLAY, null, null, null, null,
+                            null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
+                            null } } };
     private ModuleToggleSwitch buttonIncrease, buttonDecrease;
     private ModuleRadioButton radioButton;
     private ModuleText text;
@@ -272,8 +761,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         super();
 
         completionTime = (int) (18000 * ARConfiguration.getCurrentConfig().terraformSpeed);
-        buttonIncrease = new ModuleToggleSwitch(40, 20, 1, LibVulpes.proxy.getLocalizedString("msg.terraformer.atminc"), this, TextureResources.buttonScan, 80, 16, true);
-        buttonDecrease = new ModuleToggleSwitch(40, 38, 2, LibVulpes.proxy.getLocalizedString("msg.terraformer.atmdec"), this, TextureResources.buttonScan, 80, 16, false);
+        buttonIncrease = new ModuleToggleSwitch(40, 20, 1, LibVulpes.proxy.getLocalizedString("msg.terraformer.atminc"),
+                this, TextureResources.buttonScan, 80, 16, true);
+        buttonDecrease = new ModuleToggleSwitch(40, 38, 2, LibVulpes.proxy.getLocalizedString("msg.terraformer.atmdec"),
+                this, TextureResources.buttonScan, 80, 16, false);
         text = new ModuleText(10, 100, "", 0x282828);
         powerPerTick = 1000;
 
@@ -284,7 +775,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
         outOfFluid = false;
         last_mode = radioButton.getOptionSelected();
-
     }
 
     @Override
@@ -304,17 +794,17 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-        List<ModuleBase> modules =  super.getModules(ID, player);
+        List<ModuleBase> modules = super.getModules(ID, player);
 
-        //Backgrounds
+        // Backgrounds
         if (world.isRemote) {
             modules.add(new ModuleImage(173, 0, new IconResource(90, 0, 84, 88, CommonResources.genericBackground)));
         }
 
         modules.add(radioButton);
-        modules.add(new ModuleProgress(30, 57, 0, zmaster587.advancedRocketry.inventory.TextureResources.terraformProgressBar, this));
+        modules.add(new ModuleProgress(30, 57, 0,
+                zmaster587.advancedRocketry.inventory.TextureResources.terraformProgressBar, this));
         modules.add(text);
-
 
         setText();
 
@@ -329,9 +819,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     }
 
     private void setText() {
-
         String statusText;
-
 
         if (outOfFluid)
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.outofgas");
@@ -341,8 +829,10 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         else
             statusText = LibVulpes.proxy.getLocalizedString("msg.terraformer.notrunning");
 
-        text.setText(String.format("%s:\n%s\n\n%s: %.2f", LibVulpes.proxy.getLocalizedString("msg.terraformer.status"), statusText, LibVulpes.proxy.getLocalizedString("msg.terraformer.pressure"), DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).getAtmosphereDensity() / 100f));
-
+        text.setText(String.format("%s:\n%s\n\n%s: %.2f", LibVulpes.proxy.getLocalizedString("msg.terraformer.status"),
+                statusText, LibVulpes.proxy.getLocalizedString("msg.terraformer.pressure"),
+                DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension())
+                        .getAtmosphereDensity() / 100f));
     }
 
     @Override
@@ -357,7 +847,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     protected void onRunningPoweredTick() {
-        //System.out.println("energy:"+this.batteries.getUniversalEnergyStored());
+        // System.out.println("energy:"+this.batteries.getUniversalEnergyStored());
 
         if (world.isRemote && !outOfFluid) {
             if (Minecraft.getMinecraft().gameSettings.particleSetting < 2) {
@@ -365,25 +855,32 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
                 for (int i = 0; i < 3; i++) {
 
-
                     if (radioButton.getOptionSelected() == 0) {
                         float xMot = (float) ((world.rand.nextGaussian()) / 40f);
                         float zMot = (float) ((world.rand.nextGaussian()) / 40f);
                         BlockPos offsetPos = pos.offset(dir);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 5, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() - 4, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() - 4, xMot, 0.02f, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() + 5, xMot, 0.02f, zMot);
+                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 5, pos.getY() + 7,
+                                offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
+                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() - 4, pos.getY() + 7,
+                                offsetPos.getZ() + 0.5, xMot, 0.02f, zMot);
+                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 0.5f,
+                                pos.getY() + 7, offsetPos.getZ() - 4, xMot, 0.02f, zMot);
+                        AdvancedRocketry.proxy.spawnParticle("rocketSmoke", world, offsetPos.getX() + 0.5f,
+                                pos.getY() + 7, offsetPos.getZ() + 5, xMot, 0.02f, zMot);
 
                     } else {
                         float xMot = (float) ((world.rand.nextGaussian()) / 4f);
                         float yMot = (float) (world.rand.nextGaussian() / 20f);
                         float zMot = (float) ((world.rand.nextGaussian()) / 4f);
                         BlockPos offsetPos = pos.offset(dir);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 5, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.4f + yMot, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() - 4, pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.4f + yMot, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() - 4, xMot, 0.4f + yMot, zMot);
-                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 0.5f, pos.getY() + 7, offsetPos.getZ() + 5, xMot, 0.4f + yMot, zMot);
+                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 5,
+                                pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.4f + yMot, zMot);
+                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() - 4,
+                                pos.getY() + 7, offsetPos.getZ() + 0.5, xMot, 0.4f + yMot, zMot);
+                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 0.5f,
+                                pos.getY() + 7, offsetPos.getZ() - 4, xMot, 0.4f + yMot, zMot);
+                        AdvancedRocketry.proxy.spawnParticle("rocketSmokeInverse", world, offsetPos.getX() + 0.5f,
+                                pos.getY() + 7, offsetPos.getZ() + 5, xMot, 0.4f + yMot, zMot);
                     }
                 }
             }
@@ -404,7 +901,8 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                 }
 
                 for (IFluidHandler handler : fluidInPorts) {
-                    FluidStack fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidNitrogen, requiredN2), true);
+                    FluidStack fStack = handler.drain(new FluidStack(AdvancedRocketryFluids.fluidNitrogen, requiredN2),
+                            true);
 
                     if (fStack != null)
                         requiredN2 -= fStack.amount;
@@ -414,7 +912,6 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                     if (fStack != null)
                         requiredO2 -= fStack.amount;
                 }
-
 
                 if (requiredN2 != 0 || requiredO2 != 0) {
                     setOOF(true);
@@ -427,15 +924,15 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         }
 
         if (!outOfFluid) {
-            /////////from the super method
+            ///////// from the super method
             if (!world.isRemote)
                 useEnergy(powerPerTick);
-            //Increment for both client and server
+            // Increment for both client and server
             currentTime++;
 
             if (currentTime == completionTime)
                 processComplete();
-            /////////from the super method
+            ///////// from the super method
         }
     }
 
@@ -450,14 +947,15 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
 
     @Override
     protected void playMachineSound(SoundEvent event) {
-        world.playSound(getPos().getX(), getPos().getY() + 7, getPos().getZ(), event, SoundCategory.BLOCKS, Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.BLOCKS), 0.975f + world.rand.nextFloat() * 0.05f, false);
+        world.playSound(getPos().getX(), getPos().getY() + 7, getPos().getZ(), event, SoundCategory.BLOCKS,
+                Minecraft.getMinecraft().gameSettings.getSoundLevel(SoundCategory.BLOCKS),
+                0.975f + world.rand.nextFloat() * 0.05f, false);
     }
 
     @Override
     public boolean isRunning() {
-
         boolean bool = getMachineEnabled() &&
-                //super.isRunning() &&
+                // super.isRunning() &&
                 zmaster587.advancedRocketry.api.ARConfiguration.getCurrentConfig().enableTerraforming;
 
         if (!bool)
@@ -469,12 +967,14 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     public void setOOF(boolean x) {
         if (!x && outOfFluid) {
             outOfFluid = false;
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                    this.world.getBlockState(this.pos), 3);
 
             System.out.println("s oof false");
         } else if (x && !outOfFluid) {
             outOfFluid = true;
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                    this.world.getBlockState(this.pos), 3);
 
             System.out.println("s oof true");
         }
@@ -483,26 +983,28 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     @Override
     public void setMachineRunning(boolean running) {
         super.setMachineRunning(running);
-        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
-
+        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos),
+                3);
     }
-
 
     @Override
     protected void processComplete() {
         super.processComplete();
         completionTime = getCompletionTime();
 
-        DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension());
-        if (!world.isRemote && properties != null && properties.getId() == world.provider.getDimension() && ((world.provider.getClass().equals(WorldProviderPlanet.class) &&
-                properties.isNativeDimension) || ARConfiguration.getCurrentConfig().allowTerraformNonAR)) {
+        DimensionProperties properties = DimensionManager.getInstance()
+                .getDimensionProperties(world.provider.getDimension());
+        if (!world.isRemote && properties != null && properties.getId() == world.provider.getDimension() &&
+                ((world.provider.getClass().equals(WorldProviderPlanet.class) &&
+                        properties.isNativeDimension) || ARConfiguration.getCurrentConfig().allowTerraformNonAR)) {
             if (buttonIncrease.getState() && properties.getAtmosphereDensity() < 1600) {
                 properties.setAtmosphereDensity(properties.getAtmosphereDensity() + 1);
                 if (buttonIncrease.getState() && properties.getAtmosphereDensity() >= 1600) {
                     this.setMachineEnabled(false);
                     this.setMachineRunning(false);
                     markDirty();
-                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                            this.world.getBlockState(this.pos), 3);
 
                 }
             }
@@ -512,7 +1014,8 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
                     this.setMachineEnabled(false);
                     this.setMachineRunning(false);
                     markDirty();
-                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+                    this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                            this.world.getBlockState(this.pos), 3);
 
                 }
             }
@@ -550,22 +1053,24 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
         super.useNetworkData(player, side, id, nbt);
-        if(!world.isRemote) {
+        if (!world.isRemote) {
             setOOF(false);
             markDirty();
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                    this.world.getBlockState(this.pos), 3);
 
         }
     }
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
-        //if (hasValidBiomeChanger()) {
+        // if (hasValidBiomeChanger()) {
         super.onInventoryButtonPressed(buttonId);
         if (buttonId == 1 || buttonId == 2) {
-            PacketHandler.sendToServer(new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()));
+            PacketHandler.sendToServer(
+                    new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.TOGGLE.ordinal()));
         }
-        //}
+        // }
     }
 
     @Override
@@ -573,7 +1078,7 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         super.writeNetworkData(nbt);
         nbt.setInteger("selected", radioButton.getOptionSelected());
         nbt.setBoolean("oofluid", outOfFluid);
-        System.out.println("write oof:"+outOfFluid);
+        System.out.println("write oof:" + outOfFluid);
     }
 
     @Override
@@ -581,11 +1086,11 @@ public class TileAtmosphereTerraformer extends TileMultiPowerConsumer implements
         super.readNetworkData(nbt);
         radioButton.setOptionSelected(nbt.getInteger("selected"));
         outOfFluid = nbt.getBoolean("oofluid");
-        System.out.println("oof:"+outOfFluid);
+        System.out.println("oof:" + outOfFluid);
 
-        if (world !=null && world.isRemote){
-            //if (!client_contructed)
-                //client_contructed = this.completeStructure(this.world.getBlockState(this.pos));
+        if (world != null && world.isRemote) {
+            // if (!client_contructed)
+            // client_contructed = this.completeStructure(this.world.getBlockState(this.pos));
 
             setText();
         }

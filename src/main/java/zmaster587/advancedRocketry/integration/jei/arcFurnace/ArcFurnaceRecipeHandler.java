@@ -1,11 +1,11 @@
 package zmaster587.advancedRocketry.integration.jei.arcFurnace;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import mezz.jei.api.recipe.IRecipeHandler;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import zmaster587.advancedRocketry.integration.jei.ARPlugin;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class ArcFurnaceRecipeHandler implements IRecipeHandler<ArcFurnaceWrapper> {
 
@@ -31,5 +31,4 @@ public class ArcFurnaceRecipeHandler implements IRecipeHandler<ArcFurnaceWrapper
     public boolean isRecipeValid(@Nullable ArcFurnaceWrapper recipe) {
         return true;
     }
-
 }

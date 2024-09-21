@@ -1,6 +1,5 @@
 package zmaster587.advancedRocketry.client.render.multiblocks;
 
-
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -10,7 +9,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.libVulpes.block.RotatableBlock;
@@ -42,23 +43,25 @@ public class RendererElectrolyser extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         GL11.glTranslated(x + 0.5, y, z + 0.5);
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
-        GL11.glRotatef((front.getFrontOffsetZ() == 1 ? 180 : 0) - front.getFrontOffsetX() * 90f, 0, 1, 0);
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
+        GL11.glRotatef((front.getZOffset() == 1 ? 180 : 0) - front.getXOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(1.5f, 0f, -0.5f);
 
         bindTexture(texture);
         model.renderAll();
 
-        //Lightning effect
+        // Lightning effect
 
         if (multiBlockTile.isRunning()) {
             BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
             double width = 0.01;
 
-            //Isn't precision fun?
+            // Isn't precision fun?
             double ySkew = 0.1 * MathHelper.sin((tile.getWorld().getTotalWorldTime() & 0xffff) * 2f);
             double xSkew = 0.1 * MathHelper.sin((200 + tile.getWorld().getTotalWorldTime() & 0xffff) * 3f);
             double yPos = 1.4;
@@ -76,20 +79,22 @@ public class RendererElectrolyser extends TileEntitySpecialRenderer {
             double zMax = 1;
             RenderHelper.renderCrossXZ(buffer, width, xMin, yPos, zMin, xMax, yPos + ySkew, zMax + xSkew);
 
-            //tess.addVertex(xMin, yMax, zMin);
-            //tess.addVertex(xMax, yMax + ySkew, zMin);
-            //tess.addVertex(xMax, yMin + ySkew, zMin);
-            //tess.addVertex(xMin, yMin, zMin);
+            // tess.addVertex(xMin, yMax, zMin);
+            // tess.addVertex(xMax, yMax + ySkew, zMin);
+            // tess.addVertex(xMax, yMin + ySkew, zMin);
+            // tess.addVertex(xMin, yMin, zMin);
 
             xMax += 0.15;
             xMin += 0.15;
 
-            RenderHelper.renderCrossXZ(buffer, width, xMin, yPos + ySkew, zMin + xSkew, xMax, yPos - ySkew, zMax - xSkew);
+            RenderHelper.renderCrossXZ(buffer, width, xMin, yPos + ySkew, zMin + xSkew, xMax, yPos - ySkew,
+                    zMax - xSkew);
 
             xMax += 0.15;
             xMin += 0.15;
 
-            RenderHelper.renderCrossXZ(buffer, width, xMin, yPos - ySkew, zMin - xSkew, xMax, yPos + ySkew, zMax + xSkew);
+            RenderHelper.renderCrossXZ(buffer, width, xMin, yPos - ySkew, zMin - xSkew, xMax, yPos + ySkew,
+                    zMax + xSkew);
 
             xMax += 0.15;
             xMin += 0.15;
@@ -105,5 +110,4 @@ public class RendererElectrolyser extends TileEntitySpecialRenderer {
         }
         GL11.glPopMatrix();
     }
-
 }

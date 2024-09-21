@@ -1,20 +1,22 @@
 package zmaster587.advancedRocketry.advancements;
 
+import java.util.*;
 
-import com.google.common.collect.Maps;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.advancements.critereon.AbstractCriterionInstance;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.ResourceLocation;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
+import com.google.common.collect.Maps;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
 
 public class CustomTrigger implements ICriterionTrigger {
+
     private final ResourceLocation ID;
     private final Map<PlayerAdvancements, Listeners> listeners = Maps.newHashMap();
 
@@ -28,7 +30,9 @@ public class CustomTrigger implements ICriterionTrigger {
         ID = parRL;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see net.minecraft.advancements.ICriterionTrigger#getId()
      */
     @Override
@@ -37,8 +41,11 @@ public class CustomTrigger implements ICriterionTrigger {
         return ID;
     }
 
-    /* (non-Javadoc)
-     * @see net.minecraft.advancements.ICriterionTrigger#addListener(net.minecraft.advancements.PlayerAdvancements, net.minecraft.advancements.ICriterionTrigger.Listener)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see net.minecraft.advancements.ICriterionTrigger#addListener(net.minecraft.advancements.PlayerAdvancements,
+     * net.minecraft.advancements.ICriterionTrigger.Listener)
      */
     @Override
     @ParametersAreNonnullByDefault
@@ -53,8 +60,11 @@ public class CustomTrigger implements ICriterionTrigger {
         tameAnimalTrigger$listeners.add(listener);
     }
 
-    /* (non-Javadoc)
-     * @see net.minecraft.advancements.ICriterionTrigger#removeListener(net.minecraft.advancements.PlayerAdvancements, net.minecraft.advancements.ICriterionTrigger.Listener)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see net.minecraft.advancements.ICriterionTrigger#removeListener(net.minecraft.advancements.PlayerAdvancements,
+     * net.minecraft.advancements.ICriterionTrigger.Listener)
      */
     @Override
     @ParametersAreNonnullByDefault
@@ -70,8 +80,11 @@ public class CustomTrigger implements ICriterionTrigger {
         }
     }
 
-    /* (non-Javadoc)
-     * @see net.minecraft.advancements.ICriterionTrigger#removeAllListeners(net.minecraft.advancements.PlayerAdvancements)
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * net.minecraft.advancements.ICriterionTrigger#removeAllListeners(net.minecraft.advancements.PlayerAdvancements)
      */
     @Override
     public void removeAllListeners(@Nonnull PlayerAdvancements playerAdvancementsIn) {
@@ -124,6 +137,7 @@ public class CustomTrigger implements ICriterionTrigger {
     }
 
     static class Listeners {
+
         private final PlayerAdvancements playerAdvancements;
         private final Set<ICriterionTrigger.Listener> listeners = new HashSet<>();
 

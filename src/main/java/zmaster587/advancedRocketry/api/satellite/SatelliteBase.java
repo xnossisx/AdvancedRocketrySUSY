@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.api.satellite;
 
-import io.netty.buffer.ByteBuf;
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
@@ -9,20 +10,20 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.ISatelliteIdItem;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.libVulpes.util.UniversalBattery;
 
-import javax.annotation.Nonnull;
-
 public abstract class SatelliteBase {
 
     protected SatelliteProperties satelliteProperties;
-    //Will always be of type ItemSatellite
+    // Will always be of type ItemSatellite
     protected ItemStack satellite;
-    //Satellite energy storage
+    // Satellite energy storage
     protected UniversalBattery battery;
     private int dimId = Constants.INVALID_PLANET;
     private boolean isDead;
@@ -33,13 +34,15 @@ public abstract class SatelliteBase {
         isDead = false;
         satellite = ItemStack.EMPTY;
 
-        //Satellite energy storage
+        // Satellite energy storage
         battery = new UniversalBattery(this.satelliteProperties.getPowerStorage());
     }
 
     public boolean acceptsItemInConstruction(@Nonnull ItemStack item) {
         int flag = SatelliteRegistry.getSatelliteProperty(item).getPropertyFlag();
-        return SatelliteProperties.Property.MAIN.isOfType(flag) || SatelliteProperties.Property.POWER_GEN.isOfType(flag) || SatelliteProperties.Property.BATTERY.isOfType(flag);
+        return SatelliteProperties.Property.MAIN.isOfType(flag) ||
+                SatelliteProperties.Property.POWER_GEN.isOfType(flag) ||
+                SatelliteProperties.Property.BATTERY.isOfType(flag);
     }
 
     /**
@@ -57,7 +60,7 @@ public abstract class SatelliteBase {
     public abstract String getName();
 
     /**
-     * Actually does something with the satellite.  Normally called when the player rightclicks the master block
+     * Actually does something with the satellite. Normally called when the player rightclicks the master block
      *
      * @param player interacting with the satellite
      * @param world
@@ -109,7 +112,8 @@ public abstract class SatelliteBase {
      * called every tick if satellite can tick
      */
     public void tickEntity() {
-        //Base power consumption is 1 energy per tick. Think of it like a communications & positioning upkeep amount. Some satellites may end up overriding this
+        // Base power consumption is 1 energy per tick. Think of it like a communications & positioning upkeep amount.
+        // Some satellites may end up overriding this
         battery.acceptEnergy(getPowerPerTick() - 1, false);
     }
 
@@ -164,14 +168,14 @@ public abstract class SatelliteBase {
     public void setDimensionId(World world) {
         int newId = world.provider.getDimension();
         if (dimId != Constants.INVALID_PLANET) {
-            //TODO: handle dim change
+            // TODO: handle dim change
         }
         dimId = newId;
     }
 
     public void setDimensionId(int world) {
         if (dimId != Constants.INVALID_PLANET) {
-            //TODO: handle dim change
+            // TODO: handle dim change
         }
         dimId = world;
     }
@@ -189,11 +193,10 @@ public abstract class SatelliteBase {
         battery.writeToNBT(nbt);
 
         NBTTagCompound itemNBT = new NBTTagCompound();
-        //Transition
+        // Transition
         if (!satellite.isEmpty())
             satellite.writeToNBT(itemNBT);
         nbt.setTag("item", itemNBT);
-
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
@@ -207,37 +210,25 @@ public abstract class SatelliteBase {
         }
     }
 
-    public void writeDataToNetwork(ByteBuf out, byte packetId) {
+    public void writeDataToNetwork(ByteBuf out, byte packetId) {}
 
-    }
-
-    public void readDataToNetwork(byte packetId, ByteBuf in) {
-
-    }
+    public void readDataToNetwork(byte packetId, ByteBuf in) {}
 
     public void useNetworkData(EntityPlayer player, Side client, byte packetId,
-                               NBTTagCompound nbt) {
+                               NBTTagCompound nbt) {}
 
-    }
-
-    //Server Syncing stuff
-    //Used if the satellite needs to sync in a modularGUI
+    // Server Syncing stuff
+    // Used if the satellite needs to sync in a modularGUI
 
     public int numberChangesToSend() {
         return 0;
     }
 
-    public void onChangeReceived(int slot, int value) {
-
-    }
+    public void onChangeReceived(int slot, int value) {}
 
     public boolean isUpdateRequired(int localId) {
         return false;
     }
 
-    public void sendChanges(Container container, IContainerListener crafter, int variableId, int localId) {
-
-    }
-
-
+    public void sendChanges(Container container, IContainerListener crafter, int variableId, int localId) {}
 }

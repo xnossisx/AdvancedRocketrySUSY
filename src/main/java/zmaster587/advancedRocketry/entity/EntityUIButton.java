@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.station.TileHolographicPlanetSelector;
 
 public class EntityUIButton extends EntityUIPlanet {
@@ -26,7 +27,6 @@ public class EntityUIButton extends EntityUIPlanet {
         this.dataManager.register(planetID, id);
         this.dataManager.register(scale, 1f);
         this.dataManager.register(selected, false);
-
     }
 
     @Override

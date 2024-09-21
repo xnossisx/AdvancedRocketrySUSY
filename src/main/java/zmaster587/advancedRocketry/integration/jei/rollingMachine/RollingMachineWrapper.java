@@ -8,5 +8,4 @@ public class RollingMachineWrapper extends MachineRecipe {
     RollingMachineWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

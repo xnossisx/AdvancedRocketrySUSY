@@ -1,17 +1,19 @@
 package zmaster587.advancedRocketry.cable;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
-import zmaster587.libVulpes.api.IUniversalEnergy;
-import zmaster587.libVulpes.util.UniversalBattery;
-
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
+
+import zmaster587.libVulpes.api.IUniversalEnergy;
+import zmaster587.libVulpes.util.UniversalBattery;
+
 public class EnergyNetwork extends CableNetwork implements IUniversalEnergy {
+
     /**
      * Create a new network and get an ID
      *
@@ -42,7 +44,7 @@ public class EnergyNetwork extends CableNetwork implements IUniversalEnergy {
 
     @Override
     public boolean merge(CableNetwork cableNetwork) {
-        //Try not to lose power
+        // Try not to lose power
         if (super.merge(cableNetwork)) {
             battery.acceptEnergy(((EnergyNetwork) cableNetwork).battery.getUniversalEnergyStored(), false);
             return true;
@@ -51,16 +53,15 @@ public class EnergyNetwork extends CableNetwork implements IUniversalEnergy {
         return false;
     }
 
-    //TODO: balance tanks
+    // TODO: balance tanks
     @Override
     public void tick() {
         int amount = 1000;
-        //Return if there is nothing to do
+        // Return if there is nothing to do
         if (sinks.isEmpty() || (sources.isEmpty() && battery.getUniversalEnergyStored() == 0))
             return;
 
-
-        //Go through all sinks, if one is not full attempt to fill it
+        // Go through all sinks, if one is not full attempt to fill it
 
         int demand = 0;
         int supply = battery.getUniversalEnergyStored();
@@ -68,7 +69,7 @@ public class EnergyNetwork extends CableNetwork implements IUniversalEnergy {
         Iterator<Entry<TileEntity, EnumFacing>> sourceItr = sources.iterator();
 
         while (sinkItr.hasNext()) {
-            //Get tile and key
+            // Get tile and key
             Entry<TileEntity, EnumFacing> obj = sinkItr.next();
             IEnergyStorage dataHandlerSink = obj.getKey().getCapability(CapabilityEnergy.ENERGY, obj.getValue());
 
@@ -76,7 +77,7 @@ public class EnergyNetwork extends CableNetwork implements IUniversalEnergy {
         }
 
         while (sourceItr.hasNext()) {
-            //Get tile and key
+            // Get tile and key
             Entry<TileEntity, EnumFacing> obj = sourceItr.next();
             IEnergyStorage dataHandlerSink = obj.getKey().getCapability(CapabilityEnergy.ENERGY, obj.getValue());
 
@@ -88,21 +89,19 @@ public class EnergyNetwork extends CableNetwork implements IUniversalEnergy {
         sinkItr = sinks.iterator();
         while (sinkItr.hasNext()) {
 
-
-            //Get tile and key
+            // Get tile and key
             Entry<TileEntity, EnumFacing> obj = sinkItr.next();
             IEnergyStorage dataHandlerSink = obj.getKey().getCapability(CapabilityEnergy.ENERGY, obj.getValue());
-
 
             amountToMove -= dataHandlerSink.receiveEnergy(amountToMove, false);
         }
 
-        //Try to drain internal buffer first
+        // Try to drain internal buffer first
         amountMoved -= battery.extractEnergy(amountMoved, false);
 
         sourceItr = sources.iterator();
         while (sourceItr.hasNext()) {
-            //Get tile and key
+            // Get tile and key
             Entry<TileEntity, EnumFacing> obj = sourceItr.next();
             IEnergyStorage dataHandlerSink = obj.getKey().getCapability(CapabilityEnergy.ENERGY, obj.getValue());
 
@@ -111,9 +110,7 @@ public class EnergyNetwork extends CableNetwork implements IUniversalEnergy {
     }
 
     @Override
-    public void setEnergyStored(int amt) {
-
-    }
+    public void setEnergyStored(int amt) {}
 
     @Override
     public int extractEnergy(int amt, boolean simulate) {
@@ -131,9 +128,7 @@ public class EnergyNetwork extends CableNetwork implements IUniversalEnergy {
     }
 
     @Override
-    public void setMaxEnergyStored(int max) {
-
-    }
+    public void setMaxEnergyStored(int max) {}
 
     @Override
     public int acceptEnergy(int amt, boolean simulate) {

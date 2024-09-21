@@ -1,25 +1,5 @@
 package zmaster587.advancedRocketry.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import net.minecraft.block.Block;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
-import zmaster587.advancedRocketry.api.ARConfiguration;
-import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
-import zmaster587.advancedRocketry.block.BlockFuelTank;
-import zmaster587.advancedRocketry.block.BlockPressurizedFluidTank;
-import zmaster587.advancedRocketry.block.BlockRocketMotor;
-import zmaster587.advancedRocketry.tile.TileGuidanceComputer;
-import zmaster587.advancedRocketry.tile.hatch.TileSatelliteHatch;
-import zmaster587.libVulpes.block.BlockTile;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -28,7 +8,27 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
+
+import zmaster587.advancedRocketry.api.ARConfiguration;
+import zmaster587.advancedRocketry.block.BlockBipropellantRocketMotor;
+import zmaster587.advancedRocketry.block.BlockFuelTank;
+import zmaster587.advancedRocketry.block.BlockPressurizedFluidTank;
+import zmaster587.advancedRocketry.block.BlockRocketMotor;
+
 public enum WeightEngine {
+
     INSTANCE("config/advRocketry/weights.json");
 
     private final String file;
@@ -40,7 +40,7 @@ public enum WeightEngine {
     }
 
     public float getWeight(ItemStack stack) {
-        if (stack.isEmpty() || stack.getItem().getRegistryName()==null) {
+        if (stack.isEmpty() || stack.getItem().getRegistryName() == null) {
             return 0;
         }
         double weight = weights.getOrDefault(stack.getItem().getRegistryName().toString(), -1.0) * stack.getCount();
@@ -55,30 +55,30 @@ public enum WeightEngine {
         double pressureTankWeight = 5;
         double satelliteHatchWeight = 5;
 
-            if (stack.getItem() instanceof ItemBlock) {
-                Block block = ((ItemBlock) stack.getItem()).getBlock();
+        if (stack.getItem() instanceof ItemBlock) {
+            Block block = ((ItemBlock) stack.getItem()).getBlock();
 
-                if (block instanceof BlockFuelTank){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) tankWeight);
-                    return (float) tankWeight;
-                }
-                if (block instanceof BlockRocketMotor || block instanceof BlockBipropellantRocketMotor){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) motorWeight);
-                    return (float) motorWeight;
-                }
-                if (block instanceof BlockPressurizedFluidTank){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) pressureTankWeight);
-                    return (float) pressureTankWeight;
-                }
-                if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:guidancecomputer")){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) guidanceComputerWeight);
-                    return (float) guidanceComputerWeight;
-                }
-                if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:loader")){
-                    weights.put(stack.getItem().getRegistryName().toString(), (double) satelliteHatchWeight);
-                    return (float) satelliteHatchWeight;
-                }
+            if (block instanceof BlockFuelTank) {
+                weights.put(stack.getItem().getRegistryName().toString(), (double) tankWeight);
+                return (float) tankWeight;
             }
+            if (block instanceof BlockRocketMotor || block instanceof BlockBipropellantRocketMotor) {
+                weights.put(stack.getItem().getRegistryName().toString(), (double) motorWeight);
+                return (float) motorWeight;
+            }
+            if (block instanceof BlockPressurizedFluidTank) {
+                weights.put(stack.getItem().getRegistryName().toString(), (double) pressureTankWeight);
+                return (float) pressureTankWeight;
+            }
+            if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:guidancecomputer")) {
+                weights.put(stack.getItem().getRegistryName().toString(), (double) guidanceComputerWeight);
+                return (float) guidanceComputerWeight;
+            }
+            if (stack.getItem().getRegistryName().toString().equals("advancedrocketry:loader")) {
+                weights.put(stack.getItem().getRegistryName().toString(), (double) satelliteHatchWeight);
+                return (float) satelliteHatchWeight;
+            }
+        }
 
         weights.put(stack.getItem().getRegistryName().toString(), 0.1);
         return 0.1F;
@@ -94,8 +94,7 @@ public enum WeightEngine {
     }
 
     public float getTEWeight(TileEntity te) {
-
-        if(!ARConfiguration.getCurrentConfig().advancedWeightSystemInventories) return 0;
+        if (!ARConfiguration.getCurrentConfig().advancedWeightSystemInventories) return 0;
 
         float weight = 0;
 

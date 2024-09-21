@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.block;
 
+import java.util.Random;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -10,21 +12,18 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.advancements.ARAdvancements;
-import zmaster587.advancedRocketry.tile.multiblock.TileAtmosphereTerraformer;
 import zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill.TileOrbitalLaserDrill;
 import zmaster587.libVulpes.block.multiblock.BlockMultiblockMachine;
 import zmaster587.libVulpes.inventory.GuiHandler;
-
-import java.util.Random;
 
 public class BlockOrbitalLaserDrill extends BlockMultiblockMachine {
 
     public BlockOrbitalLaserDrill() {
         super(TileOrbitalLaserDrill.class, GuiHandler.guiId.MODULAR.ordinal());
-        setTickRandomly(true).setUnlocalizedName("spaceLaser");
+        setTickRandomly(true).setTranslationKey("spaceLaser");
     }
-
 
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
@@ -36,16 +35,16 @@ public class BlockOrbitalLaserDrill extends BlockMultiblockMachine {
         return true;
     }
 
-    //can happen when lever is flipped... Update the state of the tile
+    // can happen when lever is flipped... Update the state of the tile
     @Override
     public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
         if (!(world.getTileEntity(neighbor) instanceof TileOrbitalLaserDrill))
             ((TileOrbitalLaserDrill) world.getTileEntity(pos)).checkCanRun();
     }
 
-
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
+                                    EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         boolean r = super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
         if (!worldIn.isRemote) {
             if (worldIn.getTileEntity(pos) instanceof TileOrbitalLaserDrill) {
@@ -65,18 +64,16 @@ public class BlockOrbitalLaserDrill extends BlockMultiblockMachine {
     }
 
     @Override
-    public void onBlockDestroyedByExplosion(World worldIn, BlockPos pos, Explosion explosionIn) {
-        super.onBlockDestroyedByExplosion(worldIn, pos, explosionIn);
+    public void onBlockExploded(World worldIn, BlockPos pos, Explosion explosionIn) {
+        super.onBlockExploded(worldIn, pos, explosionIn);
         if (worldIn.getTileEntity(pos) instanceof TileOrbitalLaserDrill)
             ((TileOrbitalLaserDrill) worldIn.getTileEntity(pos)).onDestroy();
     }
 
-    //To check if the laser is jammed
+    // To check if the laser is jammed
     @Override
     public void updateTick(World worldIn, BlockPos pos, IBlockState state,
                            Random rand) {
         super.updateTick(worldIn, pos, state, rand);
-
-
     }
 }

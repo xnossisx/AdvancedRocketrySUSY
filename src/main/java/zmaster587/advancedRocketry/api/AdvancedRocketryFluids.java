@@ -1,15 +1,17 @@
 package zmaster587.advancedRocketry.api;
 
-import net.minecraftforge.fluids.Fluid;
-import zmaster587.advancedRocketry.util.FluidGasGiantGas;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import net.minecraftforge.fluids.Fluid;
+
+import zmaster587.advancedRocketry.util.FluidGasGiantGas;
 
 /**
  * Stores AdvancedRocketry Fluids
  */
 public class AdvancedRocketryFluids {
+
     public static Fluid fluidOxygen;
     public static Fluid fluidHydrogen;
     public static Fluid fluidRocketFuel;

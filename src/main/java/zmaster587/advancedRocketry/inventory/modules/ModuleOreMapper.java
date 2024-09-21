@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.inventory.modules;
 
+import java.nio.IntBuffer;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -12,14 +16,13 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.client.render.ClientDynamicTexture;
 import zmaster587.advancedRocketry.satellite.SatelliteOreMapping;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.render.RenderHelper;
-
-import javax.annotation.Nonnull;
-import java.nio.IntBuffer;
 
 @SideOnly(Side.CLIENT)
 public class ModuleOreMapper extends ModuleBase {
@@ -28,7 +31,8 @@ public class ModuleOreMapper extends ModuleBase {
     private static final int MAXZOOM = 128;
     private static final int MAXRADIUS = 16;
     private static final int FANCYSCANMAXSIZE = 57;
-    private static final ResourceLocation backdrop = new ResourceLocation("advancedrocketry", "textures/gui/VideoSatallite.png");
+    private static final ResourceLocation backdrop = new ResourceLocation("advancedrocketry",
+            "textures/gui/VideoSatallite.png");
     TileEntity masterConsole;
     private ClientDynamicTexture texture;
     private Thread currentMapping;
@@ -45,8 +49,9 @@ public class ModuleOreMapper extends ModuleBase {
     private int[][] oreMap;
     private World world;
     private SatelliteOreMapping satellite;
-    //Create separate thread to do this because it takes a while!
+    // Create separate thread to do this because it takes a while!
     Runnable mapper = new Runnable() {
+
         @Override
         public void run() {
             oreMap = satellite.scanChunk(world, xCenter, zCenter, scanSize / 2, radius, zoomScale);
@@ -76,13 +81,13 @@ public class ModuleOreMapper extends ModuleBase {
         if (prevSlot == -1) {
             currentMapping = new Thread(mapper);
         } else {
-            //currentMapping = new Thread(new ItemMapper(inventorySlots.getSlot(prevSlot).getStack()));//TODO
+            // currentMapping = new Thread(new ItemMapper(inventorySlots.getSlot(prevSlot).getStack()));//TODO
         }
         currentMapping.setName("Ore Scan");
         currentMapping.start();
     }
 
-    //Reset the texture and prevent memory leaks
+    // Reset the texture and prevent memory leaks
     private void resetTexture() {
         GL11.glDeleteTextures(texture.getTextureId());
         texture = new ClientDynamicTexture(Math.max(scanSize / radius, 1), Math.max(scanSize / radius, 1));
@@ -96,7 +101,7 @@ public class ModuleOreMapper extends ModuleBase {
 
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
 
-        //Draw fancy things
+        // Draw fancy things
         GlStateManager.disableTexture2D();
         buffer.color(0f, 0.8f, 0f, 1f);
         buffer.begin(GL11.GL_QUADS, buffer.getVertexFormat());
@@ -113,18 +118,17 @@ public class ModuleOreMapper extends ModuleBase {
         buffer.pos(-21, 81 - fancyScanOffset + FANCYSCANMAXSIZE, zLevel).endVertex();
         buffer.finishDrawing();
 
-
         GlStateManager.enableBlend();
 
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_DST_ALPHA);
-        buffer.color(0.5f, 0.5f, 0.0f, 0.3f + ((float) Math.sin(Math.PI * (fancyScanOffset / (float) FANCYSCANMAXSIZE)) / 3f));
+        buffer.color(0.5f, 0.5f, 0.0f,
+                0.3f + ((float) Math.sin(Math.PI * (fancyScanOffset / (float) FANCYSCANMAXSIZE)) / 3f));
         buffer.begin(GL11.GL_QUADS, buffer.getVertexFormat());
         RenderHelper.renderNorthFace(buffer, zLevel, 173, 82, 194, 141);
         buffer.finishDrawing();
 
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();
-
 
         if (world.getTotalWorldTime() - prevWorldTickTime >= 1) {
             prevWorldTickTime = world.getTotalWorldTime();
@@ -134,8 +138,7 @@ public class ModuleOreMapper extends ModuleBase {
                 fancyScanOffset++;
         }
 
-
-        //If a slot is selected draw an indicator
+        // If a slot is selected draw an indicator
         int slot;
         if ((slot = satellite.getSelectedSlot()) != -1) {
 
@@ -143,7 +146,8 @@ public class ModuleOreMapper extends ModuleBase {
             GL11.glColor3f(0f, 0.8f, 0f);
 
             buffer.begin(GL11.GL_QUADS, buffer.getVertexFormat());
-            RenderHelper.renderNorthFaceWithUV(buffer, zLevel, 13 + (18 * slot), 155, 13 + 16 + (18 * slot), 155 + 16, 0, 1, 0, 1);
+            RenderHelper.renderNorthFaceWithUV(buffer, zLevel, 13 + (18 * slot), 155, 13 + 16 + (18 * slot), 155 + 16,
+                    0, 1, 0, 1);
             buffer.finishDrawing();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
         }
@@ -154,8 +158,7 @@ public class ModuleOreMapper extends ModuleBase {
                                  int mouseY, FontRenderer font) {
         super.renderBackground(gui, x, y, mouseX, mouseY, font);
 
-
-        //If the scan is done then
+        // If the scan is done then
         if (merged) {
             IntBuffer buffer = texture.getByteBuffer();
             int scanWidth = Math.max(scanSize / radius, 1);
@@ -168,29 +171,27 @@ public class ModuleOreMapper extends ModuleBase {
             merged = false;
         }
 
-
-        //Render the background then render
+        // Render the background then render
         GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
         Minecraft.getMinecraft().renderEngine.bindTexture(backdrop);
         gui.drawTexturedModalRect(x, y, 0, 0, 240, 192);
 
-
-        //NOTE: if the controls are rendered first the display never shows up
-        //Draw the actual display
+        // NOTE: if the controls are rendered first the display never shows up
+        // Draw the actual display
         int zLevel = 100;
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture.getTextureId());
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
         buffer.begin(GL11.GL_QUADS, buffer.getVertexFormat());
-        RenderHelper.renderNorthFaceWithUV(buffer, zLevel, 47 + x, 20 + y, 47 + x + SCREEN_SIZE, 20 + y + SCREEN_SIZE, 0, 1, 0, 1);
+        RenderHelper.renderNorthFaceWithUV(buffer, zLevel, 47 + x, 20 + y, 47 + x + SCREEN_SIZE, 20 + y + SCREEN_SIZE,
+                0, 1, 0, 1);
         buffer.finishDrawing();
 
-
-        //Render sliders and controls
+        // Render sliders and controls
         Minecraft.getMinecraft().renderEngine.bindTexture(backdrop);
 
         gui.drawTexturedModalRect(197 + x, 31 + y, 0, 192, 32, 14);
 
-        //TODO replace with thing
+        // TODO replace with thing
 
         gui.drawString(font, "Zoom", 198 + x, 22 + y, 0xF0F0F0);
 
@@ -200,12 +201,13 @@ public class ModuleOreMapper extends ModuleBase {
         gui.drawString(font, String.valueOf(mouseValue), 6 + x, 79 + y, 0xF0F0F0);
     }
 
-    //Create separate thread to do this because it takes a while!
+    // Create separate thread to do this because it takes a while!
     class ItemMapper implements Runnable {
+
         private ItemStack myBlock;
 
         ItemMapper(@Nonnull ItemStack block) {
-            //Copy so we don't have any possible CME or oddness due to that
+            // Copy so we don't have any possible CME or oddness due to that
             myBlock = block.copy();
         }
 
@@ -215,5 +217,4 @@ public class ModuleOreMapper extends ModuleBase {
             merged = oreMap != null;
         }
     }
-
 }

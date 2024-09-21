@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.backwardCompat;
 
 public class TextureCoordinate {
+
     public float u, v, w;
 
     public TextureCoordinate(float u, float v) {

@@ -1,23 +1,26 @@
 package zmaster587.advancedRocketry.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-import zmaster587.advancedRocketry.AdvancedRocketry;
+import java.io.File;
+import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+
+import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
+
+import zmaster587.advancedRocketry.AdvancedRocketry;
 
 public class XMLAsteroidLoader {
 
@@ -29,12 +32,12 @@ public class XMLAsteroidLoader {
 
     @Nonnull
     public static ItemStack getStack(String text) {
-        //Backwards compat, " " used to be the delimiter
+        // Backwards compat, " " used to be the delimiter
         String[] splitStr = text.contains(";") ? text.split(";") : text.split(" ");
 
         int meta = 0;
         int size = 1;
-        //format: "name;meta;size"
+        // format: "name;meta;size"
         if (splitStr.length > 1) {
             try {
                 meta = Integer.parseInt(splitStr[1].trim());
@@ -150,7 +153,8 @@ public class XMLAsteroidLoader {
                     try {
                         asteroid.richnessVariability = Float.parseFloat(node.getTextContent());
                     } catch (NumberFormatException e) {
-                        AdvancedRocketry.logger.warn("Asteroid " + asteroid.ID + " has invalid richnessVariability value");
+                        AdvancedRocketry.logger
+                                .warn("Asteroid " + asteroid.ID + " has invalid richnessVariability value");
                     }
                 }
 
@@ -179,7 +183,8 @@ public class XMLAsteroidLoader {
                     if (!stack.isEmpty())
                         asteroid.baseStack = (stack);
                     else {
-                        AdvancedRocketry.logger.warn("Asteroid " + asteroid.ID + " has invalid baseStack: " + node.getTextContent());
+                        AdvancedRocketry.logger
+                                .warn("Asteroid " + asteroid.ID + " has invalid baseStack: " + node.getTextContent());
                     }
                 } else
                     asteroid.baseStack = new ItemStack(Blocks.COBBLESTONE);
@@ -187,7 +192,8 @@ public class XMLAsteroidLoader {
             Node asteroidNode = childNode.getFirstChild();
 
             while (asteroidNode != null) {
-                if (asteroidNode.getNodeType() != Node.ELEMENT_NODE || !asteroidNode.getNodeName().equalsIgnoreCase("ore")) {
+                if (asteroidNode.getNodeType() != Node.ELEMENT_NODE ||
+                        !asteroidNode.getNodeName().equalsIgnoreCase("ore")) {
                     asteroidNode = asteroidNode.getNextSibling();
                     continue;
                 }
@@ -195,7 +201,7 @@ public class XMLAsteroidLoader {
                 if (asteroidNode.getNodeName().equalsIgnoreCase("ore")) {
                     NamedNodeMap att = asteroidNode.getAttributes();
 
-                    //Add itemStacks
+                    // Add itemStacks
                     Node nodeStack = att.getNamedItem("itemStack");
                     Node nodeChance = att.getNamedItem("chance");
                     if (nodeStack != null && nodeChance != null) {
@@ -203,8 +209,9 @@ public class XMLAsteroidLoader {
                         if (!stack.isEmpty())
                             asteroid.itemStacks.add(stack);
                         else {
-                            AdvancedRocketry.logger.warn("Asteroid " + asteroid.ID + " has invalid ore: " + nodeStack.getTextContent());
-                            //Don't need to remove anything here
+                            AdvancedRocketry.logger.warn(
+                                    "Asteroid " + asteroid.ID + " has invalid ore: " + nodeStack.getTextContent());
+                            // Don't need to remove anything here
                             asteroidNode = asteroidNode.getNextSibling();
                             continue;
                         }
@@ -212,14 +219,16 @@ public class XMLAsteroidLoader {
                         try {
                             asteroid.stackProbabilities.add(Float.parseFloat(nodeChance.getTextContent()));
                         } catch (NumberFormatException e) {
-                            AdvancedRocketry.logger.warn("Asteroid " + asteroid.ID + " has invalid stack probability: " + nodeChance.getTextContent());
-                            //Make sure the list size syncs
+                            AdvancedRocketry.logger.warn("Asteroid " + asteroid.ID +
+                                    " has invalid stack probability: " + nodeChance.getTextContent());
+                            // Make sure the list size syncs
                             asteroid.itemStacks.remove(asteroid.itemStacks.size() - 1);
                             asteroidNode = asteroidNode.getNextSibling();
                             continue;
                         }
                     } else
-                        AdvancedRocketry.logger.warn("Asteroid " + asteroid.ID + " expected 'itemStack' and 'chance' tags, at least one is missing");
+                        AdvancedRocketry.logger.warn("Asteroid " + asteroid.ID +
+                                " expected 'itemStack' and 'chance' tags, at least one is missing");
                 }
 
                 asteroidNode = asteroidNode.getNextSibling();

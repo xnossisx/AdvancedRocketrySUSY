@@ -8,5 +8,4 @@ public class ElectrolyzerWrapper extends MachineRecipe {
     ElectrolyzerWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

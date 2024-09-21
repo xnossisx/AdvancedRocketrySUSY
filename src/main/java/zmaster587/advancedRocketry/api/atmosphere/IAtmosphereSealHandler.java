@@ -1,10 +1,10 @@
 package zmaster587.advancedRocketry.api.atmosphere;
 
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-
-import java.util.List;
 
 /**
  * Interface used to talk to the internal seal handler for advanced rocketry.
@@ -17,6 +17,7 @@ import java.util.List;
  * Created by Dark(DarkGuardsman, Robert) on 1/6/2016.
  */
 public interface IAtmosphereSealHandler {
+
     /**
      * Checks if a block can be used to seal a room for the blob
      *

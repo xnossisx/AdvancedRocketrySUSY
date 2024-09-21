@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.item.components;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.EntityLivingBase;
@@ -15,15 +19,13 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.capability.TankCapabilityItemStack;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IArmorComponent;
 import zmaster587.libVulpes.client.ResourceIcon;
 import zmaster587.libVulpes.items.ItemIngredient;
 import zmaster587.libVulpes.util.FluidUtils;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 public class ItemPressureTank extends ItemIngredient implements IArmorComponent {
 
@@ -52,9 +54,7 @@ public class ItemPressureTank extends ItemIngredient implements IArmorComponent 
 
     @Override
     public void onTick(World world, EntityPlayer player, @Nonnull ItemStack armorStack, IInventory inv,
-                       @Nonnull ItemStack componentStack) {
-
-    }
+                       @Nonnull ItemStack componentStack) {}
 
     @Override
     public boolean onComponentAdded(World world, @Nonnull ItemStack armorStack) {
@@ -62,15 +62,11 @@ public class ItemPressureTank extends ItemIngredient implements IArmorComponent 
     }
 
     @Override
-    public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {
-
-    }
+    public void onComponentRemoved(World world, @Nonnull ItemStack armorStack) {}
 
     @Override
     public void onArmorDamaged(EntityLivingBase entity, @Nonnull ItemStack armorStack,
-                               @Nonnull ItemStack componentStack, DamageSource source, int damage) {
-
-    }
+                               @Nonnull ItemStack componentStack, DamageSource source, int damage) {}
 
     public int getCapacity(@Nonnull ItemStack container) {
         return capacity * (int) Math.pow(2, container.getItemDamage());
@@ -88,14 +84,13 @@ public class ItemPressureTank extends ItemIngredient implements IArmorComponent 
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void renderScreen(@Nonnull ItemStack componentStack, List<ItemStack> modules, RenderGameOverlayEvent event, Gui gui) {
+    public void renderScreen(@Nonnull ItemStack componentStack, List<ItemStack> modules, RenderGameOverlayEvent event,
+                             Gui gui) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public ICapabilityProvider initCapabilities(@Nonnull ItemStack stack, NBTTagCompound nbt) {
         return new TankCapabilityItemStack(stack, getCapacity(stack));
     }
-
 }

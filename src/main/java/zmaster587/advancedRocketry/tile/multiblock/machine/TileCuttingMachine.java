@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.tile.multiblock.machine;
 
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -9,6 +11,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
@@ -19,13 +22,11 @@ import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.inventory.modules.ModuleProgress;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
-import java.util.List;
-
 public class TileCuttingMachine extends TileMultiblockMachine implements IModularInventory {
 
-    private static final Object[][][] structure = new Object[][][]{
-            {{'I', 'c', 'O'},
-                    {LibVulpesBlocks.motors, AdvancedRocketryBlocks.blockSawBlade, 'P'}}};
+    private static final Object[][][] structure = new Object[][][] {
+            { { 'I', 'c', 'O' },
+                    { LibVulpesBlocks.motors, AdvancedRocketryBlocks.blockSawBlade, 'P' } } };
 
     @Override
     public Object[][][] getStructure() {
@@ -39,10 +40,11 @@ public class TileCuttingMachine extends TileMultiblockMachine implements IModula
         if (isRunning() && world.getTotalWorldTime() % 10 == 0) {
             EnumFacing back = RotatableBlock.getFront(world.getBlockState(pos)).getOpposite();
 
-            float xCoord = this.getPos().getX() + (0.5f * back.getFrontOffsetX());
-            float zCoord = this.getPos().getZ() + (0.5f * back.getFrontOffsetZ());
+            float xCoord = this.getPos().getX() + (0.5f * back.getXOffset());
+            float zCoord = this.getPos().getZ() + (0.5f * back.getZOffset());
 
-            for (EntityLivingBase entity : world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(xCoord, this.getPos().getY() + 1, zCoord, xCoord + 1, this.getPos().getY() + 1.5f, zCoord + 1))) {
+            for (EntityLivingBase entity : world.getEntitiesWithinAABB(EntityLivingBase.class, new AxisAlignedBB(xCoord,
+                    this.getPos().getY() + 1, zCoord, xCoord + 1, this.getPos().getY() + 1.5f, zCoord + 1))) {
                 entity.attackEntityFrom(DamageSource.CACTUS, 1f);
             }
         }
@@ -68,7 +70,6 @@ public class TileCuttingMachine extends TileMultiblockMachine implements IModula
         return AdvancedRocketryBlocks.blockCuttingMachine.getLocalizedName();
     }
 
-
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
         List<ModuleBase> modules = super.getModules(ID, player);
@@ -76,5 +77,4 @@ public class TileCuttingMachine extends TileMultiblockMachine implements IModula
 
         return modules;
     }
-
 }

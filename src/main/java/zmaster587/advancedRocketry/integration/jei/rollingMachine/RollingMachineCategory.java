@@ -26,5 +26,4 @@ public class RollingMachineCategory extends MachineCategoryTemplate<RollingMachi
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

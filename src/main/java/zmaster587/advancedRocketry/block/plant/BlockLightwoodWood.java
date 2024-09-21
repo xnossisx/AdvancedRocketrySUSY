@@ -9,7 +9,7 @@ import net.minecraft.world.IBlockAccess;
 
 public class BlockLightwoodWood extends BlockLog {
 
-    public static final String[] names = new String[]{"blue"};
+    public static final String[] names = new String[] { "blue" };
 
     public BlockLightwoodWood() {
         super();

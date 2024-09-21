@@ -9,11 +9,13 @@ import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+
 import org.lwjgl.opengl.GL11;
 
 public class OxygenTraceFX extends Particle {
-    public static final ResourceLocation icon = new ResourceLocation("advancedrocketry:textures/particle/softround.png");
 
+    public static final ResourceLocation icon = new ResourceLocation(
+            "advancedrocketry:textures/particle/softround.png");
 
     public OxygenTraceFX(World world, double x,
                          double y, double z, double motx, double moty, double motz) {
@@ -46,8 +48,8 @@ public class OxygenTraceFX extends Particle {
     public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn,
                                float partialTicks, float rotationX, float rotationZ,
                                float rotationYZ, float rotationXY, float rotationXZ) {
-        //super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
-        //rotationZ, rotationYZ, rotationXY, rotationXZ);
+        // super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
+        // rotationZ, rotationYZ, rotationXY, rotationXZ);
 
         float f11 = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - interpPosX);
         float f12 = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - interpPosY);
@@ -62,10 +64,26 @@ public class OxygenTraceFX extends Particle {
         worldRendererIn.finishDrawing();
         worldRendererIn.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
 
-        worldRendererIn.pos(f11 - rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 - rotationYZ * f10 - rotationXZ * f10).tex(1, 1).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-        worldRendererIn.pos(f11 - rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 - rotationYZ * f10 + rotationXZ * f10).tex(1, 0).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-        worldRendererIn.pos(f11 + rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 + rotationYZ * f10 + rotationXZ * f10).tex(0, 0).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-        worldRendererIn.pos(f11 + rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 + rotationYZ * f10 - rotationXZ * f10).tex(0, 1).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+        worldRendererIn
+                .pos(f11 - rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10,
+                        f13 - rotationYZ * f10 - rotationXZ * f10)
+                .tex(1, 1).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
+                .lightmap(j, k).endVertex();
+        worldRendererIn
+                .pos(f11 - rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10,
+                        f13 - rotationYZ * f10 + rotationXZ * f10)
+                .tex(1, 0).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
+                .lightmap(j, k).endVertex();
+        worldRendererIn
+                .pos(f11 + rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10,
+                        f13 + rotationYZ * f10 + rotationXZ * f10)
+                .tex(0, 0).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
+                .lightmap(j, k).endVertex();
+        worldRendererIn
+                .pos(f11 + rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10,
+                        f13 + rotationYZ * f10 - rotationXZ * f10)
+                .tex(0, 1).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
+                .lightmap(j, k).endVertex();
         Tessellator.getInstance().draw();
         worldRendererIn.begin(GL11.GL_QUADS, DefaultVertexFormats.PARTICLE_POSITION_TEX_COLOR_LMAP);
     }
@@ -80,9 +98,10 @@ public class OxygenTraceFX extends Particle {
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
 
-        //Change color and alpha over lifespan
+        // Change color and alpha over lifespan
         this.particleAlpha = MathHelper.sin((float) Math.PI * (this.particleAge) / (float) (this.particleMaxAge));
-        this.particleScale = 0.5f * MathHelper.sin((float) Math.PI * (this.particleAge) / (float) (this.particleMaxAge));
+        this.particleScale = 0.5f *
+                MathHelper.sin((float) Math.PI * (this.particleAge) / (float) (this.particleMaxAge));
 
         this.motionX *= 1.01;
         this.motionY *= 1.01;

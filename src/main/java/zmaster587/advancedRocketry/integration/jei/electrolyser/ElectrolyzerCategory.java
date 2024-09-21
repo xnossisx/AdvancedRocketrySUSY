@@ -26,5 +26,4 @@ public class ElectrolyzerCategory extends MachineCategoryTemplate<ElectrolyzerWr
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

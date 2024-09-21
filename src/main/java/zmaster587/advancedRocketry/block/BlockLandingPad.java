@@ -9,6 +9,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.station.TileLandingPad;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.GuiHandler;
@@ -29,7 +30,6 @@ public class BlockLandingPad extends Block {
         return new TileLandingPad();
     }
 
-
     @Override
     public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
         super.onBlockAdded(worldIn, pos, state);
@@ -41,10 +41,12 @@ public class BlockLandingPad extends Block {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos,
-                                    IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY,
+                                    IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX,
+                                    float hitY,
                                     float hitZ) {
         if (!world.isRemote)
-            player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULAR.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
+            player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULAR.ordinal(), world, pos.getX(), pos.getY(),
+                    pos.getZ());
         return true;
     }
 

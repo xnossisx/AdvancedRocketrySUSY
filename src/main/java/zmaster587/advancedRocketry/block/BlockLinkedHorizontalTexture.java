@@ -9,13 +9,13 @@ import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
-
 public class BlockLinkedHorizontalTexture extends Block {
 
     public static final PropertyEnum<IconNames> TYPE = PropertyEnum.create("type", IconNames.class);
 
-    //Mapping of side to names
-    //Order is such that the side with a block can be represented as as bitmask where a side with a block is represented by a 0
+    // Mapping of side to names
+    // Order is such that the side with a block can be represented as as bitmask where a side with a block is
+    // represented by a 0
 
     public BlockLinkedHorizontalTexture(Material material) {
         super(material);
@@ -40,7 +40,6 @@ public class BlockLinkedHorizontalTexture extends Block {
     @Override
     public IBlockState getActualState(IBlockState state, IBlockAccess world,
                                       BlockPos pos) {
-
         int offset = 0;
 
         if (world.getBlockState(pos.add(1, 0, 0)).getBlock() == this)
@@ -56,6 +55,7 @@ public class BlockLinkedHorizontalTexture extends Block {
     }
 
     enum IconNames implements IStringSerializable {
+
         ALLEDGE("all"),
         NOTRIGHTEDGE("nredge"),
         NOTTOPEDGE("ntedge"),

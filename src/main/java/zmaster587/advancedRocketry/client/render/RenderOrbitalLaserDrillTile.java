@@ -6,7 +6,9 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill.TileOrbitalLaserDrill;
 
 public class RenderOrbitalLaserDrillTile extends TileEntitySpecialRenderer {
@@ -14,7 +16,6 @@ public class RenderOrbitalLaserDrillTile extends TileEntitySpecialRenderer {
     @Override
     public void render(TileEntity tileentity, double x, double y,
                        double z, float f, int damage, float a) {
-
         if (!((TileOrbitalLaserDrill) tileentity).isRunning())
             return;
 
@@ -27,8 +28,8 @@ public class RenderOrbitalLaserDrillTile extends TileEntitySpecialRenderer {
         GlStateManager.disableDepth();
         GlStateManager.disableTexture2D();
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-        //GL11.glB
-        //GL11.gl
+        // GL11.glB
+        // GL11.gl
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
 
         buffer.color(0.9F, 0.2F, 0.3F, 1F);
@@ -59,5 +60,4 @@ public class RenderOrbitalLaserDrillTile extends TileEntitySpecialRenderer {
         GlStateManager.enableDepth();
         GL11.glPopMatrix();
     }
-
 }

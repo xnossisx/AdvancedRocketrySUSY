@@ -1,6 +1,8 @@
 package zmaster587.advancedRocketry.entity;
 
-import io.netty.buffer.ByteBuf;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
@@ -12,15 +14,14 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.entity.EntityRocket.PacketType;
 import zmaster587.libVulpes.interfaces.INetworkEntity;
 import zmaster587.libVulpes.network.PacketEntity;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.EmbeddedInventory;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class EntityHoverCraft extends Entity implements IInventory, INetworkEntity {
 
@@ -33,9 +34,10 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
     protected float fanLoc;
     protected int freshBurnTime;
     protected int currentBurnTime;
-    //Used to calculate rendering stuffs
+    // Used to calculate rendering stuffs
     protected EmbeddedInventory inv;
     private boolean turningLeft, turningRight, turningUp, turningDownforWhat;
+
     public EntityHoverCraft(World par1World) {
         super(par1World);
         inv = new EmbeddedInventory(1);
@@ -45,7 +47,7 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
     public EntityHoverCraft(World par1World, double par2, double par4, double par6) {
         this(par1World);
 
-        //System.out.println(localBoundingBox);
+        // System.out.println(localBoundingBox);
 
         this.setPosition(par2, par4 + this.getYOffset(), par6);
         this.motionX = 0.0D;
@@ -71,9 +73,7 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
     }
 
     @Override
-    public void markDirty() {
-
-    }
+    public void markDirty() {}
 
     /**
      * Returns the Y offset from the entity's position for any entity riding this one.
@@ -101,7 +101,10 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
      */
     @Override
     public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
-        if (this.getPassengers().isEmpty()/* || (this.riddenByEntity != null && this.riddenByEntity instanceof EntityPlayer && this.riddenByEntity != player)*/) {
+        if (this.getPassengers().isEmpty()/*
+                                           * || (this.riddenByEntity != null && this.riddenByEntity instanceof
+                                           * EntityPlayer && this.riddenByEntity != player)
+                                           */) {
             if (!this.world.isRemote)
                 player.startRiding(this);
         }
@@ -110,7 +113,8 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
 
     @Override
     public boolean attackEntityFrom(@Nonnull DamageSource par1DamageSource, float par2) {
-        if (!this.world.isRemote && !this.isDead && par1DamageSource.getImmediateSource() instanceof EntityPlayer && !this.getPassengers().contains(par1DamageSource.getImmediateSource())) {
+        if (!this.world.isRemote && !this.isDead && par1DamageSource.getImmediateSource() instanceof EntityPlayer &&
+                !this.getPassengers().contains(par1DamageSource.getImmediateSource())) {
             for (ItemStack stack : getItemsDropOnDeath()) {
                 if (!stack.isEmpty())
                     this.entityDropItem(stack, 0.0F);
@@ -123,7 +127,7 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
     }
 
     public ItemStack[] getItemsDropOnDeath() {
-        return new ItemStack[]{inv.getStackInSlot(0), new ItemStack(AdvancedRocketryItems.itemHovercraft)};
+        return new ItemStack[] { inv.getStackInSlot(0), new ItemStack(AdvancedRocketryItems.itemHovercraft) };
     }
 
     @Override
@@ -177,7 +181,7 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
 
         this.rotationYaw += (turningRight ? 5 : 0) - (turningLeft ? 5 : 0);
         double acc = this.getPassengerMovingForward() * MAX_ACCELERATION;
-        //RCS mode, steer like boat
+        // RCS mode, steer like boat
         float yawAngle = (float) (this.rotationYaw * Math.PI / 180f);
         this.motionX += acc * MathHelper.sin(-yawAngle);
         this.motionY += (turningUp ? MAX_ACCELERATION : 0) - (turningDownforWhat ? MAX_ACCELERATION : 0);
@@ -193,11 +197,9 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
         if (this.getRidingEntity() != null)
             this.getRidingEntity().fallDistance = 0;
         this.move(MoverType.SELF, this.motionX, this.motionY, this.motionZ);
-
     }
 
     public float getPassengerMovingForward() {
-
         for (Entity entity : this.getPassengers()) {
             if (entity instanceof EntityPlayer) {
                 return ((EntityPlayer) entity).moveForward;
@@ -230,7 +232,6 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
-
         if (id == PacketType.TURNUPDATE.ordinal()) {
             this.turningLeft = nbt.getBoolean("left");
             this.turningRight = nbt.getBoolean("right");
@@ -283,7 +284,6 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
     @Override
     public void setField(int id, int value) {
         inv.setField(id, value);
-
     }
 
     @Override
@@ -297,8 +297,7 @@ public class EntityHoverCraft extends Entity implements IInventory, INetworkEnti
     }
 
     @Override
-    protected void entityInit() {
-    }
+    protected void entityInit() {}
 
     @Override
     protected void readEntityFromNBT(@Nonnull NBTTagCompound compound) {

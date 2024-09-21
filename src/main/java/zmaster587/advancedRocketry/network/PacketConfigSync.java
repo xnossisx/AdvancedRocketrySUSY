@@ -1,15 +1,17 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.libVulpes.network.BasePacket;
 
-import java.util.LinkedList;
-
 public class PacketConfigSync extends BasePacket {
+
     ARConfiguration config;
     int spaceDimId;
     int stationSize;
@@ -19,7 +21,6 @@ public class PacketConfigSync extends BasePacket {
     public PacketConfigSync(ARConfiguration config) {
         this.config = config;
     }
-
 
     public PacketConfigSync() {
         this.config = new ARConfiguration(ARConfiguration.getCurrentConfig());
@@ -37,7 +38,7 @@ public class PacketConfigSync extends BasePacket {
 
     @Override
     public void read(ByteBuf in) {
-        //nice try
+        // nice try
     }
 
     @Override
@@ -50,7 +51,5 @@ public class PacketConfigSync extends BasePacket {
     }
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-    }
-
+    public void executeServer(EntityPlayerMP player) {}
 }

@@ -1,14 +1,15 @@
 package zmaster587.advancedRocketry.api;
 
-import net.minecraft.nbt.NBTTagCompound;
-
 import java.util.Locale;
+
+import net.minecraft.nbt.NBTTagCompound;
 
 public class DataStorage {
 
     private int data, maxData;
     private DataType dataType;
     private boolean locked;
+
     public DataStorage() {
         dataType = DataType.UNDEFINED;
         locked = false;
@@ -79,7 +80,8 @@ public class DataStorage {
      * @return data amount added
      */
     public int addData(int data, DataType dataType, boolean commit) {
-        if ((!this.locked && (dataType == DataStorage.DataType.UNDEFINED)) || dataType == this.dataType || this.dataType == DataStorage.DataType.UNDEFINED) {
+        if ((!this.locked && (dataType == DataStorage.DataType.UNDEFINED)) || dataType == this.dataType ||
+                this.dataType == DataStorage.DataType.UNDEFINED) {
 
             if (this.dataType == DataStorage.DataType.UNDEFINED)
                 this.dataType = dataType;
@@ -122,8 +124,7 @@ public class DataStorage {
             dataType = DataType.UNDEFINED;
         }
 
-
-        ///TODO: dev compat
+        /// TODO: dev compat
         if (nbt.hasKey("locked"))
             locked = nbt.getBoolean("locked");
         else
@@ -131,6 +132,7 @@ public class DataStorage {
     }
 
     public enum DataType {
+
         UNDEFINED,
         DISTANCE,
         HUMIDITY,

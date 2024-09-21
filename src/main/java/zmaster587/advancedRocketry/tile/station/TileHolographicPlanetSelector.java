@@ -1,12 +1,17 @@
 package zmaster587.advancedRocketry.tile.station;
 
-import io.netty.buffer.ByteBuf;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
@@ -26,11 +31,8 @@ import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.util.INetworkMachine;
 import zmaster587.libVulpes.util.ZUtils.RedstoneState;
 
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-
-public class TileHolographicPlanetSelector extends TileEntity implements ITickable, IButtonInventory, IModularInventory, ISliderBar, INetworkMachine {
+public class TileHolographicPlanetSelector extends TileEntity implements ITickable, IButtonInventory, IModularInventory,
+                                           ISliderBar, INetworkMachine {
 
     private static final byte SCALEPACKET = 0;
     private static final byte STATEUPDATE = 1;
@@ -47,7 +49,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     private float onTime;
     private ModuleText targetGrav;
     private float size;
-    private boolean allowUpdate = true;  //Hack to get around the delay in entity position
+    private boolean allowUpdate = true;  // Hack to get around the delay in entity position
     private boolean stellarMode;
 
     public TileHolographicPlanetSelector() {
@@ -81,9 +83,8 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 
         selectedPlanet = null;
         centeredEntity = null;
-        //currentStarBody = null;
+        // currentStarBody = null;
         selectedId = Constants.INVALID_PLANET;
-
 
         if (currentStar != null) {
             currentStar.setDead();
@@ -96,8 +97,9 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     }
 
     public boolean isEnabled() {
-        boolean powered = world.isBlockIndirectlyGettingPowered(getPos()) > 0;
-        return (!powered && state == RedstoneState.INVERTED) || (powered && state == RedstoneState.ON) || state == RedstoneState.OFF;
+        boolean powered = world.getRedstonePowerFromNeighbors(getPos()) > 0;
+        return (!powered && state == RedstoneState.INVERTED) || (powered && state == RedstoneState.ON) ||
+                state == RedstoneState.OFF;
     }
 
     @Override
@@ -106,19 +108,25 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
             if (isEnabled()) {
 
                 if (onTime < 1)
-                    onTime += .2f / getHologramSize();//0.02f;
+                    onTime += .2f / getHologramSize();// 0.02f;
 
                 if (allowUpdate) {
                     for (EntityUIPlanet entity : entities) {
                         DimensionProperties properties = entity.getProperties();
                         if (entity != centeredEntity)
-                            entity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5, getInterpHologramSize() * (.1 + properties.orbitalDist / 100f), properties.orbitTheta);
+                            entity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5,
+                                    getInterpHologramSize() * (.1 + properties.orbitalDist / 100f),
+                                    properties.orbitTheta);
                         entity.setScale(getInterpHologramSize());
                     }
 
                     if (stellarMode) {
                         for (EntityUIStar entity : starEntities) {
-                            entity.setPosition(this.pos.getX() + .5 + getInterpHologramSize() * entity.getStarProperties().getPosX() / 100f, this.pos.getY() + 1, this.pos.getZ() + .5 + getInterpHologramSize() * entity.getStarProperties().getPosZ() / 100f);
+                            entity.setPosition(
+                                    this.pos.getX() + .5 +
+                                            getInterpHologramSize() * entity.getStarProperties().getPosX() / 100f,
+                                    this.pos.getY() + 1, this.pos.getZ() + .5 +
+                                            getInterpHologramSize() * entity.getStarProperties().getPosZ() / 100f);
                             entity.setScale(getInterpHologramSize());
                         }
                     } else {
@@ -127,10 +135,13 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
                             float phase = 0;
                             for (EntityUIStar entity : starEntities) {
                                 double deltaX, deltaY;
-                                deltaX = (entity.getStarProperties().getStarSeparation() * MathHelper.cos(phase) * 0.05);
-                                deltaY = (entity.getStarProperties().getStarSeparation() * MathHelper.sin(phase) * 0.05);
+                                deltaX = (entity.getStarProperties().getStarSeparation() * MathHelper.cos(phase) *
+                                        0.05);
+                                deltaY = (entity.getStarProperties().getStarSeparation() * MathHelper.sin(phase) *
+                                        0.05);
 
-                                entity.setPosition(this.pos.getX() + .5 + getInterpHologramSize() * deltaX, this.pos.getY() + 1, this.pos.getZ() + .5 + getInterpHologramSize() * deltaY);
+                                entity.setPosition(this.pos.getX() + .5 + getInterpHologramSize() * deltaX,
+                                        this.pos.getY() + 1, this.pos.getZ() + .5 + getInterpHologramSize() * deltaY);
                                 entity.setScale(getInterpHologramSize() * entity.getStarProperties().getSize());
                                 phase += phaseInc;
                             }
@@ -139,11 +150,13 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
 
                     if (currentStar != null) {
                         currentStar.setScale(getInterpHologramSize());
-                        currentStar.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5, 0, 0);
+                        currentStar.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5, 0,
+                                0);
                     }
 
                     if (centeredEntity != null) {
-                        centeredEntity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5, 0, 0);
+                        centeredEntity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5,
+                                0, 0);
                     }
 
                     if (entities.isEmpty() && starEntities.isEmpty()) {
@@ -151,11 +164,12 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
                     }
 
                     if (backButton != null) {
-                        backButton.setPosition(this.pos.getX() + .5, this.pos.getY() + 1.5 + getInterpHologramSize() / 10f, this.pos.getZ() + .5);
+                        backButton.setPosition(this.pos.getX() + .5,
+                                this.pos.getY() + 1.5 + getInterpHologramSize() / 10f, this.pos.getZ() + .5);
                     }
                 } else
                     allowUpdate = true;
-            } else { //isenabled
+            } else { // isenabled
                 if (backButton != null)
                     cleanup();
             }
@@ -163,7 +177,6 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     }
 
     public void selectSystem(int id) {
-
         if (id >= EntityUIStar.starIDoffset) {
             if (stellarMode) {
                 if (selectedId != id) {
@@ -259,7 +272,8 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
         }
 
         if (!stellarMode) {
-            List<IDimensionProperties> planetList = currentStarBody == null ? DimensionManager.getInstance().getStar(0).getPlanets() : currentStarBody.getPlanets();
+            List<IDimensionProperties> planetList = currentStarBody == null ?
+                    DimensionManager.getInstance().getStar(0).getPlanets() : currentStarBody.getPlanets();
             if (centeredEntity != null) {
                 planetList = new LinkedList<>();
                 planetList.add(centeredEntity.getProperties());
@@ -275,10 +289,11 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
             } else {
                 if (currentStarBody == null)
                     currentStarBody = DimensionManager.getInstance().getStar(0);
-                currentStar = new EntityUIStar(world, currentStarBody, this, this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5);
+                currentStar = new EntityUIStar(world, currentStarBody, this, this.pos.getX() + .5, this.pos.getY() + 1,
+                        this.pos.getZ() + .5);
                 this.getWorld().spawnEntity(currentStar);
 
-                //Spawn substars
+                // Spawn substars
                 if (currentStarBody.getSubStars() != null && !currentStarBody.getSubStars().isEmpty()) {
                     float phaseInc = 360f / currentStarBody.getSubStars().size();
                     float phase = 0;
@@ -289,7 +304,8 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
                         double deltaX, deltaY;
                         deltaX = (body.getStarSeparation() * MathHelper.cos(phase) * 0.05);
                         deltaY = (body.getStarSeparation() * MathHelper.sin(phase) * 0.05);
-                        EntityUIStar entity = new EntityUIStar(world, body, count++, this, this.pos.getX() + .5 + deltaX, this.pos.getY() + 1, this.pos.getZ() + .5 + deltaY);
+                        EntityUIStar entity = new EntityUIStar(world, body, count++, this,
+                                this.pos.getX() + .5 + deltaX, this.pos.getY() + 1, this.pos.getZ() + .5 + deltaY);
 
                         this.getWorld().spawnEntity(entity);
                         starEntities.add(entity);
@@ -299,8 +315,10 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
             }
 
             for (IDimensionProperties properties : planetList) {
-                EntityUIPlanet entity = new EntityUIPlanet(world, (DimensionProperties) properties, this, this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5);
-                //entity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 10, this.pos.getZ() + .5,  ((DimensionProperties)properties).orbitalDist/100f, ( (DimensionProperties)properties).orbitTheta);
+                EntityUIPlanet entity = new EntityUIPlanet(world, (DimensionProperties) properties, this,
+                        this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5);
+                // entity.setPositionPolar(this.pos.getX() + .5, this.pos.getY() + 10, this.pos.getZ() + .5,
+                // ((DimensionProperties)properties).orbitalDist/100f, ( (DimensionProperties)properties).orbitTheta);
                 this.getWorld().spawnEntity(entity);
                 entities.add(entity);
 
@@ -317,16 +335,16 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
             Collection<StellarBody> starList = DimensionManager.getInstance().getStars();
 
             for (StellarBody body : starList) {
-                EntityUIStar entity = new EntityUIStar(world, body, this, this.pos.getX() + .5, this.pos.getY() + 1, this.pos.getZ() + .5);
+                EntityUIStar entity = new EntityUIStar(world, body, this, this.pos.getX() + .5, this.pos.getY() + 1,
+                        this.pos.getZ() + .5);
 
                 this.getWorld().spawnEntity(entity);
                 starEntities.add(entity);
             }
         }
-        //Hack to delay position updates by a tick
+        // Hack to delay position updates by a tick
         allowUpdate = false;
     }
-
 
     @Override
     public List<ModuleBase> getModules(int id, EntityPlayer player) {
@@ -343,8 +361,9 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     private void updateText() {
         if (world.isRemote) {
 
-            //numThrusters.setText("Number Of Thrusters: 0");
-            targetGrav.setText(String.format("%s %f", LibVulpes.proxy.getLocalizedString("msg.planetholo.size"), getHologramSize()));
+            // numThrusters.setText("Number Of Thrusters: 0");
+            targetGrav.setText(String.format("%s %f", LibVulpes.proxy.getLocalizedString("msg.planetholo.size"),
+                    getHologramSize()));
         }
     }
 
@@ -387,8 +406,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     }
 
     @Override
-    public void setTotalProgress(int id, int progress) {
-    }
+    public void setTotalProgress(int id, int progress) {}
 
     @Override
     public void setProgressByUser(int id, int progress) {
@@ -413,7 +431,6 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
         if (id == STATEUPDATE) {
             out.writeByte(state.ordinal());
         }
-
     }
 
     @Override
@@ -424,7 +441,6 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
         } else if (packetId == STATEUPDATE) {
             nbt.setByte("state", in.readByte());
         }
-
     }
 
     @Override
@@ -438,7 +454,7 @@ public class TileHolographicPlanetSelector extends TileEntity implements ITickab
     }
 
     public void onInventoryButtonPressed(int buttonId) {
-        //Back button
+        // Back button
         if (buttonId == 0) {
             if (currentStar != null)
                 stellarMode = true;

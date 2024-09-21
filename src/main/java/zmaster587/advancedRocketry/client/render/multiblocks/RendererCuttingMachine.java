@@ -1,26 +1,29 @@
 package zmaster587.advancedRocketry.client.render.multiblocks;
 
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.render.RenderHelper;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
-import java.util.List;
-
 public class RendererCuttingMachine extends TileEntitySpecialRenderer {
 
-    public final static ResourceLocation texture = new ResourceLocation("advancedrocketry:textures/models/cuttingMachine.png");
+    public final static ResourceLocation texture = new ResourceLocation(
+            "advancedrocketry:textures/models/cuttingMachine.png");
     private WavefrontObject model;
 
-    //private final RenderItem dummyItem = Minecraft.getMinecraft().getRenderItem();
+    // private final RenderItem dummyItem = Minecraft.getMinecraft().getRenderItem();
 
     public RendererCuttingMachine() {
         try {
@@ -41,12 +44,14 @@ public class RendererCuttingMachine extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Initial setup
+        // Initial setup
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         GL11.glTranslated(x + .5f, y, z + 0.5f);
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
+        GL11.glRotatef((front.getXOffset() == 1 ? 180 : 0) + front.getZOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(-.5f, 0, -1.5f);
 
         if (multiBlockTile.isRunning()) {
@@ -54,7 +59,6 @@ public class RendererCuttingMachine extends TileEntitySpecialRenderer {
             float progress = multiBlockTile.getProgress(0) / (float) multiBlockTile.getTotalProgress(0);
             float tray;
             tray = 2.2f * progress;
-
 
             List<ItemStack> inputList = multiBlockTile.getInputs();
             if (inputList != null && !inputList.isEmpty() && progress < 0.65) {
@@ -70,7 +74,6 @@ public class RendererCuttingMachine extends TileEntitySpecialRenderer {
                 RenderHelper.renderItem(multiBlockTile, inputStack, Minecraft.getMinecraft().getRenderItem());
                 GL11.glPopMatrix();
             }
-
 
             List<ItemStack> outputList = multiBlockTile.getOutputs();
             if (outputList != null && !outputList.isEmpty() && progress >= 0.65) {
@@ -101,5 +104,4 @@ public class RendererCuttingMachine extends TileEntitySpecialRenderer {
         }
         GL11.glPopMatrix();
     }
-
 }

@@ -8,7 +8,6 @@ public class WorldTypeSpace extends WorldType {
         super(string);
     }
 
-
     @Override
     public boolean canBeCreated() {
         return false;

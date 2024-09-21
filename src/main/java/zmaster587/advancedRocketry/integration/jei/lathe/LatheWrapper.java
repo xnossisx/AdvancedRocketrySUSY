@@ -8,5 +8,4 @@ public class LatheWrapper extends MachineRecipe {
     LatheWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

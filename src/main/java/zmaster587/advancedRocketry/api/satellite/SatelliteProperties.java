@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.api.satellite;
 
 import net.minecraft.nbt.NBTTagCompound;
+
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.util.IWeighted;
 
@@ -29,7 +30,6 @@ public class SatelliteProperties implements IWeighted {
      * @return a flag containing the abilities of the item
      */
     public int getPropertyFlag() {
-
         int flag = 0;
         if (satType != null)
             flag |= Property.MAIN.getFlag();
@@ -57,7 +57,6 @@ public class SatelliteProperties implements IWeighted {
      * @return true if a new id is assigned, false otherwise
      */
     public boolean setId(long id) {
-
         if (this.id == -1) {
             this.id = id;
             return true;
@@ -152,6 +151,7 @@ public class SatelliteProperties implements IWeighted {
     }
 
     public enum Property {
+
         MAIN,
         DATA,
         POWER_GEN,

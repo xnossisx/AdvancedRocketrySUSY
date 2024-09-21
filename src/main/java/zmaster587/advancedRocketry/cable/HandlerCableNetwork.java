@@ -1,57 +1,65 @@
 package zmaster587.advancedRocketry.cable;
 
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import zmaster587.advancedRocketry.tile.cables.TilePipe;
-
 import java.util.Hashtable;
 import java.util.Map.Entry;
 
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+
+import zmaster587.advancedRocketry.tile.cables.TilePipe;
+
 public class HandlerCableNetwork {
+
     protected Hashtable<Integer, CableNetwork> networks = new Hashtable<>();
 
-    //private static final String FILENAME = "/data/insanityCraft.dat";
-	
-	/*public static void loadNetworksFromFile() throws IOException {
-		String saveDir = MinecraftServer.getServer().getActiveAnvilConverter().getSaveLoader(MinecraftServer.getServer().getFolderName(), false).getWorldDirectoryName();
+    // private static final String FILENAME = "/data/insanityCraft.dat";
 
-		FileInputStream stream = new FileInputStream(saveDir + FILENAME);
-
-		NBTTagCompound nbt = CompressedStreamTools.readCompressed(stream);
-
-		stream.close();
-
-		Iterator<Object> iterator = nbt.func_150296_c().iterator();
-
-		while(iterator.hasNext()) {
-
-			String key = (String)iterator.next();
-
-			NBTTagCompound subNbt = nbt.getCompoundTag(key);
-
-			CableNetwork net = CableNetwork.initWithID(Integer.parseInt(key));
-			net.readFromNBT(subNbt);
-		}
-	}
-
-	public static void saveNetworksToFile() throws IOException {
-
-		NBTTagCompound nbt = new NBTTagCompound();
-		for(Entry<Integer,CableNetwork> set : networks.entrySet()) {
-
-			NBTTagCompound subNbt = new NBTTagCompound();
-			set.getValue().writeToNBT(subNbt);
-			nbt.setTag(String.valueOf(set.getKey()), subNbt);
-		}
-
-		String saveDir = MinecraftServer.getServer().getActiveAnvilConverter().getSaveLoader(MinecraftServer.getServer().getFolderName(), false).getWorldDirectoryName();
-
-		FileOutputStream stream = new FileOutputStream(saveDir + "/data/insanityCraft.dat");
-
-		CompressedStreamTools.writeCompressed(nbt, stream);
-
-		stream.close();
-	}*/
+    /*
+     * public static void loadNetworksFromFile() throws IOException {
+     * String saveDir =
+     * MinecraftServer.getServer().getActiveAnvilConverter().getSaveLoader(MinecraftServer.getServer().getFolderName(),
+     * false).getWorldDirectoryName();
+     * 
+     * FileInputStream stream = new FileInputStream(saveDir + FILENAME);
+     * 
+     * NBTTagCompound nbt = CompressedStreamTools.readCompressed(stream);
+     * 
+     * stream.close();
+     * 
+     * Iterator<Object> iterator = nbt.func_150296_c().iterator();
+     * 
+     * while(iterator.hasNext()) {
+     * 
+     * String key = (String)iterator.next();
+     * 
+     * NBTTagCompound subNbt = nbt.getCompoundTag(key);
+     * 
+     * CableNetwork net = CableNetwork.initWithID(Integer.parseInt(key));
+     * net.readFromNBT(subNbt);
+     * }
+     * }
+     * 
+     * public static void saveNetworksToFile() throws IOException {
+     * 
+     * NBTTagCompound nbt = new NBTTagCompound();
+     * for(Entry<Integer,CableNetwork> set : networks.entrySet()) {
+     * 
+     * NBTTagCompound subNbt = new NBTTagCompound();
+     * set.getValue().writeToNBT(subNbt);
+     * nbt.setTag(String.valueOf(set.getKey()), subNbt);
+     * }
+     * 
+     * String saveDir =
+     * MinecraftServer.getServer().getActiveAnvilConverter().getSaveLoader(MinecraftServer.getServer().getFolderName(),
+     * false).getWorldDirectoryName();
+     * 
+     * FileOutputStream stream = new FileOutputStream(saveDir + "/data/insanityCraft.dat");
+     * 
+     * CompressedStreamTools.writeCompressed(nbt, stream);
+     * 
+     * stream.close();
+     * }
+     */
 
     public int getNewNetworkID() {
         CableNetwork net = CableNetwork.initNetwork();
@@ -61,16 +69,13 @@ public class HandlerCableNetwork {
         return net.networkID;
     }
 
-
     public int mergeNetworks(int a, int b) {
-
         assert (networks.get(Math.max(a, b)) == null || networks.get(Math.min(a, b)) == null);
 
         networks.get(Math.min(a, b)).merge(networks.get(Math.max(a, b)));
         networks.get(Math.min(a, b)).numCables += networks.get(Math.max(a, b)).numCables;
 
         networks.remove(Math.max(a, b));
-
 
         return Math.min(a, b);
     }

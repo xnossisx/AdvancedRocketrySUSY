@@ -4,6 +4,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.cables.TileEnergyPipe;
 
 public class BlockEnergyCable extends BlockPipe {
@@ -16,5 +17,4 @@ public class BlockEnergyCable extends BlockPipe {
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileEnergyPipe();
     }
-
 }

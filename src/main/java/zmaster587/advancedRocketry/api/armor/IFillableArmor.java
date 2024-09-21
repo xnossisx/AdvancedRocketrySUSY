@@ -1,10 +1,11 @@
 package zmaster587.advancedRocketry.api.armor;
 
-import net.minecraft.item.ItemStack;
-
 import javax.annotation.Nonnull;
 
+import net.minecraft.item.ItemStack;
+
 public interface IFillableArmor {
+
     /**
      * gets the amount of air remaining in the suit.
      *
@@ -43,5 +44,4 @@ public interface IFillableArmor {
      * @return the maximum amount of air allowed in this suit
      */
     int getMaxAir(@Nonnull ItemStack stack);
-
 }

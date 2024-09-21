@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.block;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyBool;
@@ -12,11 +14,10 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.atmosphere.TileAtmosphereDetector;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.GuiHandler;
-
-import javax.annotation.Nonnull;
 
 public class BlockRedstoneEmitter extends Block {
 
@@ -59,10 +60,12 @@ public class BlockRedstoneEmitter extends Block {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos,
-                                    IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY,
+                                    IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX,
+                                    float hitY,
                                     float hitZ) {
         if (!world.isRemote) {
-            player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), world, pos.getX(), pos.getY(), pos.getZ());
+            player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), world, pos.getX(), pos.getY(),
+                    pos.getZ());
         }
         return true;
     }
@@ -88,5 +91,4 @@ public class BlockRedstoneEmitter extends Block {
     public boolean canProvidePower(IBlockState state) {
         return true;
     }
-
 }

@@ -9,6 +9,5 @@ public class BlockEnrichedLava extends BlockFluid {
         super(fluid, material);
     }
 
-    //TODO: add eyecandy
-
+    // TODO: add eyecandy
 }

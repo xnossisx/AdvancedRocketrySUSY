@@ -1,6 +1,8 @@
 package zmaster587.advancedRocketry.tile.station;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -10,6 +12,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
@@ -20,9 +24,6 @@ import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.util.INetworkMachine;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class TileDockingPort extends TileEntity implements IModularInventory, IGuiCallback, INetworkMachine {
 
@@ -55,7 +56,6 @@ public class TileDockingPort extends TileEntity implements IModularInventory, IG
             modules.add(targetId);
             modules.add(myId);
         }
-
 
         modules.add(new ModuleText(20, 20, LibVulpes.proxy.getLocalizedString("msg.dockingport.me"), 0x2a2a2a));
 
@@ -133,7 +133,6 @@ public class TileDockingPort extends TileEntity implements IModularInventory, IG
         unregisterTileWithStation(world, pos);
     }
 
-
     @Override
     public void onLoad() {
         super.onLoad();
@@ -144,7 +143,6 @@ public class TileDockingPort extends TileEntity implements IModularInventory, IG
     public String getModularInventoryName() {
         return AdvancedRocketryBlocks.blockDockingPort.getLocalizedName();
     }
-
 
     public void registerTileWithStation(World world, BlockPos pos) {
         if (!world.isRemote && world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) {

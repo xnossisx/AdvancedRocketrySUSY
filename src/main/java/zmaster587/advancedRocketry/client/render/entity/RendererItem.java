@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.client.render.entity;
 
+import java.util.Random;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.client.renderer.entity.Render;
@@ -10,18 +14,19 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.entity.EntityItemAbducted;
 
-import javax.annotation.Nullable;
-import java.util.Random;
-
 /**
- * Yeah, i know, this is literally a copy of the item renderer, other option was asm the class responsible for render distance
+ * Yeah, i know, this is literally a copy of the item renderer, other option was asm the class responsible for render
+ * distance
  */
 @SideOnly(Side.CLIENT)
 public class RendererItem extends Render<EntityItemAbducted> implements IRenderFactory<EntityItemAbducted> {
-    private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
-    private static final String __OBFID = "CL_00001003";
+
+    private static final ResourceLocation RES_ITEM_GLINT = new ResourceLocation(
+            "textures/misc/enchanted_item_glint.png");
+    // private static final String __OBFID = "CL_00001003";
     public static boolean renderInFrame;
     public boolean renderWithColor = true;
     /**
@@ -47,7 +52,8 @@ public class RendererItem extends Render<EntityItemAbducted> implements IRenderF
      * double d2, float f, float f1). But JAD is pre 1.5 so doesn't do that.
      */
     @Override
-    public void doRender(EntityItemAbducted p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_) {
+    public void doRender(EntityItemAbducted p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_,
+                         float p_76986_8_, float p_76986_9_) {
         itemRenderer.doRender(p_76986_1_.getItemEntity(), p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
     }
 
@@ -58,7 +64,7 @@ public class RendererItem extends Render<EntityItemAbducted> implements IRenderF
 
     @Override
     public Render<? super EntityItemAbducted> createRenderFor(
-            RenderManager manager) {
+                                                              RenderManager manager) {
         return new RendererItem(manager, Minecraft.getMinecraft().getRenderItem());
     }
 }

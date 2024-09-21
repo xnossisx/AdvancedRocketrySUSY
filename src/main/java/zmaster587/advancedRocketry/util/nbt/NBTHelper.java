@@ -1,5 +1,10 @@
 package zmaster587.advancedRocketry.util.nbt;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
@@ -13,11 +18,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-
 /**
  * Tool for NBT serializing and deserializing collections and other stuff
  */
@@ -26,15 +26,20 @@ public class NBTHelper {
 
     public static NBTBase NBT_NULL = new NBTTagString("null");
 
-    public static void writeCollection(String name, NBTTagCompound compound, Collection<? extends INBTSerializable<? extends NBTBase>> collection) {
+    public static void writeCollection(String name, NBTTagCompound compound,
+                                       Collection<? extends INBTSerializable<? extends NBTBase>> collection) {
         compound.setTag(name, collectionToNBT(collection));
     }
 
-    public static <T> void writeCollection(String name, NBTTagCompound compound, Collection<T> collection, ParametrizedFactory<T, ? extends NBTBase> serializer) {
+    public static <T> void writeCollection(String name, NBTTagCompound compound, Collection<T> collection,
+                                           ParametrizedFactory<T, ? extends NBTBase> serializer) {
         compound.setTag(name, collectionToNBT(collection, serializer));
     }
 
-    public static <T, NBT_T extends NBTBase, C extends Collection<T>> C readCollection(String name, NBTTagCompound compound, Factory<C> collectionFactory, ParametrizedFactory<NBT_T, T> deserializer) {
+    public static <T, NBT_T extends NBTBase,
+            C extends Collection<T>> C readCollection(String name, NBTTagCompound compound,
+                                                      Factory<C> collectionFactory,
+                                                      ParametrizedFactory<NBT_T, T> deserializer) {
         return collectionFromNBT(getTagList(name, compound), collectionFactory, deserializer);
     }
 
@@ -44,31 +49,39 @@ public class NBTHelper {
         return tag;
     }
 
-    public static <T> NBTTagList collectionToNBT(Collection<T> collection, ParametrizedFactory<T, ? extends NBTBase> serializer) {
+    public static <T> NBTTagList collectionToNBT(Collection<T> collection,
+                                                 ParametrizedFactory<T, ? extends NBTBase> serializer) {
         NBTTagList tag = new NBTTagList();
         collection.stream().map(serializer::create).forEach(tag::appendTag);
         return tag;
     }
 
-    public static <T, NBT_T extends NBTBase, C extends Collection<T>> C collectionFromNBT(NBTTagList tag, Factory<C> collectionFactory, ParametrizedFactory<NBT_T, T> deserializer) {
+    public static <T, NBT_T extends NBTBase,
+            C extends Collection<T>> C collectionFromNBT(NBTTagList tag, Factory<C> collectionFactory,
+                                                         ParametrizedFactory<NBT_T, T> deserializer) {
         C collection = collectionFactory.create();
         tag.iterator().forEachRemaining(item -> collection.add(deserializer.create((NBT_T) item)));
         return collection;
     }
 
-    public static void writeMap(String name, NBTTagCompound compound, Map<?, ? extends INBTSerializable<? extends NBTBase>> map) {
+    public static void writeMap(String name, NBTTagCompound compound,
+                                Map<?, ? extends INBTSerializable<? extends NBTBase>> map) {
         compound.setTag(name, mapToNBT(map));
     }
 
-    public static <V> void writeMap(String name, NBTTagCompound compound, Map<?, V> map, ParametrizedFactory<V, ? extends NBTBase> serializer) {
+    public static <V> void writeMap(String name, NBTTagCompound compound, Map<?, V> map,
+                                    ParametrizedFactory<V, ? extends NBTBase> serializer) {
         compound.setTag(name, mapToNBT(map, serializer));
     }
 
-    public static <V, NBT_T extends NBTBase> Map<String, V> readMap(String name, NBTTagCompound compound, ParametrizedFactory<NBT_T, V> valueDeserializer) {
+    public static <V, NBT_T extends NBTBase> Map<String, V> readMap(String name, NBTTagCompound compound,
+                                                                    ParametrizedFactory<NBT_T, V> valueDeserializer) {
         return readMap(name, compound, Objects::toString, valueDeserializer);
     }
 
-    public static <K, V, NBT_T extends NBTBase> Map<K, V> readMap(String name, NBTTagCompound compound, ParametrizedFactory<String, K> keyDeserializer, ParametrizedFactory<NBT_T, V> valueDeserializer) {
+    public static <K, V, NBT_T extends NBTBase> Map<K, V> readMap(String name, NBTTagCompound compound,
+                                                                  ParametrizedFactory<String, K> keyDeserializer,
+                                                                  ParametrizedFactory<NBT_T, V> valueDeserializer) {
         return mapFromNBT(compound.getCompoundTag(name), HashMap::new, keyDeserializer, valueDeserializer);
     }
 
@@ -84,17 +97,25 @@ public class NBTHelper {
         return compound;
     }
 
-    public static <V, NBT_T extends NBTBase> Map<String, V> mapFromNBT(NBTTagCompound compound, ParametrizedFactory<NBT_T, V> valueDeserializer) {
+    public static <V,
+            NBT_T extends NBTBase> Map<String, V> mapFromNBT(NBTTagCompound compound,
+                                                             ParametrizedFactory<NBT_T, V> valueDeserializer) {
         return mapFromNBT(compound, Objects::toString, valueDeserializer);
     }
 
-    public static <K, V, NBT_T extends NBTBase> Map<K, V> mapFromNBT(NBTTagCompound compound, ParametrizedFactory<String, K> keyDeserializer, ParametrizedFactory<NBT_T, V> valueDeserializer) {
+    public static <K, V, NBT_T extends NBTBase> Map<K, V> mapFromNBT(NBTTagCompound compound,
+                                                                     ParametrizedFactory<String, K> keyDeserializer,
+                                                                     ParametrizedFactory<NBT_T, V> valueDeserializer) {
         return mapFromNBT(compound, HashMap::new, keyDeserializer, valueDeserializer);
     }
 
-    public static <K, V, NBT_T extends NBTBase> Map<K, V> mapFromNBT(NBTTagCompound compound, Factory<Map<K, V>> mapFactory, ParametrizedFactory<String, K> keyDeserializer, ParametrizedFactory<NBT_T, V> valueDeserializer) {
+    public static <K, V, NBT_T extends NBTBase> Map<K, V> mapFromNBT(NBTTagCompound compound,
+                                                                     Factory<Map<K, V>> mapFactory,
+                                                                     ParametrizedFactory<String, K> keyDeserializer,
+                                                                     ParametrizedFactory<NBT_T, V> valueDeserializer) {
         Map<K, V> map = mapFactory.create();
-        compound.getKeySet().forEach(key -> map.put(keyDeserializer.create(key), read(key, compound, valueDeserializer)));
+        compound.getKeySet()
+                .forEach(key -> map.put(keyDeserializer.create(key), read(key, compound, valueDeserializer)));
         return map;
     }
 
@@ -198,14 +219,14 @@ public class NBTHelper {
 
     public static void writeAABB(String key, NBTTagCompound compound, AxisAlignedBB aabb) {
         compound.setTag(key, NBTTagCompoundBuilder
-                    .create()
-                    .setDouble("minX", aabb.minX)
-                    .setDouble("minY", aabb.minY)
-                    .setDouble("minZ", aabb.minZ)
-                    .setDouble("maxX", aabb.maxX)
-                    .setDouble("maxY", aabb.maxY)
-                    .setDouble("maxZ", aabb.maxZ)
-                    .build());
+                .create()
+                .setDouble("minX", aabb.minX)
+                .setDouble("minY", aabb.minY)
+                .setDouble("minZ", aabb.minZ)
+                .setDouble("maxX", aabb.maxX)
+                .setDouble("maxY", aabb.maxY)
+                .setDouble("maxZ", aabb.maxZ)
+                .build());
     }
 
     public static AxisAlignedBB readAABB(String key, NBTTagCompound compound) {
@@ -216,8 +237,7 @@ public class NBTHelper {
                 tag.getDouble("minZ"),
                 tag.getDouble("maxX"),
                 tag.getDouble("maxY"),
-                tag.getDouble("maxZ")
-        );
+                tag.getDouble("maxZ"));
     }
 
     public static NBTBase writeTileEntity(final TileEntity tileEntity) {

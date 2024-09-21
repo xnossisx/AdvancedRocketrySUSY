@@ -25,5 +25,4 @@ public class CrystallizerRecipeHandler implements IRecipeHandler<CrystallizerWra
     public boolean isRecipeValid(CrystallizerWrapper recipe) {
         return true;
     }
-
 }

@@ -4,13 +4,16 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
 public class RendererPrecisionLaserEtcher extends TileEntitySpecialRenderer {
+
     WavefrontObject model;
 
     ResourceLocation texture = new ResourceLocation("advancedrocketry:textures/models/precisionlaseretcher.png");
@@ -21,7 +24,6 @@ public class RendererPrecisionLaserEtcher extends TileEntitySpecialRenderer {
         } catch (ModelFormatException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -34,21 +36,21 @@ public class RendererPrecisionLaserEtcher extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         GL11.glTranslated(x + .5f, y, z + 0.5f);
         EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos()));
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 0 : 180) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        GL11.glRotatef((front.getXOffset() == 1 ? 0 : 180) + front.getZOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(0.5f, 0f, 1.5f);
-
 
         if (multiBlockTile.isRunning()) {
 
-            float progress = multiBlockTile.getProgress(0) / (float) multiBlockTile.getTotalProgress(0) + f / (float) multiBlockTile.getTotalProgress(0);
+            float progress = multiBlockTile.getProgress(0) / (float) multiBlockTile.getTotalProgress(0) +
+                    f / (float) multiBlockTile.getTotalProgress(0);
 
             bindTexture(texture);
             model.renderPart("Hull");
 
-            //Full assembly translation and render
+            // Full assembly translation and render
             GL11.glPushMatrix();
             float progress2 = ((16 * progress) - (int) (16 * progress));
 
@@ -62,7 +64,7 @@ public class RendererPrecisionLaserEtcher extends TileEntitySpecialRenderer {
 
             model.renderPart("Mount");
 
-            //Render laser and laser translation
+            // Render laser and laser translation
             GL11.glPushMatrix();
             if (progress < 0.875) {
                 if (progress2 < 0.875f)
@@ -73,7 +75,6 @@ public class RendererPrecisionLaserEtcher extends TileEntitySpecialRenderer {
             model.renderPart("Laser");
             GL11.glPopMatrix();
             GL11.glPopMatrix();
-
 
         } else {
             bindTexture(texture);

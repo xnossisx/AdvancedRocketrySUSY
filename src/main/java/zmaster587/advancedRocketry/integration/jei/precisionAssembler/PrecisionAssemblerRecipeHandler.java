@@ -25,5 +25,4 @@ public class PrecisionAssemblerRecipeHandler implements IRecipeHandler<Precision
     public boolean isRecipeValid(PrecisionAssemblerWrapper recipe) {
         return true;
     }
-
 }

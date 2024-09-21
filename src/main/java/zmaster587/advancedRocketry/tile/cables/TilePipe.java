@@ -1,13 +1,14 @@
 package zmaster587.advancedRocketry.tile.cables;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+
 import zmaster587.advancedRocketry.cable.HandlerCableNetwork;
 import zmaster587.advancedRocketry.cable.NetworkRegistry;
-
-import javax.annotation.Nonnull;
 
 public class TilePipe extends TileEntity {
 
@@ -22,7 +23,6 @@ public class TilePipe extends TileEntity {
         connectedSides = new boolean[6];
     }
 
-
     public void initialize(int id) {
         networkID = id;
         initialized = true;
@@ -33,7 +33,6 @@ public class TilePipe extends TileEntity {
     public void invalidate() {
         super.invalidate();
         removePipeFromSystem();
-
     }
 
     @Override
@@ -52,10 +51,10 @@ public class TilePipe extends TileEntity {
                 getNetworkHandler().removeFromAllTypes(this, tile);
         }
 
-        //Fix NPE on chunk unload
+        // Fix NPE on chunk unload
         if (getNetworkHandler().getNetwork(networkID) != null) {
             getNetworkHandler().getNetwork(networkID).removePipeFromNetwork(this);
-            //Recreate the network until a clean way to tranverse nets in unloaded chunk can be found
+            // Recreate the network until a clean way to tranverse nets in unloaded chunk can be found
             getNetworkHandler().removeNetworkByID(networkID);
         }
     }
@@ -75,7 +74,6 @@ public class TilePipe extends TileEntity {
         nbt.setByte("conn", sides);
 
         return nbt;
-
     }
 
     @Override
@@ -89,7 +87,6 @@ public class TilePipe extends TileEntity {
         }
     }
 
-
     @Override
     public void markDirty() {
         super.markDirty();
@@ -100,10 +97,8 @@ public class TilePipe extends TileEntity {
     }
 
     public void onPlaced() {
-
         for (EnumFacing dir : EnumFacing.values()) {
             TileEntity tile = world.getTileEntity(getPos().offset(dir));
-
 
             if (tile != null) {
                 if (tile instanceof TilePipe && tile.getClass() == this.getClass()) {
@@ -120,7 +115,6 @@ public class TilePipe extends TileEntity {
                 }
             }
         }
-
 
         if (!isInitialized()) {
             initialize(getNetworkHandler().getNewNetworkID());
@@ -140,11 +134,11 @@ public class TilePipe extends TileEntity {
     }
 
     protected void attemptLink(EnumFacing dir, TileEntity tile) {
-        //If the pipe can inject or extract, add to the cache
-        //if(!(tile instanceof IFluidHandler))
-        //return;
+        // If the pipe can inject or extract, add to the cache
+        // if(!(tile instanceof IFluidHandler))
+        // return;
 
-        if (canExtract(dir, tile) && (world.isBlockIndirectlyGettingPowered(pos) > 0 || world.getStrongPower(pos) > 0)) {
+        if (canExtract(dir, tile) && (world.getRedstonePowerFromNeighbors(pos) > 0 || world.getStrongPower(pos) > 0)) {
             if (!world.isRemote) {
                 getNetworkHandler().removeFromAllTypes(this, tile);
                 getNetworkHandler().addSource(this, tile, dir);
@@ -152,7 +146,7 @@ public class TilePipe extends TileEntity {
             connectedSides[dir.ordinal()] = true;
         }
 
-        if (canInject(dir, tile) && world.isBlockIndirectlyGettingPowered(pos) == 0 && world.getStrongPower(pos) == 0) {
+        if (canInject(dir, tile) && world.getRedstonePowerFromNeighbors(pos) == 0 && world.getStrongPower(pos) == 0) {
             if (!world.isRemote) {
                 getNetworkHandler().removeFromAllTypes(this, tile);
                 getNetworkHandler().addSink(this, tile, dir);
@@ -170,10 +164,8 @@ public class TilePipe extends TileEntity {
     }
 
     public void onNeighborTileChange(BlockPos pos) {
-
-        //if(worldObj.isRemote)
-        //return;
-
+        // if(worldObj.isRemote)
+        // return;
 
         TileEntity tile = world.getTileEntity(pos);
 
@@ -183,7 +175,7 @@ public class TilePipe extends TileEntity {
 
         if (tile != null) {
 
-            //If two networks touch, merge them
+            // If two networks touch, merge them
             if (tile instanceof TilePipe && tile.getClass() == this.getClass()) {
 
                 TilePipe pipe = ((TilePipe) tile);
@@ -253,7 +245,7 @@ public class TilePipe extends TileEntity {
                         dir = dir2;
                 }
 
-                //If the pipe can inject or extract, add to the cache
+                // If the pipe can inject or extract, add to the cache
                 if (dir != null)
                     attemptLink(dir, tile);
             }
@@ -267,8 +259,6 @@ public class TilePipe extends TileEntity {
             if (dir != null)
                 connectedSides[dir.ordinal()] = false;
         }
-
-
     }
 
     public HandlerCableNetwork getNetworkHandler() {
@@ -303,6 +293,6 @@ public class TilePipe extends TileEntity {
 
     public void setInvalid() {
         initialized = false;
-        //markDirty();
+        // markDirty();
     }
 }

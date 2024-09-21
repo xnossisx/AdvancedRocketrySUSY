@@ -25,5 +25,4 @@ public class PrecisionLaserEtcherRecipeHandler implements IRecipeHandler<Precisi
     public boolean isRecipeValid(PrecisionLaserEtcherWrapper recipe) {
         return true;
     }
-
 }

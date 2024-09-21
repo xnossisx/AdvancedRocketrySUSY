@@ -1,13 +1,14 @@
 package zmaster587.advancedRocketry.util;
 
 import net.minecraft.entity.Entity;
+
 import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 
 public class SpaceTravelInteraction {
 
     public static void tick(SpacePosition spacePosition, Entity entity) {
-        //Check if close to a world
+        // Check if close to a world
         if (spacePosition.world == null && spacePosition.star != null) {
             for (IDimensionProperties properties : spacePosition.star.getPlanets()) {
                 SpacePosition worldSpacePosition = properties.getSpacePosition();
@@ -16,10 +17,9 @@ public class SpaceTravelInteraction {
                 if (distanceSq < 200) {
                     spacePosition.world = (DimensionProperties) properties;
 
-
-                    //Radius to put the player
+                    // Radius to put the player
                     double radius = -480;
-                    //Assume planet centered at 0
+                    // Assume planet centered at 0
                     SpacePosition planetPosition = new SpacePosition();
                     double theta = Math.atan2(entity.motionZ, entity.motionX);
 
@@ -36,7 +36,7 @@ public class SpaceTravelInteraction {
 
             // transition to solar navigation
             if (distanceSq > 40000 * 8) {
-                //Radius to put the player
+                // Radius to put the player
                 double radius = 12;
 
                 SpacePosition planetPosition = spacePosition.world.getSpacePosition();

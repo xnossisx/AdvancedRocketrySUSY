@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.satellite;
 
+import java.util.*;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -7,7 +11,7 @@ import net.minecraft.nbt.NBTTagIntArray;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.chunk.Chunk;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
@@ -16,25 +20,23 @@ import zmaster587.advancedRocketry.util.BiomeHandler;
 import zmaster587.libVulpes.api.IUniversalEnergy;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
-import javax.annotation.Nonnull;
-import java.util.*;
-
 public class SatelliteBiomeChanger extends SatelliteBase {
 
     private static int MAX_SIZE = 1024;
     private Biome biomeId;
     private int radius;
-    //Stores blocks to be updated
-    //Note: we really don't care about order, in fact, lack of order is better
+    // Stores blocks to be updated
+    // Note: we really don't care about order, in fact, lack of order is better
     private List<HashedBlockPosition> toChangeList;
     private Set<Byte> discoveredBiomes;
-private int noise_val;
+    private int noise_val;
+
     public SatelliteBiomeChanger() {
         super();
         radius = 4;
         toChangeList = new LinkedList<>();
         discoveredBiomes = new HashSet<>();
-        biomeId =  Biome.getBiome(0);
+        biomeId = Biome.getBiome(0);
         noise_val = 6;
     }
 
@@ -71,7 +73,6 @@ private int noise_val;
     @Nonnull
     public ItemStack getControllerItemStack(@Nonnull ItemStack satIdChip,
                                             SatelliteProperties properties) {
-
         ItemBiomeChanger idChipItem = (ItemBiomeChanger) satIdChip.getItem();
         idChipItem.setSatellite(satIdChip, properties);
         return satIdChip;
@@ -82,24 +83,24 @@ private int noise_val;
         return !stack.isEmpty() && stack.getItem() instanceof ItemBiomeChanger;
     }
 
-
     @Override
     public void tickEntity() {
-        //This is hacky..
+        // This is hacky..
         World world = net.minecraftforge.common.DimensionManager.getWorld(getDimensionId());
         int powerrequired = 120;
         if (world != null) {
 
             for (int i = 0; i < 10; i++) {
-                //TODO: Better imp
+                // TODO: Better imp
 
                 if (world.getTotalWorldTime() % 1 == 0 && !toChangeList.isEmpty()) {
                     if (battery.getUniversalEnergyStored() > powerrequired) {
                         if (battery.extractEnergy(powerrequired, false) == powerrequired) {
                             HashedBlockPosition pos = toChangeList.remove(world.rand.nextInt(toChangeList.size()));
-                            //HashedBlockPosition pos = toChangeList.remove(toChangeList.size()-1);
+                            // HashedBlockPosition pos = toChangeList.remove(toChangeList.size()-1);
 
-                            BiomeHandler.terraform(world, biomeId, pos.getBlockPos(), true, world.provider.getDimension());
+                            BiomeHandler.terraform(world, biomeId, pos.getBlockPos(), true,
+                                    world.provider.getDimension());
                         }
                     } else
                         break;
@@ -126,8 +127,8 @@ private int noise_val;
 
         // make it less square by adding noise to the edges
 
-        for (int xx = -radius-noise_val; xx < radius+noise_val; xx++) {
-            for (int zz = -radius-noise_val; zz < radius+noise_val; zz++) {
+        for (int xx = -radius - noise_val; xx < radius + noise_val; xx++) {
+            for (int zz = -radius - noise_val; zz < radius + noise_val; zz++) {
 
                 int nx = xx + pos.getX();
                 int nz = zz + pos.getZ();
@@ -142,14 +143,13 @@ private int noise_val;
     }
 
     private boolean isAdd(int xx, int zz) {
-
         if (xx > radius || xx < -radius || zz > radius || zz < -radius) {
             Random r = new Random();
             // less probability if it gets further away from max radius
             int dx = Math.abs(xx) - radius;
             int dz = Math.abs(zz) - radius;
             int d = Math.max(dx, dz);
-            d = Math.max((d + 1)/2, 1);
+            d = Math.max((d + 1) / 2, 1);
             if (r.nextInt(d) == 0)
                 return true;
             return false;
@@ -173,7 +173,7 @@ private int noise_val;
 
         int[] array = new int[toChangeList.size() * 3];
         Iterator<HashedBlockPosition> itr = toChangeList.iterator();
-        for (int i = 0; i < toChangeList.size()*3; i += 3) {
+        for (int i = 0; i < toChangeList.size() * 3; i += 3) {
             HashedBlockPosition pos = itr.next();
             array[i] = pos.x;
             array[i + 1] = pos.y;
@@ -211,4 +211,3 @@ private int noise_val;
         }
     }
 }
-

@@ -1,15 +1,15 @@
 package zmaster587.advancedRocketry.util.nbt;
 
+import java.util.Collection;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Consumer;
+
 import net.minecraft.nbt.*;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.util.INBTSerializable;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 /**
  * An utility class to functionally construct NBTTagCompound.
@@ -100,7 +100,8 @@ public class NBTTagCompoundBuilder {
         return this;
     }
 
-    public NBTTagCompoundBuilder setCollection(String key, Collection<? extends INBTSerializable<? extends NBTBase>> collection) {
+    public NBTTagCompoundBuilder setCollection(String key,
+                                               Collection<? extends INBTSerializable<? extends NBTBase>> collection) {
         NBTHelper.writeCollection(key, instance, collection);
         return this;
     }
@@ -130,7 +131,8 @@ public class NBTTagCompoundBuilder {
         return this;
     }
 
-    public <T> NBTTagCompoundBuilder setCollection(String key, Collection<T> collection, ParametrizedFactory<T, ? extends NBTBase> serializer) {
+    public <T> NBTTagCompoundBuilder setCollection(String key, Collection<T> collection,
+                                                   ParametrizedFactory<T, ? extends NBTBase> serializer) {
         NBTHelper.writeCollection(key, instance, collection, serializer);
         return this;
     }
@@ -145,7 +147,8 @@ public class NBTTagCompoundBuilder {
         return this;
     }
 
-    public <T> NBTTagCompoundBuilder setMap(String key, Map<?, T> map, ParametrizedFactory<T, ? extends NBTBase> serializer) {
+    public <T> NBTTagCompoundBuilder setMap(String key, Map<?, T> map,
+                                            ParametrizedFactory<T, ? extends NBTBase> serializer) {
         NBTHelper.writeMap(key, instance, map, serializer);
         return this;
     }

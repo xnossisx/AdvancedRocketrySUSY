@@ -4,7 +4,9 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.libVulpes.block.RotatableBlock;
@@ -34,10 +36,12 @@ public class RenderBiomeScanner extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Initial setup
+        // Initial setup
 
-        //Rotate and move the model into position
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
+        // Rotate and move the model into position
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
         GL11.glTranslated(x, y, z + 1);
 
         bindTexture(texture);
@@ -46,5 +50,4 @@ public class RenderBiomeScanner extends TileEntitySpecialRenderer {
 
         GL11.glPopMatrix();
     }
-
 }

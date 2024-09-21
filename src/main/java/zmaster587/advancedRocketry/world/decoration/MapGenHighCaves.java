@@ -5,11 +5,11 @@ import net.minecraft.world.chunk.ChunkPrimer;
 
 public class MapGenHighCaves extends MapGenCaveExt {
 
-
     /**
      * Recursively called by generate()
      */
-    protected void recursiveGenerate(World worldIn, int chunkX, int chunkZ, int originalX, int originalZ, ChunkPrimer chunkPrimerIn) {
+    protected void recursiveGenerate(World worldIn, int chunkX, int chunkZ, int originalX, int originalZ,
+                                     ChunkPrimer chunkPrimerIn) {
         int i = this.rand.nextInt(this.rand.nextInt(this.rand.nextInt(15) + 1) + 1);
 
         if (this.rand.nextInt(7) != 0) {
@@ -36,9 +36,9 @@ public class MapGenHighCaves extends MapGenCaveExt {
                     f2 *= this.rand.nextFloat() * this.rand.nextFloat() * 3.0F + 1.0F;
                 }
 
-                this.addTunnel(this.rand.nextLong(), originalX, originalZ, chunkPrimerIn, d0, d1, d2, f2, f, f1, 0, 0, 1.0D);
+                this.addTunnel(this.rand.nextLong(), originalX, originalZ, chunkPrimerIn, d0, d1, d2, f2, f, f1, 0, 0,
+                        1.0D);
             }
         }
     }
-
 }

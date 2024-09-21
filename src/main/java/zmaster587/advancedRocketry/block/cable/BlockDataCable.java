@@ -4,6 +4,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.cables.TileDataPipe;
 
 public class BlockDataCable extends BlockPipe {
@@ -12,10 +13,8 @@ public class BlockDataCable extends BlockPipe {
         super(material);
     }
 
-
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileDataPipe();
     }
-
 }

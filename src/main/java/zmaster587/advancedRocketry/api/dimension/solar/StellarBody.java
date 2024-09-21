@@ -1,17 +1,18 @@
 package zmaster587.advancedRocketry.api.dimension.solar;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.common.util.Constants.NBT;
-import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
-import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.advancedRocketry.util.SpacePosition;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.util.Constants.NBT;
+
+import zmaster587.advancedRocketry.api.dimension.IDimensionProperties;
+import zmaster587.advancedRocketry.dimension.DimensionProperties;
+import zmaster587.advancedRocketry.util.SpacePosition;
 
 public class StellarBody {
 
@@ -63,7 +64,7 @@ public class StellarBody {
         return (int) (100 * size);
     }
 
-    //Returns the distance between the star and sub stars
+    // Returns the distance between the star and sub stars
     public float getStarSeparation() {
         return starSeperation;
     }
@@ -163,19 +164,17 @@ public class StellarBody {
         return (int) (color[0] * 0xFF) | ((int) (color[1] * 0xFF) << 8) | ((int) (color[2] * 0xFF) << 16);
     }
 
-    //Thank you to http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
+    // Thank you to http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
 
     /**
      * @return the color of the star as an array of floats with length 3
      */
     public float[] getColor() {
-
-
-        //Define
+        // Define
         float[] color = new float[3];
-        float temperature = ((getTemperature() * .477f) + 10f); //0 -> 10 100 -> 57.7
+        float temperature = ((getTemperature() * .477f) + 10f); // 0 -> 10 100 -> 57.7
 
-        //Find red
+        // Find red
         if (temperature < 66)
             color[0] = 1f;
         else {
@@ -185,19 +184,18 @@ public class StellarBody {
             color[0] = MathHelper.clamp(color[0] / 255f, 0f, 1f);
         }
 
-        //Calc Green
+        // Calc Green
         if (temperature < 66) {
             color[1] = temperature;
             color[1] = (float) (99.47f * Math.log(color[1]) - 161.1f);
-            color[1] = MathHelper.clamp(color[1]/255, 0f, 1f);
+            color[1] = MathHelper.clamp(color[1] / 255, 0f, 1f);
         } else {
             color[1] = temperature - 60;
             color[1] = 288f * (float) Math.pow(color[1], -0.07551);
             color[1] = MathHelper.clamp(color[1] / 255f, 0f, 1f);
         }
 
-
-        //Calculate Blue
+        // Calculate Blue
         if (temperature > 67)
             color[2] = 1f;
         else if (temperature <= 19) {
@@ -245,7 +243,7 @@ public class StellarBody {
             list.appendTag(tag);
         }
 
-        if (!list.hasNoTags())
+        if (!list.isEmpty())
             nbt.setTag("subStars", list);
     }
 
@@ -278,7 +276,7 @@ public class StellarBody {
     }
 
     public SpacePosition getSpacePosition() {
-        //TODO
+        // TODO
         return new SpacePosition();
     }
 }

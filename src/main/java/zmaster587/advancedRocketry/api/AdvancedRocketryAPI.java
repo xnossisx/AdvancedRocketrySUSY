@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.api;
 
 import net.minecraft.enchantment.Enchantment;
+
 import zmaster587.advancedRocketry.api.atmosphere.IAtmosphereSealHandler;
 import zmaster587.advancedRocketry.api.dimension.solar.IGalaxy;
 
@@ -9,6 +10,7 @@ import zmaster587.advancedRocketry.api.dimension.solar.IGalaxy;
  * Created by Dark(DarkGuardsman, Robert) on 1/6/2016.
  */
 public class AdvancedRocketryAPI {
+
     /**
      * Used to check if a block is seal-able, including register & handle block sealing support
      */

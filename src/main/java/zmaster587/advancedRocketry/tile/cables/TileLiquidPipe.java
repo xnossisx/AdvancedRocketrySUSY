@@ -3,9 +3,9 @@ package zmaster587.advancedRocketry.tile.cables;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+
 import zmaster587.advancedRocketry.cable.HandlerCableNetwork;
 import zmaster587.advancedRocketry.cable.NetworkRegistry;
-
 
 public class TileLiquidPipe extends TilePipe {
 
@@ -22,5 +22,4 @@ public class TileLiquidPipe extends TilePipe {
     public HandlerCableNetwork getNetworkHandler() {
         return NetworkRegistry.liquidNetwork;
     }
-
 }

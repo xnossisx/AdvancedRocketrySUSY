@@ -1,27 +1,27 @@
 package zmaster587.advancedRocketry.util;
 
-import net.minecraft.item.ItemStack;
-
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
+import net.minecraft.item.ItemStack;
+
 public class Asteroid {
+
     private static final int precision = 1000;
     public static Random rand = new Random();
     public String ID;
-    public int distance;                    //distance from the star, impacts fuelcost
-    public int mass;                        //factor of the amount of material total
-    public int minLevel;                    //Minimum level of the telescope required
-    public float massVariability;            //variability of mass
-    public float richness;                    //factor of the ratio of ore to stone
-    public float richnessVariability;        //variability of richness
-    public float probability;                //probability of the asteroid spawning
+    public int distance;                    // distance from the star, impacts fuelcost
+    public int mass;                        // factor of the amount of material total
+    public int minLevel;                    // Minimum level of the telescope required
+    public float massVariability;            // variability of mass
+    public float richness;                    // factor of the ratio of ore to stone
+    public float richnessVariability;        // variability of richness
+    public float probability;                // probability of the asteroid spawning
     public float timeMultiplier;
     public ItemStack baseStack;
     public List<Float> stackProbabilities;    //
     public List<ItemStack> itemStacks;
-
 
     public Asteroid() {
         stackProbabilities = new LinkedList<>();
@@ -52,14 +52,12 @@ public class Asteroid {
         return getHarvest(seed, 1);
     }
 
-
     /**
      * @param seed        to use in RNG
      * @param uncertainty how uncertain the outcome should be, 1 is default settings, 0 is 100% known
      * @return
      */
     public List<StackEntry> getHarvest(long seed, float uncertainty) {
-
         List<StackEntry> entries = new LinkedList<>();
         rand.setSeed(seed);
 
@@ -83,7 +81,7 @@ public class Asteroid {
         float normFactor = 0;
         for (Float prob : stackProbabilities)
             normFactor += prob;
-        //normFactor /= stackProbabilities.size();
+        // normFactor /= stackProbabilities.size();
 
         for (int i = 0; i < numOres; i++) {
 
@@ -131,8 +129,8 @@ public class Asteroid {
         return entries;
     }
 
-
     public static class StackEntry {
+
         public ItemStack stack;
         public int variablility;
         public int midpoint;

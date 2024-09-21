@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+
 import org.lwjgl.opengl.GL11;
 
 public class FxLaser extends Particle {
@@ -31,7 +32,7 @@ public class FxLaser extends Particle {
     public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn,
                                float partialTicks, float rotationX, float rotationZ,
                                float rotationYZ, float rotationXY, float rotationXZ) {
-        //worldRendererIn.finishDrawing();
+        // worldRendererIn.finishDrawing();
 
         float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - interpPosX);
         float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - interpPosY);
@@ -43,10 +44,14 @@ public class FxLaser extends Particle {
 
         double radius = .3f;
         double fwdOffset = 0.075f;
-        double entityOffX = entityFrom.posX - MathHelper.cos((float) (entityFrom.rotationYaw * Math.PI / 180f)) * radius + fwdOffset * MathHelper.sin((float) (entityFrom.rotationYaw * Math.PI / 180f));
-        double entityOffY = entityFrom.posY + (entityFrom.getEntityId() == entityIn.getEntityId() && Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 ? entityIn.getEyeHeight() - 0.12f : 1.15f);
-        double entityOffZ = entityFrom.posZ - MathHelper.sin((float) (entityFrom.rotationYaw * Math.PI / 180f)) * radius - fwdOffset * MathHelper.cos((float) (entityFrom.rotationYaw * Math.PI / 180f));
-
+        double entityOffX = entityFrom.posX -
+                MathHelper.cos((float) (entityFrom.rotationYaw * Math.PI / 180f)) * radius +
+                fwdOffset * MathHelper.sin((float) (entityFrom.rotationYaw * Math.PI / 180f));
+        double entityOffY = entityFrom.posY + (entityFrom.getEntityId() == entityIn.getEntityId() &&
+                Minecraft.getMinecraft().gameSettings.thirdPersonView == 0 ? entityIn.getEyeHeight() - 0.12f : 1.15f);
+        double entityOffZ = entityFrom.posZ -
+                MathHelper.sin((float) (entityFrom.rotationYaw * Math.PI / 180f)) * radius -
+                fwdOffset * MathHelper.cos((float) (entityFrom.rotationYaw * Math.PI / 180f));
 
         GL11.glDisable(GL11.GL_LIGHTING);
         GL11.glEnable(GL11.GL_BLEND);
@@ -62,7 +67,6 @@ public class FxLaser extends Particle {
         buffer.pos(entityOffX - entityIn.posX, entityOffY - entityIn.posY, entityOffZ - entityIn.posZ).endVertex();
         buffer.pos(x, y, z).endVertex();
 
-
         Tessellator.getInstance().draw();
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -72,19 +76,15 @@ public class FxLaser extends Particle {
         GL11.glLineWidth(1);
     }
 
-
     @Override
     public int getFXLayer() {
         return 3;
     }
 
-
     @Override
     public void onUpdate() {
-
         if (this.particleAge++ >= this.particleMaxAge) {
             this.setExpired();
         }
     }
-
 }

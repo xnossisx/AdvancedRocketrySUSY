@@ -1,11 +1,12 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.libVulpes.network.BasePacket;
 
@@ -15,9 +16,7 @@ import zmaster587.libVulpes.network.BasePacket;
 public class PacketOxygenState extends BasePacket {
 
     @Override
-    public void write(ByteBuf out) {
-
-    }
+    public void write(ByteBuf out) {}
 
     @Override
     @SideOnly(Side.CLIENT)
@@ -26,18 +25,11 @@ public class PacketOxygenState extends BasePacket {
     }
 
     @Override
-    public void read(ByteBuf in) {
-
-    }
+    public void read(ByteBuf in) {}
 
     @Override
-    public void executeClient(EntityPlayer thePlayer) {
-
-    }
+    public void executeClient(EntityPlayer thePlayer) {}
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-
-    }
-
+    public void executeServer(EntityPlayerMP player) {}
 }

@@ -1,5 +1,10 @@
 package zmaster587.advancedRocketry.block;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -13,11 +18,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import zmaster587.advancedRocketry.entity.EntityDummy;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.List;
+import zmaster587.advancedRocketry.entity.EntityDummy;
 
 public class BlockSeat extends Block {
 
@@ -34,7 +36,7 @@ public class BlockSeat extends Block {
 
     @Override
     @Nonnull
-    public BlockRenderLayer getBlockLayer() {
+    public BlockRenderLayer getRenderLayer() {
         return BlockRenderLayer.CUTOUT;
     }
 
@@ -54,15 +56,16 @@ public class BlockSeat extends Block {
         return side == EnumFacing.DOWN;
     }
 
-    //If the block is destroyed remove any mounting associated with it
+    // If the block is destroyed remove any mounting associated with it
     @Override
-    public void onBlockDestroyedByExplosion(World world, BlockPos pos,
-                                            Explosion explosionIn) {
-        super.onBlockDestroyedByExplosion(world, pos, explosionIn);
+    public void onBlockExploded(World world, BlockPos pos,
+                                Explosion explosionIn) {
+        super.onBlockExploded(world, pos, explosionIn);
 
-        List<EntityDummy> list = world.getEntitiesWithinAABB(EntityDummy.class, new AxisAlignedBB(pos, pos.add(1, 1, 1)));
+        List<EntityDummy> list = world.getEntitiesWithinAABB(EntityDummy.class,
+                new AxisAlignedBB(pos, pos.add(1, 1, 1)));
 
-        //We only expect one but just be sure
+        // We only expect one but just be sure
         for (EntityDummy entityDummy : list) {
             if (entityDummy != null) {
                 entityDummy.setDead();
@@ -79,19 +82,20 @@ public class BlockSeat extends Block {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos,
-                                    IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY,
+                                    IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX,
+                                    float hitY,
                                     float hitZ) {
-
         if (!world.isRemote) {
-            List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(player, new AxisAlignedBB(pos, pos.add(1, 1, 1)));
+            List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(player,
+                    new AxisAlignedBB(pos, pos.add(1, 1, 1)));
 
-            //Try to mount player to dummy entity in the block
+            // Try to mount player to dummy entity in the block
             for (Entity e : list) {
                 if (e instanceof EntityDummy) {
                     if (!e.getPassengers().isEmpty()) {
                         return true;
                     } else {
-                        //Ensure that the entity is in the correct position
+                        // Ensure that the entity is in the correct position
                         e.setPosition(pos.getX() + 0.5f, pos.getY() + 0.2f, pos.getZ() + 0.5f);
                         player.startRiding(e);
                         return true;

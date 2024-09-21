@@ -1,6 +1,13 @@
 package zmaster587.advancedRocketry.tile.multiblock;
 
-import io.netty.buffer.ByteBuf;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,6 +21,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.DataStorage;
@@ -39,49 +48,57 @@ import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerConsumer;
 import zmaster587.libVulpes.util.EmbeddedInventory;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Random;
-
 public class TileObservatory extends TileMultiPowerConsumer implements IModularInventory, IDataInventory, IGuiCallback {
 
     final static int openTime = 100;
     final static int observationTime = 1000;
-    private static final Block[] lens = {AdvancedRocketryBlocks.blockLens, Blocks.GLASS};
-    private static final Object[][][] structure = new Object[][][]{
+    private static final Block[] lens = { AdvancedRocketryBlocks.blockLens, Blocks.GLASS };
+    private static final Object[][][] structure = new Object[][][] {
 
-            {{null, null, null, null, null},
-                    {null, LibVulpesBlocks.blockStructureBlock, lens, LibVulpesBlocks.blockStructureBlock, null},
-                    {null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, null},
-                    {null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, null},
-                    {null, null, null, null, null}},
+            { { null, null, null, null, null },
+                    { null, LibVulpesBlocks.blockStructureBlock, lens, LibVulpesBlocks.blockStructureBlock, null },
+                    { null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null },
+                    { null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null },
+                    { null, null, null, null, null } },
 
-            {{null, null, null, null, null},
-                    {null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, null},
-                    {null, LibVulpesBlocks.blockStructureBlock, lens, LibVulpesBlocks.blockStructureBlock, null},
-                    {null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, null},
-                    {null, null, null, null, null}},
+            { { null, null, null, null, null },
+                    { null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null },
+                    { null, LibVulpesBlocks.blockStructureBlock, lens, LibVulpesBlocks.blockStructureBlock, null },
+                    { null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null },
+                    { null, null, null, null, null } },
 
-            {{null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, null},
-                    {LibVulpesBlocks.blockStructureBlock, Blocks.AIR, Blocks.AIR, Blocks.AIR, LibVulpesBlocks.blockStructureBlock},
-                    {LibVulpesBlocks.blockStructureBlock, Blocks.AIR, Blocks.AIR, Blocks.AIR, LibVulpesBlocks.blockStructureBlock},
-                    {LibVulpesBlocks.blockStructureBlock, Blocks.AIR, lens, Blocks.AIR, LibVulpesBlocks.blockStructureBlock},
-                    {null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, null}},
+            { { null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                    LibVulpesBlocks.blockStructureBlock, null },
+                    { LibVulpesBlocks.blockStructureBlock, Blocks.AIR, Blocks.AIR, Blocks.AIR,
+                            LibVulpesBlocks.blockStructureBlock },
+                    { LibVulpesBlocks.blockStructureBlock, Blocks.AIR, Blocks.AIR, Blocks.AIR,
+                            LibVulpesBlocks.blockStructureBlock },
+                    { LibVulpesBlocks.blockStructureBlock, Blocks.AIR, lens, Blocks.AIR,
+                            LibVulpesBlocks.blockStructureBlock },
+                    { null, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null } },
 
-            {{null, '*', 'c', '*', null},
-                    {'*', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, '*'},
-                    {'*', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, '*'},
-                    {'*', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, '*'},
-                    {null, '*', '*', '*', null}},
+            { { null, '*', 'c', '*', null },
+                    { '*', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, '*' },
+                    { '*', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, '*' },
+                    { '*', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, '*' },
+                    { null, '*', '*', '*', null } },
 
-            {{null, '*', '*', '*', null},
-                    {'*', AdvancedRocketryBlocks.blockStructureTower, AdvancedRocketryBlocks.blockStructureTower, AdvancedRocketryBlocks.blockStructureTower, '*'},
-                    {'*', AdvancedRocketryBlocks.blockStructureTower, LibVulpesBlocks.motors, AdvancedRocketryBlocks.blockStructureTower, '*'},
-                    {'*', AdvancedRocketryBlocks.blockStructureTower, AdvancedRocketryBlocks.blockStructureTower, AdvancedRocketryBlocks.blockStructureTower, '*'},
-                    {null, '*', '*', '*', null}}};
+            { { null, '*', '*', '*', null },
+                    { '*', AdvancedRocketryBlocks.blockStructureTower, AdvancedRocketryBlocks.blockStructureTower,
+                            AdvancedRocketryBlocks.blockStructureTower, '*' },
+                    { '*', AdvancedRocketryBlocks.blockStructureTower, LibVulpesBlocks.motors,
+                            AdvancedRocketryBlocks.blockStructureTower, '*' },
+                    { '*', AdvancedRocketryBlocks.blockStructureTower, AdvancedRocketryBlocks.blockStructureTower,
+                            AdvancedRocketryBlocks.blockStructureTower, '*' },
+                    { null, '*', '*', '*', null } } };
     private static final byte TAB_SWITCH = 10;
     private static final byte BUTTON_PRESS = 11;
     private static final short LIST_OFFSET = 100;
@@ -106,7 +123,10 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
         lastSeed = -1;
         completionTime = observationTime;
         dataCables = new LinkedList<>();
-        tabModule = new ModuleTab(4, 0, 0, this, 2, new String[]{LibVulpes.proxy.getLocalizedString("msg.tooltip.data"), LibVulpes.proxy.getLocalizedString("msg.tooltip.asteroidselection")}, new ResourceLocation[][]{TextureResources.tabData, TextureResources.tabAsteroid});
+        tabModule = new ModuleTab(4, 0, 0, this, 2,
+                new String[] { LibVulpes.proxy.getLocalizedString("msg.tooltip.data"),
+                        LibVulpes.proxy.getLocalizedString("msg.tooltip.asteroidselection") },
+                new ResourceLocation[][] { TextureResources.tabData, TextureResources.tabAsteroid });
     }
 
     public float getOpenProgress() {
@@ -133,7 +153,6 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
     @Override
     protected void replaceStandardBlock(BlockPos newPos, IBlockState state,
                                         TileEntity tile) {
-
         Block block = state.getBlock();
 
         if (block == AdvancedRocketryBlocks.blockLens) {
@@ -153,14 +172,15 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
 
     @Override
     public void update() {
-
-        //Freaky jenky crap to make sure the multiblock loads on chunkload etc
+        // Freaky jenky crap to make sure the multiblock loads on chunkload etc
         if (timeAlive == 0) {
             attemptCompleteStructure(world.getBlockState(pos));
             timeAlive = 0x1;
         }
 
-        if ((world.isRemote && isOpen) || (!world.isRemote && isRunning() && getMachineEnabled() && ((!world.isRaining() && world.canBlockSeeSky(pos.add(0, 1, 0)) && !world.isDaytime()) || world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId))) {
+        if ((world.isRemote && isOpen) || (!world.isRemote && isRunning() && getMachineEnabled() &&
+                ((!world.isRaining() && world.canBlockSeeSky(pos.add(0, 1, 0)) && !world.isDaytime()) ||
+                        world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId))) {
 
             if (!isOpen) {
                 isOpen = true;
@@ -184,15 +204,14 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
         }
     }
 
-    //Always running if enabled
+    // Always running if enabled
     @Override
     public boolean isRunning() {
         return true;
     }
 
     @Override
-    protected void processComplete() {
-    }
+    protected void processComplete() {}
 
     @Override
     public void resetCache() {
@@ -208,7 +227,6 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
     @Override
     @Nonnull
     public AxisAlignedBB getRenderBoundingBox() {
-
         return new AxisAlignedBB(pos.add(-5, -3, -5), pos.add(5, 3, 5));
     }
 
@@ -278,8 +296,8 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
     @Override
     public boolean completeStructure(IBlockState state) {
         boolean result = super.completeStructure(state);
-        ((BlockMultiblockMachine) world.getBlockState(pos).getBlock()).setBlockState(world, world.getBlockState(pos), pos, result);
-
+        ((BlockMultiblockMachine) world.getBlockState(pos).getBlock()).setBlockState(world, world.getBlockState(pos),
+                pos, result);
 
         completionTime = observationTime;
         return result;
@@ -298,43 +316,54 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
 
         if (tabModule.getTab() == 1) {
 
-            //ADD io slots
+            // ADD io slots
             modules.add(new ModuleTexturedSlotArray(5, 120, this, 1, 2, TextureResources.idChip));
             modules.add(new ModuleOutputSlotArray(45, 120, this, 2, 3));
-            modules.add(new ModuleProgress(25, 120, 0, new ProgressBarImage(217, 0, 17, 17, 234, 0, EnumFacing.DOWN, TextureResources.progressBars), this));
-            modules.add(new ModuleButton(25, 120, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonNull, LibVulpes.proxy.getLocalizedString("msg.observetory.text.processdiscovery"), 17, 17));
+            modules.add(new ModuleProgress(25, 120, 0,
+                    new ProgressBarImage(217, 0, 17, 17, 234, 0, EnumFacing.DOWN, TextureResources.progressBars),
+                    this));
+            modules.add(
+                    new ModuleButton(25, 120, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonNull,
+                            LibVulpes.proxy.getLocalizedString("msg.observetory.text.processdiscovery"), 17, 17));
 
+            ModuleButton scanButton = new ModuleButton(100, 120, 2,
+                    LibVulpes.proxy.getLocalizedString("msg.observetory.scan.button"), this,
+                    zmaster587.libVulpes.inventory.TextureResources.buttonBuild,
+                    LibVulpes.proxy.getLocalizedString("msg.observetory.scan.tooltip"), 64, 18);
 
-            ModuleButton scanButton = new ModuleButton(100, 120, 2, LibVulpes.proxy.getLocalizedString("msg.observetory.scan.button"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild, LibVulpes.proxy.getLocalizedString("msg.observetory.scan.tooltip"), 64, 18);
-
-            scanButton.setColor(extractData(dataConsumedPerRefresh, DataType.DISTANCE, EnumFacing.DOWN, false) == dataConsumedPerRefresh ? 0x00ff00 : 0xff0000);
+            scanButton.setColor(extractData(dataConsumedPerRefresh, DataType.DISTANCE, EnumFacing.DOWN, false) ==
+                    dataConsumedPerRefresh ? 0x00ff00 : 0xff0000);
 
             modules.add(scanButton);
-
 
             List<ModuleBase> list2 = new LinkedList<>();
             List<ModuleBase> buttonList = new LinkedList<>();
             buttonType.clear();
 
-
             int g = 0;
             Asteroid asteroidSmol;
-            if (lastButton != -1 && lastType != null && !lastType.isEmpty() && (asteroidSmol = ARConfiguration.getCurrentConfig().asteroidTypes.get(lastType)) != null) {
-                List<StackEntry> harvestList = asteroidSmol.getHarvest(lastSeed + lastButton, Math.max(1 - ((Math.min(getDataAmt(DataType.COMPOSITION), 2000) + Math.min(getDataAmt(DataType.MASS), 2000)) / 4000f), 0));
+            if (lastButton != -1 && lastType != null && !lastType.isEmpty() &&
+                    (asteroidSmol = ARConfiguration.getCurrentConfig().asteroidTypes.get(lastType)) != null) {
+                List<StackEntry> harvestList = asteroidSmol.getHarvest(lastSeed + lastButton,
+                        Math.max(1 - ((Math.min(getDataAmt(DataType.COMPOSITION), 2000) +
+                                Math.min(getDataAmt(DataType.MASS), 2000)) / 4000f), 0));
                 for (StackEntry entry : harvestList) {
-                    //buttonList.add(new ModuleButton((g % 3)*24, 24*(g/3), -2, "",this, TextureResources.tabData, 24, 24));
-                    buttonList.add(new ModuleSlotButton((g % 2) * 24 + 1, 24 * (g / 2) + 1, -2, this, entry.stack, entry.midpoint + " +/-  " + entry.variablility, getWorld()));
-                    buttonList.add(new ModuleText((g % 2) * 24 + 1, 24 * (g / 2) + 1, entry.midpoint + "\n+/- " + entry.variablility, 0xFFFFFF, 0.5f));
+                    // buttonList.add(new ModuleButton((g % 3)*24, 24*(g/3), -2, "",this, TextureResources.tabData, 24,
+                    // 24));
+                    buttonList.add(new ModuleSlotButton((g % 2) * 24 + 1, 24 * (g / 2) + 1, -2, this, entry.stack,
+                            entry.midpoint + " +/-  " + entry.variablility, getWorld()));
+                    buttonList.add(new ModuleText((g % 2) * 24 + 1, 24 * (g / 2) + 1,
+                            entry.midpoint + "\n+/- " + entry.variablility, 0xFFFFFF, 0.5f));
                     g++;
                 }
 
                 float time = asteroidSmol.timeMultiplier;
 
-                buttonList.add(new ModuleText(0, 24 * (1 + (g / 2)), String.format("%s\n%.2fx", "Time:", time), 0x2f2f2f));
+                buttonList.add(
+                        new ModuleText(0, 24 * (1 + (g / 2)), String.format("%s\n%.2fx", "Time:", time), 0x2f2f2f));
             }
 
-
-            //Calculate Types
+            // Calculate Types
             int totalAmountAllowed = 10;
             float totalWeight = 0;
 
@@ -347,7 +376,7 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
                 }
             }
 
-            //Yeah, eww
+            // Yeah, eww
             List<Asteroid> finalList = new LinkedList<>();
             Random rand = new Random(lastSeed);
             for (Asteroid asteroid : viableTypes) {
@@ -357,11 +386,11 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
                 }
             }
 
-
             for (int i = 0; i < finalList.size(); i++) {
                 Asteroid asteroid = finalList.get(i);
 
-                ModuleButton button = new ModuleButton(0, i * 18, LIST_OFFSET + i, asteroid.getName(), this, TextureResources.buttonAsteroid, 112, 18);
+                ModuleButton button = new ModuleButton(0, i * 18, LIST_OFFSET + i, asteroid.getName(), this,
+                        TextureResources.buttonAsteroid, 112, 18);
 
                 if (lastButton - LIST_OFFSET == i) {
                     button.setColor(0xFFFF00);
@@ -371,50 +400,56 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
                 buttonType.put(i, asteroid.getName());
             }
 
+            modules.add(new ModuleText(10, 18, LibVulpes.proxy.getLocalizedString("msg.observetory.text.asteroids"),
+                    0x2d2d2d));
+            modules.add(new ModuleText(105, 18, LibVulpes.proxy.getLocalizedString("msg.observetory.text.composition"),
+                    0x2d2d2d));
 
-            modules.add(new ModuleText(10, 18, LibVulpes.proxy.getLocalizedString("msg.observetory.text.asteroids"), 0x2d2d2d));
-            modules.add(new ModuleText(105, 18, LibVulpes.proxy.getLocalizedString("msg.observetory.text.composition"), 0x2d2d2d));
-
-
-            //Ore display
+            // Ore display
             int baseX = 122;
             int baseY = 32;
             int sizeX = 52;
             int sizeY = 46;
             if (world.isRemote) {
-                //Border
-                modules.add(new ModuleScaledImage(baseX - 3, baseY - 3, 3, baseY + sizeY + 6, TextureResources.verticalBar));
-                modules.add(new ModuleScaledImage(baseX + sizeX, baseY - 3, -3, baseY + sizeY + 6, TextureResources.verticalBar));
+                // Border
+                modules.add(new ModuleScaledImage(baseX - 3, baseY - 3, 3, baseY + sizeY + 6,
+                        TextureResources.verticalBar));
+                modules.add(new ModuleScaledImage(baseX + sizeX, baseY - 3, -3, baseY + sizeY + 6,
+                        TextureResources.verticalBar));
                 modules.add(new ModuleScaledImage(baseX, baseY - 3, sizeX, 3, TextureResources.horizontalBar));
                 modules.add(new ModuleScaledImage(baseX, 2 * baseY + sizeY, sizeX, -3, TextureResources.horizontalBar));
             }
 
-            ModuleContainerPanYOnly pan2 = new ModuleContainerPanYOnly(baseX, baseY, buttonList, new LinkedList<>(), null, 40, 48, 0, 0, 0, 72);
+            ModuleContainerPanYOnly pan2 = new ModuleContainerPanYOnly(baseX, baseY, buttonList, new LinkedList<>(),
+                    null, 40, 48, 0, 0, 0, 72);
             modules.add(pan2);
 
-            //Add borders for asteroid
-             baseX = 5;
-             baseY = 32;
-             sizeX = 112;
-             sizeY = 46;
+            // Add borders for asteroid
+            baseX = 5;
+            baseY = 32;
+            sizeX = 112;
+            sizeY = 46;
             if (world.isRemote) {
-                //Border
-                modules.add(new ModuleScaledImage(baseX - 3, baseY - 3, 3, baseY + sizeY + 6, TextureResources.verticalBar));
-                modules.add(new ModuleScaledImage(baseX + sizeX, baseY - 3, -3, baseY + sizeY + 6, TextureResources.verticalBar));
+                // Border
+                modules.add(new ModuleScaledImage(baseX - 3, baseY - 3, 3, baseY + sizeY + 6,
+                        TextureResources.verticalBar));
+                modules.add(new ModuleScaledImage(baseX + sizeX, baseY - 3, -3, baseY + sizeY + 6,
+                        TextureResources.verticalBar));
                 modules.add(new ModuleScaledImage(baseX, baseY - 3, sizeX, 3, TextureResources.horizontalBar));
                 modules.add(new ModuleScaledImage(baseX, 2 * baseY + sizeY, sizeX, -3, TextureResources.horizontalBar));
             }
 
-            //Relying on a bug, is this safe?
+            // Relying on a bug, is this safe?
             if (lastSeed != -1) {
-                ModuleContainerPanYOnly pan = new ModuleContainerPanYOnly(baseX, baseY, list2, new LinkedList<>(), null, sizeX - 2, sizeY, 0, -48, 0, 72);
+                ModuleContainerPanYOnly pan = new ModuleContainerPanYOnly(baseX, baseY, list2, new LinkedList<>(), null,
+                        sizeX - 2, sizeY, 0, -48, 0, 72);
                 modules.add(pan);
             }
 
-
         } else if (tabModule.getTab() == 0) {
             modules.add(new ModulePower(18, 20, getBatteries()));
-            modules.add(toggleSwitch = new ModuleToggleSwitch(160, 5, 0, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage, 11, 26, getMachineEnabled()));
+            modules.add(toggleSwitch = new ModuleToggleSwitch(160, 5, 0, "", this,
+                    zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage, 11, 26, getMachineEnabled()));
 
             List<DataStorage> distanceStorage = new LinkedList<>();
             List<DataStorage> compositionStorage = new LinkedList<>();
@@ -443,14 +478,19 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
                 modules.add(new ModuleData(120, 20, 4, this, massStorage.toArray(new DataStorage[0])));
             }
 
-            modules.add(new ModuleText(10, 90, LibVulpes.proxy.getLocalizedString("msg.observetory.text.observabledistance") + " " + getMaxDistance(), 0x2d2d2d, false));
+            modules.add(new ModuleText(10, 90,
+                    LibVulpes.proxy.getLocalizedString("msg.observetory.text.observabledistance") + " " +
+                            getMaxDistance(),
+                    0x2d2d2d, false));
         }
 
-		/*DataStorage data[] = new DataStorage[dataCables.size()];
-
-		if(data.length > 0)
-			modules.add(new ModuleData(40, 20, 0, this, data));*/
-        //modules.add(new ModuleProgress(120, 30, 0, TextureResources.progressScience, this));
+        /*
+         * DataStorage data[] = new DataStorage[dataCables.size()];
+         * 
+         * if(data.length > 0)
+         * modules.add(new ModuleData(40, 20, 0, this, data));
+         */
+        // modules.add(new ModuleProgress(120, 30, 0, TextureResources.progressScience, this));
 
         return modules;
     }
@@ -464,7 +504,7 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
         super.onInventoryButtonPressed(buttonId);
 
         if (buttonId == 1) {
-            //Begin discovery processing
+            // Begin discovery processing
             PacketHandler.sendToServer(new PacketMachine(this, PROCESS_CHIP));
         }
 
@@ -475,17 +515,17 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
         }
         if (buttonId == 2) {
 
-            //for(TileDataBus bus : getDataBus()) {
-            if (extractData(dataConsumedPerRefresh, DataType.DISTANCE, EnumFacing.UP, false) == dataConsumedPerRefresh) {
+            // for(TileDataBus bus : getDataBus()) {
+            if (extractData(dataConsumedPerRefresh, DataType.DISTANCE, EnumFacing.UP, false) ==
+                    dataConsumedPerRefresh) {
                 lastSeed = world.getTotalWorldTime() / 100;
                 lastButton = -1;
                 lastType = "";
                 PacketHandler.sendToServer(new PacketMachine(this, SEED_CHANGE));
             }
-            //}
+            // }
         }
     }
-
 
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id,
@@ -498,25 +538,28 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
             loadData(-2);
         else if (id == TAB_SWITCH && !world.isRemote) {
             tabModule.setTab(nbt.getShort("tab"));
-            player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), getWorld(), pos.getX(), pos.getY(), pos.getZ());
+            player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), getWorld(), pos.getX(),
+                    pos.getY(), pos.getZ());
         } else if (id == BUTTON_PRESS && !world.isRemote) {
             lastButton = nbt.getShort("button");
             lastType = buttonType.get(lastButton - LIST_OFFSET);
             markDirty();
             world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
-            player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), getWorld(), pos.getX(), pos.getY(), pos.getZ());
+            player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), getWorld(), pos.getX(),
+                    pos.getY(), pos.getZ());
 
         } else if (id == SEED_CHANGE) {
-            if (extractData(dataConsumedPerRefresh, DataType.DISTANCE, EnumFacing.UP, false) >= dataConsumedPerRefresh) {
+            if (extractData(dataConsumedPerRefresh, DataType.DISTANCE, EnumFacing.UP, false) >=
+                    dataConsumedPerRefresh) {
                 lastSeed = world.getTotalWorldTime() / 100;
                 lastButton = -1;
                 lastType = "";
                 extractData(dataConsumedPerRefresh, DataType.DISTANCE, EnumFacing.UP, true);
                 world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 2);
                 markDirty();
-                player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), getWorld(), pos.getX(), pos.getY(), pos.getZ());
+                player.openGui(LibVulpes.instance, GuiHandler.guiId.MODULARNOINV.ordinal(), getWorld(), pos.getX(),
+                        pos.getY(), pos.getZ());
             }
-
 
         } else if (id == PROCESS_CHIP && !world.isRemote) {
 
@@ -555,7 +598,6 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
             nbt.setShort("tab", in.readShort());
         else if (packetId == BUTTON_PRESS)
             nbt.setShort("button", in.readShort());
-
     }
 
     @Override
@@ -601,13 +643,10 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
     }
 
     @Override
-    public void openInventory(EntityPlayer player) {
-
-    }
+    public void openInventory(EntityPlayer player) {}
 
     @Override
-    public void closeInventory(EntityPlayer player) {
-    }
+    public void closeInventory(EntityPlayer player) {}
 
     @Override
     public boolean isItemValidForSlot(int p_94041_1_, @Nonnull ItemStack p_94041_2_) {
@@ -633,7 +672,8 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
     @Override
     public void loadData(int id) {
         int chipSlot = !inv.getStackInSlot(0).isEmpty() ? 0 : !inv.getStackInSlot(3).isEmpty() ? 3 : 4;
-        ItemStack dataChip = !inv.getStackInSlot(0).isEmpty() ? inv.getStackInSlot(0) : !inv.getStackInSlot(3).isEmpty() ? inv.getStackInSlot(3) : inv.getStackInSlot(4);
+        ItemStack dataChip = !inv.getStackInSlot(0).isEmpty() ? inv.getStackInSlot(0) :
+                !inv.getStackInSlot(3).isEmpty() ? inv.getStackInSlot(3) : inv.getStackInSlot(4);
 
         if (dataChip != ItemStack.EMPTY && dataChip.getItem() instanceof ItemData && dataChip.getCount() == 1) {
 
@@ -642,10 +682,15 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
 
             for (TileDataBus tile : dataCables) {
                 if (doesSlotIndexMatchDataType(data.getDataType(), chipSlot))
-                    dataItem.removeData(dataChip, tile.addData(Math.min(tile.getDataObject().getMaxData() - tile.getData(), data.getMaxData()), data.getDataType(), EnumFacing.UP, true), DataStorage.DataType.UNDEFINED);
+                    dataItem.removeData(dataChip,
+                            tile.addData(
+                                    Math.min(tile.getDataObject().getMaxData() - tile.getData(), data.getMaxData()),
+                                    data.getDataType(), EnumFacing.UP, true),
+                            DataStorage.DataType.UNDEFINED);
             }
 
-            //dataItem.setData(dataChip, data.getData(), data.getData() != 0 ? data.getDataType() : DataType.UNDEFINED);
+            // dataItem.setData(dataChip, data.getData(), data.getData() != 0 ? data.getDataType() :
+            // DataType.UNDEFINED);
         }
 
         if (world.isRemote) {
@@ -656,7 +701,8 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
     @Override
     public void storeData(int id) {
         int chipSlot = !inv.getStackInSlot(0).isEmpty() ? 0 : !inv.getStackInSlot(3).isEmpty() ? 3 : 4;
-        ItemStack dataChip = !inv.getStackInSlot(0).isEmpty() ? inv.getStackInSlot(0) : !inv.getStackInSlot(3).isEmpty() ? inv.getStackInSlot(3) : inv.getStackInSlot(4);
+        ItemStack dataChip = !inv.getStackInSlot(0).isEmpty() ? inv.getStackInSlot(0) :
+                !inv.getStackInSlot(3).isEmpty() ? inv.getStackInSlot(3) : inv.getStackInSlot(4);
 
         if (dataChip != ItemStack.EMPTY && dataChip.getItem() instanceof ItemData && dataChip.getCount() == 1) {
 
@@ -666,7 +712,8 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
             for (TileDataBus tile : dataCables) {
                 DataStorage.DataType dataType = tile.getDataObject().getDataType();
                 if (doesSlotIndexMatchDataType(dataType, chipSlot))
-                    data.addData(tile.extractData(data.getMaxData() - data.getData(), data.getDataType(), EnumFacing.UP, true), dataType, true);
+                    data.addData(tile.extractData(data.getMaxData() - data.getData(), data.getDataType(), EnumFacing.UP,
+                            true), dataType, true);
             }
 
             dataItem.setData(dataChip, data.getData(), data.getDataType());
@@ -695,9 +742,7 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
     }
 
     @Override
-    public void setField(int id, int value) {
-
-    }
+    public void setField(int id, int value) {}
 
     @Override
     public int getFieldCount() {
@@ -705,17 +750,16 @@ public class TileObservatory extends TileMultiPowerConsumer implements IModularI
     }
 
     @Override
-    public void clear() {
-
-    }
+    public void clear() {}
 
     @Override
     public void onModuleUpdated(ModuleBase module) {
-        //ReopenUI on server
+        // ReopenUI on server
         PacketHandler.sendToServer(new PacketMachine(this, TAB_SWITCH));
     }
 
     private boolean doesSlotIndexMatchDataType(DataType type, int slotIndex) {
-        return (type == DataType.DISTANCE && slotIndex == 0) || (type == DataType.COMPOSITION && slotIndex == 3) || (type == DataType.MASS && slotIndex == 4);
+        return (type == DataType.DISTANCE && slotIndex == 0) || (type == DataType.COMPOSITION && slotIndex == 3) ||
+                (type == DataType.MASS && slotIndex == 4);
     }
 }

@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
  * Stores references to Advanced Rocketry's blocks
  */
 public class AdvancedRocketryBlocks {
+
     public static Block blockTerraformingTerminal;
     public static Block blockNuclearEngine;
     public static Block blockSpaceLaser;

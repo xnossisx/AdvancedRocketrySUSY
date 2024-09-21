@@ -26,5 +26,4 @@ public class PlatePressCategory extends MachineCategoryTemplate<PlatePressWrappe
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

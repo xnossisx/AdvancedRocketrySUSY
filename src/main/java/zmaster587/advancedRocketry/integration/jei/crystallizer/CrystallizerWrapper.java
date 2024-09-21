@@ -8,5 +8,4 @@ public class CrystallizerWrapper extends MachineRecipe {
     CrystallizerWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

@@ -1,28 +1,29 @@
 package zmaster587.advancedRocketry.item;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import zmaster587.libVulpes.LibVulpes;
 
-import javax.annotation.Nonnull;
-import java.util.List;
+import com.mojang.realmsclient.gui.ChatFormatting;
+
+import zmaster587.libVulpes.LibVulpes;
 
 public class ItemAsteroidChip extends ItemMultiData {
 
     private static final String uuidIdentifier = "UUID";
     private static final String astType = "astype";
 
-    public ItemAsteroidChip() {
-    }
+    public ItemAsteroidChip() {}
 
     @Override
     public boolean isDamageable() {
         return false;
     }
-
 
     /**
      * Removes any Information and reset the stack to a default state
@@ -69,22 +70,21 @@ public class ItemAsteroidChip extends ItemMultiData {
 
     @Override
     public void addInformation(@Nonnull ItemStack stack, World player, List<String> list, ITooltipFlag bool) {
-
         if (!stack.hasTagCompound()) {
             list.add(LibVulpes.proxy.getLocalizedString("msg.unprogrammed"));
         } else {
             if (stack.getItemDamage() == 0) {
 
-                list.add(LibVulpes.proxy.getLocalizedString("msg.asteroidChip.asteroid") + "-" + ChatFormatting.DARK_GREEN + getUUID(stack));
+                list.add(LibVulpes.proxy.getLocalizedString("msg.asteroidChip.asteroid") + "-" +
+                        ChatFormatting.DARK_GREEN + getUUID(stack));
 
                 super.addInformation(stack, player, list, bool);
 
-                //list.add("Mass: " + unknown);
-                //list.add("Atmosphere Density: " + unknown);
-                //list.add("Distance From Star: " + unknown);
+                // list.add("Mass: " + unknown);
+                // list.add("Atmosphere Density: " + unknown);
+                // list.add("Distance From Star: " + unknown);
 
             }
         }
     }
-
 }

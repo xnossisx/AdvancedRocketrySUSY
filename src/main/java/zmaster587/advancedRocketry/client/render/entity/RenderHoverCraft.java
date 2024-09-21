@@ -9,7 +9,9 @@ import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.entity.EntityHoverCraft;
@@ -36,7 +38,7 @@ public class RenderHoverCraft extends Render<EntityHoverCraft> implements IRende
 
     @Override
     public Render<? super EntityHoverCraft> createRenderFor(
-            RenderManager manager) {
+                                                            RenderManager manager) {
         return new RenderHoverCraft(manager);
     }
 
@@ -49,15 +51,13 @@ public class RenderHoverCraft extends Render<EntityHoverCraft> implements IRende
     public boolean shouldRender(EntityHoverCraft livingEntity,
                                 ICamera camera, double camX, double camY, double camZ) {
         // TODO Auto-generated method stub
-        //return super.shouldRender(livingEntity, camera, camX, camY, camZ);
+        // return super.shouldRender(livingEntity, camera, camX, camY, camZ);
         return true;
     }
 
     @Override
     public void doRender(EntityHoverCraft entity, double x, double y, double z,
                          float entityYaw, float partialTicks) {
-
-
         GL11.glPushMatrix();
         GL11.glTranslated(x, y + 1, z);
         GL11.glRotated(180 - entityYaw, 0, 1, 0);
@@ -78,21 +78,23 @@ public class RenderHoverCraft extends Render<EntityHoverCraft> implements IRende
         final float offsetZ = 1.9f;
         float offset = -0.1f;
 
-
         for (int i = 0; i < count; i++) {
             float newRadius = (offset * (count - i) - 0.85f - start) * 0.5f;
 
             RenderHelper.renderTopFace(buffer, start + offset * i, -newRadius, -newRadius, newRadius, newRadius);
             RenderHelper.renderBottomFace(buffer, start + offset * i, -newRadius, -newRadius, newRadius, newRadius);
 
-            RenderHelper.renderTopFace(buffer, start + offset * i, -newRadius + offsetX, -newRadius + offsetZ, newRadius + offsetX, newRadius + offsetZ);
-            RenderHelper.renderBottomFace(buffer, start + offset * i, -newRadius + offsetX, -newRadius + offsetZ, newRadius + offsetX, newRadius + offsetZ);
+            RenderHelper.renderTopFace(buffer, start + offset * i, -newRadius + offsetX, -newRadius + offsetZ,
+                    newRadius + offsetX, newRadius + offsetZ);
+            RenderHelper.renderBottomFace(buffer, start + offset * i, -newRadius + offsetX, -newRadius + offsetZ,
+                    newRadius + offsetX, newRadius + offsetZ);
 
-            RenderHelper.renderTopFace(buffer, start + offset * i, -newRadius - offsetX, -newRadius + offsetZ, newRadius - offsetX, newRadius + offsetZ);
-            RenderHelper.renderBottomFace(buffer, start + offset * i, -newRadius - offsetX, -newRadius + offsetZ, newRadius - offsetX, newRadius + offsetZ);
+            RenderHelper.renderTopFace(buffer, start + offset * i, -newRadius - offsetX, -newRadius + offsetZ,
+                    newRadius - offsetX, newRadius + offsetZ);
+            RenderHelper.renderBottomFace(buffer, start + offset * i, -newRadius - offsetX, -newRadius + offsetZ,
+                    newRadius - offsetX, newRadius + offsetZ);
         }
         Tessellator.getInstance().draw();
-
 
         GlStateManager.enableTexture2D();
         GlStateManager.disableBlend();

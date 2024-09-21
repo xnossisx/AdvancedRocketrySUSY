@@ -26,5 +26,4 @@ public class SawMillCategory extends MachineCategoryTemplate<SawMillWrapper> {
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

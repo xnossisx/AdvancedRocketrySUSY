@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.world.biome;
 
+import java.util.Random;
+
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -7,11 +9,10 @@ import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.world.gen.WorldGenCharredTree;
 import zmaster587.advancedRocketry.world.gen.WorldGenElectricMushroom;
-
-import java.util.Random;
 
 public class BiomeGenStormland extends Biome {
 
@@ -36,15 +37,14 @@ public class BiomeGenStormland extends Biome {
         int x = pos.getX() + rand.nextInt(16);
         int y = rand.nextInt(28) + 80;
         int z = pos.getZ() + rand.nextInt(16);
-        (new WorldGenElectricMushroom(AdvancedRocketryBlocks.blockElectricMushroom)).generate(worldIn, rand, new BlockPos(x, y, z));
+        (new WorldGenElectricMushroom(AdvancedRocketryBlocks.blockElectricMushroom)).generate(worldIn, rand,
+                new BlockPos(x, y, z));
     }
-
 
     @Override
     public float getSpawningChance() {
-        return 0f; //Nothing spawns
+        return 0f; // Nothing spawns
     }
-
 
     @Override
     @SideOnly(Side.CLIENT)

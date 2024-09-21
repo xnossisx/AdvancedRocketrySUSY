@@ -1,5 +1,10 @@
 package zmaster587.advancedRocketry.inventory.modules;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -8,14 +13,12 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.gui.CommonResources;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
-
-import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.List;
 
 public class ModuleBrokenPart extends ModuleBase {
 
@@ -60,14 +63,14 @@ public class ModuleBrokenPart extends ModuleBase {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void renderToolTip(final int guiOffsetX, final int guiOffsetY, final int mouseX, final int mouseY, final float zLevel, final GuiContainer gui, final FontRenderer font) {
+    public void renderToolTip(final int guiOffsetX, final int guiOffsetY, final int mouseX, final int mouseY,
+                              final float zLevel, final GuiContainer gui, final FontRenderer font) {
         super.renderToolTip(guiOffsetX, guiOffsetY, mouseX, mouseY, zLevel, gui, font);
 
         if (this.part != null && this.isMouseOver(mouseX, mouseY)) {
             List<String> list = Arrays.asList(
-                    LibVulpes.proxy.getLocalizedString(this.part.getUnlocalizedName() + ".name"),
-                    LibVulpes.proxy.getLocalizedString("msg.brokenstage.text") + ": " + this.part.getItemDamage() / 3
-            );
+                    LibVulpes.proxy.getLocalizedString(this.part.getTranslationKey() + ".name"),
+                    LibVulpes.proxy.getLocalizedString("msg.brokenstage.text") + ": " + this.part.getItemDamage() / 3);
             this.drawTooltip(gui, list, mouseX, mouseY, zLevel, font);
         }
     }

@@ -1,17 +1,18 @@
 package zmaster587.advancedRocketry.satellite;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.api.IUniversalEnergyTransmitter;
-
-import javax.annotation.Nonnull;
 
 public class SatelliteMicrowaveEnergy extends SatelliteBase implements IUniversalEnergyTransmitter {
 
@@ -31,7 +32,6 @@ public class SatelliteMicrowaveEnergy extends SatelliteBase implements IUniversa
         return LibVulpes.proxy.getLocalizedString("msg.itemsatellite.microwavestatus");
     }
 
-
     @Override
     public String getName() {
         return "Microwave Energy Satellite";
@@ -49,7 +49,8 @@ public class SatelliteMicrowaveEnergy extends SatelliteBase implements IUniversa
 
     @Override
     public int getEnergyMTU(EnumFacing side) {
-        return (int) (ARConfiguration.getCurrentConfig().microwaveRecieverMulitplier * battery.extractEnergy(battery.getMaxEnergyStored(), false));
+        return (int) (ARConfiguration.getCurrentConfig().microwaveRecieverMulitplier *
+                battery.extractEnergy(battery.getMaxEnergyStored(), false));
     }
 
     @Override

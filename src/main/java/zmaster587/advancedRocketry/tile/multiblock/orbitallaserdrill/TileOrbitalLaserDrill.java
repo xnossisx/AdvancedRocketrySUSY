@@ -1,6 +1,10 @@
 package zmaster587.advancedRocketry.tile.multiblock.orbitallaserdrill;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -19,6 +23,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.stations.SpaceObjectManager;
@@ -33,52 +39,96 @@ import zmaster587.libVulpes.tile.multiblock.TileMultiPowerConsumer;
 import zmaster587.libVulpes.util.MultiInventory;
 import zmaster587.libVulpes.util.ZUtils;
 
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
-
 public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGuiCallback, IButtonInventory {
 
-    private static final int POWER_PER_OPERATION = (int) (10000 * ARConfiguration.getCurrentConfig().spaceLaserPowerMult);
+    private static final int POWER_PER_OPERATION = (int) (10000 *
+            ARConfiguration.getCurrentConfig().spaceLaserPowerMult);
     private AbstractDrill drill;
     private terraformingdrill terraformingDrill;
     private AbstractDrill miningDrill;
     public int laserX, laserZ, tickSinceLastOperation;
     protected boolean isRunning, finished, isJammed;
     private ModuleButton resetBtn;
-    Object[][][] structure = new Object[][][]{
+    Object[][][] structure = new Object[][][] {
             {
-                    {null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null},
-                    {null, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null, null, null},
-                    {LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null, null},
-                    {null, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null},
-                    {null, null, null, null, null, null, null, null, null, null, null}
+                    { null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null },
+                    { null, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null, null,
+                            null },
+                    { LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null, null },
+                    { null, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null, null, null,
+                            null },
+                    { null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null },
+                    { null, null, null, null, null, null, null, null, null, null, null }
             },
             {
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P'},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P'},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockStructureBlock, null, AdvancedRocketryBlocks.blockLens, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null},
-                    {LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockStructureBlock, null, AdvancedRocketryBlocks.blockLens, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P'},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P'},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null}
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens,
+                            AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P' },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, 'P' },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null, AdvancedRocketryBlocks.blockLens, null,
+                            LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null },
+                    { LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null, AdvancedRocketryBlocks.blockLens, null,
+                            LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, 'P' },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens,
+                            AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P' },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, null }
             },
             {
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P'},
-                    {'O', 'c', 'O', null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P'},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, null, AdvancedRocketryBlocks.blockLens, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, AdvancedRocketryBlocks.blockLens, LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, null, AdvancedRocketryBlocks.blockLens, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P'},
-                    {null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P'},
-                    {null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null}
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens,
+                            AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P' },
+                    { 'O', 'c', 'O', null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, 'P' },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null, AdvancedRocketryBlocks.blockLens, null,
+                            LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, AdvancedRocketryBlocks.blockLens,
+                            LibVulpesBlocks.blockAdvStructureBlock, null, null, null, null, null, null },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, null, AdvancedRocketryBlocks.blockLens, null,
+                            LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, null },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, 'P' },
+                    { null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock, AdvancedRocketryBlocks.blockLens,
+                            AdvancedRocketryBlocks.blockLens, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser, 'P' },
+                    { null, null, null, null, null, null, LibVulpesBlocks.blockAdvStructureBlock,
+                            AdvancedRocketryBlocks.blockVacuumLaser, AdvancedRocketryBlocks.blockVacuumLaser,
+                            AdvancedRocketryBlocks.blockVacuumLaser, null }
             },
     };
     public int radius, xCenter, yCenter, numSteps;
@@ -90,12 +140,12 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
 
     private boolean terraformingstatus;
     boolean client_first_loop = true; // for render bug on client
-    //private Ticket ticket; // this is useless anyway because it would not load the energy supply system and the laser would run out of energy
+    // private Ticket ticket; // this is useless anyway because it would not load the energy supply system and the laser
+    // would run out of energy
 
     int last_orbit_dim;
     TerraformingHelper t;
     WorldServer orbitWorld;
-
 
     public TileOrbitalLaserDrill() {
         super();
@@ -108,7 +158,8 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         yCenter = 0;
         numSteps = 0;
         prevDir = null;
-        resetBtn = new ModuleButton(40, 20, 2, LibVulpes.proxy.getLocalizedString("msg.spacelaser.reset"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild, 34, 20);
+        resetBtn = new ModuleButton(40, 20, 2, LibVulpes.proxy.getLocalizedString("msg.spacelaser.reset"), this,
+                zmaster587.libVulpes.inventory.TextureResources.buttonBuild, 34, 20);
         positionText = new ModuleText(83, 63, "empty... shit!", 0x0b0b0b);
         updateText = new ModuleText(83, 63, "also empty...", 0x0b0b0b);
         xtext = new ModuleText(83, 33, "X:", 0x0b0b0b);
@@ -140,12 +191,13 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         return structure;
     }
 
-    //Required so we see the laser
+    // Required so we see the laser
     @SideOnly(Side.CLIENT)
     @Override
     @Nonnull
     public AxisAlignedBB getRenderBoundingBox() {
-        return new AxisAlignedBB(this.pos.getX() - 5, this.pos.getY() - 1000, this.pos.getZ() - 5, this.pos.getX() + 5, this.pos.getY() + 50, this.pos.getZ() + 5);
+        return new AxisAlignedBB(this.pos.getX() - 5, this.pos.getY() - 1000, this.pos.getZ() - 5, this.pos.getX() + 5,
+                this.pos.getY() + 50, this.pos.getZ() + 5);
     }
 
     @Override
@@ -171,7 +223,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         if (id == 15) {
             out.writeInt(this.laserX);
             out.writeInt(this.laserZ);
-        }else if (id == 11){
+        } else if (id == 11) {
             out.writeInt(mode.ordinal());
             out.writeInt(this.xCenter);
             out.writeInt(this.yCenter);
@@ -179,15 +231,13 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             out.writeInt(this.laserZ);
             out.writeBoolean(this.isRunning);
             out.writeBoolean(terraformingstatus);
-        }
-        else if (id == 12) {
+        } else if (id == 12) {
             out.writeBoolean(isRunning);
-        }
-        else if (id == 14){
+        } else if (id == 14) {
             out.writeInt(mode.ordinal());
             out.writeInt(this.xCenter);
             out.writeInt(this.yCenter);
-        }else if (id == 16){
+        } else if (id == 16) {
             out.writeBoolean(terraformingstatus);
         }
     }
@@ -196,11 +246,10 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     public void readDataFromNetwork(ByteBuf in, byte id,
                                     NBTTagCompound nbt) {
         super.readDataFromNetwork(in, id, nbt);
-        if (id == 15){
+        if (id == 15) {
             nbt.setInteger("currentX", in.readInt());
             nbt.setInteger("currentZ", in.readInt());
-        }
-        else if (id == 11){
+        } else if (id == 11) {
             nbt.setInteger("mode", in.readInt());
             nbt.setInteger("newX", in.readInt());
             nbt.setInteger("newZ", in.readInt());
@@ -208,24 +257,21 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             nbt.setInteger("currentZ", in.readInt());
             nbt.setBoolean("isRunning", in.readBoolean());
             nbt.setBoolean("terraformingstatus", in.readBoolean());
-        }
-        else if (id == 12) {
+        } else if (id == 12) {
             nbt.setBoolean("isRunning", in.readBoolean());
-        }
-        else if (id == 14){
+        } else if (id == 14) {
             nbt.setInteger("mode", in.readInt());
             nbt.setInteger("newX", in.readInt());
             nbt.setInteger("newZ", in.readInt());
-        }else if (id == 16){
+        } else if (id == 16) {
             nbt.setBoolean("terraformingstatus", in.readBoolean());
         }
-
     }
 
-    public void client_update_tf_info(){
-        if (!terraformingstatus && this.mode == MODE.T_FORM){
+    public void client_update_tf_info() {
+        if (!terraformingstatus && this.mode == MODE.T_FORM) {
             this.no_targets_text.setVisible(true);
-        }else{
+        } else {
             this.no_targets_text.setVisible(false);
         }
     }
@@ -233,13 +279,12 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
-
         super.useNetworkData(player, side, id, nbt);
         if (id == 15) {
             laserZ = nbt.getInteger("currentZ");
             laserX = nbt.getInteger("currentX");
-            positionText.setText("position:\n"+this.laserX+" : "+this.laserZ);
-        }else if (id == 11){
+            positionText.setText("position:\n" + this.laserX + " : " + this.laserZ);
+        } else if (id == 11) {
             resetSpiral();
             this.isRunning = nbt.getBoolean("isRunning");
             mode = MODE.values()[nbt.getInteger("mode")];
@@ -247,57 +292,54 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             yCenter = nbt.getInteger("newZ");
             laserZ = nbt.getInteger("currentZ");
             laserX = nbt.getInteger("currentX");
-            positionText.setText("position:\n"+this.laserX+" : "+this.laserZ);
+            positionText.setText("position:\n" + this.laserX + " : " + this.laserZ);
             updateText.setText(this.getMode().toString());
             locationX.setText(String.valueOf(this.xCenter));
             locationZ.setText(String.valueOf(this.yCenter));
-            //System.out.println("reset client:"+xCenter+":"+yCenter+":"+mode);
+            // System.out.println("reset client:"+xCenter+":"+yCenter+":"+mode);
             resetBtn.setColor(0xf0f0f0);
             check_is_terraforming_update_gui();
 
             this.terraformingstatus = nbt.getBoolean("terraformingstatus");
             client_update_tf_info();
-            //System.out.println("is running: "+ isRunning);
+            // System.out.println("is running: "+ isRunning);
 
-
-        }
-       else if (id == 12) {
+        } else if (id == 12) {
             this.isRunning = nbt.getBoolean("isRunning");
-       }
-       else if (id == 16){
+        } else if (id == 16) {
             this.terraformingstatus = nbt.getBoolean("terraformingstatus");
             client_update_tf_info();
 
-        }
-        else if (id == 14){
-           resetSpiral();
-           mode = MODE.values()[nbt.getInteger("mode")];
-           xCenter = nbt.getInteger("newX");
-           yCenter = nbt.getInteger("newZ");
-           laserZ = yCenter;
-           laserX = xCenter;
-           //System.out.println("reset:"+xCenter+":"+yCenter+":"+mode);
-           // do all the reset stuff
+        } else if (id == 14) {
+            resetSpiral();
+            mode = MODE.values()[nbt.getInteger("mode")];
+            xCenter = nbt.getInteger("newX");
+            yCenter = nbt.getInteger("newZ");
+            laserZ = yCenter;
+            laserX = xCenter;
+            // System.out.println("reset:"+xCenter+":"+yCenter+":"+mode);
+            // do all the reset stuff
             if (drill != null) {
                 drill.deactivate();
             }
             finished = false;
             setRunning(false);
 
-            if (mode == MODE.T_FORM){
+            if (mode == MODE.T_FORM) {
                 this.drill = this.terraformingDrill;
-            }else {
+            } else {
                 this.drill = this.miningDrill;
             }
 
-           checkjam();
-           checkCanRun();
-            //update clients on new data
-           PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos, 2048);
-       }
-        else if (id == 13)
-            //update clients on new data
-            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos, 2048);
+            checkjam();
+            checkCanRun();
+            // update clients on new data
+            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos,
+                    2048);
+        } else if (id == 13)
+            // update clients on new data
+            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 11), this.world.provider.getDimension(), pos,
+                    2048);
 
         markDirty();
     }
@@ -324,9 +366,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         }
     }
 
-
-
-
     public void outputItems() {
         // Loop over each output hatch in your inventory
         for (int ic = 0; ic < this.getItemOutPorts().size(); ic++) {
@@ -334,18 +373,19 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             IInventory inventory = itemOutPorts.get(ic);
             if (inventory instanceof TileEntity) {
 
-
                 for (EnumFacing direction : EnumFacing.values()) {
                     TileEntity tileEntity = world.getTileEntity(((TileEntity) inventory).getPos().offset(direction));
                     if (tileEntity != null) {
-                        if (tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,null)){
-                            transferItems(inventory, tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY,null));
+                        if (tileEntity.hasCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)) {
+                            transferItems(inventory,
+                                    tileEntity.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null));
                         }
                     }
                 }
             }
         }
     }
+
     private void resetSpiral() {
         radius = 0;
         prevDir = null;
@@ -359,15 +399,16 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     }
 
     public void setRunning(boolean value) {
-        if (world.isRemote){
+        if (world.isRemote) {
             System.out.println("client should not call setRunning");
             return;
         }
         isRunning = value;
         // this needs to be sent to all to update players on ground of change
-        // or you make 2 packages, one for space dim and one for ground dim at laser coords but this is more easy this way...
+        // or you make 2 packages, one for space dim and one for ground dim at laser coords but this is more easy this
+        // way...
         PacketHandler.sendToAll(new PacketMachine(this, (byte) 12));
-        //PacketHandler.sendToNearby(new PacketMachine(this, (byte) 12), this.world.provider.getDimension(), pos, 128);
+        // PacketHandler.sendToNearby(new PacketMachine(this, (byte) 12), this.world.provider.getDimension(), pos, 128);
 
         markDirty();
     }
@@ -410,9 +451,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
 
     @Override
     public void update() {
-
-
-        //Freaky janky crap to make sure the multiblock loads on chunkload etc
+        // Freaky janky crap to make sure the multiblock loads on chunkload etc
         if (world.isRemote && client_first_loop) {
             PacketHandler.sendToServer(new PacketMachine(this, (byte) 13));
             client_first_loop = false;
@@ -427,7 +466,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
 
         if (!this.world.isRemote) {
             tickSinceLastOperation++;
-
 
             if (mode != MODE.T_FORM) {
                 checkjam();
@@ -446,7 +484,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
                     ZUtils.mergeInventory(stacks, this.inv);
 
                     if (!ZUtils.isInvEmpty(stacks)) {
-                        //TODO: drop extra items
+                        // TODO: drop extra items
                         this.drill.deactivate();
                         this.isJammed = true;
                     }
@@ -459,7 +497,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             if (!this.inv.isEmpty()) {
                 outputItems();
             }
-
 
             if (this.drill.isFinished()) {
                 setRunning(false);
@@ -487,9 +524,10 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
                                 }
                             }
 
-                            this.laserX += 3 * prevDir.getFrontOffsetX();
-                            this.laserZ += 3 * prevDir.getFrontOffsetZ();
-                            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 15), this.world.provider.getDimension(), pos, 128);
+                            this.laserX += 3 * prevDir.getXOffset();
+                            this.laserZ += 3 * prevDir.getZOffset();
+                            PacketHandler.sendToNearby(new PacketMachine(this, (byte) 15),
+                                    this.world.provider.getDimension(), pos, 128);
 
                         }
                     }
@@ -499,20 +537,20 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     }
 
     public boolean isReadyForOperation() {
-
         if (mode == MODE.T_FORM) return true; // every tick on terraforming
 
         if (batteries.getUniversalEnergyStored() == 0)
             return false;
 
-        return tickSinceLastOperation > (3 * this.batteries.getMaxEnergyStored() / (float) this.batteries.getUniversalEnergyStored());
+        return tickSinceLastOperation >
+                (3 * this.batteries.getMaxEnergyStored() / (float) this.batteries.getUniversalEnergyStored());
     }
 
     public void onDestroy() {
         if (this.drill != null) {
             this.drill.deactivate();
         }
-        //ForgeChunkManager.releaseTicket(ticket);
+        // ForgeChunkManager.releaseTicket(ticket);
     }
 
     @Override
@@ -539,8 +577,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
         super.writeToNBT(nbt);
 
-
-
         nbt.setInteger("laserX", laserX);
         nbt.setInteger("laserZ", laserZ);
         nbt.setByte("mode", (byte) mode.ordinal());
@@ -561,7 +597,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     public void readFromNBT(NBTTagCompound nbt) {
         super.readFromNBT(nbt);
 
-
         laserX = nbt.getInteger("laserX");
         laserZ = nbt.getInteger("laserZ");
         mode = MODE.values()[nbt.getByte("mode")];
@@ -576,9 +611,9 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             prevDir = EnumFacing.values()[nbt.getInteger("prevDir")];
         }
 
-        if (mode == MODE.T_FORM){
+        if (mode == MODE.T_FORM) {
             this.drill = this.terraformingDrill;
-        }else {
+        } else {
             this.drill = this.miningDrill;
         }
     }
@@ -587,11 +622,9 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
      * Take items from internal inventory
      */
     public void checkjam() {
-
-
         if (this.one_hatch_empty()) {
             this.isJammed = false;
-        }else{
+        } else {
             this.isJammed = true;
         }
     }
@@ -613,24 +646,25 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         return !canMachineSeeEarth() ||
                 batteries.getUniversalEnergyStored() == 0 ||
                 !(this.world.provider instanceof WorldProviderSpace) ||
-                !zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().canTravelTo(((WorldProviderSpace) this.world.provider).getDimensionProperties(getPos()).getParentPlanet()) ||
+                !zmaster587.advancedRocketry.dimension.DimensionManager.getInstance()
+                        .canTravelTo(((WorldProviderSpace) this.world.provider).getDimensionProperties(getPos())
+                                .getParentPlanet()) ||
 
-                (mode != MODE.T_FORM && ARConfiguration.getCurrentConfig().laserBlackListDims.contains(((WorldProviderSpace) this.world.provider).getDimensionProperties(getPos()).getParentPlanet()));
+                (mode != MODE.T_FORM && ARConfiguration.getCurrentConfig().laserBlackListDims.contains(
+                        ((WorldProviderSpace) this.world.provider).getDimensionProperties(getPos()).getParentPlanet()));
     }
 
     /**
      * Checks to see if the situation for firing the laser exists... and changes the state accordingly
      */
 
-
-
     public void checkCanRun() {
         if (world.isRemote) return; // client has no business here
 
+        int orbitDimId = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos)
+                .getOrbitingPlanetId();
 
-        int orbitDimId = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getOrbitingPlanetId();
-
-        if (orbitDimId != last_orbit_dim ||orbitWorld== null || t == null){
+        if (orbitDimId != last_orbit_dim || orbitWorld == null || t == null) {
             last_orbit_dim = orbitDimId;
             if (!DimensionManager.isDimensionRegistered(orbitDimId)) {
                 if (isRunning) {
@@ -640,7 +674,7 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
                 return;
             }
 
-                orbitWorld = DimensionManager.getWorld(orbitDimId);
+            orbitWorld = DimensionManager.getWorld(orbitDimId);
             if (orbitWorld == null) {
                 DimensionManager.initDimension(orbitDimId);
                 orbitWorld = DimensionManager.getWorld(orbitDimId);
@@ -655,8 +689,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             t = terraformingDrill.get_my_helper(orbitWorld);
         }
 
-
-
         if (!t.has_blocks_in_tf_queue()) {
             if (terraformingstatus) {
                 terraformingstatus = false;
@@ -670,29 +702,27 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             }
         }
 
-
-        //Laser  redstone power, not be jammed, and be in orbit and energy to function
-        if ((mode == MODE.T_FORM && (t==null ||!t.has_blocks_in_tf_queue())) || this.finished || (this.isJammed && mode != MODE.T_FORM) || world.isBlockIndirectlyGettingPowered(getPos()) == 0 || unableToRun()) {
+        // Laser redstone power, not be jammed, and be in orbit and energy to function
+        if ((mode == MODE.T_FORM && (t == null || !t.has_blocks_in_tf_queue())) || this.finished ||
+                (this.isJammed && mode != MODE.T_FORM) || world.getRedstonePowerFromNeighbors(getPos()) == 0 ||
+                unableToRun()) {
             if (isRunning) {
                 drill.deactivate();
                 setRunning(false);
             }
-        } else if (world.isBlockIndirectlyGettingPowered(getPos()) > 0) {
-
+        } else if (world.getRedstonePowerFromNeighbors(getPos()) > 0) {
 
             if (orbitDimId == SpaceObjectManager.WARPDIMID)
                 return;
 
+            // Laser will be on at this point
 
-
-
-            //Laser will be on at this point
-
-            //if (ticket == null) {
-            //    ticket = ForgeChunkManager.requestTicket(AdvancedRocketry.instance, this.world, Type.NORMAL);
-            //    if (ticket != null)
-            //        ForgeChunkManager.forceChunk(ticket, new ChunkPos(getPos().getX() / 16 - (getPos().getX() < 0 ? 1 : 0), getPos().getZ() / 16 - (getPos().getZ() < 0 ? 1 : 0)));
-            //}
+            // if (ticket == null) {
+            // ticket = ForgeChunkManager.requestTicket(AdvancedRocketry.instance, this.world, Type.NORMAL);
+            // if (ticket != null)
+            // ForgeChunkManager.forceChunk(ticket, new ChunkPos(getPos().getX() / 16 - (getPos().getX() < 0 ? 1 : 0),
+            // getPos().getZ() / 16 - (getPos().getZ() < 0 ? 1 : 0)));
+            // }
             if (!isRunning) {
 
                 // load dimension i guess
@@ -707,8 +737,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
                 setRunning(drill.activate(orbitWorld, laserX, laserZ));
             }
         }
-
-
     }
 
     public int getEnergyPercentScaled(int max) {
@@ -719,16 +747,15 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         return batteries.getUniversalEnergyStored() != 0;
     }
 
-
     /**
      * @return returns whether enough power is stored for the next operation
      */
     public boolean hasPowerForOperation() {
         return POWER_PER_OPERATION <= batteries.getUniversalEnergyStored();
     }
-    //InventoryHandling end
+    // InventoryHandling end
 
-    //Redstone Flux start
+    // Redstone Flux start
 
     /**
      * DO NOT USE UNLESS YOU HAVE NO OTHER OPTION!!!
@@ -743,11 +770,12 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         return this.isJammed;
     }
 
-    //Redstone Flux end
+    // Redstone Flux end
 
     public void setJammed(boolean b) {
         this.isJammed = b;
     }
+
     @Override
     public void onModuleUpdated(ModuleBase module) {
         resetBtn.setColor(0x90ff90);
@@ -758,7 +786,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             if (!((ModuleTextBox) module).getText().isEmpty() && !((ModuleTextBox) module).getText().contentEquals("-"))
                 yCenter = Integer.parseInt(((ModuleTextBox) module).getText());
         }
-
     }
 
     @Override
@@ -766,15 +793,13 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
         List<ModuleBase> modules = new LinkedList<>();
 
         if (world.isRemote) {
-            //request update on information
+            // request update on information
             PacketHandler.sendToServer(new PacketMachine(this, (byte) 13));
 
             modules.add(updateText = new ModuleText(110, 20, this.getMode().toString(), 0x0b0b0b, true));
 
-
             modules.add(locationX);
             modules.add(locationZ);
-
 
             modules.add(xtext);
             modules.add(ztext);
@@ -783,11 +808,13 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
 
             modules.add(positionText);
 
-            //modules.add(new ModuleImage(8, 16, TextureResources.laserGuiBG));
+            // modules.add(new ModuleImage(8, 16, TextureResources.laserGuiBG));
         }
 
-        modules.add(new ModuleButton(83, 20, 0, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonLeft, 5, 8));
-        modules.add(new ModuleButton(137, 20, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight, 5, 8));
+        modules.add(new ModuleButton(83, 20, 0, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonLeft, 5,
+                8));
+        modules.add(new ModuleButton(137, 20, 1, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonRight,
+                5, 8));
         modules.add(resetBtn);
         modules.add(new ModulePower(11, 25, batteries));
 
@@ -812,8 +839,8 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             ztext.setVisible(false);
             positionText.setVisible(false);
             client_update_tf_info();
-            //no_targets_text.setVisible(true);
-        }else{
+            // no_targets_text.setVisible(true);
+        } else {
             locationX.setVisible(true);
             locationZ.setVisible(true);
             xtext.setVisible(true);
@@ -822,9 +849,10 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
             no_targets_text.setVisible(false);
         }
     }
+
     @Override
     public void onInventoryButtonPressed(int buttonId) {
-        if (buttonId!=2)
+        if (buttonId != 2)
             resetBtn.setColor(0x90ff90);
         if (buttonId == 0) {
             this.decrementMode();
@@ -846,7 +874,6 @@ public class TileOrbitalLaserDrill extends TileMultiPowerConsumer implements IGu
     public double getMaxRenderDistanceSquared() {
         return 320 * 320;
     }
-
 
     public enum MODE {
         SINGLE,

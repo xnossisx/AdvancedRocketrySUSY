@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.event.terraingen.PopulateChunkEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 
@@ -17,14 +18,19 @@ public class MapGenLander {
         World worldIn = event.getWorld();
         BlockPos position = new BlockPos(16 * event.getChunkX() + 11, 0, 16 * event.getChunkZ() + 3);
 
-        if (DimensionManager.getInstance().getDimensionProperties(worldIn.provider.getDimension()).getName().equals("Luna") && position.getZ() == 67 && position.getX() == 2347) {
+        if (DimensionManager.getInstance().getDimensionProperties(worldIn.provider.getDimension()).getName()
+                .equals("Luna") && position.getZ() == 67 && position.getX() == 2347) {
 
             position = worldIn.getHeight(position).down();
 
-            worldIn.setBlockState(position.add(0, 0, 3), Blocks.STONE_SLAB.getDefaultState().withProperty(BlockSlab.HALF, EnumBlockHalf.TOP));
-            worldIn.setBlockState(position.add(0, 0, -3), Blocks.STONE_SLAB.getDefaultState().withProperty(BlockSlab.HALF, EnumBlockHalf.TOP));
-            worldIn.setBlockState(position.add(3, 0, 0), Blocks.STONE_SLAB.getDefaultState().withProperty(BlockSlab.HALF, EnumBlockHalf.TOP));
-            worldIn.setBlockState(position.add(-3, 0, 0), Blocks.STONE_SLAB.getDefaultState().withProperty(BlockSlab.HALF, EnumBlockHalf.TOP));
+            worldIn.setBlockState(position.add(0, 0, 3),
+                    Blocks.STONE_SLAB.getDefaultState().withProperty(BlockSlab.HALF, EnumBlockHalf.TOP));
+            worldIn.setBlockState(position.add(0, 0, -3),
+                    Blocks.STONE_SLAB.getDefaultState().withProperty(BlockSlab.HALF, EnumBlockHalf.TOP));
+            worldIn.setBlockState(position.add(3, 0, 0),
+                    Blocks.STONE_SLAB.getDefaultState().withProperty(BlockSlab.HALF, EnumBlockHalf.TOP));
+            worldIn.setBlockState(position.add(-3, 0, 0),
+                    Blocks.STONE_SLAB.getDefaultState().withProperty(BlockSlab.HALF, EnumBlockHalf.TOP));
 
             position = position.up();
 
@@ -77,5 +83,4 @@ public class MapGenLander {
             worldIn.setBlockState(position.add(2, 4, 0), Blocks.IRON_BARS.getDefaultState());
         }
     }
-
 }

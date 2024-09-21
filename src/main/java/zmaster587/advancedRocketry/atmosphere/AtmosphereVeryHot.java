@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.atmosphere;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+
 import zmaster587.libVulpes.LibVulpes;
 
 public class AtmosphereVeryHot extends AtmosphereNeedsSuit {
@@ -11,7 +12,6 @@ public class AtmosphereVeryHot extends AtmosphereNeedsSuit {
                              String name) {
         super(canTick, isBreathable, allowsCombustion, name);
     }
-
 
     @Override
     public String getDisplayMessage() {

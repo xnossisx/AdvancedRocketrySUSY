@@ -6,6 +6,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import zmaster587.libVulpes.block.BlockTile;
 
 public class BlockTileRedstoneEmitter extends BlockTile {

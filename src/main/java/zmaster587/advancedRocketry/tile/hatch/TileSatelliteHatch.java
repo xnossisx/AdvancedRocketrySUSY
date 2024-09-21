@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.tile.hatch;
 
 import net.minecraft.item.ItemStack;
+
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
@@ -27,9 +28,9 @@ public class TileSatelliteHatch extends TileInventoryHatch implements IWeighted 
     }
 
     public SatelliteBase getSatellite() {
-
         ItemStack itemStack = inventory.getStackInSlot(0);
-        if (!itemStack.isEmpty() && itemStack.getItem() instanceof ItemSatellite && SatelliteRegistry.getSatelliteProperties(itemStack) != null) {
+        if (!itemStack.isEmpty() && itemStack.getItem() instanceof ItemSatellite &&
+                SatelliteRegistry.getSatelliteProperties(itemStack) != null) {
             SatelliteProperties properties = SatelliteRegistry.getSatelliteProperties(itemStack);
 
             if (properties == null)

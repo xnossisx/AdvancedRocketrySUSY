@@ -1,11 +1,17 @@
 package zmaster587.advancedRocketry.armor;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryFluids;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.IAtmosphere;
@@ -14,10 +20,6 @@ import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.util.EmbeddedInventory;
 import zmaster587.libVulpes.util.FluidUtils;
 import zmaster587.libVulpes.util.IconResource;
-
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
 
 public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
 
@@ -31,8 +33,11 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
             return true;
 
         FluidStack fstack;
-        return !stack.isEmpty() && stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP) &&
-                ((fstack = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP).getTankProperties()[0].getContents()) == null || FluidUtils.areFluidsSameType(fstack.getFluid(), AdvancedRocketryFluids.fluidOxygen));
+        return !stack.isEmpty() &&
+                stack.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP) &&
+                ((fstack = stack.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)
+                        .getTankProperties()[0].getContents()) == null ||
+                        FluidUtils.areFluidsSameType(fstack.getFluid(), AdvancedRocketryFluids.fluidOxygen));
     }
 
     @Override
@@ -55,7 +60,6 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
      */
     @Override
     public int getAirRemaining(@Nonnull ItemStack stack) {
-
         List<ItemStack> list = getComponents(stack);
 
         int airRemaining = 0;
@@ -68,15 +72,17 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
 
         return airRemaining;
 
-		/*if(stack.hasTagCompound()) {
-			return stack.getTagCompound().getInteger("air");
-		}
-		else {
-			NBTTagCompound nbt = new NBTTagCompound();
-			nbt.setInteger("air", 0);
-			stack.setTagCompound(nbt);
-			return getMaxAir();
-		}*/
+        /*
+         * if(stack.hasTagCompound()) {
+         * return stack.getTagCompound().getInteger("air");
+         * }
+         * else {
+         * NBTTagCompound nbt = new NBTTagCompound();
+         * nbt.setInteger("air", 0);
+         * stack.setTagCompound(nbt);
+         * return getMaxAir();
+         * }
+         */
     }
 
     /**
@@ -87,15 +93,17 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
      */
     @Override
     public void setAirRemaining(@Nonnull ItemStack stack, int amt) {
-		/*NBTTagCompound nbt;
-		if(stack.hasTagCompound()) {
-			nbt = stack.getTagCompound();
-		}
-		else {
-			nbt = new NBTTagCompound();
-		}
-		nbt.setInteger("air", amt);
-		stack.setTagCompound(nbt);*/
+        /*
+         * NBTTagCompound nbt;
+         * if(stack.hasTagCompound()) {
+         * nbt = stack.getTagCompound();
+         * }
+         * else {
+         * nbt = new NBTTagCompound();
+         * }
+         * nbt.setInteger("air", amt);
+         * stack.setTagCompound(nbt);
+         */
     }
 
     /**
@@ -107,7 +115,6 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
      */
     @Override
     public int decrementAir(@Nonnull ItemStack stack, int amt) {
-
         if (stack.hasTagCompound()) {
             EmbeddedInventory inv = new EmbeddedInventory(getNumSlots(stack));
             inv.readFromNBT(stack.getTagCompound());
@@ -120,12 +127,14 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
             int amtDrained = amt;
             for (ItemStack component : list) {
                 if (component.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
-                    IFluidHandlerItem fluidItem = component.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP);
+                    IFluidHandlerItem fluidItem = component
+                            .getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP);
                     FluidStack fluidStack = FluidUtils.getFluidForItem(component);
 
                     FluidStack fluidDrained = null;
 
-                    if (fluidStack != null && FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
+                    if (fluidStack != null &&
+                            FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
                         fluidDrained = fluidItem.drain(amtDrained, true);
 
                     if (fluidDrained != null)
@@ -141,20 +150,22 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
         }
         return 0;
 
-		/*NBTTagCompound nbt;
-		if(stack.hasTagCompound()) {
-			nbt = stack.getTagCompound();
-		}
-		else {
-			nbt = new NBTTagCompound();
-		}
-
-		int prevAmt = nbt.getInteger("air");
-		int newAmt = Math.max(prevAmt - amt,0);
-		nbt.setInteger("air", newAmt);
-		stack.setTagCompound(nbt);
-
-		return prevAmt - newAmt;*/
+        /*
+         * NBTTagCompound nbt;
+         * if(stack.hasTagCompound()) {
+         * nbt = stack.getTagCompound();
+         * }
+         * else {
+         * nbt = new NBTTagCompound();
+         * }
+         * 
+         * int prevAmt = nbt.getInteger("air");
+         * int newAmt = Math.max(prevAmt - amt,0);
+         * nbt.setInteger("air", newAmt);
+         * stack.setTagCompound(nbt);
+         * 
+         * return prevAmt - newAmt;
+         */
     }
 
     /**
@@ -166,7 +177,6 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
      */
     @Override
     public int increment(@Nonnull ItemStack stack, int amt) {
-
         if (stack.hasTagCompound()) {
             EmbeddedInventory inv = new EmbeddedInventory(getNumSlots(stack));
             inv.readFromNBT(stack.getTagCompound());
@@ -175,26 +185,29 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
             for (int i = 0; i < inv.getSizeInventory(); i++) {
                 if (!inv.getStackInSlot(i).isEmpty()) {
 
-                    if (i < 2 && inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
+                    if (i < 2 && inv.getStackInSlot(i)
+                            .hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
                         list.add(inv.getStackInSlot(i));
                     } else if (FluidUtils.containsFluid(inv.getStackInSlot(i))) {
 
                         FluidStack fstack = FluidUtils.getFluidForItem(inv.getStackInSlot(i));
-                        if (fstack != null && FluidUtils.areFluidsSameType(fstack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
+                        if (fstack != null &&
+                                FluidUtils.areFluidsSameType(fstack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
                             list.add(inv.getStackInSlot(i));
                     }
 
                 }
             }
 
-
             int amtDrained = amt;
-            //At this point the list contains ONLY capable items
+            // At this point the list contains ONLY capable items
             for (ItemStack component : list) {
-                IFluidHandlerItem fHandler = component.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP);
+                IFluidHandlerItem fHandler = component
+                        .getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP);
                 FluidStack fluidStack = fHandler.getTankProperties()[0].getContents();
 
-                if (fluidStack == null || FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
+                if (fluidStack == null ||
+                        FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
                     amtDrained -= fHandler.fill(new FluidStack(AdvancedRocketryFluids.fluidOxygen, amtDrained), true);
 
                 if (amtDrained == 0)
@@ -209,20 +222,22 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
 
         return 0;
 
-		/*NBTTagCompound nbt;
-		if(stack.hasTagCompound()) {
-			nbt = stack.getTagCompound();
-		}
-		else {
-			nbt = new NBTTagCompound();
-		}
-
-		int prevAmt = nbt.getInteger("air");
-		int newAmt = Math.min(prevAmt + amt, getMaxAir());
-		nbt.setInteger("air", newAmt);
-		stack.setTagCompound(nbt);
-
-		return newAmt - prevAmt;*/
+        /*
+         * NBTTagCompound nbt;
+         * if(stack.hasTagCompound()) {
+         * nbt = stack.getTagCompound();
+         * }
+         * else {
+         * nbt = new NBTTagCompound();
+         * }
+         * 
+         * int prevAmt = nbt.getInteger("air");
+         * int newAmt = Math.min(prevAmt + amt, getMaxAir());
+         * nbt.setInteger("air", newAmt);
+         * stack.setTagCompound(nbt);
+         * 
+         * return newAmt - prevAmt;
+         */
     }
 
     /**
@@ -230,7 +245,6 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
      */
     @Override
     public int getMaxAir(@Nonnull ItemStack stack) {
-
         if (stack.hasTagCompound()) {
             EmbeddedInventory inv = new EmbeddedInventory(getNumSlots(stack));
             inv.readFromNBT(stack.getTagCompound());
@@ -239,39 +253,43 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
             for (int i = 0; i < inv.getSizeInventory(); i++) {
                 if (!inv.getStackInSlot(i).isEmpty()) {
 
-                    if (i < 2 && inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
+                    if (i < 2 && inv.getStackInSlot(i)
+                            .hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
                         list.add(inv.getStackInSlot(i));
-                    } else if (inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP)) {
+                    } else if (inv.getStackInSlot(i).hasCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY,
+                            EnumFacing.UP)) {
 
-                        FluidStack fstack = FluidUtils.getFluidForItem(inv.getStackInSlot(i));
-                        if (fstack != null && FluidUtils.areFluidsSameType(fstack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
-                            list.add(inv.getStackInSlot(i));
-                    }
+                                FluidStack fstack = FluidUtils.getFluidForItem(inv.getStackInSlot(i));
+                                if (fstack != null && FluidUtils.areFluidsSameType(fstack.getFluid(),
+                                        AdvancedRocketryFluids.fluidOxygen))
+                                    list.add(inv.getStackInSlot(i));
+                            }
 
                 }
             }
 
             int maxAir = 0;
             for (ItemStack component : list) {
-                IFluidHandlerItem fHandler = component.getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP);
+                IFluidHandlerItem fHandler = component
+                        .getCapability(CapabilityFluidHandler.FLUID_HANDLER_ITEM_CAPABILITY, EnumFacing.UP);
                 FluidStack fluidStack = fHandler.getTankProperties()[0].getContents();
 
-                if (fluidStack == null || fluidStack.getFluid() == null || FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
+                if (fluidStack == null || fluidStack.getFluid() == null ||
+                        FluidUtils.areFluidsSameType(fluidStack.getFluid(), AdvancedRocketryFluids.fluidOxygen))
                     maxAir += fHandler.getTankProperties()[0].getCapacity();
             }
-
 
             return maxAir;
         }
 
         return 0;
 
-        //return Configuration.spaceSuitOxygenTime*1200; //30 minutes;
+        // return Configuration.spaceSuitOxygenTime*1200; //30 minutes;
     }
 
     @Override
-    public boolean protectsFromSubstance(@Nonnull IAtmosphere atmosphere, @Nonnull ItemStack stack, boolean commitProtection) {
-
+    public boolean protectsFromSubstance(@Nonnull IAtmosphere atmosphere, @Nonnull ItemStack stack,
+                                         boolean commitProtection) {
         if (!super.protectsFromSubstance(atmosphere, stack, commitProtection))
             return false;
 
@@ -280,8 +298,10 @@ public class ItemSpaceChest extends ItemSpaceArmor implements IFillableArmor {
             return true;
 
         // If the atmosphere allows for combustion, it probably has O2, TODO: atmosphere with non O2 oxidizers
-        boolean commitAndDecrement = commitProtection && ((IFillableArmor) AdvancedRocketryItems.itemSpaceSuit_Chest).decrementAir(stack, 1) > 0;
-        boolean noncommitAndHasAir = !commitProtection && ((IFillableArmor) AdvancedRocketryItems.itemSpaceSuit_Chest).getAirRemaining(stack) > 0;
+        boolean commitAndDecrement = commitProtection &&
+                ((IFillableArmor) AdvancedRocketryItems.itemSpaceSuit_Chest).decrementAir(stack, 1) > 0;
+        boolean noncommitAndHasAir = !commitProtection &&
+                ((IFillableArmor) AdvancedRocketryItems.itemSpaceSuit_Chest).getAirRemaining(stack) > 0;
         return noncommitAndHasAir || commitAndDecrement;
     }
 }

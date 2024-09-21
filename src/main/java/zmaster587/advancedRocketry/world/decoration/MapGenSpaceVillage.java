@@ -1,12 +1,12 @@
 package zmaster587.advancedRocketry.world.decoration;
 
-import net.minecraft.init.Biomes;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.structure.MapGenVillage;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+
+import net.minecraft.init.Biomes;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.gen.structure.MapGenVillage;
 
 public class MapGenSpaceVillage extends MapGenVillage {
 
@@ -43,10 +43,10 @@ public class MapGenSpaceVillage extends MapGenVillage {
 
         if (i == k && j == l) {
 
-            return !this.world.getBiomeProvider().areBiomesViable(i * 16 + 8, j * 16 + 8, 0, BLACKLIST_VILLAGE_SPAWN_BIOMES);
+            return !this.world.getBiomeProvider().areBiomesViable(i * 16 + 8, j * 16 + 8, 0,
+                    BLACKLIST_VILLAGE_SPAWN_BIOMES);
         }
 
         return false;
     }
-
 }

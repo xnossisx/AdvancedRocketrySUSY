@@ -4,6 +4,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public interface IMiningDrill {
+
     /**
      * @return mining speed of the drill in blocks/tick
      */

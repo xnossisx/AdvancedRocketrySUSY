@@ -6,6 +6,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+
 import org.lwjgl.opengl.GL11;
 
 public final class GraphicsHelper {
@@ -14,7 +15,8 @@ public final class GraphicsHelper {
         drawCenteredScaledString(Minecraft.getMinecraft().fontRenderer, text, x, y, scale, color);
     }
 
-    public static void drawCenteredScaledString(FontRenderer fontRenderer, String text, int x, int y, float scale, int color) {
+    public static void drawCenteredScaledString(FontRenderer fontRenderer, String text, int x, int y, float scale,
+                                                int color) {
         GlStateManager.pushMatrix();
         GlStateManager.scale(scale, scale, 1.0F);
         drawCenteredString(fontRenderer, text, (int) (x / scale), (int) (y / scale), color);
@@ -61,7 +63,8 @@ public final class GraphicsHelper {
         GL11.glScissor(x, Minecraft.getMinecraft().displayHeight - (y + height), width, height);
     }
 
-    public static void drawTexturedModalRect(int x, int y, int width, int height, int u, int v, int textureWidth, int textureHeight, int textureSizeX, int textureSizeY, float zLevel) {
+    public static void drawTexturedModalRect(int x, int y, int width, int height, int u, int v, int textureWidth,
+                                             int textureHeight, int textureSizeX, int textureSizeY, float zLevel) {
         float f = 1.0F / textureSizeX;
         float f1 = 1.0F / textureSizeY;
 
@@ -79,15 +82,19 @@ public final class GraphicsHelper {
         tess.draw();
     }
 
-    public static void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, float zLevel) {
+    public static void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height,
+                                             float zLevel) {
         drawTexturedModalRect(x, y, width, height, textureX, textureY, width, height, 256, 256, zLevel);
     }
 
-    public static void drawColoredModalRect(int x, int y, int width, int height, float r, float g, float b, float a, float zLevel) {
-        drawColoredModalRect(x, y, width, height, (int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255), zLevel);
+    public static void drawColoredModalRect(int x, int y, int width, int height, float r, float g, float b, float a,
+                                            float zLevel) {
+        drawColoredModalRect(x, y, width, height, (int) (r * 255), (int) (g * 255), (int) (b * 255), (int) (a * 255),
+                zLevel);
     }
 
-    public static void drawColoredModalRect(int x, int y, int width, int height, int r, int g, int b, int a, float zLevel) {
+    public static void drawColoredModalRect(int x, int y, int width, int height, int r, int g, int b, int a,
+                                            float zLevel) {
         Tessellator tess = Tessellator.getInstance();
         BufferBuilder bb = tess.getBuffer();
         bb.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);

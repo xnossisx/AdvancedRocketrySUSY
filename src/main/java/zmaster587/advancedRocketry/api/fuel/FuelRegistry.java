@@ -1,11 +1,12 @@
 package zmaster587.advancedRocketry.api.fuel;
 
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.Fluid;
+import java.util.HashSet;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.HashSet;
+
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.Fluid;
 
 public class FuelRegistry {
 
@@ -92,15 +93,16 @@ public class FuelRegistry {
     }
 
     public enum FuelType {
-        LIQUID_MONOPROPELLANT,        //Used in ground to space rockets
+
+        LIQUID_MONOPROPELLANT,        // Used in ground to space rockets
         LIQUID_BIPROPELLANT,
         LIQUID_OXIDIZER,
         NUCLEAR_WORKING_FLUID,
-        ION,        //Used in satellites
-        WARP,        //Used in interstellar missions
-        IMPULSE;    //Used in interplanetary missions
+        ION,        // Used in satellites
+        WARP,        // Used in interstellar missions
+        IMPULSE;    // Used in interplanetary missions
 
-        //Stores a fuel entry for each type of fuel
+        // Stores a fuel entry for each type of fuel
         final HashSet<FuelEntry> fuels;
 
         FuelType() {
@@ -150,13 +152,13 @@ public class FuelRegistry {
             return false;
         }
 
-        //Returns the fuel if it exists otherwise null (Helper)
+        // Returns the fuel if it exists otherwise null (Helper)
 
         public FuelEntry getFuel(@Nonnull ItemStack stack) {
             return getFuel((Object) stack);
         }
 
-        //Returns the fuel if it exists otherwise null (Helper)
+        // Returns the fuel if it exists otherwise null (Helper)
         public FuelEntry getFuel(Fluid fluid) {
             return getFuel((Object) fluid);
         }
@@ -166,7 +168,6 @@ public class FuelRegistry {
          * @return Fuel entry for the itemStack if it exists, null otherwise
          */
         private FuelEntry getFuel(Object obj) {
-
             for (FuelEntry fuel : fuels) {
                 FuelEntry entry;
 
@@ -179,12 +180,12 @@ public class FuelRegistry {
 
     private static class FuelEntry {
 
-        //Fuel: itemstack or liquid
+        // Fuel: itemstack or liquid
         private Object fuel;
-        //Type: as defined above
+        // Type: as defined above
         private FuelType type;
 
-        //Multiplier: basically how good is the fuel relative to the base value set in the config
+        // Multiplier: basically how good is the fuel relative to the base value set in the config
         private float multiplier;
 
         /**
@@ -196,7 +197,7 @@ public class FuelRegistry {
             this.multiplier = multiplier;
         }
 
-        //Returns
+        // Returns
 
         /**
          * @param obj object to check against
@@ -213,7 +214,7 @@ public class FuelRegistry {
                 return false;
         }
 
-        //Override equals(Object), each the itemstack or fluid determines the entry
+        // Override equals(Object), each the itemstack or fluid determines the entry
         @Override
         public boolean equals(@Nullable Object obj) {
             if (obj != null) {

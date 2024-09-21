@@ -1,12 +1,13 @@
 package zmaster587.advancedRocketry.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
+
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.dimension.DimensionProperties.AtmosphereTypes;
 import zmaster587.advancedRocketry.dimension.DimensionProperties.Temps;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class OreGenProperties {
 
@@ -16,7 +17,8 @@ public class OreGenProperties {
      * @see DimensionProperties.AtmosphereTypes
      * @see DimensionProperties.Temps
      */
-    private static OreGenProperties[][] oreGenPropertyMap = new OreGenProperties[DimensionProperties.AtmosphereTypes.values().length][DimensionProperties.Temps.values().length];
+    private static OreGenProperties[][] oreGenPropertyMap = new OreGenProperties[DimensionProperties.AtmosphereTypes
+            .values().length][DimensionProperties.Temps.values().length];
     private List<OreEntry> oreEntries;
 
     public OreGenProperties() {
@@ -56,6 +58,7 @@ public class OreGenProperties {
     }
 
     public static class OreEntry {
+
         int minHeight;
         int maxHeight;
         int clumpSize;
@@ -90,5 +93,4 @@ public class OreGenProperties {
             return chancePerChunk;
         }
     }
-
 }

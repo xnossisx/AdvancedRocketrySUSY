@@ -1,11 +1,12 @@
 package zmaster587.advancedRocketry.item;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
+
 import zmaster587.libVulpes.block.INamedMetaBlock;
 import zmaster587.libVulpes.items.ItemBlockMeta;
-
-import javax.annotation.Nonnull;
 
 public class ItemBlockCrystal extends ItemBlockMeta {
 
@@ -14,7 +15,7 @@ public class ItemBlockCrystal extends ItemBlockMeta {
     }
 
     @Override
-    public String getUnlocalizedName(@Nonnull ItemStack stack) {
+    public String getTranslationKey(@Nonnull ItemStack stack) {
         return ((INamedMetaBlock) Block.getBlockFromItem(stack.getItem())).getUnlocalizedName(stack.getItemDamage());
     }
 }

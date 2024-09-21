@@ -1,25 +1,27 @@
 package zmaster587.advancedRocketry.api;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagInt;
+
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.Vector3F;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 public class StatsRocket {
 
     private static final String TAGNAME = "rocketStats";
     public static final int INVALID_SEAT = Integer.MIN_VALUE;
     private final List<HashedBlockPosition> passengerSeats = new ArrayList<>();
-    //Used for orbital height calculations
+    // Used for orbital height calculations
     public int orbitHeight;
     public float injectionBurnLenghtMult;
     HashedBlockPosition pilotSeatPos;
@@ -81,13 +83,15 @@ public class StatsRocket {
         statTags = new HashMap<>();
     }
 
-	/*public StatsRocket(int thrust, int weight, int fuelRate, int fuel) {
-		this.thrust = thrust;
-		this.weight = weight;
-		this.fuelLiquid = fuel;
-		lastSeatX = -1;
-		engineLoc = new ArrayList<Vector3F>();
-	}*/
+    /*
+     * public StatsRocket(int thrust, int weight, int fuelRate, int fuel) {
+     * this.thrust = thrust;
+     * this.weight = weight;
+     * this.fuelLiquid = fuel;
+     * lastSeatX = -1;
+     * engineLoc = new ArrayList<Vector3F>();
+     * }
+     */
 
     public static StatsRocket createFromNBT(NBTTagCompound nbt) {
         if (nbt.hasKey(TAGNAME)) {
@@ -169,8 +173,9 @@ public class StatsRocket {
     }
 
     public float getAcceleration(float gravitationalMultiplier) {
-        float N = getThrust() - (weight * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel) ? gravitationalMultiplier : 1));
-        return N/weight/20f;
+        float N = getThrust() -
+                (weight * ((ARConfiguration.getCurrentConfig().gravityAffectsFuel) ? gravitationalMultiplier : 1));
+        return N / weight / 20f;
     }
 
     public List<Vector3F<Float>> getEngineLocations() {
@@ -202,8 +207,8 @@ public class StatsRocket {
      * @param z
      */
     public void addEngineLocation(float x, float y, float z) {
-        //We want to be in the center of the block
-        //System.out.println("ADD engine at "+x+":"+y+":"+z);
+        // We want to be in the center of the block
+        // System.out.println("ADD engine at "+x+":"+y+":"+z);
         engineLoc.add(new Vector3F<>(x, y, z));
     }
 
@@ -328,7 +333,6 @@ public class StatsRocket {
      * @return the base engine consumption rate of the fuel per tick
      */
     public int getBaseFuelRate(@Nullable FuelRegistry.FuelType type) {
-
         if (!ARConfiguration.getCurrentConfig().rocketRequireFuel || type == null)
             return 0;
 
@@ -481,7 +485,7 @@ public class StatsRocket {
      * @return amount of fuel added
      */
     public int addFuelAmount(@Nonnull FuelRegistry.FuelType type, int amt) {
-        //TODO: finish other ones
+        // TODO: finish other ones
         switch (type) {
             case WARP:
                 int maxAddWarp = fuelCapacityWarp - fuelWarp;
@@ -553,6 +557,7 @@ public class StatsRocket {
         passengerSeats.clear();
         statTags.clear();
     }
+
     public void reset_no_fuel() {
         thrust = 0;
         weight = 0;
@@ -632,7 +637,7 @@ public class StatsRocket {
             else if (obj instanceof Integer)
                 dynStats.setInteger(key, (int) obj);
         }
-        if (!dynStats.hasNoTags())
+        if (!dynStats.isEmpty())
             stats.setTag("dynStats", dynStats);
 
         stats.setInteger("playerXPos", pilotSeatPos.x);
@@ -645,9 +650,9 @@ public class StatsRocket {
 
             for (int i = 0; (i / 3) < engineLoc.size(); i += 3) {
                 Vector3F<Float> vec = engineLoc.get(i / 3);
-                locs[i] = (int)(vec.x*2);
-                locs[i + 1] = (int)(vec.y*2);
-                locs[i + 2] = (int)(vec.z*2);
+                locs[i] = (int) (vec.x * 2);
+                locs[i + 1] = (int) (vec.y * 2);
+                locs[i + 2] = (int) (vec.z * 2);
             }
             stats.setIntArray("engineLoc", locs);
         }
@@ -669,7 +674,7 @@ public class StatsRocket {
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
-this.reset();
+        this.reset();
         if (nbt.hasKey(TAGNAME)) {
             NBTTagCompound stats = nbt.getCompoundTag(TAGNAME);
             this.thrust = stats.getInteger("thrust");
@@ -711,10 +716,8 @@ this.reset();
             this.fuelBaseRateNuclearWorkingFluid = stats.getInteger("fuelBaseRateNuclearWorkingFluid");
             this.fuelBaseRateWarp = stats.getInteger("fuelBaseRateWarp");
 
-
             if (stats.hasKey("dynStats")) {
                 NBTTagCompound dynStats = stats.getCompoundTag("dynStats");
-
 
                 for (String key : dynStats.getKeySet()) {
                     Object obj = dynStats.getTag(key);
@@ -735,7 +738,8 @@ this.reset();
 
                 for (int i = 0; i < locations.length; i += 3) {
 
-                    this.addEngineLocation((float)locations[i]/2, (float)locations[i + 1]/2, (float)locations[i + 2]/2);
+                    this.addEngineLocation((float) locations[i] / 2, (float) locations[i + 1] / 2,
+                            (float) locations[i + 2] / 2);
                 }
             }
 

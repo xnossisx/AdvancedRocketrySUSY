@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.tile.multiblock.machine;
 
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -7,6 +9,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
@@ -16,13 +19,11 @@ import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.inventory.modules.ModuleProgress;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
-import java.util.List;
-
 public class TileLathe extends TileMultiblockMachine implements IModularInventory {
 
     public static final Object[][][] structure = {
-            {{'c', LibVulpesBlocks.motors, Blocks.AIR, 'I'}},
-            {{'P', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, 'O'}},
+            { { 'c', LibVulpesBlocks.motors, Blocks.AIR, 'I' } },
+            { { 'P', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, 'O' } },
     };
 
     @Override
@@ -37,7 +38,6 @@ public class TileLathe extends TileMultiblockMachine implements IModularInventor
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-
         return new AxisAlignedBB(pos.add(-3, -2, -3), pos.add(3, 2, 3));
     }
 

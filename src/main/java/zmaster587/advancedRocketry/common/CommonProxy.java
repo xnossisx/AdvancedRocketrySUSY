@@ -7,6 +7,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
 import zmaster587.advancedRocketry.network.PacketLaserGun;
@@ -17,45 +18,32 @@ public class CommonProxy {
 
     private static final zmaster587.advancedRocketry.dimension.DimensionManager dimensionManagerServer = new zmaster587.advancedRocketry.dimension.DimensionManager();
 
-    public void registerRenderers() {
+    public void registerRenderers() {}
 
-    }
-
-    public void registerEventHandlers() {
-
-    }
+    public void registerEventHandlers() {}
 
     public void spawnParticle(String particle, World world, double x, double y,
-                              double z, double motionX, double motionY, double motionZ) {
-
-    }
+                              double z, double motionX, double motionY, double motionZ) {}
 
     public void spawnDynamicRocketSmoke(World world, double x, double y,
-                                        double z, double motionX, double motionY, double motionZ, int engineNum) {
-
-    }
+                                        double z, double motionX, double motionY, double motionZ, int engineNum) {}
 
     public void spawnDynamicRocketFlame(World world, double x, double y,
-                                        double z, double motionX, double motionY, double motionZ, int engineNum) {
+                                        double z, double motionX, double motionY, double motionZ, int engineNum) {}
 
-    }
-
-    public void registerKeyBindings() {
-
-    }
+    public void registerKeyBindings() {}
 
     public Profiler getProfiler() {
         return FMLCommonHandler.instance().getMinecraftServerInstance().profiler;
     }
 
-    public void changeClientPlayerWorld(World world) {
-
-    }
+    public void changeClientPlayerWorld(World world) {}
 
     public void fireFogBurst(ISpaceObject station) {
-        PacketHandler.sendToNearby(new PacketStationUpdate(station, PacketStationUpdate.Type.SIGNAL_WHITE_BURST), ARConfiguration.getCurrentConfig().spaceDimId, station.getSpawnLocation().x, 128, station.getSpawnLocation().z, ARConfiguration.getCurrentConfig().stationSize);
+        PacketHandler.sendToNearby(new PacketStationUpdate(station, PacketStationUpdate.Type.SIGNAL_WHITE_BURST),
+                ARConfiguration.getCurrentConfig().spaceDimId, station.getSpawnLocation().x, 128,
+                station.getSpawnLocation().z, ARConfiguration.getCurrentConfig().stationSize);
     }
-
 
     public float calculateCelestialAngleSpaceStation() {
         return 0;
@@ -69,12 +57,10 @@ public class CommonProxy {
 
     public void preinit() {
         // TODO Auto-generated method stub
-
     }
 
     public void init() {
         // TODO Auto-generated method stub
-
     }
 
     public void spawnLaser(Entity entity, Vec3d toPos) {
@@ -82,23 +68,18 @@ public class CommonProxy {
     }
 
     public void loadUILayout(
-            net.minecraftforge.common.config.Configuration config) {
+                             net.minecraftforge.common.config.Configuration config) {
         // TODO Auto-generated method stub
-
     }
 
-    public void displayMessage(String msg, int time) {
-
-    }
+    public void displayMessage(String msg, int time) {}
 
     public void preInitBlocks() {
         // TODO Auto-generated method stub
-
     }
 
     public void preInitItems() {
         // TODO Auto-generated method stub
-
     }
 
     public String getNameFromBiome(Biome biome) {

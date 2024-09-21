@@ -1,14 +1,15 @@
 package zmaster587.advancedRocketry.util;
 
+import java.util.UUID;
+
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.nbt.JsonToNBT;
 import net.minecraft.nbt.NBTException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome.SpawnListEntry;
-import org.w3c.dom.DOMException;
 
-import java.util.UUID;
+import org.w3c.dom.DOMException;
 
 public class SpawnListEntryNBT extends SpawnListEntry {
 
@@ -23,7 +24,6 @@ public class SpawnListEntryNBT extends SpawnListEntry {
     }
 
     public void setNbt(String nbtString) throws DOMException, NBTException {
-
         this.nbtString = nbtString;
         if (nbtString.isEmpty())
             this.nbt = null;

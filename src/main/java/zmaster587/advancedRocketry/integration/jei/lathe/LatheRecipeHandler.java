@@ -25,5 +25,4 @@ public class LatheRecipeHandler implements IRecipeHandler<LatheWrapper> {
     public boolean isRecipeValid(LatheWrapper recipe) {
         return true;
     }
-
 }

@@ -25,5 +25,4 @@ public class SawMillRecipeHandler implements IRecipeHandler<SawMillWrapper> {
     public boolean isRecipeValid(SawMillWrapper recipe) {
         return true;
     }
-
 }

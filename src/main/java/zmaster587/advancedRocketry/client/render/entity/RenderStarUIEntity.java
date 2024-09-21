@@ -10,7 +10,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.client.render.multiblocks.RendererWarpCore;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
@@ -26,7 +28,7 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
 
     @Override
     public Render<? super EntityUIStar> createRenderFor(
-            RenderManager manager) {
+                                                        RenderManager manager) {
         return new RenderStarUIEntity(manager);
     }
 
@@ -38,7 +40,6 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
     @Override
     public void doRender(EntityUIStar entity, double x, double y, double z,
                          float entityYaw, float partialTicks) {
-
         StellarBody body = entity.getStarProperties();
         if (body == null)
             return;
@@ -57,18 +58,17 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
         GL11.glColor3d(body.getColor()[0], body.getColor()[1], body.getColor()[2]);
-        //GL11.glColor3ub((byte)(body.getColorRGB8() & 0xff), (byte)((body.getColorRGB8() >>> 8) & 0xff), (byte)((body.getColorRGB8() >>> 16) & 0xff));
-        //GlStateManager.color();
+        // GL11.glColor3ub((byte)(body.getColorRGB8() & 0xff), (byte)((body.getColorRGB8() >>> 8) & 0xff),
+        // (byte)((body.getColorRGB8() >>> 16) & 0xff));
+        // GlStateManager.color();
 
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         RenderHelper.renderNorthFaceWithUV(buffer, 0, -5, -5, 5, 5, 0, 1, 0, 1);
         Tessellator.getInstance().draw();
 
-
         RenderHelper.cleanupPlayerFacingMatrix();
 
-
-        //Render hololines
+        // Render hololines
         GL11.glPushMatrix();
         GL11.glScaled(.1, .1, .1);
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -90,8 +90,7 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
         GlStateManager.alphaFunc(GL11.GL_GREATER, .1f);
         GlStateManager.enableTexture2D();
 
-
-        //RenderSelection
+        // RenderSelection
         if (entity.isSelected()) {
             GlStateManager.disableTexture2D();
             double speedRotate = 0.025d;
@@ -121,32 +120,38 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
             sizeScale = .1f * sizeScale;
             GL11.glScaled(sizeScale, sizeScale, sizeScale);
 
-            //Render atmosphere UI/planet info
+            // Render atmosphere UI/planet info
 
-            RenderHelper.setupPlayerFacingMatrix(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z), 0, 0, 0);
+            RenderHelper.setupPlayerFacingMatrix(
+                    Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z), 0,
+                    0, 0);
             buffer = Tessellator.getInstance().getBuffer();
 
-            //Draw Mass indicator
+            // Draw Mass indicator
             Minecraft.getMinecraft().renderEngine.bindTexture(RenderPlanetUIEntity.planetUIFG);
             GlStateManager.color(1, 1, 1, 0.8f);
             renderMassIndicator(buffer, body.getTemperature() / 200f);
 
-            //Draw background
+            // Draw background
             GlStateManager.color(1, 1, 1, 1);
             Minecraft.getMinecraft().renderEngine.bindTexture(RenderPlanetUIEntity.planetUIBG);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             RenderHelper.renderNorthFaceWithUV(buffer, 1, -40, -25, 40, 55, 1, 0, 1, 0);
             Tessellator.getInstance().draw();
 
-            //Render planet name
+            // Render planet name
             RenderHelper.cleanupPlayerFacingMatrix();
-            RenderHelper.renderTag(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z), body.getName(), 0, .9, 0, 5);
-            RenderHelper.renderTag(Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z), "Num Planets: " + body.getNumPlanets(), 0, .6, 0, 5);
+            RenderHelper.renderTag(
+                    Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z),
+                    body.getName(), 0, .9, 0, 5);
+            RenderHelper.renderTag(
+                    Minecraft.getMinecraft().player.getDistanceSq(hitObj.hitVec.x, hitObj.hitVec.y, hitObj.hitVec.z),
+                    "Num Planets: " + body.getNumPlanets(), 0, .6, 0, 5);
 
             GL11.glPopMatrix();
         }
 
-        //Clean up and make player not transparent
+        // Clean up and make player not transparent
         GlStateManager.enableLighting();
         GlStateManager.disableBlend();
         GlStateManager.color(1, 1, 1, 1);
@@ -166,7 +171,7 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
         float maxUV = (1 - percent) * 0.406f + .578f;
-        //Offset by 15 for Y
+        // Offset by 15 for Y
         RenderHelper.renderNorthFaceWithUV(buffer, 0, 6, 20 + (1 - percent) * 33, 39, 53, .5624f, .984f, .984f, maxUV);
         Tessellator.getInstance().draw();
     }
@@ -175,8 +180,9 @@ public class RenderStarUIEntity extends Render<EntityUIStar> implements IRenderF
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 
         float maxUV = (1 - percent) * 0.406f + .578f;
-        //Offset by 15 for Y
-        RenderHelper.renderNorthFaceWithUV(buffer, 0, -38, 21.4f + (1 - percent) * 33, -4, 53, .016f, .4376f, .984f, maxUV);
+        // Offset by 15 for Y
+        RenderHelper.renderNorthFaceWithUV(buffer, 0, -38, 21.4f + (1 - percent) * 33, -4, 53, .016f, .4376f, .984f,
+                maxUV);
         Tessellator.getInstance().draw();
     }
 }

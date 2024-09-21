@@ -8,5 +8,4 @@ public class PrecisionAssemblerWrapper extends MachineRecipe {
     PrecisionAssemblerWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

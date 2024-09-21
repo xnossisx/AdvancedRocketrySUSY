@@ -1,8 +1,9 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.util.SpacePosition;
 import zmaster587.libVulpes.network.BasePacket;
 
@@ -14,9 +15,7 @@ public class PacketMoveRocketInSpace extends BasePacket {
     boolean hasWorld;
     boolean hasStar;
 
-
-    public PacketMoveRocketInSpace() {
-    }
+    public PacketMoveRocketInSpace() {}
 
     public PacketMoveRocketInSpace(SpacePosition position) {
         this.position = position;
@@ -39,8 +38,7 @@ public class PacketMoveRocketInSpace extends BasePacket {
     }
 
     @Override
-    public void readClient(ByteBuf in) {
-    }
+    public void readClient(ByteBuf in) {}
 
     @Override
     public void read(ByteBuf in) {
@@ -58,11 +56,8 @@ public class PacketMoveRocketInSpace extends BasePacket {
     }
 
     @Override
-    public void executeClient(EntityPlayer thePlayer) {
-    }
+    public void executeClient(EntityPlayer thePlayer) {}
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-
-    }
+    public void executeServer(EntityPlayerMP player) {}
 }

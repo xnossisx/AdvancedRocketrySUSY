@@ -10,7 +10,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.tile.multiblock.energy.TileMicrowaveReciever;
 import zmaster587.libVulpes.render.RenderHelper;
@@ -31,18 +33,17 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
         GL11.glPushMatrix();
         GL11.glTranslated(x, y, z);
         BufferBuilder buffer = Tessellator.getInstance().getBuffer();
-        //Initial setup
+        // Initial setup
         bindTexture(texture);
 
-        //Initial setup
+        // Initial setup
         int i2 = this.getWorld().getCombinedLight(tile.getPos().add(0, 1, 0), 0);
         int j = i2 % 65536;
         int k = i2 / 65536;
         OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, (float) j, (float) k);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-
-        //Draw heat FX
+        // Draw heat FX
         if (ARConfiguration.getCurrentConfig().advancedVFX && multiBlockTile.getPowerMadeLastTick() > 0) {
             double distance = Math.sqrt(Minecraft.getMinecraft().player.getDistanceSq(tile.getPos()));
             if (distance < 16) {
@@ -58,7 +59,8 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
                         amplitideMax *= (resolution / 2) - Math.abs(g - resolution / 2);
                         amplitideMax *= (resolution / 2) - Math.abs(i - resolution / 2);
 
-                        yLoc[i][g] = amplitideMax * MathHelper.sin(((i * 16 + g + tile.getWorld().getTotalWorldTime()) & 0xffff) * 0.5f);
+                        yLoc[i][g] = amplitideMax *
+                                MathHelper.sin(((i * 16 + g + tile.getWorld().getTotalWorldTime()) & 0xffff) * 0.5f);
                     }
 
                 }
@@ -69,7 +71,10 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
 
                 for (int i = 0; i < (int) resolution; i++) {
                     for (int g = 0; g < (int) resolution; g++) {
-                        RenderHelper.renderTopFaceWithUV(buffer, 1.01 + yLoc[i][g], 5 * i / resolution, 5 * g / resolution, 5 * (i + 1) / resolution, 5 * (g + 1) / resolution, 5 * i / resolution, 5 * (i + 1) / resolution, 5 * g / resolution, 5 * (g + 1) / resolution);
+                        RenderHelper.renderTopFaceWithUV(buffer, 1.01 + yLoc[i][g], 5 * i / resolution,
+                                5 * g / resolution, 5 * (i + 1) / resolution, 5 * (g + 1) / resolution,
+                                5 * i / resolution, 5 * (i + 1) / resolution, 5 * g / resolution,
+                                5 * (g + 1) / resolution);
                     }
                 }
                 Tessellator.getInstance().draw();
@@ -77,11 +82,11 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
             }
         }
 
-        //Draw main panel
+        // Draw main panel
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         RenderHelper.renderTopFaceWithUV(buffer, 1.01, -2, -2, 3, 3, 0, 5, 0, 5);
         Tessellator.getInstance().draw();
-        //And sides
+        // And sides
 
         bindTexture(panelSide);
 
@@ -114,9 +119,9 @@ public class RendererMicrowaveReciever extends TileEntitySpecialRenderer {
             GlStateManager.color(0.2F, 0.2F, 0.2F, 0.3F);
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
 
-            //GL11.glTranslated(0.5, 0, 0.5);
-            //GL11.glRotated(tile.getWorldObj().getTotalWorldTime()/10.0 % 360, 0, 1, 0);
-            //GL11.glTranslated(-0.3, 0, -0.3);
+            // GL11.glTranslated(0.5, 0, 0.5);
+            // GL11.glRotated(tile.getWorldObj().getTotalWorldTime()/10.0 % 360, 0, 1, 0);
+            // GL11.glTranslated(-0.3, 0, -0.3);
 
             for (float radius = 0.25F; radius < 2; radius += .25F) {
 

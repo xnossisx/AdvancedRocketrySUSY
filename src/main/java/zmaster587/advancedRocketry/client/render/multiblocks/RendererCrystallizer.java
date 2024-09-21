@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.client.render.multiblocks;
 
+import java.util.List;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.entity.item.EntityItem;
@@ -7,13 +9,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.libVulpes.block.RotatableBlock;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
-
-import java.util.List;
 
 public class RendererCrystallizer extends TileEntitySpecialRenderer {
 
@@ -21,9 +23,7 @@ public class RendererCrystallizer extends TileEntitySpecialRenderer {
 
     ResourceLocation texture = new ResourceLocation("advancedrocketry:textures/models/crystalliser.png");
 
-
     public RendererCrystallizer() {
-
         try {
             model = new WavefrontObject(new ResourceLocation("advancedrocketry:models/crystalliser.obj"));
         } catch (ModelFormatException e) {
@@ -42,10 +42,12 @@ public class RendererCrystallizer extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         GL11.glTranslated(x + .5f, y, z + 0.5f);
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
+        GL11.glRotatef((front.getXOffset() == 1 ? 180 : 0) + front.getZOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(-.5f, 0, -1.5f);
 
         if (multiBlockTile.isRunning()) {
@@ -71,25 +73,27 @@ public class RendererCrystallizer extends TileEntitySpecialRenderer {
                 GL11.glTranslated(1, 0.2, 0.7);
                 GL11.glRotatef(rotation, 0, 1, 0);
                 GL11.glScalef(progress, progress, progress);
-                zmaster587.libVulpes.render.RenderHelper.renderItem(multiBlockTile, stack, Minecraft.getMinecraft().getRenderItem());
+                zmaster587.libVulpes.render.RenderHelper.renderItem(multiBlockTile, stack,
+                        Minecraft.getMinecraft().getRenderItem());
                 GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
                 GL11.glTranslated(1, 0.2, 1.5);
                 GL11.glRotatef(rotation, 0, 1, 0);
                 GL11.glScalef(progress, progress, progress);
-                zmaster587.libVulpes.render.RenderHelper.renderItem(multiBlockTile, stack, Minecraft.getMinecraft().getRenderItem());
+                zmaster587.libVulpes.render.RenderHelper.renderItem(multiBlockTile, stack,
+                        Minecraft.getMinecraft().getRenderItem());
                 GL11.glPopMatrix();
 
                 GL11.glPushMatrix();
                 GL11.glTranslated(1, 0.2, 2.3);
                 GL11.glRotatef(rotation, 0, 1, 0);
                 GL11.glScalef(progress, progress, progress);
-                zmaster587.libVulpes.render.RenderHelper.renderItem(multiBlockTile, stack, Minecraft.getMinecraft().getRenderItem());
+                zmaster587.libVulpes.render.RenderHelper.renderItem(multiBlockTile, stack,
+                        Minecraft.getMinecraft().getRenderItem());
                 GL11.glPopMatrix();
 
                 GL11.glPopMatrix();
-
 
                 GL11.glPushMatrix();
                 GL11.glEnable(GL11.GL_BLEND);
@@ -99,11 +103,12 @@ public class RendererCrystallizer extends TileEntitySpecialRenderer {
 
                 float divisor = 1 / 255f;
 
-                GL11.glColor4f((color & 0xFF) * divisor * .5f, ((color & 0xFF00) >>> 8) * divisor * .5f, ((color & 0xFF0000) >>> 16) * divisor * .5f, 0xE4 * divisor);
+                GL11.glColor4f((color & 0xFF) * divisor * .5f, ((color & 0xFF00) >>> 8) * divisor * .5f,
+                        ((color & 0xFF0000) >>> 16) * divisor * .5f, 0xE4 * divisor);
                 GL11.glDisable(GL11.GL_TEXTURE_2D);
                 GL11.glTranslatef(0, 1.1f, 0);
 
-                //Fill before emptying
+                // Fill before emptying
                 if (progress < 0.05)
                     GL11.glScaled(1, 20 * progress, 1);
                 else

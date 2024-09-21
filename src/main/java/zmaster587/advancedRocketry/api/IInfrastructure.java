@@ -1,6 +1,5 @@
 package zmaster587.advancedRocketry.api;
 
-
 /**
  * Implemented by a class if it can be linked to a rocket by a linking tool
  */

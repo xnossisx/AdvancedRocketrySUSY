@@ -1,5 +1,8 @@
 package zmaster587.advancedRocketry.inventory.modules;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -9,6 +12,7 @@ import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.api.DataStorage;
 import zmaster587.advancedRocketry.util.IDataInventory;
 import zmaster587.libVulpes.inventory.TextureResources;
@@ -16,9 +20,6 @@ import zmaster587.libVulpes.inventory.modules.IButtonInventory;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.inventory.modules.ModuleButton;
 import zmaster587.libVulpes.util.IconResource;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ModuleData extends ModuleBase implements IButtonInventory {
 
@@ -42,8 +43,10 @@ public class ModuleData extends ModuleBase implements IButtonInventory {
         this.chipStorage = chipStorage;
         this.slot = slot;
 
-        buttonStore = new ModuleButton(10 + offsetX, offsetY, 0, "", this, TextureResources.buttonDown, "Store to Chip", 16, 10);
-        buttonLoad = new ModuleButton(12 + offsetX, 36 + offsetY, 1, "", this, TextureResources.buttonLeft, "Store to buffer", 10, 16);
+        buttonStore = new ModuleButton(10 + offsetX, offsetY, 0, "", this, TextureResources.buttonDown, "Store to Chip",
+                16, 10);
+        buttonLoad = new ModuleButton(12 + offsetX, 36 + offsetY, 1, "", this, TextureResources.buttonLeft,
+                "Store to buffer", 10, 16);
     }
 
     @Override
@@ -114,15 +117,15 @@ public class ModuleData extends ModuleBase implements IButtonInventory {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void renderForeground(int guiOffsetX, int guiOffsetY, int mouseX, int mouseY, float zLevel, GuiContainer gui, FontRenderer font) {
-
+    public void renderForeground(int guiOffsetX, int guiOffsetY, int mouseX, int mouseY, float zLevel, GuiContainer gui,
+                                 FontRenderer font) {
         buttonLoad.renderForeground(guiOffsetX, guiOffsetY, mouseX, mouseY, zLevel, gui, font);
         buttonStore.renderForeground(guiOffsetX, guiOffsetY, mouseX, mouseY, zLevel, gui, font);
 
         int relativeX = mouseX - offsetX;
         int relativeY = mouseY - offsetY;
 
-        //Handles data tooltip
+        // Handles data tooltip
         if (relativeX > 0 && relativeX < barXSize && relativeY > 0 && relativeY < barYSize) {
             int totalData = 0, totalMaxData = 0;
 
@@ -137,7 +140,6 @@ public class ModuleData extends ModuleBase implements IButtonInventory {
 
             this.drawTooltip(gui, list, mouseX, mouseY, zLevel, font);
         }
-
     }
 
     @Override
@@ -147,7 +149,8 @@ public class ModuleData extends ModuleBase implements IButtonInventory {
         buttonStore.renderBackground(gui, x, y, mouseX, mouseY, font);
 
         for (Slot slot : slotList) {
-            gui.drawTexturedModalRect(x + slot.xPos - 1, y + slot.yPos - 1, icon.getxLoc(), icon.getyLoc(), icon.getxSize(), icon.getySize());
+            gui.drawTexturedModalRect(x + slot.xPos - 1, y + slot.yPos - 1, icon.getxLoc(), icon.getyLoc(),
+                    icon.getxSize(), icon.getySize());
         }
 
         int totalData = 0, totalMaxData = 0;
@@ -162,6 +165,8 @@ public class ModuleData extends ModuleBase implements IButtonInventory {
         gui.drawTexturedModalRect(offsetX + x, offsetY + y, 176, 18, 8, 40);
         gui.drawTexturedModalRect(offsetX + x - 1, offsetY + y + barYSize + 4, 19, 171, 10, 10);
 
-        gui.drawTexturedModalRect(offsetX + x + 1, 1 + offsetY + y + (barYSize - (int) (percent * barYSize)), textureOffsetX, barYSize - (int) (percent * barYSize) + textureOffsetY, barXSize, (int) (percent * barYSize));
+        gui.drawTexturedModalRect(offsetX + x + 1, 1 + offsetY + y + (barYSize - (int) (percent * barYSize)),
+                textureOffsetX, barYSize - (int) (percent * barYSize) + textureOffsetY, barXSize,
+                (int) (percent * barYSize));
     }
 }

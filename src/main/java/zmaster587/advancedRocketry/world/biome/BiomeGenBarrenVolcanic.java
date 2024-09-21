@@ -4,6 +4,7 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.MapGenBase;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.world.decoration.MapGenVolcano;
 
@@ -12,7 +13,6 @@ public class BiomeGenBarrenVolcanic extends Biome {
     public static MapGenBase volcano;
 
     public BiomeGenBarrenVolcanic(BiomeProperties properties) {
-
         super(properties);
 
         spawnableMonsterList.clear();
@@ -36,6 +36,4 @@ public class BiomeGenBarrenVolcanic extends Biome {
     public int getGrassColorAtPos(BlockPos pos) {
         return 0x132113;
     }
-
-
 }

@@ -1,11 +1,14 @@
 package zmaster587.advancedRocketry.tile.multiblock.machine;
 
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
@@ -18,16 +21,16 @@ import zmaster587.libVulpes.inventory.modules.ModuleProgress;
 import zmaster587.libVulpes.inventory.modules.ModuleText;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
-import java.util.List;
-
 public class TileCrystallizer extends TileMultiblockMachine implements IModularInventory {
 
+    public static final Object[][][] structure = {
+            { { AdvancedRocketryBlocks.blockQuartzCrucible, AdvancedRocketryBlocks.blockQuartzCrucible,
+                    AdvancedRocketryBlocks.blockQuartzCrucible },
+                    { AdvancedRocketryBlocks.blockQuartzCrucible, AdvancedRocketryBlocks.blockQuartzCrucible,
+                            AdvancedRocketryBlocks.blockQuartzCrucible } },
 
-    public static final Object[][][] structure = {{{AdvancedRocketryBlocks.blockQuartzCrucible, AdvancedRocketryBlocks.blockQuartzCrucible, AdvancedRocketryBlocks.blockQuartzCrucible},
-            {AdvancedRocketryBlocks.blockQuartzCrucible, AdvancedRocketryBlocks.blockQuartzCrucible, AdvancedRocketryBlocks.blockQuartzCrucible}},
-
-            {{'O', 'c', 'I'},
-                    {'l', 'P', 'L'}},
+            { { 'O', 'c', 'I' },
+                    { 'l', 'P', 'L' } },
 
     };
 
@@ -53,7 +56,8 @@ public class TileCrystallizer extends TileMultiblockMachine implements IModularI
 
     public boolean isGravityWithinBounds() {
         if (!(ARConfiguration.getCurrentConfig().crystalliserMaximumGravity == 0)) {
-            return ARConfiguration.getCurrentConfig().crystalliserMaximumGravity > DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension()).gravitationalMultiplier;
+            return ARConfiguration.getCurrentConfig().crystalliserMaximumGravity > DimensionManager.getInstance()
+                    .getDimensionProperties(world.provider.getDimension()).gravitationalMultiplier;
         }
         return true;
     }
@@ -63,7 +67,6 @@ public class TileCrystallizer extends TileMultiblockMachine implements IModularI
         if (isGravityWithinBounds()) {
             super.onRunningPoweredTick();
         }
-
     }
 
     @Override
@@ -72,7 +75,8 @@ public class TileCrystallizer extends TileMultiblockMachine implements IModularI
 
         modules.add(new ModuleProgress(100, 4, 0, TextureResources.crystallizerProgressBar, this));
         if (!isGravityWithinBounds()) {
-            modules.add(new ModuleText(10, 75, LibVulpes.proxy.getLocalizedString("msg.crystalliser.gravityTooHigh"), 0xFF1b1b));
+            modules.add(new ModuleText(10, 75, LibVulpes.proxy.getLocalizedString("msg.crystalliser.gravityTooHigh"),
+                    0xFF1b1b));
         }
         return modules;
     }

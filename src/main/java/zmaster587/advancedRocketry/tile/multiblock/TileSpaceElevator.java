@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.tile.multiblock;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -16,6 +20,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.entity.EntityElevatorCapsule;
@@ -39,28 +44,35 @@ import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerConsumer;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-
 public class TileSpaceElevator extends TileMultiPowerConsumer implements IModularInventory, ILinkableTile, ITickable {
 
     private static final byte SUMMON_PACKET = 2;
     private static final int BUTTON_ID_OFFSET = 5;
-    Object[][][] structure =
+    Object[][][] structure = {
             {
-                    {
-                            {Blocks.AIR, Blocks.AIR, Blocks.AIR, 'P', 'c', 'P', Blocks.AIR, Blocks.AIR, Blocks.AIR},
-                            {"blockSteel", Blocks.AIR, Blocks.AIR, "slab", "slab", "slab", Blocks.AIR, Blocks.AIR, "blockSteel"},
-                            {Blocks.AIR, LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock, Blocks.AIR},
-                            {Blocks.AIR, "slab", LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock, "slab", Blocks.AIR},
-                            {"slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab"},
-                            {"slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.motors, LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab"},
-                            {"slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab"},
-                            {Blocks.AIR, "slab", LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock, "slab", Blocks.AIR},
-                            {Blocks.AIR, LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock, Blocks.AIR},
-                            {"blockSteel", Blocks.AIR, Blocks.AIR, "slab", "slab", "slab", Blocks.AIR, Blocks.AIR, "blockSteel"}
-                    }
-            };
+                    { Blocks.AIR, Blocks.AIR, Blocks.AIR, 'P', 'c', 'P', Blocks.AIR, Blocks.AIR, Blocks.AIR },
+                    { "blockSteel", Blocks.AIR, Blocks.AIR, "slab", "slab", "slab", Blocks.AIR, Blocks.AIR,
+                            "blockSteel" },
+                    { Blocks.AIR, LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab", "slab", "slab",
+                            LibVulpesBlocks.blockAdvStructureBlock, Blocks.AIR },
+                    { Blocks.AIR, "slab", LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab",
+                            LibVulpesBlocks.blockAdvStructureBlock, "slab", Blocks.AIR },
+                    { "slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, "slab",
+                            "slab", "slab" },
+                    { "slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.motors,
+                            LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab" },
+                    { "slab", "slab", "slab", LibVulpesBlocks.blockAdvStructureBlock,
+                            LibVulpesBlocks.blockAdvStructureBlock, LibVulpesBlocks.blockAdvStructureBlock, "slab",
+                            "slab", "slab" },
+                    { Blocks.AIR, "slab", LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab",
+                            LibVulpesBlocks.blockAdvStructureBlock, "slab", Blocks.AIR },
+                    { Blocks.AIR, LibVulpesBlocks.blockAdvStructureBlock, "slab", "slab", "slab", "slab", "slab",
+                            LibVulpesBlocks.blockAdvStructureBlock, Blocks.AIR },
+                    { "blockSteel", Blocks.AIR, Blocks.AIR, "slab", "slab", "slab", Blocks.AIR, Blocks.AIR,
+                            "blockSteel" }
+            }
+    };
     EntityElevatorCapsule capsule;
     boolean firstTick;
     DimensionBlockPosition dimBlockPos;
@@ -77,27 +89,36 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
         dimBlockPos = null;
     }
 
-    public static boolean isDestinationValid(int destinationDimensionID, DimensionBlockPosition pos, HashedBlockPosition myPos, int myDimensionID) {
+    public static boolean isDestinationValid(int destinationDimensionID, DimensionBlockPosition pos,
+                                             HashedBlockPosition myPos, int myDimensionID) {
         if (pos == null || pos.pos == null)
             return false;
-        if (myDimensionID == ARConfiguration.getCurrentConfig().spaceDimId && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()) != null) {
-            return PlanetaryTravelHelper.isTravelWithinGeostationaryOrbit((SpaceStationObject) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()), pos.dimid);
-        } else if (pos.dimid == ARConfiguration.getCurrentConfig().spaceDimId && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos()) != null) {
-            return PlanetaryTravelHelper.isTravelWithinGeostationaryOrbit((SpaceStationObject) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos()), myDimensionID);
-        }
+        if (myDimensionID == ARConfiguration.getCurrentConfig().spaceDimId &&
+                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()) != null) {
+            return PlanetaryTravelHelper.isTravelWithinGeostationaryOrbit((SpaceStationObject) SpaceObjectManager
+                    .getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()), pos.dimid);
+        } else if (pos.dimid == ARConfiguration.getCurrentConfig().spaceDimId &&
+                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos()) != null) {
+                    return PlanetaryTravelHelper
+                            .isTravelWithinGeostationaryOrbit((SpaceStationObject) SpaceObjectManager.getSpaceManager()
+                                    .getSpaceStationFromBlockCoords(pos.pos.getBlockPos()), myDimensionID);
+                }
         return false;
     }
 
-    public static boolean wouldTetherBreakOnConnect(int destinationDimensionID, DimensionBlockPosition pos, HashedBlockPosition myPos, int myDimensionID) {
-        SpaceStationObject spaceStation = (myDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) ? (SpaceStationObject) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPos.getBlockPos()) : (SpaceStationObject) SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(pos.pos.getBlockPos());
+    public static boolean wouldTetherBreakOnConnect(int destinationDimensionID, DimensionBlockPosition pos,
+                                                    HashedBlockPosition myPos, int myDimensionID) {
+        SpaceStationObject spaceStation = (myDimensionID == ARConfiguration.getCurrentConfig().spaceDimId) ?
+                (SpaceStationObject) SpaceObjectManager.getSpaceManager()
+                        .getSpaceStationFromBlockCoords(myPos.getBlockPos()) :
+                (SpaceStationObject) SpaceObjectManager.getSpaceManager()
+                        .getSpaceStationFromBlockCoords(pos.pos.getBlockPos());
         return spaceStation != null && spaceStation.wouldStationBreakTether();
     }
 
     @Override
     public void deconstructMultiBlock(World world, BlockPos destroyedPos, boolean blockBroken, IBlockState state) {
         super.deconstructMultiBlock(world, destroyedPos, blockBroken, state);
-
-
 
         World otherPlanet;
         if ((otherPlanet = DimensionManager.getWorld(dimBlockPos.dimid)) == null) {
@@ -109,7 +130,9 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
             TileEntity tile = otherPlanet.getTileEntity(dimBlockPos.pos.getBlockPos());
             if (tile instanceof TileSpaceElevator) {
                 ((TileSpaceElevator) tile).updateTetherLinkPosition(dimBlockPos, null);
-                updateTetherLinkPosition(new DimensionBlockPosition(world.provider.getDimension(), new HashedBlockPosition(getPos())), null);
+                updateTetherLinkPosition(
+                        new DimensionBlockPosition(world.provider.getDimension(), new HashedBlockPosition(getPos())),
+                        null);
             }
         }
     }
@@ -139,12 +162,17 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
         List<ModuleBase> modules = super.getModules(ID, player);
 
         if (ID == GuiHandler.guiId.MODULAR.ordinal()) {
-            modules.add(new ModuleButton(50, 47, 1, LibVulpes.proxy.getLocalizedString("msg.spaceElevator.button.summon"), this, TextureResources.buttonBuild, 80, 18));
+            modules.add(
+                    new ModuleButton(50, 47, 1, LibVulpes.proxy.getLocalizedString("msg.spaceElevator.button.summon"),
+                            this, TextureResources.buttonBuild, 80, 18));
             if (isTetherConnected()) {
-                modules.add(new ModuleText(30, 23, LibVulpes.proxy.getLocalizedString("msg.spaceElevator.warning.anchored0"), 0x2d2d2d));
-                modules.add(new ModuleText(30, 35, LibVulpes.proxy.getLocalizedString("msg.spaceElevator.warning.anchored1"), 0x2d2d2d));
+                modules.add(new ModuleText(30, 23,
+                        LibVulpes.proxy.getLocalizedString("msg.spaceElevator.warning.anchored0"), 0x2d2d2d));
+                modules.add(new ModuleText(30, 35,
+                        LibVulpes.proxy.getLocalizedString("msg.spaceElevator.warning.anchored1"), 0x2d2d2d));
             } else {
-                modules.add(new ModuleText(30, 32, LibVulpes.proxy.getLocalizedString("msg.spaceElevator.warning.unanchored"), 0x2d2d2d));
+                modules.add(new ModuleText(30, 32,
+                        LibVulpes.proxy.getLocalizedString("msg.spaceElevator.warning.unanchored"), 0x2d2d2d));
             }
         }
 
@@ -175,7 +203,8 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
             e.setDead();
         else {
             capsule = e;
-            capsule.setSourceTile(new DimensionBlockPosition(world.provider.getDimension(), new HashedBlockPosition(pos)));
+            capsule.setSourceTile(
+                    new DimensionBlockPosition(world.provider.getDimension(), new HashedBlockPosition(pos)));
             capsule.setDst(dimBlockPos);
         }
 
@@ -188,7 +217,6 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
-
         if (id == SUMMON_PACKET) {
             summonCapsule();
         } else if (id == BUTTON_ID_OFFSET) {
@@ -202,13 +230,14 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
     }
 
     public EntityElevatorCapsule getCapsuleOnLine() {
-
         if (capsule != null && capsule.isDead)
             capsule = null;
 
         double capsulePosX = getLandingLocationX();
         double capsulePosZ = getLandingLocationZ();
-        for (EntityElevatorCapsule e : world.getEntitiesWithinAABB(EntityElevatorCapsule.class, new AxisAlignedBB(capsulePosX - 3, 0, capsulePosZ - 3, capsulePosX + 3, EntityElevatorCapsule.MAX_HEIGHT, capsulePosZ + 3))) {
+        for (EntityElevatorCapsule e : world.getEntitiesWithinAABB(EntityElevatorCapsule.class,
+                new AxisAlignedBB(capsulePosX - 3, 0, capsulePosZ - 3, capsulePosX + 3,
+                        EntityElevatorCapsule.MAX_HEIGHT, capsulePosZ + 3))) {
             if (!e.isDead) {
                 capsule = e;
                 break;
@@ -220,12 +249,12 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
 
     public double getLandingLocationX() {
         EnumFacing facing = RotatableBlock.getFront(world.getBlockState(getPos()));
-        return getPos().getX() + facing.getFrontOffsetX() * -5 - facing.getFrontOffsetZ() * 2 + 0.5;
+        return getPos().getX() + facing.getXOffset() * -5 - facing.getZOffset() * 2 + 0.5;
     }
 
     public double getLandingLocationZ() {
         EnumFacing facing = RotatableBlock.getFront(world.getBlockState(getPos()));
-        return getPos().getZ() + facing.getFrontOffsetX() * 2 + facing.getFrontOffsetZ() * -5 + 0.5;
+        return getPos().getZ() + facing.getXOffset() * 2 + facing.getZOffset() * -5 + 0.5;
     }
 
     public void rotateCapsule() {
@@ -246,11 +275,10 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
     }
 
     public void summonCapsule() {
-
         if (!isTetherConnected())
             return;
         // If a capsule exists, delete the existing one and create a new one
-        while (getCapsuleOnLine() != null){
+        while (getCapsuleOnLine() != null) {
             getCapsuleOnLine().setDead();
         }
         // also check for the other elevator if there is a capsule
@@ -263,10 +291,11 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
         if (otherPlanet != null) {
             TileEntity tile = otherPlanet.getTileEntity(dimBlockPos.pos.getBlockPos());
             if (tile instanceof TileSpaceElevator) {
-                if (((TileSpaceElevator) tile).getCapsuleOnLine() != null) {((TileSpaceElevator) tile).getCapsuleOnLine().setDead();}
+                if (((TileSpaceElevator) tile).getCapsuleOnLine() != null) {
+                    ((TileSpaceElevator) tile).getCapsuleOnLine().setDead();
+                }
             }
         }
-
 
         capsule = new EntityElevatorCapsule(world);
         rotateCapsule();
@@ -277,7 +306,8 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
         capsule.setPosition(capsulePosX, getPos().getY() + yOffset, capsulePosZ);
 
         capsule.setDst(dimBlockPos);
-        capsule.setSourceTile(new DimensionBlockPosition(world.provider.getDimension(), new HashedBlockPosition(this.getPos())));
+        capsule.setSourceTile(
+                new DimensionBlockPosition(world.provider.getDimension(), new HashedBlockPosition(this.getPos())));
 
         world.spawnEntity(capsule);
     }
@@ -315,12 +345,14 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
                 world = DimensionManager.getWorld(dimPos.dimid);
             }
 
-            if (!isDestinationValid(dimPos.dimid, dimPos, new HashedBlockPosition(getPos()), myWorld.provider.getDimension())) {
+            if (!isDestinationValid(dimPos.dimid, dimPos, new HashedBlockPosition(getPos()),
+                    myWorld.provider.getDimension())) {
                 player.sendMessage(new TextComponentTranslation("msg.spaceElevator.linkNotGeostationaryError"));
                 return false;
             }
 
-            if (wouldTetherBreakOnConnect(dimPos.dimid, dimPos, new HashedBlockPosition(getPos()), myWorld.provider.getDimension())) {
+            if (wouldTetherBreakOnConnect(dimPos.dimid, dimPos, new HashedBlockPosition(getPos()),
+                    myWorld.provider.getDimension())) {
                 player.sendMessage(new TextComponentTranslation("msg.spaceElevator.tetherWouldBreakError"));
                 return false;
             }
@@ -333,8 +365,10 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
             if (world != null) {
                 TileEntity tile = world.getTileEntity(dimPos.pos.getBlockPos());
                 if (tile instanceof TileSpaceElevator) {
-                    updateTetherLinkPosition(new DimensionBlockPosition(this.world.provider.getDimension(), new HashedBlockPosition(getPos())), dimPos);
-                    ((TileSpaceElevator) tile).updateTetherLinkPosition(dimPos, new DimensionBlockPosition(this.world.provider.getDimension(), new HashedBlockPosition(getPos())));
+                    updateTetherLinkPosition(new DimensionBlockPosition(this.world.provider.getDimension(),
+                            new HashedBlockPosition(getPos())), dimPos);
+                    ((TileSpaceElevator) tile).updateTetherLinkPosition(dimPos, new DimensionBlockPosition(
+                            this.world.provider.getDimension(), new HashedBlockPosition(getPos())));
                     player.sendMessage(new TextComponentTranslation("msg.spaceElevator.newDstAdded"));
 
                     if (capsule != null) {
@@ -357,24 +391,30 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
         return world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId;
     }
 
-    public void updateTetherLinkPosition(DimensionBlockPosition myPosition, DimensionBlockPosition dimensionBlockPosition) {
-        if (myPosition.dimid == ARConfiguration.getCurrentConfig().spaceDimId && SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()) != null) {
+    public void updateTetherLinkPosition(DimensionBlockPosition myPosition,
+                                         DimensionBlockPosition dimensionBlockPosition) {
+        if (myPosition.dimid == ARConfiguration.getCurrentConfig().spaceDimId &&
+                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()) !=
+                        null) {
             if (dimensionBlockPosition != null) {
-                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()).setDeltaRotation(0, EnumFacing.EAST);
-                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()).setDeltaRotation(0, EnumFacing.UP);
-                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()).setDeltaRotation(0, EnumFacing.NORTH);
+                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos())
+                        .setDeltaRotation(0, EnumFacing.EAST);
+                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos())
+                        .setDeltaRotation(0, EnumFacing.UP);
+                SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos())
+                        .setDeltaRotation(0, EnumFacing.NORTH);
             }
-            SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos()).setIsAnchored(dimensionBlockPosition != null);
+            SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(myPosition.pos.getBlockPos())
+                    .setIsAnchored(dimensionBlockPosition != null);
         }
-        if (dimensionBlockPosition == null){
+        if (dimensionBlockPosition == null) {
             isTetherConnected = false;
             Entity entity = getCapsuleOnLine();
 
             if (entity != null) {
                 entity.setDead();
             }
-        }
-        else
+        } else
             isTetherConnected = true;
 
         dimBlockPos = dimensionBlockPosition;
@@ -398,7 +438,7 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
     public void writeNetworkData(NBTTagCompound nbt) {
         if (dimBlockPos != null) {
             nbt.setInteger("dstDimId", dimBlockPos.dimid);
-            nbt.setIntArray("dstPos", new int[]{dimBlockPos.pos.x, dimBlockPos.pos.y, dimBlockPos.pos.z});
+            nbt.setIntArray("dstPos", new int[] { dimBlockPos.pos.x, dimBlockPos.pos.y, dimBlockPos.pos.z });
             nbt.setBoolean("tether", isTetherConnected);
             super.writeNetworkData(nbt);
         } else
@@ -422,6 +462,7 @@ public class TileSpaceElevator extends TileMultiPowerConsumer implements IModula
             dimBlockPos = null;
         isTetherConnected = nbt.getBoolean("tether");
 
-        landingPadDisplayText.setText(dimBlockPos != null ? dimBlockPos.toString() : LibVulpes.proxy.getLocalizedString("msg.label.noneSelected"));
+        landingPadDisplayText.setText(dimBlockPos != null ? dimBlockPos.toString() :
+                LibVulpes.proxy.getLocalizedString("msg.label.noneSelected"));
     }
 }

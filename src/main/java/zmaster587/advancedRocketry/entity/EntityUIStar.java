@@ -6,6 +6,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
@@ -14,11 +15,13 @@ import zmaster587.advancedRocketry.tile.station.TileHolographicPlanetSelector;
 public class EntityUIStar extends EntityUIPlanet {
 
     public final static int starIDoffset = 10000;
-    protected static final DataParameter<Integer> subStarData = EntityDataManager.createKey(EntityUIStar.class, DataSerializers.VARINT);
+    protected static final DataParameter<Integer> subStarData = EntityDataManager.createKey(EntityUIStar.class,
+            DataSerializers.VARINT);
     private StellarBody star;
     private int subStar;
 
-    public EntityUIStar(World worldIn, StellarBody properties, TileHolographicPlanetSelector tile, double x, double y, double z) {
+    public EntityUIStar(World worldIn, StellarBody properties, TileHolographicPlanetSelector tile, double x, double y,
+                        double z) {
         this(worldIn);
         setPosition(x, y, z);
         setProperties(properties);
@@ -26,7 +29,8 @@ public class EntityUIStar extends EntityUIPlanet {
         subStar = -1;
     }
 
-    public EntityUIStar(World worldIn, StellarBody properties, int subStar, TileHolographicPlanetSelector tile, double x, double y, double z) {
+    public EntityUIStar(World worldIn, StellarBody properties, int subStar, TileHolographicPlanetSelector tile,
+                        double x, double y, double z) {
         this(worldIn, properties, tile, x, y, z);
         this.dataManager.set(subStarData, (this.subStar = subStar));
     }
@@ -52,7 +56,7 @@ public class EntityUIStar extends EntityUIPlanet {
     }
 
     public int getPlanetID() {
-        //this.dataManager.set(planetID, 256);
+        // this.dataManager.set(planetID, 256);
 
         if (!world.isRemote)
             return star == null ? -1 : star.getId();
@@ -70,7 +74,8 @@ public class EntityUIStar extends EntityUIPlanet {
     }
 
     public StellarBody getStarProperties() {
-        if ((star == null && getPlanetID() != Constants.INVALID_PLANET) || (star != null && getPlanetID() != star.getId())) {
+        if ((star == null && getPlanetID() != Constants.INVALID_PLANET) ||
+                (star != null && getPlanetID() != star.getId())) {
             star = DimensionManager.getInstance().getStar(getPlanetID());
             if ((subStar = this.dataManager.get(subStarData)) != -1)
                 if (!star.getSubStars().isEmpty())

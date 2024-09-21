@@ -4,6 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.network.PacketOxygenState;
 import zmaster587.libVulpes.LibVulpes;
@@ -17,7 +18,6 @@ public class AtmosphereSuperHighPressureNoOxygen extends AtmosphereNeedsSuit {
                                                String name) {
         super(canTick, isBreathable, allowsCombustion, name);
     }
-
 
     @Override
     public String getDisplayMessage() {
@@ -35,7 +35,7 @@ public class AtmosphereSuperHighPressureNoOxygen extends AtmosphereNeedsSuit {
             player.attackEntityFrom(AtmosphereHandler.lowOxygenDamage, 1);
             player.addPotionEffect(new PotionEffect(Potion.getPotionById(2), 40, 4));
             player.addPotionEffect(new PotionEffect(Potion.getPotionById(4), 40, 4));
-            //Removes the ability to jump. Nitrogen/other gas narcosis
+            // Removes the ability to jump. Nitrogen/other gas narcosis
             player.addPotionEffect(new PotionEffect(Potion.getPotionById(8), 40, 150));
             if (enableNausea) {
                 player.addPotionEffect(new PotionEffect(Potion.getPotionById(9), 400, 2));

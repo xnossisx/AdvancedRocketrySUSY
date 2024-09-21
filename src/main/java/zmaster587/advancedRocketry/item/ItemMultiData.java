@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.item;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
@@ -9,11 +13,9 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.api.DataStorage;
 import zmaster587.advancedRocketry.world.util.MultiData;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 public class ItemMultiData extends Item {
 
@@ -44,7 +46,6 @@ public class ItemMultiData extends Item {
     }
 
     private MultiData getDataStorage(@Nonnull ItemStack item) {
-
         MultiData data = new MultiData();
 
         if (!item.hasTagCompound()) {
@@ -58,7 +59,6 @@ public class ItemMultiData extends Item {
 
     public boolean isFull(@Nonnull ItemStack item, DataStorage.DataType dataType) {
         return getDataStorage(item).getMaxData() == getData(item, dataType);
-
     }
 
     public int addData(@Nonnull ItemStack item, int amount, DataStorage.DataType dataType) {
@@ -119,7 +119,8 @@ public class ItemMultiData extends Item {
 
         for (DataStorage.DataType type : DataStorage.DataType.values()) {
             if (type != DataStorage.DataType.UNDEFINED)
-                list.add(data.getDataAmount(type) + " / " + data.getMaxData() + " " + I18n.format(type.toString(), new Object[0]) + " Data");
+                list.add(data.getDataAmount(type) + " / " + data.getMaxData() + " " +
+                        I18n.format(type.toString(), new Object[0]) + " Data");
         }
     }
 }

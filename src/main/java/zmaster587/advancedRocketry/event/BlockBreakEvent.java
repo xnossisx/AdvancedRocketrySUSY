@@ -3,7 +3,6 @@ package zmaster587.advancedRocketry.event;
 import net.minecraftforge.fml.common.eventhandler.Cancelable;
 import net.minecraftforge.fml.common.eventhandler.Event;
 
-
 @Cancelable
 public class BlockBreakEvent extends Event {
 
@@ -15,8 +14,8 @@ public class BlockBreakEvent extends Event {
         posZ = z;
     }
 
-
     public static class LaserBreakEvent extends BlockBreakEvent {
+
         public LaserBreakEvent(int x, int y, int z) {
             super(x, y, z);
         }

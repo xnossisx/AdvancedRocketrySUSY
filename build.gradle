@@ -654,8 +654,9 @@ processResources {
         fcd.expand(
                 'version': modVersion,
                 'mcversion': minecraftVersion,
-                'modid': modId,
-                'modname': modName
+                'modId': modId,
+                'modName': modName,
+                'libVulpesVersion': libVulpesVersion
         )
     }
 

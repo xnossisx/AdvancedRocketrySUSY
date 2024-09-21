@@ -14,7 +14,6 @@ public class FluidGasGiantGas {
         minGravity = minGravityInput;
         maxGravity = maxGravityInput;
         chance = chanceInput;
-
     }
 
     public Fluid getFluid() {
@@ -32,5 +31,4 @@ public class FluidGasGiantGas {
     public double getChance() {
         return chance;
     }
-
 }

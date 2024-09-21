@@ -11,7 +11,8 @@ public interface IGravityManager {
     void setGravityMultiplier(Entity entity, double multiplier);
 
     /**
-     * Removes the specified entity from the list of entities with custom gravity effects and normal planetary gravity takes over
+     * Removes the specified entity from the list of entities with custom gravity effects and normal planetary gravity
+     * takes over
      *
      * @param entity entity to remove from custom gravity
      */

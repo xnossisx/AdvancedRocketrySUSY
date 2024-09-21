@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.world.util;
 
+import java.io.File;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.WorldProvider;
 import net.minecraft.world.chunk.storage.IChunkLoader;
@@ -9,8 +11,6 @@ import net.minecraft.world.storage.ISaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import net.minecraftforge.common.DimensionManager;
 
-import java.io.File;
-
 public class DummySaveHandler implements ISaveHandler {
 
     @Override
@@ -19,9 +19,7 @@ public class DummySaveHandler implements ISaveHandler {
     }
 
     @Override
-    public void checkSessionLock() {
-
-    }
+    public void checkSessionLock() {}
 
     @Override
     public IChunkLoader getChunkLoader(WorldProvider p_75763_1_) {
@@ -30,19 +28,13 @@ public class DummySaveHandler implements ISaveHandler {
 
     @Override
     public void saveWorldInfoWithPlayer(WorldInfo p_75755_1_,
-                                        NBTTagCompound p_75755_2_) {
-
-    }
+                                        NBTTagCompound p_75755_2_) {}
 
     @Override
-    public void saveWorldInfo(WorldInfo p_75761_1_) {
-
-    }
+    public void saveWorldInfo(WorldInfo p_75761_1_) {}
 
     @Override
-    public void flush() {
-
-    }
+    public void flush() {}
 
     @Override
     public File getWorldDirectory() {
@@ -63,5 +55,4 @@ public class DummySaveHandler implements ISaveHandler {
     public TemplateManager getStructureTemplateManager() {
         return null;
     }
-
 }

@@ -6,6 +6,7 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
+
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.inventory.modules.ModuleSlotArray;
@@ -19,15 +20,14 @@ public class ModuleSatellite extends ModuleSlotArray {
 
     public ModuleSatellite(int offsetX, int offsetY, IInventory container, int slot) {
         super(offsetX, offsetY, container, slot, slot + 1);
-
     }
 
     @Override
     public void renderBackground(GuiContainer gui, int x, int y, int mouseX, int mouseY,
                                  FontRenderer font) {
-
         for (Slot slot : slotList) {
-            gui.drawTexturedModalRect(x + slot.xPos - 1, y + slot.yPos - 1, satelliteSlot.getxLoc(), satelliteSlot.getyLoc(), satelliteSlot.getxSize(), satelliteSlot.getySize());
+            gui.drawTexturedModalRect(x + slot.xPos - 1, y + slot.yPos - 1, satelliteSlot.getxLoc(),
+                    satelliteSlot.getyLoc(), satelliteSlot.getxSize(), satelliteSlot.getySize());
         }
     }
 
@@ -68,5 +68,4 @@ public class ModuleSatellite extends ModuleSlotArray {
     public void setSatellite(SatelliteBase satellite) {
         this.satellite = satellite;
     }
-
 }

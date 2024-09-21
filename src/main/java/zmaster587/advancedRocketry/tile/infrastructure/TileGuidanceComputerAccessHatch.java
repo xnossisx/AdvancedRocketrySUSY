@@ -1,6 +1,11 @@
 package zmaster587.advancedRocketry.tile.infrastructure;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -14,6 +19,8 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.EntityRocketBase;
 import zmaster587.advancedRocketry.api.IInfrastructure;
@@ -36,14 +43,11 @@ import zmaster587.libVulpes.util.INetworkMachine;
 import zmaster587.libVulpes.util.ZUtils;
 import zmaster587.libVulpes.util.ZUtils.RedstoneState;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.LinkedList;
-import java.util.List;
+public class TileGuidanceComputerAccessHatch extends TilePointer implements IInfrastructure, IInventory,
+                                             IModularInventory, IToggleButton, INetworkMachine, ITickable {
 
-public class TileGuidanceComputerAccessHatch extends TilePointer implements IInfrastructure, IInventory, IModularInventory, IToggleButton, INetworkMachine, ITickable {
-
-    private static final int buttonAutoEject = 0, buttonSatellite = 1, buttonPlanet = 2, buttonStation = 3, redstoneState = 4;
+    private static final int buttonAutoEject = 0, buttonSatellite = 1, buttonPlanet = 2, buttonStation = 3,
+            redstoneState = 4;
     EntityRocket rocket;
     ModuleRedstoneOutputButton redstoneControl;
     RedstoneState state;
@@ -55,12 +59,17 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
         buttonState = new boolean[4];
         chipEjected = false;
 
-        redstoneControl = new ModuleRedstoneOutputButton(174, 4, redstoneState, "", this, LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.loadingState"));
+        redstoneControl = new ModuleRedstoneOutputButton(174, 4, redstoneState, "", this,
+                LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.loadingState"));
         state = RedstoneState.ON;
-        module_autoEject = new ModuleToggleSwitch(90, 15, buttonAutoEject, "", this, TextureResources.buttonAutoEject, LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.ejectonlanding"), 24, 24, false);
-        module_satellite = new ModuleToggleSwitch(64, 41, buttonSatellite, "", this, TextureResources.buttonAutoEject, LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.ejectonsatlanding"), 24, 24, false);
-        module_planet = new ModuleToggleSwitch(90, 41, buttonPlanet, "", this, TextureResources.buttonAutoEject, LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.ejectonplanetlanding"), 24, 24, false);
-        module_station = new ModuleToggleSwitch(116, 41, buttonStation, "", this, TextureResources.buttonAutoEject, LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.ejectonstationlanding"), 24, 24, false);
+        module_autoEject = new ModuleToggleSwitch(90, 15, buttonAutoEject, "", this, TextureResources.buttonAutoEject,
+                LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.ejectonlanding"), 24, 24, false);
+        module_satellite = new ModuleToggleSwitch(64, 41, buttonSatellite, "", this, TextureResources.buttonAutoEject,
+                LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.ejectonsatlanding"), 24, 24, false);
+        module_planet = new ModuleToggleSwitch(90, 41, buttonPlanet, "", this, TextureResources.buttonAutoEject,
+                LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.ejectonplanetlanding"), 24, 24, false);
+        module_station = new ModuleToggleSwitch(116, 41, buttonStation, "", this, TextureResources.buttonAutoEject,
+                LibVulpes.proxy.getLocalizedString("msg.guidanceComputerHatch.ejectonstationlanding"), 24, 24, false);
     }
 
     @Override
@@ -150,14 +159,10 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
     }
 
     @Override
-    public void openInventory(EntityPlayer player) {
-
-    }
+    public void openInventory(EntityPlayer player) {}
 
     @Override
-    public void closeInventory(EntityPlayer player) {
-
-    }
+    public void closeInventory(EntityPlayer player) {}
 
     @Override
     public boolean isItemValidForSlot(int index, @Nonnull ItemStack stack) {
@@ -175,9 +180,7 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
     }
 
     @Override
-    public void setField(int id, int value) {
-
-    }
+    public void setField(int id, int value) {}
 
     @Override
     public int getFieldCount() {
@@ -195,7 +198,6 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
     @Override
     public boolean onLinkStart(@Nonnull ItemStack item, TileEntity entity,
                                EntityPlayer player, World world) {
-
         ItemLinker.setMasterCoords(item, this.getPos());
 
         if (this.rocket != null) {
@@ -204,7 +206,10 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
         }
 
         if (player.world.isRemote)
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentTranslation("%s %s", new TextComponentTranslation("msg.guidanceComputerHatch.link"), ": " + getPos().getX() + " " + getPos().getY() + " " + getPos().getZ()));
+            Minecraft.getMinecraft().ingameGUI.getChatGUI()
+                    .printChatMessage(new TextComponentTranslation("%s %s",
+                            new TextComponentTranslation("msg.guidanceComputerHatch.link"),
+                            ": " + getPos().getX() + " " + getPos().getY() + " " + getPos().getZ()));
         return true;
     }
 
@@ -212,14 +217,16 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
     public boolean onLinkComplete(@Nonnull ItemStack item, TileEntity entity,
                                   EntityPlayer player, World world) {
         if (player.world.isRemote)
-            Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentTranslation("msg.linker.error.firstMachine"));
+            Minecraft.getMinecraft().ingameGUI.getChatGUI()
+                    .printChatMessage(new TextComponentTranslation("msg.linker.error.firstMachine"));
         return false;
     }
 
     @Override
     public void unlinkRocket() {
         rocket = null;
-        ((BlockARHatch) AdvancedRocketryBlocks.blockLoader).setRedstoneState(world, world.getBlockState(pos), pos, false);
+        ((BlockARHatch) AdvancedRocketryBlocks.blockLoader).setRedstoneState(world, world.getBlockState(pos), pos,
+                false);
         chipEjected = false;
     }
 
@@ -233,7 +240,8 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
         this.rocket = (EntityRocket) rocket;
         IInventory guidanceComputer;
 
-        if (!chipEjected && buttonState[buttonAutoEject] && (guidanceComputer = this.rocket.storage.getGuidanceComputer()) != null) {
+        if (!chipEjected && buttonState[buttonAutoEject] &&
+                (guidanceComputer = this.rocket.storage.getGuidanceComputer()) != null) {
             ItemStack stack = guidanceComputer.getStackInSlot(0);
             if (!stack.isEmpty()) {
                 if ((stack.getItem() instanceof ItemSatelliteIdentificationChip && buttonState[buttonSatellite]) ||
@@ -278,9 +286,7 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
         modules.add(new ModuleLimitedSlotArray(15, 15, this, 0, 1));
         modules.add(redstoneControl);
 
-
         modules.add(module_autoEject);
-
 
         if (world.isRemote)
             module_satellite.setBGColor(0xFF2a4bad);
@@ -310,8 +316,10 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
 
     public void update() {
         if (!world.isRemote && rocket != null) {
-            boolean rocketContainsItems = rocket.storage.getGuidanceComputer() != null && !rocket.storage.getGuidanceComputer().getStackInSlot(0).isEmpty() && (chipEjected || !buttonState[buttonAutoEject]);
-            //Update redstone state
+            boolean rocketContainsItems = rocket.storage.getGuidanceComputer() != null &&
+                    !rocket.storage.getGuidanceComputer().getStackInSlot(0).isEmpty() &&
+                    (chipEjected || !buttonState[buttonAutoEject]);
+            // Update redstone state
             setRedstoneState(!rocketContainsItems);
 
         }
@@ -319,7 +327,8 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
 
     protected void setRedstoneState(boolean condition) {
         condition = isStateActive(state, condition);
-        ((BlockARHatch) AdvancedRocketryBlocks.blockLoader).setRedstoneState(world, world.getBlockState(pos), pos, condition);
+        ((BlockARHatch) AdvancedRocketryBlocks.blockLoader).setRedstoneState(world, world.getBlockState(pos), pos,
+                condition);
     }
 
     protected boolean isStateActive(RedstoneState state, boolean condition) {
@@ -346,9 +355,7 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
     }
 
     @Override
-    public void unlinkMission() {
-
-    }
+    public void unlinkMission() {}
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
@@ -359,13 +366,10 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
             buttonState[buttonId] = !buttonState[buttonId];
             PacketHandler.sendToServer(new PacketMachine(this, (byte) buttonId));
         }
-
     }
 
     @Override
-    public void stateUpdated(ModuleBase module) {
-
-    }
+    public void stateUpdated(ModuleBase module) {}
 
     @Override
     public void writeDataToNetwork(ByteBuf out, byte id) {
@@ -378,7 +382,6 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
             }
             out.writeShort(status);
         }
-
     }
 
     @Override
@@ -413,7 +416,6 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-
         nbt.setBoolean("chipEjected", chipEjected);
         nbt.setByte("redstoneState", (byte) state.ordinal());
 
@@ -444,5 +446,4 @@ public class TileGuidanceComputerAccessHatch extends TilePointer implements IInf
     public boolean isEmpty() {
         return getStackInSlot(0).isEmpty();
     }
-
 }

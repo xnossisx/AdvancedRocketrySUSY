@@ -7,6 +7,7 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.Vec3i;
+
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.client.ClientProxy;
 import zmaster587.advancedRocketry.tile.TileBrokenPart;
@@ -24,12 +25,13 @@ public class RendererBrokenPart extends TileEntitySpecialRenderer<TileBrokenPart
             GlStateManager.pushMatrix();
             GlStateManager.translate((float) x, (float) y, (float) z);
 
-            String name = blk.getUnlocalizedName().split("\\.")[1].toLowerCase();
+            String name = blk.getTranslationKey().split("\\.")[1].toLowerCase();
             String pathToTexture = "textures/models/" + name + "_" + tile.getStage() / 3 + ".png";
 
             if (tile.getBlockType() instanceof BlockFullyRotatable) {
                 IBlockState state = tile.getWorld().getBlockState(tile.getPos());
-                EnumFacing facing = state.getBlock().getActualState(state, tile.getWorld(), tile.getPos()).getValue(BlockFullyRotatable.FACING);
+                EnumFacing facing = state.getBlock().getActualState(state, tile.getWorld(), tile.getPos())
+                        .getValue(BlockFullyRotatable.FACING);
                 Vec3i dir = facing.getDirectionVec();
                 GlStateManager.translate(0.5F, 0.5F, 0.5F);
                 if (dir.getY() > 0) {
@@ -52,10 +54,11 @@ public class RendererBrokenPart extends TileEntitySpecialRenderer<TileBrokenPart
                 GlStateManager.translate(0.0625F, 0.0625F, 0.0625F);
                 GlStateManager.matrixMode(5888);
             } else {
-                this.bindTexture(new ResourceLocation(res.getResourceDomain(), pathToTexture));
+                this.bindTexture(new ResourceLocation(res.getNamespace(), pathToTexture));
             }
 
-            WavefrontObject model = ClientProxy.getModel(new ResourceLocation(res.getResourceDomain(), "models/block/models/" + name + ".obj"));
+            WavefrontObject model = ClientProxy
+                    .getModel(new ResourceLocation(res.getNamespace(), "models/block/models/" + name + ".obj"));
             model.renderAll();
 
             if (destroyStage >= 0) {

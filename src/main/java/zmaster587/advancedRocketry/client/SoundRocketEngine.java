@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.client;
 import net.minecraft.client.audio.MovingSound;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
+
 import zmaster587.advancedRocketry.entity.EntityRocket;
 
 public class SoundRocketEngine extends MovingSound {
@@ -17,7 +18,6 @@ public class SoundRocketEngine extends MovingSound {
 
     @Override
     public void update() {
-
         if (rocket.isDead)
             this.donePlaying = true;
 
@@ -34,5 +34,4 @@ public class SoundRocketEngine extends MovingSound {
         this.yPosF = (float) rocket.posY;
         this.zPosF = (float) rocket.posZ;
     }
-
 }

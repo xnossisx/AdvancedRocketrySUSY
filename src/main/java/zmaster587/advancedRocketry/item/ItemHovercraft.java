@@ -1,5 +1,10 @@
 package zmaster587.advancedRocketry.item;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.block.Block;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
@@ -16,12 +21,9 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.entity.EntityHoverCraft;
 import zmaster587.libVulpes.LibVulpes;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 public class ItemHovercraft extends Item {
 
@@ -51,7 +53,7 @@ public class ItemHovercraft extends Item {
         float f7 = f4 * f5;
         float f8 = f3 * f5;
         double d3 = 5.0D;
-        Vec3d vec3d1 = vec3d.addVector((double) f7 * 5.0D, (double) f6 * 5.0D, (double) f8 * 5.0D);
+        Vec3d vec3d1 = vec3d.add((double) f7 * 5.0D, (double) f6 * 5.0D, (double) f8 * 5.0D);
         RayTraceResult raytraceresult = worldIn.rayTraceBlocks(vec3d, vec3d1, true);
 
         if (raytraceresult == null) {
@@ -59,7 +61,8 @@ public class ItemHovercraft extends Item {
         } else {
             Vec3d vec3d2 = playerIn.getLook(1.0F);
             boolean flag = false;
-            List<Entity> list = worldIn.getEntitiesWithinAABBExcludingEntity(playerIn, playerIn.getEntityBoundingBox().expand(vec3d2.x * 5.0D, vec3d2.y * 5.0D, vec3d2.z * 5.0D).grow(1.0D));
+            List<Entity> list = worldIn.getEntitiesWithinAABBExcludingEntity(playerIn, playerIn.getEntityBoundingBox()
+                    .expand(vec3d2.x * 5.0D, vec3d2.y * 5.0D, vec3d2.z * 5.0D).grow(1.0D));
 
             for (Entity entity : list) {
                 if (entity.canBeCollidedWith()) {
@@ -78,7 +81,8 @@ public class ItemHovercraft extends Item {
             } else {
                 Block block = worldIn.getBlockState(raytraceresult.getBlockPos()).getBlock();
                 boolean flag1 = block == Blocks.WATER || block == Blocks.FLOWING_WATER;
-                EntityHoverCraft entityboat = new EntityHoverCraft(worldIn, raytraceresult.hitVec.x, flag1 ? raytraceresult.hitVec.y - 0.12D : raytraceresult.hitVec.y, raytraceresult.hitVec.z);
+                EntityHoverCraft entityboat = new EntityHoverCraft(worldIn, raytraceresult.hitVec.x,
+                        flag1 ? raytraceresult.hitVec.y - 0.12D : raytraceresult.hitVec.y, raytraceresult.hitVec.z);
                 entityboat.rotationYaw = playerIn.rotationYaw;
 
                 if (!worldIn.getCollisionBoxes(entityboat, entityboat.getEntityBoundingBox().grow(-0.1D)).isEmpty()) {

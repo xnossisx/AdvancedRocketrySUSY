@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.asm;
 
+import java.util.Collections;
+
 import net.minecraftforge.fml.common.DummyModContainer;
 import net.minecraftforge.fml.common.LoadController;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -10,12 +12,9 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventBus;
 
-import java.util.Collections;
-
-
 public class ModContainer extends DummyModContainer {
 
-    //ModContainer Class adapted from SackCastellon
+    // ModContainer Class adapted from SackCastellon
     public ModContainer() {
         super(new ModMetadata());
 
@@ -42,18 +41,14 @@ public class ModContainer extends DummyModContainer {
     }
 
     @EventHandler
-    public void modConstruction(FMLConstructionEvent event) {
-    }
+    public void modConstruction(FMLConstructionEvent event) {}
 
     @EventHandler
-    public void preInit(FMLPreInitializationEvent event) {
-    }
+    public void preInit(FMLPreInitializationEvent event) {}
 
     @EventHandler
-    public void load(FMLInitializationEvent event) {
-    }
+    public void load(FMLInitializationEvent event) {}
 
     @EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
-    }
+    public void postInit(FMLPostInitializationEvent event) {}
 }

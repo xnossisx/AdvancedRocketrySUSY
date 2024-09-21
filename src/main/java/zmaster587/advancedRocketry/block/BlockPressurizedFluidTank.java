@@ -1,5 +1,12 @@
 package zmaster587.advancedRocketry.block;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -17,6 +24,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.item.ItemBlockFluidTank;
@@ -25,12 +33,6 @@ import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.GuiHandler.guiId;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileFluidHatch;
 import zmaster587.libVulpes.util.FluidUtils;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.LinkedList;
-import java.util.List;
 
 public class BlockPressurizedFluidTank extends Block {
 
@@ -47,10 +49,11 @@ public class BlockPressurizedFluidTank extends Block {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand,
+                                    EnumFacing side, float hitX, float hitY, float hitZ) {
         TileEntity tile = world.getTileEntity(pos);
 
-        //Do some fancy fluid stuff
+        // Do some fancy fluid stuff
         if (FluidUtils.containsFluid(player.getHeldItem(hand))) {
             FluidUtil.interactWithFluidHandler(player, hand, ((TileFluidHatch) tile).getFluidTank());
         } else if (!world.isRemote)
@@ -72,11 +75,10 @@ public class BlockPressurizedFluidTank extends Block {
 
     @Override
     @ParametersAreNonnullByDefault
-    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te, @Nonnull ItemStack stack) {
-
+    public void harvestBlock(World world, EntityPlayer player, BlockPos pos, IBlockState state, @Nullable TileEntity te,
+                             @Nonnull ItemStack stack) {
         if (te instanceof TileFluidTank) {
             IFluidHandler fluid = te.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, EnumFacing.DOWN);
-
 
             ItemStack itemstack = new ItemStack(AdvancedRocketryBlocks.blockPressureTank);
 
@@ -90,7 +92,8 @@ public class BlockPressurizedFluidTank extends Block {
             float f2 = world.rand.nextFloat() * 0.8F + 0.1F;
 
             itemstack.setCount(1);
-            entityitem = new EntityItem(world, (float) pos.getX() + f, (float) pos.getY() + f1, (float) pos.getZ() + f2, new ItemStack(itemstack.getItem(), 1, 0));
+            entityitem = new EntityItem(world, (float) pos.getX() + f, (float) pos.getY() + f1, (float) pos.getZ() + f2,
+                    new ItemStack(itemstack.getItem(), 1, 0));
             float f3 = 0.05F;
             entityitem.motionX = (float) world.rand.nextGaussian() * f3;
             entityitem.motionY = (float) world.rand.nextGaussian() * f3 + 0.2F;
@@ -109,7 +112,6 @@ public class BlockPressurizedFluidTank extends Block {
     @ParametersAreNonnullByDefault
     public boolean shouldSideBeRendered(IBlockState blockState,
                                         IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-
         if (side.getYOffset() != 0) {
             if (blockAccess.getBlockState(pos).getBlock() == this)
                 return true;
@@ -135,7 +137,8 @@ public class BlockPressurizedFluidTank extends Block {
                                  BlockPos neighbor) {
         TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof TileFluidTank)
-            ((TileFluidTank) tile).onAdjacentBlockUpdated(EnumFacing.getFacingFromVector(neighbor.getX() - pos.getX(), neighbor.getY() - pos.getY(), neighbor.getZ() - pos.getZ()));
+            ((TileFluidTank) tile).onAdjacentBlockUpdated(EnumFacing.getFacingFromVector(neighbor.getX() - pos.getX(),
+                    neighbor.getY() - pos.getY(), neighbor.getZ() - pos.getZ()));
     }
 
     @Nonnull

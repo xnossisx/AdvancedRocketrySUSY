@@ -1,5 +1,10 @@
 package zmaster587.advancedRocketry.satellite;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -7,16 +12,13 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
+
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
 import zmaster587.advancedRocketry.item.ItemOreScanner;
-
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SatelliteOreMapping extends SatelliteBase {
 
@@ -73,20 +75,20 @@ public class SatelliteOreMapping extends SatelliteBase {
         return battery.extractEnergy(1000, true) == 1000;
     }
 
-    public int[][] scanChunk(World world, int offsetX, int offsetZ, int radius, int blocksPerPixel, @Nonnull ItemStack block, int zoomLevel) {
+    public int[][] scanChunk(World world, int offsetX, int offsetZ, int radius, int blocksPerPixel,
+                             @Nonnull ItemStack block, int zoomLevel) {
         blocksPerPixel = Math.max(blocksPerPixel, 1);
         int[][] ret = new int[(radius * 2) / blocksPerPixel][(radius * 2) / blocksPerPixel];
 
         if (canBeginScan() && battery.extractEnergy(375 * zoomLevel, false) == 375 * zoomLevel) {
-            //Base cost is 1000 per scan
+            // Base cost is 1000 per scan
             battery.extractEnergy(1000, false);
-            //Modified by 375 * zoom level for a filtered scan
+            // Modified by 375 * zoom level for a filtered scan
             battery.extractEnergy(375 * zoomLevel, true);
-            //Now for the actual scanning
+            // Now for the actual scanning
             for (int z = -radius; z < radius; z += blocksPerPixel) {
                 for (int x = -radius; x < radius; x += blocksPerPixel) {
                     int oreCount = 0, otherCount = 0;
-
 
                     for (int y = world.getHeight(); y > 0; y--) {
                         for (int deltaY = 0; deltaY < blocksPerPixel; deltaY++) {
@@ -96,13 +98,14 @@ public class SatelliteOreMapping extends SatelliteBase {
                                 if (world.isAirBlock(pos))
                                     continue;
 
-                                //Note:May not work with tileEntities (GT ores)
+                                // Note:May not work with tileEntities (GT ores)
                                 boolean found = false;
                                 List<ItemStack> drops;
                                 IBlockState state = world.getBlockState(pos);
                                 drops = state.getBlock().getDrops(world, pos, state, 0);
                                 for (ItemStack stack : drops) {
-                                    if (stack.getItem() == block.getItem() && stack.getItemDamage() == block.getItemDamage()) {
+                                    if (stack.getItem() == block.getItem() &&
+                                            stack.getItemDamage() == block.getItemDamage()) {
                                         oreCount++;
                                         found = true;
                                     }
@@ -119,8 +122,8 @@ public class SatelliteOreMapping extends SatelliteBase {
                     if (Thread.interrupted())
                         return null;
 
-
-                    ret[(x + radius) / blocksPerPixel][(z + radius) / blocksPerPixel] = (int) ((oreCount / (float) Math.max(otherCount, 1)) * 0xFFFF);
+                    ret[(x + radius) / blocksPerPixel][(z + radius) /
+                            blocksPerPixel] = (int) ((oreCount / (float) Math.max(otherCount, 1)) * 0xFFFF);
                 }
             }
         }
@@ -142,7 +145,7 @@ public class SatelliteOreMapping extends SatelliteBase {
         blocksPerPixel = Math.max(blocksPerPixel, 1);
         int[][] ret = new int[(radius * 2) / blocksPerPixel][(radius * 2) / blocksPerPixel];
 
-        //Get all the ores we want to look for
+        // Get all the ores we want to look for
         if (oreList.isEmpty()) {
             String[] strings = OreDictionary.getOreNames();
             for (String str : strings) {
@@ -151,15 +154,14 @@ public class SatelliteOreMapping extends SatelliteBase {
             }
         }
         if (canBeginScan() && battery.extractEnergy(250 * zoomLevel, false) == 250 * zoomLevel) {
-            //Base cost is 1000 per scan
+            // Base cost is 1000 per scan
             battery.extractEnergy(1000, false);
-            //Modified by 250 * zoom level for a basic, unfiltered scan
+            // Modified by 250 * zoom level for a basic, unfiltered scan
             battery.extractEnergy(250 * zoomLevel, true);
-            //Now for the actual scan
+            // Now for the actual scan
             for (int z = -radius; z < radius; z += blocksPerPixel) {
                 for (int x = -radius; x < radius; x += blocksPerPixel) {
                     int oreCount = 0, otherCount = 0;
-
 
                     for (int y = world.getHeight(); y > 0; y--) {
                         for (int deltaY = 0; deltaY < blocksPerPixel; deltaY++) {
@@ -174,7 +176,8 @@ public class SatelliteOreMapping extends SatelliteBase {
                                     List<ItemStack> itemlist = OreDictionary.getOres(OreDictionary.getOreName(i));
 
                                     for (ItemStack item : itemlist) {
-                                        if (item.getItem() == Item.getItemFromBlock(world.getBlockState(pos).getBlock())) {
+                                        if (item.getItem() ==
+                                                Item.getItemFromBlock(world.getBlockState(pos).getBlock())) {
                                             exists = true;
                                             break out;
                                         }
@@ -193,8 +196,8 @@ public class SatelliteOreMapping extends SatelliteBase {
                     if (Thread.interrupted())
                         return null;
 
-
-                    ret[(x + radius) / blocksPerPixel][(z + radius) / blocksPerPixel] = (int) ((oreCount / (float) Math.max(otherCount, 1)) * 0xFFFF);
+                    ret[(x + radius) / blocksPerPixel][(z + radius) /
+                            blocksPerPixel] = (int) ((oreCount / (float) Math.max(otherCount, 1)) * 0xFFFF);
                 }
             }
         }
@@ -211,7 +214,6 @@ public class SatelliteOreMapping extends SatelliteBase {
     public String getName() {
         return "Ore Mapper";
     }
-
 
     public int getZoomRadius() {
         return Math.min(satelliteProperties.getPowerGeneration() / 4, 7);

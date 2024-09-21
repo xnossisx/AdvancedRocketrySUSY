@@ -26,5 +26,4 @@ public class CentrifugeCategory extends MachineCategoryTemplate<CentrifugeWrappe
     public String getModName() {
         return "Advanced Rocketry";
     }
-
 }

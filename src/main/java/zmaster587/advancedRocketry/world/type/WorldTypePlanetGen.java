@@ -7,6 +7,7 @@ import net.minecraft.world.gen.ChunkGeneratorSettings;
 import net.minecraft.world.gen.IChunkGenerator;
 import net.minecraft.world.gen.layer.GenLayer;
 import net.minecraft.world.gen.layer.GenLayerZoom;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.world.ChunkProviderPlanet;
 import zmaster587.advancedRocketry.world.GenLayerBiomePlanet;
@@ -19,14 +20,14 @@ public class WorldTypePlanetGen extends WorldType {
 
     @Override
     public BiomeProvider getBiomeProvider(World world) {
-        return null;//new ChunkManagerPlanet(world); //new WorldChunkManager(world);//
+        return null;// new ChunkManagerPlanet(world); //new WorldChunkManager(world);//
     }
 
     @Override
     public IChunkGenerator getChunkGenerator(World world, String generatorOptions) {
-        return new ChunkProviderPlanet(world, world.getSeed(), ARConfiguration.getCurrentConfig().generateVanillaStructures, generatorOptions);
+        return new ChunkProviderPlanet(world, world.getSeed(),
+                ARConfiguration.getCurrentConfig().generateVanillaStructures, generatorOptions);
     }
-
 
     @Override
     public boolean canBeCreated() {
@@ -42,13 +43,12 @@ public class WorldTypePlanetGen extends WorldType {
      */
     @Override
     public GenLayer getBiomeLayer(long worldSeed, GenLayer parentLayer, ChunkGeneratorSettings chunkProviderSettings) {
-        //return super.getBiomeLayer(worldSeed, parentLayer);
+        // return super.getBiomeLayer(worldSeed, parentLayer);
         GenLayer ret = new GenLayerBiomePlanet(200L, parentLayer, this);
 
         ret = GenLayerZoom.magnify(1000L, ret, 2);
-        //REKT with random ocean
-        //ret = new GenLayerEdge(1000L, ret, Mode.SPECIAL);
+        // REKT with random ocean
+        // ret = new GenLayerEdge(1000L, ret, Mode.SPECIAL);
         return ret;
     }
-
 }

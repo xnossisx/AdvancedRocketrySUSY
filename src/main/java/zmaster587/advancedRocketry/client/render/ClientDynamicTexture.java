@@ -1,12 +1,13 @@
 package zmaster587.advancedRocketry.client.render;
 
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
-import zmaster587.advancedRocketry.AdvancedRocketry;
-
 import java.awt.image.BufferedImage;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
+
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
+
+import zmaster587.advancedRocketry.AdvancedRocketry;
 
 public class ClientDynamicTexture {
 
@@ -44,14 +45,14 @@ public class ClientDynamicTexture {
      * @param color color in RGBA8
      */
     public void setPixel(int x, int y, int color) {
-
         ByteBuffer buffer = BufferUtils.createByteBuffer(image.getHeight() * image.getWidth() * BYTES_PER_PIXEL);
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, getTextureId());
         GL11.glGetTexImage(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         buffer.putInt(x + (y * image.getHeight()), color);
 
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA,
+                GL11.GL_UNSIGNED_BYTE, buffer);
     }
 
     /**
@@ -60,8 +61,8 @@ public class ClientDynamicTexture {
     public IntBuffer getByteBuffer() {
         ByteBuffer buffer = BufferUtils.createByteBuffer(image.getHeight() * image.getWidth() * BYTES_PER_PIXEL);
 
-        //GL11.glBindTexture(GL11.GL_TEXTURE_2D, getTextureId());
-        //GL11.glGetTexImage(GL11.GL_TEXTURE_2D,0 , GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        // GL11.glBindTexture(GL11.GL_TEXTURE_2D, getTextureId());
+        // GL11.glGetTexImage(GL11.GL_TEXTURE_2D,0 , GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
         int[] pixels = new int[image.getWidth() * image.getHeight()];
         image.getRGB(0, 0, image.getWidth(), image.getHeight(), pixels, 0, image.getWidth());
 
@@ -73,19 +74,21 @@ public class ClientDynamicTexture {
     public void setByteBuffer(IntBuffer buffer) {
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, getTextureId());
 
-        //Just clamp to edge
-        //GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
-        //GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
+        // Just clamp to edge
+        // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
+        // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
 
-        //Scale linearly
-        //GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-        //GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+        // Scale linearly
+        // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+        // GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 
-        //GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
+        // GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
 
-        //GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        // GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA,
+        // GL11.GL_UNSIGNED_BYTE, buffer);
         try {
-            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, image.getWidth(), image.getHeight(), GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+            GL11.glTexSubImage2D(GL11.GL_TEXTURE_2D, 0, 0, 0, image.getWidth(), image.getHeight(), GL11.GL_RGBA,
+                    GL11.GL_UNSIGNED_BYTE, buffer);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
             AdvancedRocketry.logger.warn("Planet image generation FX failed!");
@@ -93,7 +96,7 @@ public class ClientDynamicTexture {
     }
 
     private void init() {
-        //create array, every single pixel
+        // create array, every single pixel
 
         ByteBuffer buffer = BufferUtils.createByteBuffer(image.getHeight() * image.getWidth() * BYTES_PER_PIXEL);
 
@@ -104,17 +107,18 @@ public class ClientDynamicTexture {
 
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, getTextureId());
 
-        //Just clamp to edge
+        // Just clamp to edge
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_CLAMP);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_CLAMP);
 
-        //Scale linearly
+        // Scale linearly
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_NEAREST);
         GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_NEAREST);
 
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
 
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, image.getWidth(), image.getHeight(), 0, GL11.GL_RGBA,
+                GL11.GL_UNSIGNED_BYTE, buffer);
     }
 
     /**

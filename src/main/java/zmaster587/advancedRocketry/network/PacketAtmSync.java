@@ -1,15 +1,16 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.atmosphere.AtmosphereRegister;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereHandler;
 import zmaster587.libVulpes.network.BasePacket;
-
-import java.io.IOException;
 
 public class PacketAtmSync extends BasePacket {
 
@@ -21,9 +22,7 @@ public class PacketAtmSync extends BasePacket {
         this.pressure = pressure;
     }
 
-    public PacketAtmSync() {
-
-    }
+    public PacketAtmSync() {}
 
     @Override
     public void write(ByteBuf out) {
@@ -51,7 +50,7 @@ public class PacketAtmSync extends BasePacket {
 
     @Override
     public void read(ByteBuf in) {
-        //Do nothing on server, we don't want hackers now do we ;)
+        // Do nothing on server, we don't want hackers now do we ;)
     }
 
     @Override
@@ -61,8 +60,5 @@ public class PacketAtmSync extends BasePacket {
     }
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-
-    }
-
+    public void executeServer(EntityPlayerMP player) {}
 }

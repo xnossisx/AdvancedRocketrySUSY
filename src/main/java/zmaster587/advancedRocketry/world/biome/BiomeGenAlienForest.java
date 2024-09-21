@@ -1,16 +1,18 @@
 package zmaster587.advancedRocketry.world.biome;
 
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.init.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
+
 import zmaster587.advancedRocketry.world.gen.WorldGenAlienTree;
 import zmaster587.advancedRocketry.world.gen.WorldGenNoTree;
-
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Random;
 
 public class BiomeGenAlienForest extends Biome {
 
@@ -28,11 +30,10 @@ public class BiomeGenAlienForest extends Biome {
     @Override
     @ParametersAreNonnullByDefault
     public void decorate(World worldIn, Random rand, BlockPos pos) {
-        //int xCoord = (chunkX << 4) + 8;
-        //int zCoord = (chunkZ << 4) + 8;
+        // int xCoord = (chunkX << 4) + 8;
+        // int zCoord = (chunkZ << 4) + 8;
 
         if (rand.nextInt(20) == 0) {
-
 
             alienTree.generate(worldIn, rand, worldIn.getHeight(pos));
         }

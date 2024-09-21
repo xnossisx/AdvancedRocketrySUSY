@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.tile.multiblock.machine;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -11,6 +15,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.oredict.OreDictionary;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
@@ -21,23 +26,20 @@ import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.inventory.modules.ModuleProgress;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-
 public class TilePrecisionLaserEtcher extends TileMultiblockMachine implements IModularInventory {
 
     public static final Object[][][] structure = {
-            {{"slab", "slab", "slab"},
-                    {Blocks.AIR, "slab", Blocks.AIR},
-                    {"slab", "slab", "slab"}},
+            { { "slab", "slab", "slab" },
+                    { Blocks.AIR, "slab", Blocks.AIR },
+                    { "slab", "slab", "slab" } },
 
-            {{AdvancedRocketryBlocks.blockStructureTower, Blocks.AIR, LibVulpesBlocks.blockStructureBlock},
-                    {Blocks.AIR, AdvancedRocketryBlocks.blockVacuumLaser, LibVulpesBlocks.blockStructureBlock},
-                    {AdvancedRocketryBlocks.blockStructureTower, Blocks.AIR, LibVulpesBlocks.blockStructureBlock}},
+            { { AdvancedRocketryBlocks.blockStructureTower, Blocks.AIR, LibVulpesBlocks.blockStructureBlock },
+                    { Blocks.AIR, AdvancedRocketryBlocks.blockVacuumLaser, LibVulpesBlocks.blockStructureBlock },
+                    { AdvancedRocketryBlocks.blockStructureTower, Blocks.AIR, LibVulpesBlocks.blockStructureBlock } },
 
-            {{LibVulpesBlocks.blockStructureBlock, 'c', 'I'},
-                    {'P', LibVulpesBlocks.motors, 'O'},
-                    {'P', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock}},
+            { { LibVulpesBlocks.blockStructureBlock, 'c', 'I' },
+                    { 'P', LibVulpesBlocks.motors, 'O' },
+                    { 'P', LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock } },
     };
 
     @Override
@@ -66,10 +68,15 @@ public class TilePrecisionLaserEtcher extends TileMultiblockMachine implements I
                     ItemStack stackInSlot = hatch.getStackInSlot(i);
 
                     for (ItemStack stack : ingredient) {
-                        if ((!stackInSlot.isEmpty() && stackInSlot.getCount() >= stack.getCount() && (stackInSlot.isItemEqual(stack) || stack.getItemDamage() == 32767 && stackInSlot.getItem() == stack.getItem())) && !isLensItem(stack)) {
+                        if ((!stackInSlot.isEmpty() && stackInSlot.getCount() >= stack.getCount() &&
+                                (stackInSlot.isItemEqual(stack) ||
+                                        stack.getItemDamage() == 32767 && stackInSlot.getItem() == stack.getItem())) &&
+                                !isLensItem(stack)) {
                             hatch.decrStackSize(i, stack.getCount());
                             hatch.markDirty();
-                            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(((TileEntity) hatch).getPos()), this.world.getBlockState(((TileEntity) hatch).getPos()), 6);
+                            this.world.notifyBlockUpdate(this.pos,
+                                    this.world.getBlockState(((TileEntity) hatch).getPos()),
+                                    this.world.getBlockState(((TileEntity) hatch).getPos()), 6);
                             continue label77;
                         }
                     }
@@ -81,7 +88,6 @@ public class TilePrecisionLaserEtcher extends TileMultiblockMachine implements I
     @Override
     @Nonnull
     public AxisAlignedBB getRenderBoundingBox() {
-
         return new AxisAlignedBB(pos.add(-3, -2, -3), pos.add(3, 2, 3));
     }
 

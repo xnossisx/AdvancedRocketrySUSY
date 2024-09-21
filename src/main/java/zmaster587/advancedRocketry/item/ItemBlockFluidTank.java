@@ -1,5 +1,11 @@
 package zmaster587.advancedRocketry.item;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.util.ITooltipFlag;
@@ -15,13 +21,9 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidTank;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.tile.TileFluidTank;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 public class ItemBlockFluidTank extends ItemBlock {
 
@@ -39,19 +41,22 @@ public class ItemBlockFluidTank extends ItemBlock {
         if (fluidStack == null) {
             list.add("Empty");
         } else {
-            list.add(fluidStack.getLocalizedName() + ": " + fluidStack.amount/1000 + "/"+64* ARConfiguration.getCurrentConfig().blockTankCapacity+"b");
+            list.add(fluidStack.getLocalizedName() + ": " + fluidStack.amount / 1000 + "/" +
+                    64 * ARConfiguration.getCurrentConfig().blockTankCapacity + "b");
         }
     }
 
     @Override
     @ParametersAreNonnullByDefault
-    public boolean placeBlockAt(@Nonnull ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
+    public boolean placeBlockAt(@Nonnull ItemStack stack, EntityPlayer player, World world, BlockPos pos,
+                                EnumFacing side, float hitX, float hitY, float hitZ, IBlockState newState) {
         super.placeBlockAt(stack, player, world, pos, side, hitX, hitY, hitZ, newState);
 
         TileEntity tile = world.getTileEntity(pos);
 
         if (tile instanceof TileFluidTank) {
-            IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, EnumFacing.DOWN);
+            IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY,
+                    EnumFacing.DOWN);
             ItemStack stack2 = stack.copy();
             stack2.setCount(1);
             handler.fill(drain(stack2, Integer.MAX_VALUE), true);
@@ -61,9 +66,8 @@ public class ItemBlockFluidTank extends ItemBlock {
     }
 
     public void fill(@Nonnull ItemStack stack, FluidStack fluid) {
-
         NBTTagCompound nbt;
-        FluidTank tank = new FluidTank((int) (640000* ARConfiguration.getCurrentConfig().blockTankCapacity));
+        FluidTank tank = new FluidTank((int) (640000 * ARConfiguration.getCurrentConfig().blockTankCapacity));
         if (stack.hasTagCompound()) {
             nbt = stack.getTagCompound();
             tank.readFromNBT(nbt);
@@ -78,7 +82,7 @@ public class ItemBlockFluidTank extends ItemBlock {
 
     public FluidStack drain(@Nonnull ItemStack stack, int amt) {
         NBTTagCompound nbt;
-        FluidTank tank = new FluidTank((int) (640000* ARConfiguration.getCurrentConfig().blockTankCapacity));
+        FluidTank tank = new FluidTank((int) (640000 * ARConfiguration.getCurrentConfig().blockTankCapacity));
         if (stack.hasTagCompound()) {
             nbt = stack.getTagCompound();
             tank.readFromNBT(nbt);
@@ -95,7 +99,7 @@ public class ItemBlockFluidTank extends ItemBlock {
 
     public FluidStack getFluid(@Nonnull ItemStack stack) {
         NBTTagCompound nbt;
-        FluidTank tank = new FluidTank((int) (640000* ARConfiguration.getCurrentConfig().blockTankCapacity));
+        FluidTank tank = new FluidTank((int) (640000 * ARConfiguration.getCurrentConfig().blockTankCapacity));
         if (stack.hasTagCompound()) {
             nbt = stack.getTagCompound();
             tank.readFromNBT(nbt);

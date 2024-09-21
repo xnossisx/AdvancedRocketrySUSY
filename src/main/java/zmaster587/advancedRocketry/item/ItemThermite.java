@@ -1,9 +1,9 @@
 package zmaster587.advancedRocketry.item;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-
-import javax.annotation.Nonnull;
 
 public class ItemThermite extends Item {
 
@@ -11,5 +11,4 @@ public class ItemThermite extends Item {
     public int getItemBurnTime(@Nonnull ItemStack itemStack) {
         return 6000;
     }
-
 }

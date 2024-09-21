@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.tile.multiblock.energy;
 
-import io.netty.buffer.ByteBuf;
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -12,6 +13,8 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
@@ -26,35 +29,33 @@ import zmaster587.libVulpes.network.PacketMachine;
 import zmaster587.libVulpes.tile.multiblock.TileMultiPowerProducer;
 import zmaster587.libVulpes.util.Vector3F;
 
-import java.util.List;
-
 public class TileSolarArray extends TileMultiPowerProducer implements ITickable {
 
-    static final Object[][][] structure = new Object[][][]{
+    static final Object[][][] structure = new Object[][][] {
             {
-                    {'p', 'c', 'p'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'},
-                    {'*', '*', '*'}
-            }};
+                    { 'p', 'c', 'p' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' },
+                    { '*', '*', '*' }
+            } };
 
     boolean initialCheck;
     int powerMadeLastTick, prevPowerMadeLastTick;
@@ -62,7 +63,8 @@ public class TileSolarArray extends TileMultiPowerProducer implements ITickable 
     ModuleText textModule;
 
     public TileSolarArray() {
-        textModule = new ModuleText(40, 20, LibVulpes.proxy.getLocalizedString("msg.microwaverec.notgenerating"), 0x2b2b2b);
+        textModule = new ModuleText(40, 20, LibVulpes.proxy.getLocalizedString("msg.microwaverec.notgenerating"),
+                0x2b2b2b);
     }
 
     @Override
@@ -96,19 +98,22 @@ public class TileSolarArray extends TileMultiPowerProducer implements ITickable 
 
     @Override
     protected boolean completeStructure(IBlockState state) {
-        //Needed definitions
+        // Needed definitions
         EnumFacing front = this.getFrontDirection(state);
         Vector3F<Integer> offset = this.getControllerOffset(structure);
 
-        //Panel-checker iterator
+        // Panel-checker iterator
         numPanels = 0;
         for (int y = 0; y < structure.length; ++y) {
             for (int z = 0; z < structure[0].length; ++z) {
                 for (int x = 0; x < structure[0][0].length; ++x) {
-                    int globalX = this.pos.getX() + (x - offset.x) * front.getFrontOffsetZ() - (z - offset.z) * front.getFrontOffsetX();
+                    int globalX = this.pos.getX() + (x - offset.x) * front.getZOffset() -
+                            (z - offset.z) * front.getXOffset();
                     int globalY = this.pos.getY() - y + offset.y;
-                    int globalZ = this.pos.getZ() - (x - offset.x) * front.getFrontOffsetX() - (z - offset.z) * front.getFrontOffsetZ();
-                    if (world.getBlockState(new BlockPos(globalX, globalY, globalZ)).getBlock() == AdvancedRocketryBlocks.blockSolarArrayPanel) {
+                    int globalZ = this.pos.getZ() - (x - offset.x) * front.getXOffset() -
+                            (z - offset.z) * front.getZOffset();
+                    if (world.getBlockState(new BlockPos(globalX, globalY, globalZ)).getBlock() ==
+                            AdvancedRocketryBlocks.blockSolarArrayPanel) {
                         numPanels++;
                     }
                 }
@@ -124,7 +129,6 @@ public class TileSolarArray extends TileMultiPowerProducer implements ITickable 
 
     @Override
     public void update() {
-
         if (!initialCheck && !world.isRemote) {
             completeStructure = attemptCompleteStructure(world.getBlockState(pos));
             initialCheck = true;
@@ -134,12 +138,20 @@ public class TileSolarArray extends TileMultiPowerProducer implements ITickable 
             return;
 
         if (!world.isRemote) {
-            DimensionProperties properties = DimensionManager.getInstance().getDimensionProperties(world.provider.getDimension());
-            double insolationPowerMultiplier = (world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) ? SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos).getInsolationMultiplier() : properties.getPeakInsolationMultiplier();
+            DimensionProperties properties = DimensionManager.getInstance()
+                    .getDimensionProperties(world.provider.getDimension());
+            double insolationPowerMultiplier = (world.provider.getDimension() ==
+                    ARConfiguration.getCurrentConfig().spaceDimId) ?
+                            SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(this.pos)
+                                    .getInsolationMultiplier() :
+                            properties.getPeakInsolationMultiplier();
             int energyRecieved = 0;
-            if (enabled && ((world.isDaytime() && world.canBlockSeeSky(this.pos.up())) || (world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId && world.canBlockSeeSky(this.pos.down())))) {
-                //Multiplied by two for 520W = 1 RF/t becoming 2 RF/t @ 100% efficiency, and by insolation mult for solar stuff
-                //Slight adjustment to make Earth 0.9995 into a 1.0
+            if (enabled && ((world.isDaytime() && world.canBlockSeeSky(this.pos.up())) ||
+                    (world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId &&
+                            world.canBlockSeeSky(this.pos.down())))) {
+                // Multiplied by two for 520W = 1 RF/t becoming 2 RF/t @ 100% efficiency, and by insolation mult for
+                // solar stuff
+                // Slight adjustment to make Earth 0.9995 into a 1.0
                 energyRecieved = (int) (numPanels * 1.0005d * 2 * insolationPowerMultiplier);
             }
             powerMadeLastTick = energyRecieved * ARConfiguration.getCurrentConfig().solarGeneratorMult;
@@ -152,7 +164,8 @@ public class TileSolarArray extends TileMultiPowerProducer implements ITickable 
             producePower(powerMadeLastTick);
         }
         if (world.isRemote)
-            textModule.setText(LibVulpes.proxy.getLocalizedString("msg.microwaverec.generating") + " " + powerMadeLastTick + " " + LibVulpes.proxy.getLocalizedString("msg.powerunit.rfpertick"));
+            textModule.setText(LibVulpes.proxy.getLocalizedString("msg.microwaverec.generating") + " " +
+                    powerMadeLastTick + " " + LibVulpes.proxy.getLocalizedString("msg.powerunit.rfpertick"));
     }
 
     @Override
@@ -189,7 +202,6 @@ public class TileSolarArray extends TileMultiPowerProducer implements ITickable 
         canRender = nbt.getBoolean("canRender");
         readNetworkData(nbt);
     }
-
 
     @Override
     public void writeDataToNetwork(ByteBuf out, byte id) {
@@ -231,5 +243,4 @@ public class TileSolarArray extends TileMultiPowerProducer implements ITickable 
         super.readNetworkData(nbt);
         this.numPanels = nbt.getInteger("numPanels");
     }
-
 }

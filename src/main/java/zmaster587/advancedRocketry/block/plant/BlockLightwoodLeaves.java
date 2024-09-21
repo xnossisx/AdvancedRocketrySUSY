@@ -1,5 +1,10 @@
 package zmaster587.advancedRocketry.block.plant;
 
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.block.BlockLeaves;
 import net.minecraft.block.BlockPlanks.EnumType;
 import net.minecraft.block.state.BlockStateContainer;
@@ -14,16 +19,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Random;
+import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 
 public class BlockLightwoodLeaves extends BlockLeaves {
 
-    protected static final String[] names = {"blueLeaf"};
-    protected static final String[][] textures = new String[][]{{"leaves_oak"}, {"leaves_oak_opaque"}};
+    protected static final String[] names = { "blueLeaf" };
+    protected static final String[][] textures = new String[][] { { "leaves_oak" }, { "leaves_oak_opaque" } };
 
     public BlockLightwoodLeaves() {
         super();
@@ -45,7 +47,8 @@ public class BlockLightwoodLeaves extends BlockLeaves {
     @Override
     @Nonnull
     public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(DECAYABLE, (meta & 1) == 1).withProperty(CHECK_DECAY, (meta & 2) == 2);
+        return this.getDefaultState().withProperty(DECAYABLE, (meta & 1) == 1).withProperty(CHECK_DECAY,
+                (meta & 2) == 2);
     }
 
     public int quantityDropped(Random p_149745_1_) {
@@ -68,7 +71,6 @@ public class BlockLightwoodLeaves extends BlockLeaves {
         return Item.getItemFromBlock(AdvancedRocketryBlocks.blockLightwoodSapling);
     }
 
-
     @Override
     @Nonnull
     public NonNullList<ItemStack> onSheared(@Nonnull ItemStack item, IBlockAccess world, BlockPos pos, int fortune) {
@@ -81,7 +83,7 @@ public class BlockLightwoodLeaves extends BlockLeaves {
         return EnumType.OAK;
     }
 
-    //These three methods need to be overridden
+    // These three methods need to be overridden
     @Override
     public boolean isOpaqueCube(IBlockState state) {
         return Blocks.LEAVES.isOpaqueCube(state);
@@ -90,14 +92,15 @@ public class BlockLightwoodLeaves extends BlockLeaves {
     @Override
     @SideOnly(Side.CLIENT)
     @Nonnull
-    public BlockRenderLayer getBlockLayer() {
-        return Blocks.LEAVES.getBlockLayer();
+    public BlockRenderLayer getRenderLayer() {
+        return Blocks.LEAVES.getRenderLayer();
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     @ParametersAreNonnullByDefault
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,
+                                        EnumFacing side) {
         return Blocks.LEAVES.shouldSideBeRendered(blockState, blockAccess, pos, side);
     }
 }

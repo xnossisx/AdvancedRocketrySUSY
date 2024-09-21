@@ -1,10 +1,10 @@
 package zmaster587.advancedRocketry.advancements;
 
+import java.lang.reflect.Method;
+
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.advancements.ICriterionTrigger;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-
-import java.lang.reflect.Method;
 
 public class ARAdvancements {
 
@@ -18,7 +18,7 @@ public class ARAdvancements {
     public static final CustomTrigger DEATH_STAR = new CustomTrigger("deathstar");
     public static final CustomTrigger ATM_TERRAFORMER = new CustomTrigger("pressurize");
 
-    public static final CustomTrigger[] TRIGGER_ARRAY = new CustomTrigger[]{
+    public static final CustomTrigger[] TRIGGER_ARRAY = new CustomTrigger[] {
             MOON_LANDING,
             ONE_SMALL_STEP,
             BEER,
@@ -33,7 +33,8 @@ public class ARAdvancements {
     public static void register() {
         Method method;
         try {
-            method = ReflectionHelper.findMethod(CriteriaTriggers.class, "register", "func_192118_a", ICriterionTrigger.class);
+            method = ReflectionHelper.findMethod(CriteriaTriggers.class, "register", "func_192118_a",
+                    ICriterionTrigger.class);
             method.setAccessible(true);
             for (int i = 0; i < ARAdvancements.TRIGGER_ARRAY.length; i++) {
                 method.invoke(null, ARAdvancements.TRIGGER_ARRAY[i]);

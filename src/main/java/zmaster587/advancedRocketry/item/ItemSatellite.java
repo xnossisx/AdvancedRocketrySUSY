@@ -1,19 +1,22 @@
 package zmaster587.advancedRocketry.item;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+
+import com.mojang.realmsclient.gui.ChatFormatting;
+
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.util.EmbeddedInventory;
 import zmaster587.libVulpes.util.ZUtils;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 public class ItemSatellite extends ItemIdWithName {
 
@@ -39,26 +42,23 @@ public class ItemSatellite extends ItemIdWithName {
     }
 
     public void setSatellite(@Nonnull ItemStack stack, SatelliteProperties properties) {
-
         SatelliteBase testSatellite = SatelliteRegistry.getNewSatellite(properties.getSatelliteType());
         if (testSatellite != null) {
-            //Check to see if we have some NBT already, if so, add to it
+            // Check to see if we have some NBT already, if so, add to it
             NBTTagCompound nbt;
             if (stack.hasTagCompound())
                 nbt = stack.getTagCompound();
             else
                 nbt = new NBTTagCompound();
 
-            //Stick the properties into the NBT of the stack
+            // Stick the properties into the NBT of the stack
             properties.writeToNBT(nbt);
             stack.setTagCompound(nbt);
 
             setName(stack, testSatellite.getName());
         } else
             stack.setTagCompound(null);
-
     }
-
 
     @Override
     public void addInformation(@Nonnull ItemStack stack, World player, List<String> list, ITooltipFlag bool) {
@@ -87,7 +87,8 @@ public class ItemSatellite extends ItemIdWithName {
 
             if (SatelliteProperties.Property.DATA.isOfType(properties.getPropertyFlag())) {
                 if ((dataStorage = properties.getMaxDataStorage()) > 0)
-                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatellite.data") + ZUtils.formatNumber(dataStorage));
+                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatellite.data") +
+                            ZUtils.formatNumber(dataStorage));
                 else
                     list.add(ChatFormatting.YELLOW + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.nodata"));
             }
@@ -100,6 +101,5 @@ public class ItemSatellite extends ItemIdWithName {
         } else {
             list.add(ChatFormatting.RED + LibVulpes.proxy.getLocalizedString("msg.itemsatellite.empty"));
         }
-
     }
 }

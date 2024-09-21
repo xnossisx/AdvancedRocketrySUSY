@@ -12,8 +12,10 @@ import net.minecraftforge.common.util.EnumHelper;
  */
 public class AdvancedRocketryItems {
 
-    //TODO: fix
-    public static final ArmorMaterial spaceSuit = EnumHelper.addArmorMaterial("spaceSuit", "", ArmorMaterial.DIAMOND.getDurability(EntityEquipmentSlot.CHEST), new int[]{1, 1, 1, 1}, 0, new SoundEvent(new ResourceLocation("")), 0);
+    // TODO: fix
+    public static final ArmorMaterial spaceSuit = EnumHelper.addArmorMaterial("spaceSuit", "",
+            ArmorMaterial.DIAMOND.getDurability(EntityEquipmentSlot.CHEST), new int[] { 1, 1, 1, 1 }, 0,
+            new SoundEvent(new ResourceLocation("")), 0);
 
     public static Item itemWafer;
     public static Item itemCircuitPlate;

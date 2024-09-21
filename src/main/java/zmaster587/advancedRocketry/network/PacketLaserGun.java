@@ -1,10 +1,11 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.Vec3d;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.libVulpes.network.BasePacket;
 
@@ -19,8 +20,7 @@ public class PacketLaserGun extends BasePacket {
         this.toPos = toPos;
     }
 
-    public PacketLaserGun() {
-    }
+    public PacketLaserGun() {}
 
     @Override
     public void write(ByteBuf out) {
@@ -37,9 +37,7 @@ public class PacketLaserGun extends BasePacket {
     }
 
     @Override
-    public void read(ByteBuf in) {
-
-    }
+    public void read(ByteBuf in) {}
 
     @Override
     public void executeClient(EntityPlayer thePlayer) {
@@ -50,8 +48,5 @@ public class PacketLaserGun extends BasePacket {
     }
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-
-    }
-
+    public void executeServer(EntityPlayerMP player) {}
 }

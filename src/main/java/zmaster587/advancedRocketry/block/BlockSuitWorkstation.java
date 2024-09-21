@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.libVulpes.block.BlockTile;
 
 public class BlockSuitWorkstation extends BlockTile {
@@ -19,7 +20,7 @@ public class BlockSuitWorkstation extends BlockTile {
     public void breakBlock(World world, BlockPos pos, IBlockState state) {
         TileEntity tile = world.getTileEntity(pos);
 
-        //This code could use some optimization -Dark
+        // This code could use some optimization -Dark
         if (tile instanceof IInventory) {
             IInventory inventory = (IInventory) tile;
             int i1 = 0;
@@ -30,7 +31,8 @@ public class BlockSuitWorkstation extends BlockTile {
                 float f1 = world.rand.nextFloat() * 0.8F + 0.1F;
                 EntityItem entityitem;
 
-                for (float f2 = world.rand.nextFloat() * 0.8F + 0.1F; itemstack.getCount() > 0; world.spawnEntity(entityitem)) {
+                for (float f2 = world.rand.nextFloat() * 0.8F + 0.1F; itemstack.getCount() > 0; world
+                        .spawnEntity(entityitem)) {
                     int j1 = world.rand.nextInt(21) + 10;
 
                     if (j1 > itemstack.getCount()) {
@@ -38,7 +40,8 @@ public class BlockSuitWorkstation extends BlockTile {
                     }
 
                     itemstack.setCount(itemstack.getCount() - j1);
-                    entityitem = new EntityItem(world, (float) pos.getX() + f, (float) pos.getY() + f1, (float) pos.getZ() + f2, new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
+                    entityitem = new EntityItem(world, (float) pos.getX() + f, (float) pos.getY() + f1,
+                            (float) pos.getZ() + f2, new ItemStack(itemstack.getItem(), j1, itemstack.getItemDamage()));
                     float f3 = 0.05F;
                     entityitem.motionX = (float) world.rand.nextGaussian() * f3;
                     entityitem.motionY = (float) world.rand.nextGaussian() * f3 + 0.2F;
@@ -52,6 +55,5 @@ public class BlockSuitWorkstation extends BlockTile {
         }
 
         world.removeTileEntity(pos);
-
     }
 }

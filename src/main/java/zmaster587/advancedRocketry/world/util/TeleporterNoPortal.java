@@ -11,9 +11,9 @@ public class TeleporterNoPortal extends Teleporter {
     }
 
     public void teleport(Entity entity, WorldServer world) {
-
         if (entity.isEntityAlive()) {
-            entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
+            entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw,
+                    entity.rotationPitch);
             world.spawnEntity(entity);
             world.updateEntityWithOptionalForce(entity, false);
         }
@@ -26,9 +26,7 @@ public class TeleporterNoPortal extends Teleporter {
     }
 
     @Override
-    public void removeStalePortalLocations(long par1) {
-    }
-
+    public void removeStalePortalLocations(long par1) {}
 
     @Override
     public boolean makePortal(Entity p_85188_1_) {

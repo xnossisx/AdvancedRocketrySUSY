@@ -1,30 +1,34 @@
 package zmaster587.advancedRocketry.api.util;
 
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.AreaBlob;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
 public interface IBlobHandler {
-	/* *
-	 * Called when a block is being removed from a blob
-	 * @param pos BlockPosition to remove
-	 * /
-	public void onBlobRemove(BlockPosition pos);
-	
-	
-	/**
-	 * Called when a block is being added to the blob
-	 * @param pos BlockPosition to add
-	 
-	public void onBlobAdd(BlockPosition pos);*/
+    /*
+     * *
+     * Called when a block is being removed from a blob
+     * 
+     * @param pos BlockPosition to remove
+     * /
+     * public void onBlobRemove(BlockPosition pos);
+     * 
+     * 
+     * /**
+     * Called when a block is being added to the blob
+     * 
+     * @param pos BlockPosition to add
+     * 
+     * public void onBlobAdd(BlockPosition pos);
+     */
 
     /**
      * @return true if a blob is allowed to form otherwise false
      */
     boolean canFormBlob();
 
-
-    //Screw you too for changing it back
+    // Screw you too for changing it back
 
     /**
      * Due to Minecraft's obf code we need a different method name than getWorld()

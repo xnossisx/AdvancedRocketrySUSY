@@ -1,11 +1,12 @@
 package zmaster587.advancedRocketry.item;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import zmaster587.advancedRocketry.util.StorageChunk;
 
-import javax.annotation.Nonnull;
+import zmaster587.advancedRocketry.util.StorageChunk;
 
 public class ItemPackedStructure extends Item {
 

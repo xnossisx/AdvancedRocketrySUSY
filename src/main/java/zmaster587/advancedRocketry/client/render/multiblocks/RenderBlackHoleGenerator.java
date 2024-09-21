@@ -8,7 +8,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.tile.multiblock.energy.TileBlackHoleGenerator;
@@ -39,13 +41,15 @@ public class RenderBlackHoleGenerator extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Initial setup
+        // Initial setup
 
-        //Rotate and move the model into position
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
+        // Rotate and move the model into position
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
         GL11.glTranslated(x + .5, y + .5, z + .5);
 
-        GL11.glRotatef((front.getFrontOffsetZ() == 1 ? 180 : 0) - front.getFrontOffsetX() * 90f, 0, 1, 0);
+        GL11.glRotatef((front.getZOffset() == 1 ? 180 : 0) - front.getXOffset() * 90f, 0, 1, 0);
 
         bindTexture(texture);
 
@@ -82,8 +86,6 @@ public class RenderBlackHoleGenerator extends TileEntitySpecialRenderer {
             GlStateManager.resetColor();
         }
 
-
         GL11.glPopMatrix();
     }
-
 }

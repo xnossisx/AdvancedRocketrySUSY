@@ -8,5 +8,4 @@ public class PlatePressWrapper extends MachineRecipe {
     PlatePressWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

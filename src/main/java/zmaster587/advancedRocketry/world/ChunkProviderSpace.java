@@ -1,5 +1,8 @@
 package zmaster587.advancedRocketry.world;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.minecraft.block.Block;
 import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.util.math.BlockPos;
@@ -9,10 +12,8 @@ import net.minecraft.world.biome.Biome.SpawnListEntry;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.IChunkGenerator;
-import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
 
-import java.util.Arrays;
-import java.util.List;
+import zmaster587.advancedRocketry.api.AdvancedRocketryBiomes;
 
 public class ChunkProviderSpace implements IChunkGenerator {
 
@@ -28,9 +29,10 @@ public class ChunkProviderSpace implements IChunkGenerator {
         byte[] abyte = new byte[65536];
         ChunkPrimer chunkprimer = new ChunkPrimer();
 
-        //ChunkExtendedBiome
-        Chunk chunk = new Chunk(this.worldObj, chunkprimer, p_73154_1_, p_73154_2_);//new Chunk(this.worldObj, ablock, abyte, p_73154_1_, p_73154_2_);
-        //TODO: convert back to int
+        // ChunkExtendedBiome
+        Chunk chunk = new Chunk(this.worldObj, chunkprimer, p_73154_1_, p_73154_2_);// new Chunk(this.worldObj, ablock,
+                                                                                    // abyte, p_73154_1_, p_73154_2_);
+        // TODO: convert back to int
         byte[] abyte1 = chunk.getBiomeArray();
 
         Arrays.fill(abyte1, (byte) Biome.getIdForBiome(AdvancedRocketryBiomes.spaceBiome));
@@ -40,9 +42,7 @@ public class ChunkProviderSpace implements IChunkGenerator {
     }
 
     @Override
-    public void populate(int x, int z) {
-
-    }
+    public void populate(int x, int z) {}
 
     @Override
     public boolean generateStructures(Chunk chunkIn, int x, int z) {
@@ -51,14 +51,12 @@ public class ChunkProviderSpace implements IChunkGenerator {
 
     @Override
     public List<SpawnListEntry> getPossibleCreatures(
-            EnumCreatureType creatureType, BlockPos pos) {
+                                                     EnumCreatureType creatureType, BlockPos pos) {
         return null;
     }
 
     @Override
-    public void recreateStructures(Chunk chunkIn, int x, int z) {
-
-    }
+    public void recreateStructures(Chunk chunkIn, int x, int z) {}
 
     @Override
     public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position,
@@ -72,5 +70,4 @@ public class ChunkProviderSpace implements IChunkGenerator {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

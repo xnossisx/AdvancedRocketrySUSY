@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.block.cable;
 
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -11,11 +15,9 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.cables.TileDataPipe;
 import zmaster587.advancedRocketry.tile.cables.TilePipe;
-
-import javax.annotation.Nonnull;
-import java.util.Random;
 
 public class BlockPipe extends Block {
 
@@ -23,7 +25,6 @@ public class BlockPipe extends Block {
 
     protected BlockPipe(Material material) {
         super(material);
-
     }
 
     @Override
@@ -78,7 +79,6 @@ public class BlockPipe extends Block {
         ((TilePipe) worldIn.getTileEntity(pos)).onPlaced();
     }
 
-
     @Override
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileDataPipe();
@@ -88,6 +88,4 @@ public class BlockPipe extends Block {
     public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
         ((TilePipe) world.getTileEntity(pos)).onNeighborTileChange(neighbor);
     }
-
-
 }

@@ -1,12 +1,13 @@
 package zmaster587.advancedRocketry.util;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants.NBT;
-import zmaster587.libVulpes.util.HashedBlockPosition;
 
-import java.util.LinkedList;
-import java.util.List;
+import zmaster587.libVulpes.util.HashedBlockPosition;
 
 public class NBTStorableListList {
 
@@ -24,16 +25,14 @@ public class NBTStorableListList {
         NBTTagList list = new NBTTagList();
         for (DimensionBlockPosition pos : this.pos) {
             NBTTagCompound tag = new NBTTagCompound();
-            tag.setIntArray("loc", new int[]{pos.pos.x, pos.pos.y, pos.pos.z});
+            tag.setIntArray("loc", new int[] { pos.pos.x, pos.pos.y, pos.pos.z });
             tag.setInteger("dim", pos.dimid);
             list.appendTag(tag);
         }
         nbt.setTag("list", list);
-
     }
 
     public void readFromNBT(NBTTagCompound nbt) {
-
         NBTTagList list = nbt.getTagList("list", NBT.TAG_COMPOUND);
         pos.clear();
         for (int i = 0; i < list.tagCount(); i++) {

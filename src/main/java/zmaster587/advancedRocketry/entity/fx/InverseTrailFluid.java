@@ -4,6 +4,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
 public class InverseTrailFluid extends InverseTrailFx {
+
     double initX, initZ, distX, distZ;
 
     public InverseTrailFluid(World world, double x,
@@ -33,7 +34,7 @@ public class InverseTrailFluid extends InverseTrailFx {
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
         this.prevPosZ = this.posZ;
-        //Change color and alpha over lifespan
+        // Change color and alpha over lifespan
         this.particleAlpha = 0.25f * this.particleAge / (float) this.particleMaxAge;
 
         double normalizedAge = 1 - (this.particleAge / (double) this.particleMaxAge);

@@ -27,5 +27,4 @@ public class BlockRegolith extends Block {
     public MapColor getMapColor(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
         return this.extraMapColor;
     }
-
 }

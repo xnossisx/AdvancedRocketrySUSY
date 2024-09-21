@@ -7,9 +7,10 @@ import net.minecraft.world.biome.Biome;
 public class BiomeGenWatermelon extends Biome {
 
     public BiomeGenWatermelon(int biomeId, boolean register) {
-        super(new BiomeProperties("Watermelon").setBaseHeight(1f).setHeightVariation(0.1f).setTemperature(0.9f).setRainDisabled());
+        super(new BiomeProperties("Watermelon").setBaseHeight(1f).setHeightVariation(0.1f).setTemperature(0.9f)
+                .setRainDisabled());
 
-        //cold and dry
+        // cold and dry
 
         this.decorator.generateFalls = false;
         this.decorator.flowersPerChunk = 0;
@@ -21,9 +22,8 @@ public class BiomeGenWatermelon extends Biome {
         this.spawnableMonsterList.add(new Biome.SpawnListEntry(EntityEnderman.class, 10, 1, 10));
     }
 
-
     @Override
     public float getSpawningChance() {
-        return 0.7f; //Nothing spawns
+        return 0.7f; // Nothing spawns
     }
 }

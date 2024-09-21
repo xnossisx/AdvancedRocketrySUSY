@@ -1,14 +1,14 @@
 package zmaster587.advancedRocketry.api;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.registries.IForgeRegistry;
-
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.biome.Biome;
+import net.minecraftforge.registries.IForgeRegistry;
 
 /**
  * Stores information relating to the biomes and biome registry of AdvancedRocketry
@@ -44,7 +44,7 @@ public class AdvancedRocketryBiomes {
     public static Biome getBiome(String string) {
         Biome biome = Biome.REGISTRY.getObject(new ResourceLocation(string));
 
-        //Fallback to ID
+        // Fallback to ID
         if (biome == null) {
             biome = Biome.getBiome(Integer.parseInt(string));
         }
@@ -79,7 +79,8 @@ public class AdvancedRocketryBiomes {
     }
 
     /**
-     * Registers a biome as high pressure for use with the planet generators (It will only spawn on planets with high pressure)
+     * Registers a biome as high pressure for use with the planet generators (It will only spawn on planets with high
+     * pressure)
      *
      * @param biome
      */
@@ -93,7 +94,8 @@ public class AdvancedRocketryBiomes {
     }
 
     /**
-     * Registers a biome to have a chance to spawn as the only biome on a planet, will not register the biome if it is in the blacklist already
+     * Registers a biome to have a chance to spawn as the only biome on a planet, will not register the biome if it is
+     * in the blacklist already
      *
      * @param biome
      */
@@ -103,7 +105,7 @@ public class AdvancedRocketryBiomes {
     }
 
     public void blackListVanillaBiomes() {
-        //Good grief... this is long, better than making users do it though..
+        // Good grief... this is long, better than making users do it though..
         for (int i = 0; i < 40; i++)
             blackListedBiomeIds.add(i);
 
@@ -136,13 +138,12 @@ public class AdvancedRocketryBiomes {
     }
 
     /**
-     * Gets Biomes from Advanced Rocketry's biomes registry.  If it does not exist attepts to retrieve from vanilla forge
+     * Gets Biomes from Advanced Rocketry's biomes registry. If it does not exist attepts to retrieve from vanilla forge
      *
      * @param id biome id
      * @return Biome retrieved from the biome ID
      */
     public Biome getBiomeById(int id) {
-
         for (Biome biome : registeredBiomes) {
             if (Biome.getIdForBiome(biome) == id)
                 return biome;
@@ -150,5 +151,4 @@ public class AdvancedRocketryBiomes {
 
         return Biome.getBiome(id);
     }
-
 }

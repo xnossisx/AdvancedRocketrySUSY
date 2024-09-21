@@ -19,5 +19,4 @@ public class SatelliteMassScanner extends SatelliteData {
     public double failureChance() {
         return 0;
     }
-
 }

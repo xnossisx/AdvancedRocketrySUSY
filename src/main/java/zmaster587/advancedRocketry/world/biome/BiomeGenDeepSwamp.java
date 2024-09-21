@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.world.biome;
 
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.BlockFlower.EnumFlowerType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.monster.EntitySlime;
@@ -11,10 +15,8 @@ import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import zmaster587.advancedRocketry.world.gen.WorldGenNoTree;
 
-import javax.annotation.Nonnull;
-import java.util.Random;
+import zmaster587.advancedRocketry.world.gen.WorldGenNoTree;
 
 public class BiomeGenDeepSwamp extends Biome {
 
@@ -58,7 +60,6 @@ public class BiomeGenDeepSwamp extends Biome {
     @Override
     public void genTerrainBlocks(World worldIn, Random rand,
                                  @Nonnull ChunkPrimer chunkPrimerIn, int x, int z, double noiseVal) {
-
         double d0 = GRASS_COLOR_NOISE.getValue((double) x * 0.25D, (double) z * 0.25D);
 
         if (d0 > 0.0D) {
@@ -88,7 +89,6 @@ public class BiomeGenDeepSwamp extends Biome {
      */
     @SideOnly(Side.CLIENT)
     public int getBiomeGrassColor(int x, int y, int z) {
-
         double d0 = GRASS_COLOR_NOISE.getValue((double) x * 0.25D, (double) z * 0.25D);
         return d0 < -0.1D ? 5011004 : 6975545;
     }

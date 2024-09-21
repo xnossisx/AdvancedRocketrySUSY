@@ -1,28 +1,29 @@
 package zmaster587.advancedRocketry.api;
 
+import java.util.LinkedList;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
+
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.util.LinkedList;
-import java.util.Set;
-
-
 public abstract class EntityRocketBase extends Entity {
 
-    //Stores other info about the rocket such as fuel and acceleration properties
+    // Stores other info about the rocket such as fuel and acceleration properties
     public StatsRocket stats;
-    //Linked list containing Objects implementing IInfrastructure
+    // Linked list containing Objects implementing IInfrastructure
     protected LinkedList<IInfrastructure> connectedInfrastructure;
 
-    //Stores the blocks and tiles that make up the rocket
-    //public StorageChunk storage;
-    //stores the coordinates of infrastructures, used for when the world loads/saves
+    // Stores the blocks and tiles that make up the rocket
+    // public StorageChunk storage;
+    // stores the coordinates of infrastructures, used for when the world loads/saves
     protected Set<HashedBlockPosition> infrastructureCoords;
 
     public EntityRocketBase(World world) {
@@ -49,7 +50,8 @@ public abstract class EntityRocketBase extends Entity {
     }
 
     /**
-     * Called when the player is sitting in the rocket and hits the launch key, this is where countdown begin/gui should be called from before launch
+     * Called when the player is sitting in the rocket and hits the launch key, this is where countdown begin/gui should
+     * be called from before launch
      */
     public abstract void prepareLaunch();
 
@@ -108,12 +110,12 @@ public abstract class EntityRocketBase extends Entity {
     /**
      * @return the location of the rocket in the world
      */
-    //Vector3F<Double> getLocation();
+    // Vector3F<Double> getLocation();
 
     /**
      * @return the velocity of the rocket
      */
-    //Vector3F<Double> getVelocity();
+    // Vector3F<Double> getVelocity();
     public String getTextOverlay() {
         return "";
     }
@@ -130,7 +132,8 @@ public abstract class EntityRocketBase extends Entity {
         MinecraftForge.EVENT_BUS.post(new RocketEvent.RocketReachesOrbitEvent(this));
 
         if (this.world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) {
-            ISpaceObject station = AdvancedRocketryAPI.spaceObjectManager.getSpaceStationFromBlockCoords(this.getPosition());
+            ISpaceObject station = AdvancedRocketryAPI.spaceObjectManager
+                    .getSpaceStationFromBlockCoords(this.getPosition());
 
             if (station != null) {
                 station.setPadStatus((int) Math.floor(this.posX), (int) Math.floor(this.posZ), false);

@@ -8,5 +8,4 @@ public class CentrifugeWrapper extends MachineRecipe {
     CentrifugeWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

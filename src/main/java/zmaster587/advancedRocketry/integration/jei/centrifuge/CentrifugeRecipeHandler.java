@@ -25,5 +25,4 @@ public class CentrifugeRecipeHandler implements IRecipeHandler<CentrifugeWrapper
     public boolean isRecipeValid(CentrifugeWrapper recipe) {
         return true;
     }
-
 }

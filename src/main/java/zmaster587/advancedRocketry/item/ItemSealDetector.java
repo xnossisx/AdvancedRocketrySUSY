@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.fluids.IFluidBlock;
+
 import zmaster587.advancedRocketry.util.SealableBlockHandler;
 
 /**
@@ -20,7 +21,7 @@ import zmaster587.advancedRocketry.util.SealableBlockHandler;
  * Created by Dark(DarkGuardsman, Robert) on 1/6/2016.
  */
 public class ItemSealDetector extends Item {
-    //TODO make consume power?
+    // TODO make consume power?
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand) {
@@ -52,5 +53,4 @@ public class ItemSealDetector extends Item {
         }
         return EnumActionResult.SUCCESS;
     }
-
 }

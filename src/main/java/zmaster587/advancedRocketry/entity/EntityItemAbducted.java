@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.entity;
 
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.item.EntityItem;
@@ -11,11 +13,10 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.world.World;
 
-import javax.annotation.Nonnull;
-
 public class EntityItemAbducted extends Entity {
 
-    private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityItem.class, DataSerializers.ITEM_STACK);
+    private static final DataParameter<ItemStack> ITEM = EntityDataManager.createKey(EntityItem.class,
+            DataSerializers.ITEM_STACK);
 
     private int lifespan;
     private int age = 0;
@@ -63,7 +64,7 @@ public class EntityItemAbducted extends Entity {
         if (this.getEntityItem().isEmpty()) {
             this.setDead();
         }
-        //super.onEntityUpdate();
+        // super.onEntityUpdate();
 
         this.prevPosX = this.posX;
         this.prevPosY = this.posY;
@@ -112,7 +113,6 @@ public class EntityItemAbducted extends Entity {
         p_70014_1_.setShort("Age", (short) this.age);
         p_70014_1_.setInteger("Lifespan", lifespan);
 
-
         if (!this.getEntityItem().isEmpty()) {
             p_70014_1_.setTag("Item", this.getEntityItem().writeToNBT(new NBTTagCompound()));
         }
@@ -123,7 +123,6 @@ public class EntityItemAbducted extends Entity {
      */
     public void readEntityFromNBT(NBTTagCompound p_70037_1_) {
         this.age = p_70037_1_.getShort("Age");
-
 
         NBTTagCompound nbttagcompound1 = p_70037_1_.getCompoundTag("Item");
         this.setEntityItemStack(new ItemStack(nbttagcompound1));

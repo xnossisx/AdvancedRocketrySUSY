@@ -1,5 +1,12 @@
 package zmaster587.advancedRocketry.world;
 
+import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
+
+import java.util.List;
+import java.util.Random;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
@@ -21,23 +28,17 @@ import net.minecraft.world.gen.feature.WorldGenDungeons;
 import net.minecraft.world.gen.feature.WorldGenLakes;
 import net.minecraft.world.gen.structure.*;
 import net.minecraftforge.event.terraingen.TerrainGen;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
-import zmaster587.advancedRocketry.event.PlanetEventHandler;
 import zmaster587.advancedRocketry.util.OreGenProperties;
 import zmaster587.advancedRocketry.util.OreGenProperties.OreEntry;
 import zmaster587.advancedRocketry.world.decoration.*;
 import zmaster587.advancedRocketry.world.ore.CustomizableOreGen;
-import zmaster587.advancedRocketry.world.provider.WorldProviderPlanet;
-
-import javax.annotation.Nullable;
-import java.util.List;
-import java.util.Random;
-
-import static net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.*;
 
 public class ChunkProviderPlanet implements IChunkGenerator {
+
     /**
      * RNG.
      */
@@ -75,7 +76,6 @@ public class ChunkProviderPlanet implements IChunkGenerator {
     private double[] depthRegion;
     private boolean habitable;
 
-
     private MapGenCraterSmall craterGeneratorSmall;
     private MapGenCrater craterGenerator;
     private MapGenCraterHuge craterGeneratorHuge;
@@ -88,7 +88,8 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         strongholdGenerator = (MapGenStronghold) TerrainGen.getModdedMapGen(strongholdGenerator, STRONGHOLD);
         villageGenerator = (MapGenVillage) TerrainGen.getModdedMapGen(villageGenerator, VILLAGE);
         mineshaftGenerator = (MapGenMineshaft) TerrainGen.getModdedMapGen(mineshaftGenerator, MINESHAFT);
-        scatteredFeatureGenerator = (MapGenScatteredFeature) TerrainGen.getModdedMapGen(scatteredFeatureGenerator, SCATTERED_FEATURE);
+        scatteredFeatureGenerator = (MapGenScatteredFeature) TerrainGen.getModdedMapGen(scatteredFeatureGenerator,
+                SCATTERED_FEATURE);
         ravineGenerator = TerrainGen.getModdedMapGen(ravineGenerator, RAVINE);
     }
 
@@ -106,7 +107,8 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         this.heightMap = new double[825];
         this.biomeWeights = new float[25];
 
-        DimensionProperties dimProps = DimensionManager.getInstance().getDimensionProperties(worldIn.provider.getDimension());
+        DimensionProperties dimProps = DimensionManager.getInstance()
+                .getDimensionProperties(worldIn.provider.getDimension());
 
         for (int i = -2; i <= 2; ++i) {
             for (int j = -2; j <= 2; ++j) {
@@ -117,7 +119,8 @@ public class ChunkProviderPlanet implements IChunkGenerator {
 
         if (p_i46668_5_ != null) {
             this.settings = ChunkGeneratorSettings.Factory.jsonToFactory(p_i46668_5_).build();
-            this.oceanBlock = this.settings.useLavaOceans ? Blocks.LAVA.getDefaultState() : Blocks.WATER.getDefaultState();
+            this.oceanBlock = this.settings.useLavaOceans ? Blocks.LAVA.getDefaultState() :
+                    Blocks.WATER.getDefaultState();
             worldIn.setSeaLevel(dimProps.getSeaLevel());
         }
 
@@ -139,9 +142,9 @@ public class ChunkProviderPlanet implements IChunkGenerator {
                 ((MapGenRavineExt) ravineGenerator).setFillerBlock(this.fillblock);
         }
 
-
-        net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextOverworld ctx =
-                new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextOverworld(minLimitPerlinNoise, maxLimitPerlinNoise, mainPerlinNoise, surfaceNoise, scaleNoise, depthNoise, forestNoise);
+        net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextOverworld ctx = new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextOverworld(
+                minLimitPerlinNoise, maxLimitPerlinNoise, mainPerlinNoise, surfaceNoise, scaleNoise, depthNoise,
+                forestNoise);
         ctx = net.minecraftforge.event.terraingen.TerrainGen.getModdedNoiseGenerators(worldIn, this.rand, ctx);
         this.minLimitPerlinNoise = ctx.getLPerlin1();
         this.maxLimitPerlinNoise = ctx.getLPerlin2();
@@ -151,20 +154,25 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         this.depthNoise = ctx.getDepth();
         this.forestNoise = ctx.getForest();
 
-        this.mapFeaturesEnabled = dimProps.canGenerateStructures() && ARConfiguration.getCurrentConfig().generateVanillaStructures;
+        this.mapFeaturesEnabled = dimProps.canGenerateStructures() &&
+                ARConfiguration.getCurrentConfig().generateVanillaStructures;
 
-        //TODO: may break on little planets
-        float atmDensity = dimProps.getAtmosphereDensity() / 100f; // this fucking shit does not belong here -> ((WorldProviderPlanet) worldObj.provider).getAtmosphereDensity(new BlockPos(0, 0, 0));
+        // TODO: may break on little planets
+        float atmDensity = dimProps.getAtmosphereDensity() / 100f; // this fucking shit does not belong here ->
+                                                                   // ((WorldProviderPlanet)
+                                                                   // worldObj.provider).getAtmosphereDensity(new
+                                                                   // BlockPos(0, 0, 0));
         habitable = dimProps.getAtmosphere().isBreathable();
 
-
         if (ARConfiguration.getCurrentConfig().generateCraters && dimProps.canGenerateCraters() && atmDensity <= 0.05)
-            craterGeneratorSmall = new MapGenCraterSmall((int) ((16 + (8 * (1 - atmDensity))) * dimProps.getCraterMultiplier()));
+            craterGeneratorSmall = new MapGenCraterSmall(
+                    (int) ((16 + (8 * (1 - atmDensity))) * dimProps.getCraterMultiplier()));
         else
             craterGeneratorSmall = null;
 
         if (ARConfiguration.getCurrentConfig().generateCraters && dimProps.canGenerateCraters() && atmDensity < 2)
-            craterGenerator = new MapGenCrater((int) ((250 + (175 * (1 - atmDensity))) * dimProps.getCraterMultiplier()), atmDensity < 0.05);
+            craterGenerator = new MapGenCrater(
+                    (int) ((250 + (175 * (1 - atmDensity))) * dimProps.getCraterMultiplier()), atmDensity < 0.05);
         else
             craterGenerator = null;
 
@@ -188,22 +196,24 @@ public class ChunkProviderPlanet implements IChunkGenerator {
             ravineGenerator = null;
         }
 
-        //Yes, the trees shouldn't be here. This, however, makes them NOT MAKE WALLS. So they're here
+        // Yes, the trees shouldn't be here. This, however, makes them NOT MAKE WALLS. So they're here
         swampTreeGenerator = new MapGenSwampTree(10);
-
     }
 
     public void setBlocksInChunk(int x, int z, ChunkPrimer primer) {
-        setBlocksInChunk(x,z,primer,null);
+        setBlocksInChunk(x, z, primer, null);
     }
+
     public void setBlocksInChunk(int x, int z, ChunkPrimer primer, BiomeProvider bp) {
         byte b0 = 63;
-        //TODO: may break for little planets
+        // TODO: may break for little planets
         if (bp == null) {
-            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration, x * 4 - 2, z * 4 - 2, 10, 10);
+            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomesForGeneration(this.biomesForGeneration,
+                    x * 4 - 2, z * 4 - 2, 10, 10);
             this.generateHeightmap(x * 4, 0, z * 4);
-        }else{
-            this.biomesForGeneration = bp.getBiomesForGeneration(this.biomesForGeneration, x * 4 - 2, z * 4 - 2, 10, 10);
+        } else {
+            this.biomesForGeneration = bp.getBiomesForGeneration(this.biomesForGeneration, x * 4 - 2, z * 4 - 2, 10,
+                    10);
             this.generateHeightmap(x * 4, 0, z * 4);
         }
         for (int i = 0; i < 4; ++i) {
@@ -241,9 +251,11 @@ public class ChunkProviderPlanet implements IChunkGenerator {
 
                             for (int l2 = 0; l2 < 4; ++l2) {
                                 if ((lvt_45_1_ += d16) > 0.0D) {
-                                    primer.setBlockState(i * 4 + k2, heightmapOffset + i2 * 8 + j2, l * 4 + l2, this.fillblock);
+                                    primer.setBlockState(i * 4 + k2, heightmapOffset + i2 * 8 + j2, l * 4 + l2,
+                                            this.fillblock);
                                 } else if (i2 * 8 + j2 < worldObj.getSeaLevel()) {
-                                    primer.setBlockState(i * 4 + k2, heightmapOffset + i2 * 8 + j2, l * 4 + l2, this.oceanBlock);
+                                    primer.setBlockState(i * 4 + k2, heightmapOffset + i2 * 8 + j2, l * 4 + l2,
+                                            this.oceanBlock);
                                 }
                             }
 
@@ -264,38 +276,40 @@ public class ChunkProviderPlanet implements IChunkGenerator {
     public void replaceBiomeBlocks(int x, int z, ChunkPrimer primer, Biome[] biomesIn) {
         if (!net.minecraftforge.event.ForgeEventFactory.onReplaceBiomeBlocks(this, x, z, primer, this.worldObj)) return;
         double d0 = 0.03125D;
-        this.depthBuffer = this.surfaceNoise.getRegion(this.depthBuffer, x * 16, z * 16, 16, 16, 0.0625D, 0.0625D, 1.0D);
+        this.depthBuffer = this.surfaceNoise.getRegion(this.depthBuffer, x * 16, z * 16, 16, 16, 0.0625D, 0.0625D,
+                1.0D);
 
         for (int i = 0; i < 16; ++i) {
             for (int j = 0; j < 16; ++j) {
                 Biome biome = biomesIn[j + i * 16];
-                biome.genTerrainBlocks(this.worldObj, this.rand, primer, x * 16 + i, z * 16 + j, this.depthBuffer[j + i * 16]);
+                biome.genTerrainBlocks(this.worldObj, this.rand, primer, x * 16 + i, z * 16 + j,
+                        this.depthBuffer[j + i * 16]);
             }
         }
     }
 
     public ChunkPrimer getChunkPrimer(int x, int z) {
-        return getChunkPrimer(x,z,null);
+        return getChunkPrimer(x, z, null);
     }
-    public ChunkPrimer getChunkPrimer(int x, int z, BiomeProvider bp) {
 
+    public ChunkPrimer getChunkPrimer(int x, int z, BiomeProvider bp) {
         this.rand.setSeed((long) x * 341873128712L + (long) z * 132897987541L);
         ChunkPrimer chunkprimer = new ChunkPrimer();
         boolean is_terraforming = false;
         if (bp == null) {
-            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, x * 16, z * 16, 16, 16);
+            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, x * 16,
+                    z * 16, 16, 16);
             this.setBlocksInChunk(x, z, chunkprimer); // this messes up biome generation, needs to reset biomes
-            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, x * 16, z * 16, 16, 16);
+            this.biomesForGeneration = this.worldObj.getBiomeProvider().getBiomes(this.biomesForGeneration, x * 16,
+                    z * 16, 16, 16);
             this.replaceBiomeBlocks(x, z, chunkprimer, this.biomesForGeneration);
-        }
-        else {
+        } else {
             this.biomesForGeneration = bp.getBiomes(this.biomesForGeneration, x * 16, z * 16, 16, 16);
             this.setBlocksInChunk(x, z, chunkprimer, bp); // this messes up biome generation, needs to reset biomes
             this.biomesForGeneration = bp.getBiomes(this.biomesForGeneration, x * 16, z * 16, 16, 16);
             this.replaceBiomeBlocks(x, z, chunkprimer, this.biomesForGeneration);
             is_terraforming = true;
         }
-
 
         if (this.settings.useCaves && caveGenerator != null) {
             this.caveGenerator.generate(this.worldObj, x, z, chunkprimer);
@@ -320,10 +334,10 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         if (this.geodeGenerator != null)
             this.geodeGenerator.generate(this.worldObj, x, z, chunkprimer);
 
-        //Trees are always
+        // Trees are always
         this.swampTreeGenerator.generate(this.worldObj, x, z, chunkprimer);
 
-        if (this.mapFeaturesEnabled && habitable  && !is_terraforming) { // terraforming would destroy it all...
+        if (this.mapFeaturesEnabled && habitable && !is_terraforming) { // terraforming would destroy it all...
             if (this.settings.useMineShafts) {
                 this.mineshaftGenerator.generate(this.worldObj, x, z, chunkprimer);
             }
@@ -362,8 +376,7 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         return chunk;
     }
 
-
-    //@Override
+    // @Override
     public Chunk generateChunk2(int x, int z) {
         ChunkPrimer chunkPrimer = getChunkPrimer(x, z);
         Chunk chunk = new Chunk(this.worldObj, chunkPrimer, x, z);
@@ -378,12 +391,17 @@ public class ChunkProviderPlanet implements IChunkGenerator {
     }
 
     private void generateHeightmap(int p_185978_1_, int p_185978_2_, int p_185978_3_) {
-        this.depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion, p_185978_1_, p_185978_3_, 5, 5, this.settings.depthNoiseScaleX, this.settings.depthNoiseScaleZ, this.settings.depthNoiseScaleExponent);
+        this.depthRegion = this.depthNoise.generateNoiseOctaves(this.depthRegion, p_185978_1_, p_185978_3_, 5, 5,
+                this.settings.depthNoiseScaleX, this.settings.depthNoiseScaleZ, this.settings.depthNoiseScaleExponent);
         float f = this.settings.coordinateScale;
         float f1 = this.settings.heightScale * heightmapMult;
-        this.mainNoiseRegion = this.mainPerlinNoise.generateNoiseOctaves(this.mainNoiseRegion, p_185978_1_, p_185978_2_, p_185978_3_, 5, 33, 5, f / this.settings.mainNoiseScaleX, f1 / this.settings.mainNoiseScaleY, f / this.settings.mainNoiseScaleZ);
-        this.minLimitRegion = this.minLimitPerlinNoise.generateNoiseOctaves(this.minLimitRegion, p_185978_1_, p_185978_2_, p_185978_3_, 5, 33, 5, f, f1, f);
-        this.maxLimitRegion = this.maxLimitPerlinNoise.generateNoiseOctaves(this.maxLimitRegion, p_185978_1_, p_185978_2_, p_185978_3_, 5, 33, 5, f, f1, f);
+        this.mainNoiseRegion = this.mainPerlinNoise.generateNoiseOctaves(this.mainNoiseRegion, p_185978_1_, p_185978_2_,
+                p_185978_3_, 5, 33, 5, f / this.settings.mainNoiseScaleX, f1 / this.settings.mainNoiseScaleY,
+                f / this.settings.mainNoiseScaleZ);
+        this.minLimitRegion = this.minLimitPerlinNoise.generateNoiseOctaves(this.minLimitRegion, p_185978_1_,
+                p_185978_2_, p_185978_3_, 5, 33, 5, f, f1, f);
+        this.maxLimitRegion = this.maxLimitPerlinNoise.generateNoiseOctaves(this.maxLimitRegion, p_185978_1_,
+                p_185978_2_, p_185978_3_, 5, 33, 5, f, f1, f);
         int i = 0;
         int j = 0;
 
@@ -398,8 +416,10 @@ public class ChunkProviderPlanet implements IChunkGenerator {
                 for (int j1 = -2; j1 <= 2; ++j1) {
                     for (int k1 = -2; k1 <= 2; ++k1) {
                         Biome biome1 = this.biomesForGeneration[k + j1 + 2 + (l + k1 + 2) * 10];
-                        float f5 = this.settings.biomeDepthOffSet + biome1.getBaseHeight() * this.settings.biomeDepthWeight;
-                        float f6 = this.settings.biomeScaleOffset + biome1.getHeightVariation() * this.settings.biomeScaleWeight;
+                        float f5 = this.settings.biomeDepthOffSet +
+                                biome1.getBaseHeight() * this.settings.biomeDepthWeight;
+                        float f6 = this.settings.biomeScaleOffset +
+                                biome1.getHeightVariation() * this.settings.biomeScaleWeight;
 
                         if (this.terrainType == WorldType.AMPLIFIED && f5 > 0.0F) {
                             f5 = 1.0F + f5 * 2.0F;
@@ -495,7 +515,7 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         boolean flag = false;
         ChunkPos chunkpos = new ChunkPos(x, z);
 
-        //noinspection ConstantConditions
+        // noinspection ConstantConditions
         net.minecraftforge.event.ForgeEventFactory.onChunkPopulate(true, this, this.worldObj, this.rand, x, z, flag);
 
         if (this.mapFeaturesEnabled && habitable) {
@@ -519,41 +539,49 @@ public class ChunkProviderPlanet implements IChunkGenerator {
             }
         }
 
-        if (false && biome != Biomes.DESERT && biome != Biomes.DESERT_HILLS && this.settings.useWaterLakes && !flag && this.rand.nextInt(this.settings.waterLakeChance) == 0)
-            if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag, net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAKE)) {
-                int i1 = this.rand.nextInt(16) + 8;
-                int j1 = this.rand.nextInt(256);
-                int k1 = this.rand.nextInt(16) + 8;
-                (new WorldGenLakes(Blocks.WATER)).generate(this.worldObj, this.rand, blockpos.add(i1, j1, k1));
-            }
+        if (false && biome != Biomes.DESERT && biome != Biomes.DESERT_HILLS && this.settings.useWaterLakes && !flag &&
+                this.rand.nextInt(this.settings.waterLakeChance) == 0)
+            if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag,
+                    net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAKE)) {
+                        int i1 = this.rand.nextInt(16) + 8;
+                        int j1 = this.rand.nextInt(256);
+                        int k1 = this.rand.nextInt(16) + 8;
+                        (new WorldGenLakes(Blocks.WATER)).generate(this.worldObj, this.rand, blockpos.add(i1, j1, k1));
+                    }
 
         if (false && !flag && this.rand.nextInt(this.settings.lavaLakeChance / 10) == 0 && this.settings.useLavaLakes)
-            if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag, net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAVA)) {
-                int i2 = this.rand.nextInt(16) + 8;
-                int l2 = this.rand.nextInt(this.rand.nextInt(248) + 8);
-                int k3 = this.rand.nextInt(16) + 8;
+            if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag,
+                    net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.LAVA)) {
+                        int i2 = this.rand.nextInt(16) + 8;
+                        int l2 = this.rand.nextInt(this.rand.nextInt(248) + 8);
+                        int k3 = this.rand.nextInt(16) + 8;
 
-                if (l2 < this.worldObj.getSeaLevel() || this.rand.nextInt(this.settings.lavaLakeChance / 8) == 0) {
-                    (new WorldGenLakes(Blocks.LAVA)).generate(this.worldObj, this.rand, blockpos.add(i2, l2, k3));
-                }
-            }
+                        if (l2 < this.worldObj.getSeaLevel() ||
+                                this.rand.nextInt(this.settings.lavaLakeChance / 8) == 0) {
+                            (new WorldGenLakes(Blocks.LAVA)).generate(this.worldObj, this.rand,
+                                    blockpos.add(i2, l2, k3));
+                        }
+                    }
 
         if (habitable && this.settings.useDungeons)
-            if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag, net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.DUNGEON)) {
-                for (int j2 = 0; j2 < this.settings.dungeonChance; ++j2) {
-                    int i3 = this.rand.nextInt(16) + 8;
-                    int l3 = this.rand.nextInt(256);
-                    int l1 = this.rand.nextInt(16) + 8;
-                    (new WorldGenDungeons()).generate(this.worldObj, this.rand, blockpos.add(i3, l3, l1));
-                }
-            }
+            if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag,
+                    net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.DUNGEON)) {
+                        for (int j2 = 0; j2 < this.settings.dungeonChance; ++j2) {
+                            int i3 = this.rand.nextInt(16) + 8;
+                            int l3 = this.rand.nextInt(256);
+                            int l1 = this.rand.nextInt(16) + 8;
+                            (new WorldGenDungeons()).generate(this.worldObj, this.rand, blockpos.add(i3, l3, l1));
+                        }
+                    }
 
         biome.decorate(this.worldObj, this.rand, new BlockPos(i, 0, j));
-        if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag, net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ANIMALS))
+        if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag,
+                net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ANIMALS))
             WorldEntitySpawner.performWorldGenSpawning(this.worldObj, biome, i + 8, j + 8, 16, 16, this.rand);
         blockpos = blockpos.add(8, 0, 8);
 
-        if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag, net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ICE)) {
+        if (net.minecraftforge.event.terraingen.TerrainGen.populate(this, this.worldObj, this.rand, x, z, flag,
+                net.minecraftforge.event.terraingen.PopulateChunkEvent.Populate.EventType.ICE)) {
             for (int k2 = 0; k2 < 16; ++k2) {
                 for (int j3 = 0; j3 < 16; ++j3) {
                     BlockPos blockpos1 = this.worldObj.getPrecipitationHeight(blockpos.add(k2, 0, j3));
@@ -568,15 +596,17 @@ public class ChunkProviderPlanet implements IChunkGenerator {
                     }
                 }
             }
-        }//Forge: End ICE
+        }// Forge: End ICE
 
         net.minecraftforge.event.ForgeEventFactory.onChunkPopulate(false, this, this.worldObj, this.rand, x, z, flag);
 
-        OreGenProperties oreGenProperties = DimensionManager.getInstance().getDimensionProperties(this.worldObj.provider.getDimension()).getOreGenProperties(this.worldObj);
+        OreGenProperties oreGenProperties = DimensionManager.getInstance()
+                .getDimensionProperties(this.worldObj.provider.getDimension()).getOreGenProperties(this.worldObj);
 
         if (oreGenProperties != null) {
             for (OreEntry entry : oreGenProperties.getOreEntries()) {
-                new CustomizableOreGen(entry).generate(rand, x, z, this.worldObj, this, this.worldObj.getChunkProvider());
+                new CustomizableOreGen(entry).generate(rand, x, z, this.worldObj, this,
+                        this.worldObj.getChunkProvider());
             }
         }
 
@@ -588,7 +618,7 @@ public class ChunkProviderPlanet implements IChunkGenerator {
      */
     @Override
     public List<SpawnListEntry> getPossibleCreatures(
-            EnumCreatureType creatureType, BlockPos pos) {
+                                                     EnumCreatureType creatureType, BlockPos pos) {
         Biome biome = this.worldObj.getBiome(pos);
 
         return biome.getSpawnableList(creatureType);
@@ -601,7 +631,6 @@ public class ChunkProviderPlanet implements IChunkGenerator {
 
     @Override
     public void recreateStructures(Chunk chunkIn, int x, int z) {
-
         if (this.mapFeaturesEnabled || !habitable) {
             if (this.settings.useMineShafts) {
                 this.mineshaftGenerator.generate(this.worldObj, x, z, null);
@@ -613,7 +642,6 @@ public class ChunkProviderPlanet implements IChunkGenerator {
             if (this.settings.useStrongholds) {
                 this.strongholdGenerator.generate(this.worldObj, x, z, null);
             }
-
 
             if (this.settings.useTemples) {
                 this.scatteredFeatureGenerator.generate(this.worldObj, x, z, null);
@@ -628,7 +656,8 @@ public class ChunkProviderPlanet implements IChunkGenerator {
 
     @Override
     @Nullable
-    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
+    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position,
+                                           boolean findUnexplored) {
         if (!this.mapFeaturesEnabled || !habitable) {
             return null;
         } else if ("Stronghold".equals(structureName) && this.strongholdGenerator != null) {
@@ -640,7 +669,8 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         } else if ("Mineshaft".equals(structureName) && this.mineshaftGenerator != null) {
             return this.mineshaftGenerator.getNearestStructurePos(worldIn, position, findUnexplored);
         } else {
-            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null ? this.scatteredFeatureGenerator.getNearestStructurePos(worldIn, position, findUnexplored) : null;
+            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null ?
+                    this.scatteredFeatureGenerator.getNearestStructurePos(worldIn, position, findUnexplored) : null;
         }
     }
 
@@ -657,7 +687,8 @@ public class ChunkProviderPlanet implements IChunkGenerator {
         } else if ("Mineshaft".equals(structureName) && this.mineshaftGenerator != null) {
             return this.mineshaftGenerator.isInsideStructure(pos);
         } else {
-            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null && this.scatteredFeatureGenerator.isInsideStructure(pos);
+            return "Temple".equals(structureName) && this.scatteredFeatureGenerator != null &&
+                    this.scatteredFeatureGenerator.isInsideStructure(pos);
         }
     }
 }

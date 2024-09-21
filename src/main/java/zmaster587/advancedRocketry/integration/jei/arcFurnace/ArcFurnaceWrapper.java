@@ -8,5 +8,4 @@ public class ArcFurnaceWrapper extends MachineRecipe {
     ArcFurnaceWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

@@ -8,11 +8,12 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.libVulpes.render.RenderHelper;
 
 public class FxLaserHeat extends Particle {
-
 
     double size;
 
@@ -31,7 +32,7 @@ public class FxLaserHeat extends Particle {
     public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn,
                                float partialTicks, float rotationX, float rotationZ,
                                float rotationYZ, float rotationXY, float rotationXZ) {
-        //worldRendererIn.finishDrawing();
+        // worldRendererIn.finishDrawing();
 
         float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - interpPosX);
         float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - interpPosY);
@@ -51,10 +52,8 @@ public class FxLaserHeat extends Particle {
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_NORMAL);
         GlStateManager.color(0.8f, 0.2f, 0.2f, particleAlpha);
 
-
         double size = this.size * particleAlpha;
         RenderHelper.renderCube(buffer, x - size, y - size, z - size, x + size, y + size, z + size);
-
 
         Tessellator.getInstance().draw();
 
@@ -65,16 +64,13 @@ public class FxLaserHeat extends Particle {
         GL11.glLineWidth(1);
     }
 
-
     @Override
     public int getFXLayer() {
         return 3;
     }
 
-
     @Override
     public void onUpdate() {
-
         this.particleAlpha = 1 - (particleAge / (float) particleMaxAge);
 
         if (this.particleAge++ >= this.particleMaxAge) {

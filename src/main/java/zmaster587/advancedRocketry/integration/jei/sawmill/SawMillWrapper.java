@@ -8,5 +8,4 @@ public class SawMillWrapper extends MachineRecipe {
     SawMillWrapper(IRecipe rec) {
         super(rec);
     }
-
 }

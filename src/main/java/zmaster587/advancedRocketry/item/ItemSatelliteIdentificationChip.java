@@ -1,19 +1,21 @@
 package zmaster587.advancedRocketry.item;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.Constants;
 import zmaster587.advancedRocketry.api.ISatelliteIdItem;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.api.satellite.SatelliteProperties;
 import zmaster587.libVulpes.LibVulpes;
-
-import javax.annotation.Nonnull;
-import java.util.List;
 
 public class ItemSatelliteIdentificationChip extends Item implements ISatelliteIdItem {
 
@@ -28,7 +30,8 @@ public class ItemSatelliteIdentificationChip extends Item implements ISatelliteI
 
             long satId = nbt.getLong("satelliteId");
 
-            SatelliteBase satellite = zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getSatellite(satId);
+            SatelliteBase satellite = zmaster587.advancedRocketry.dimension.DimensionManager.getInstance()
+                    .getSatellite(satId);
 
             if (satellite != null) {
 
@@ -36,10 +39,11 @@ public class ItemSatelliteIdentificationChip extends Item implements ISatelliteI
                     nbt.setInteger("dimId", satellite.getDimensionId());
                 }
 
-                if (zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId()) != null)
-                    nbt.setString(name, zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId()).getName());
+                if (zmaster587.advancedRocketry.dimension.DimensionManager.getInstance()
+                        .getDimensionProperties(satellite.getDimensionId()) != null)
+                    nbt.setString(name, zmaster587.advancedRocketry.dimension.DimensionManager.getInstance()
+                            .getDimensionProperties(satellite.getDimensionId()).getName());
             }
-
 
             return satellite;
         }
@@ -79,7 +83,6 @@ public class ItemSatelliteIdentificationChip extends Item implements ISatelliteI
             else
                 nbt = new NBTTagCompound();
 
-
             nbt.setString("satelliteName", satellite2.getName());
             nbt.setLong("satelliteId", satellite.getId());
             nbt.setFloat("weight", satellite.getWeight());
@@ -116,7 +119,6 @@ public class ItemSatelliteIdentificationChip extends Item implements ISatelliteI
 
         if (stack.hasTagCompound() && (nbt = stack.getTagCompound()).hasKey("dimId")) {
 
-
             return nbt.getInteger("dimId");
         }
         return Constants.INVALID_PLANET; // Cant have a [strike]nether[/strike] satellite anyway...ofc you can
@@ -136,11 +138,13 @@ public class ItemSatelliteIdentificationChip extends Item implements ISatelliteI
                 if (stack.getTagCompound().hasKey(name)) {
 
                     list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.id") + satId);
-                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.planet") + stack.getTagCompound().getString(name));
+                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.planet") +
+                            stack.getTagCompound().getString(name));
                     list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.sat") + satelliteName);
                 } else {
                     list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.planetunk"));
-                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.satlost")); //TODO: make satellite respond with name until
+                    list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.satlost")); // TODO: make satellite
+                                                                                             // respond with name until
                 }
             } else {
                 list.add(LibVulpes.proxy.getLocalizedString("msg.itemsatchip.id") + satId);

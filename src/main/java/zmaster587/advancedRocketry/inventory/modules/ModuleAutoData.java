@@ -1,5 +1,8 @@
 package zmaster587.advancedRocketry.inventory.modules;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
@@ -8,13 +11,11 @@ import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.api.DataStorage;
 import zmaster587.advancedRocketry.util.IDataInventory;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.util.IconResource;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ModuleAutoData extends ModuleBase {
 
@@ -32,7 +33,8 @@ public class ModuleAutoData extends ModuleBase {
     IDataInventory chipOutput;
     IconResource icon = zmaster587.advancedRocketry.inventory.TextureResources.ioSlot;
 
-    public ModuleAutoData(int offsetX, int offsetY, int slot1, int slot2, IDataInventory chipInput, IDataInventory chipOutput, DataStorage... data) {
+    public ModuleAutoData(int offsetX, int offsetY, int slot1, int slot2, IDataInventory chipInput,
+                          IDataInventory chipOutput, DataStorage... data) {
         super(offsetX, offsetY);
         this.data = data;
         prevData = new int[data.length];
@@ -89,12 +91,12 @@ public class ModuleAutoData extends ModuleBase {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void renderForeground(int guiOffsetX, int guiOffsetY, int mouseX, int mouseY, float zLevel, GuiContainer gui, FontRenderer font) {
-
+    public void renderForeground(int guiOffsetX, int guiOffsetY, int mouseX, int mouseY, float zLevel, GuiContainer gui,
+                                 FontRenderer font) {
         int relativeX = mouseX - offsetX;
         int relativeY = mouseY - offsetY;
 
-        //Handles data tooltip
+        // Handles data tooltip
         if (relativeX > 0 && relativeX < barXSize && relativeY > 0 && relativeY < barYSize) {
             int totalData = 0, totalMaxData = 0;
 
@@ -109,15 +111,14 @@ public class ModuleAutoData extends ModuleBase {
 
             this.drawTooltip(gui, list, mouseX, mouseY, zLevel, font);
         }
-
     }
 
     @Override
     @SideOnly(Side.CLIENT)
     public void renderBackground(GuiContainer gui, int x, int y, int mouseX, int mouseY, FontRenderer font) {
-
         for (Slot slot : slotList) {
-            gui.drawTexturedModalRect(x + slot.xPos - 1, y + slot.yPos - 1, icon.getxLoc(), icon.getyLoc(), icon.getxSize(), icon.getySize());
+            gui.drawTexturedModalRect(x + slot.xPos - 1, y + slot.yPos - 1, icon.getxLoc(), icon.getyLoc(),
+                    icon.getxSize(), icon.getySize());
         }
 
         int totalData = 0, totalMaxData = 0;
@@ -132,6 +133,8 @@ public class ModuleAutoData extends ModuleBase {
         gui.drawTexturedModalRect(offsetX + x, offsetY + y, 176, 18, 8, 40);
         gui.drawTexturedModalRect(offsetX + x - 1, offsetY + y + barYSize + 4, 19, 171, 10, 10);
 
-        gui.drawTexturedModalRect(offsetX + x + 1, 1 + offsetY + y + (barYSize - (int) (percent * barYSize)), textureOffsetX, barYSize - (int) (percent * barYSize) + textureOffsetY, barXSize, (int) (percent * barYSize));
+        gui.drawTexturedModalRect(offsetX + x + 1, 1 + offsetY + y + (barYSize - (int) (percent * barYSize)),
+                textureOffsetX, barYSize - (int) (percent * barYSize) + textureOffsetY, barXSize,
+                (int) (percent * barYSize));
     }
 }

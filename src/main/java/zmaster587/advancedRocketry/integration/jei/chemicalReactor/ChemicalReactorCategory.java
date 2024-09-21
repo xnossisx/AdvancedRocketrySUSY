@@ -1,20 +1,21 @@
 package zmaster587.advancedRocketry.integration.jei.chemicalReactor;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemStack;
+import net.minecraftforge.fluids.FluidStack;
+
 import mezz.jei.api.IGuiHelper;
 import mezz.jei.api.gui.IGuiFluidStackGroup;
 import mezz.jei.api.gui.IGuiItemStackGroup;
 import mezz.jei.api.gui.IRecipeLayout;
 import mezz.jei.api.ingredients.IIngredients;
-import net.minecraft.item.ItemArmor;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
 import zmaster587.advancedRocketry.integration.jei.ARPlugin;
 import zmaster587.advancedRocketry.integration.jei.MachineCategoryTemplate;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.libVulpes.LibVulpes;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ChemicalReactorCategory extends MachineCategoryTemplate<ChemicalReactorlWrapper> {
 
@@ -46,7 +47,7 @@ public class ChemicalReactorCategory extends MachineCategoryTemplate<ChemicalRea
         for (int i = 0; i < 10; i++) {
             guiItemStacks.init(i, true, 18 * (i % 3), 18 * (i / 3));
 
-            //Set capacity to 1mb to make sure it fills the screen
+            // Set capacity to 1mb to make sure it fills the screen
             guiFluidStacks.init(i, true, 18 * (i % 3) + 1, 18 * (i / 3) + 1, 16, 16, 1, false, null);
         }
 
@@ -77,7 +78,8 @@ public class ChemicalReactorCategory extends MachineCategoryTemplate<ChemicalRea
         if (isArmorRecipe) {
             List<ItemStack> outputStacks = new LinkedList<>();
             for (ItemStack stacks : ingredients.getInputs(ItemStack.class).get(0)) {
-                outputStacks.add(new ItemStack(ingredients.getOutputs(ItemStack.class).get(0).get(0).getItem(), 1, stacks.getItemDamage()));
+                outputStacks.add(new ItemStack(ingredients.getOutputs(ItemStack.class).get(0).get(0).getItem(), 1,
+                        stacks.getItemDamage()));
             }
             guiItemStacks.set(i++, outputStacks);
         } else {
@@ -90,5 +92,4 @@ public class ChemicalReactorCategory extends MachineCategoryTemplate<ChemicalRea
             guiFluidStacks.set(i++, stacks);
         }
     }
-
 }

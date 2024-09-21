@@ -1,24 +1,25 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.dimension.solar.StellarBody;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.libVulpes.network.BasePacket;
 
-import java.io.IOException;
-
 public class PacketStellarInfo extends BasePacket {
+
     StellarBody star;
     int starId;
     NBTTagCompound nbt;
     boolean removeStar;
 
-    public PacketStellarInfo() {
-    }
+    public PacketStellarInfo() {}
 
     public PacketStellarInfo(int starId, StellarBody star) {
         this.star = star;
@@ -31,13 +32,11 @@ public class PacketStellarInfo extends BasePacket {
         out.writeInt(starId);
         out.writeBoolean(star == null);
 
-
         if ((star != null)) {
             star.writeToNBT(nbt);
             PacketBuffer packetBuffer = new PacketBuffer(out);
             packetBuffer.writeCompoundTag(nbt);
         }
-
     }
 
     @Override
@@ -59,7 +58,7 @@ public class PacketStellarInfo extends BasePacket {
 
     @Override
     public void read(ByteBuf in) {
-        //Should never be read on the server!
+        // Should never be read on the server!
     }
 
     @Override
@@ -82,7 +81,5 @@ public class PacketStellarInfo extends BasePacket {
     }
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-    }
-
+    public void executeServer(EntityPlayerMP player) {}
 }

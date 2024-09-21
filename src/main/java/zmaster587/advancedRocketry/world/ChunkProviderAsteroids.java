@@ -1,5 +1,8 @@
 package zmaster587.advancedRocketry.world;
 
+import java.util.List;
+import java.util.Random;
+
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EnumCreatureType;
@@ -15,14 +18,12 @@ import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.MapGenCavesHell;
 import net.minecraft.world.gen.NoiseGeneratorOctaves;
 import net.minecraft.world.gen.NoiseGeneratorSimplex;
+
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.util.OreGenProperties;
 import zmaster587.advancedRocketry.util.OreGenProperties.OreEntry;
 import zmaster587.advancedRocketry.world.ore.CustomizableOreGen;
-
-import java.util.List;
-import java.util.Random;
 
 public class ChunkProviderAsteroids extends ChunkProviderPlanet {
 
@@ -52,7 +53,6 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
     private IBlockState oceanBlock;
     private IBlockState fillblock;
 
-
     public ChunkProviderAsteroids(World worldIn, boolean p_i45637_2_, long seed, String p_i46668_5_) {
         super(worldIn, seed, p_i45637_2_, p_i46668_5_);
         this.world = worldIn;
@@ -67,7 +67,8 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
         this.depthNoise = new NoiseGeneratorOctaves(this.rand, 16);
         this.islandNoise = new NoiseGeneratorSimplex(this.rand);
 
-        DimensionProperties dimProps = DimensionManager.getInstance().getDimensionProperties(worldIn.provider.getDimension());
+        DimensionProperties dimProps = DimensionManager.getInstance()
+                .getDimensionProperties(worldIn.provider.getDimension());
 
         worldIn.setSeaLevel(dimProps.getSeaLevel());
 
@@ -85,8 +86,9 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
             this.fillblock = Blocks.STONE.getDefaultState();
         }
 
-        net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextHell ctx =
-                new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextHell(lperlinNoise1, lperlinNoise2, perlinNoise1, slowsandGravelNoiseGen, netherrackExculsivityNoiseGen, scaleNoise, depthNoise);
+        net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextHell ctx = new net.minecraftforge.event.terraingen.InitNoiseGensEvent.ContextHell(
+                lperlinNoise1, lperlinNoise2, perlinNoise1, slowsandGravelNoiseGen, netherrackExculsivityNoiseGen,
+                scaleNoise, depthNoise);
         ctx = net.minecraftforge.event.terraingen.TerrainGen.getModdedNoiseGenerators(worldIn, this.rand, ctx);
         this.lperlinNoise1 = ctx.getLPerlin1();
         this.lperlinNoise2 = ctx.getLPerlin2();
@@ -95,7 +97,8 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
         this.netherrackExculsivityNoiseGen = ctx.getPerlin3();
         this.scaleNoise = ctx.getScale();
         this.depthNoise = ctx.getDepth();
-        this.genNetherCaves = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(genNetherCaves, net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.NETHER_CAVE);
+        this.genNetherCaves = net.minecraftforge.event.terraingen.TerrainGen.getModdedMapGen(genNetherCaves,
+                net.minecraftforge.event.terraingen.InitMapGenEvent.EventType.NETHER_CAVE);
         super.heightmapOffset = 0;
         super.heightmapMult *= 1D;
     }
@@ -156,8 +159,10 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
         }
     }
 
-    private double[] getHeights(double[] p_185963_1_, int p_185963_2_, int p_185963_3_, int p_185963_4_, int p_185963_5_, int p_185963_6_, int p_185963_7_) {
-        net.minecraftforge.event.terraingen.ChunkGeneratorEvent.InitNoiseField event = new net.minecraftforge.event.terraingen.ChunkGeneratorEvent.InitNoiseField(this, p_185963_1_, p_185963_2_, p_185963_3_, p_185963_4_, p_185963_5_, p_185963_6_, p_185963_7_);
+    private double[] getHeights(double[] p_185963_1_, int p_185963_2_, int p_185963_3_, int p_185963_4_,
+                                int p_185963_5_, int p_185963_6_, int p_185963_7_) {
+        net.minecraftforge.event.terraingen.ChunkGeneratorEvent.InitNoiseField event = new net.minecraftforge.event.terraingen.ChunkGeneratorEvent.InitNoiseField(
+                this, p_185963_1_, p_185963_2_, p_185963_3_, p_185963_4_, p_185963_5_, p_185963_6_, p_185963_7_);
         net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event);
         if (event.getResult() == net.minecraftforge.fml.common.eventhandler.Event.Result.DENY)
             return event.getNoisefield();
@@ -170,9 +175,15 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
         double d1 = 684.412D;
         double scale = 1;
         d0 = d0 * 6D;
-        this.pnr = this.perlinNoise1.generateNoiseOctaves(this.pnr, (int) (scale * p_185963_2_), (int) (scale * p_185963_3_), (int) (scale * p_185963_4_), p_185963_5_, p_185963_6_, p_185963_7_, scale * d0 / 80.0D, scale * 4.277575000000001D, scale * d0 / 80.0D);
-        this.ar = this.lperlinNoise1.generateNoiseOctaves(this.ar, (int) (scale * p_185963_2_), (int) (scale * p_185963_3_), (int) (scale * p_185963_4_), p_185963_5_, p_185963_6_, p_185963_7_, scale * d0, scale * 684.412D, scale * d0);
-        this.br = this.lperlinNoise2.generateNoiseOctaves(this.br, (int) (scale * p_185963_2_), (int) (scale * p_185963_3_), (int) (scale * p_185963_4_), p_185963_5_, p_185963_6_, p_185963_7_, scale * d0, scale * 684.412D, scale * d0);
+        this.pnr = this.perlinNoise1.generateNoiseOctaves(this.pnr, (int) (scale * p_185963_2_),
+                (int) (scale * p_185963_3_), (int) (scale * p_185963_4_), p_185963_5_, p_185963_6_, p_185963_7_,
+                scale * d0 / 80.0D, scale * 4.277575000000001D, scale * d0 / 80.0D);
+        this.ar = this.lperlinNoise1.generateNoiseOctaves(this.ar, (int) (scale * p_185963_2_),
+                (int) (scale * p_185963_3_), (int) (scale * p_185963_4_), p_185963_5_, p_185963_6_, p_185963_7_,
+                scale * d0, scale * 684.412D, scale * d0);
+        this.br = this.lperlinNoise2.generateNoiseOctaves(this.br, (int) (scale * p_185963_2_),
+                (int) (scale * p_185963_3_), (int) (scale * p_185963_4_), p_185963_5_, p_185963_6_, p_185963_7_,
+                scale * d0, scale * 684.412D, scale * d0);
         int i = p_185963_2_ / 2;
         int j = p_185963_4_ / 2;
         int k = 0;
@@ -240,7 +251,8 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
                 long l = p_185960_2_ + j;
 
                 if (this.islandNoise.getValue((double) k, (double) l) < -0.9399999761581421D) {
-                    float f3 = (MathHelper.abs((float) k) * 3439.0F + MathHelper.abs((float) l) * 147.0F) % 13.0F + 9.0F;
+                    float f3 = (MathHelper.abs((float) k) * 3439.0F + MathHelper.abs((float) l) * 147.0F) % 13.0F +
+                            9.0F;
                     f = (float) (p_185960_3_ - i * 2);
                     f1 = (float) (p_185960_4_ - j * 2);
                     float f4 = 100.0F - MathHelper.sqrt(f * f + f1 * f1) * f3;
@@ -270,10 +282,10 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
         this.rand.setSeed((long) x * 341873128712L + (long) z * 132897987541L);
         ChunkPrimer chunkprimer = new ChunkPrimer();
 
-        //this.makeasteroids(x, z, chunkprimer);
+        // this.makeasteroids(x, z, chunkprimer);
         this.prepareHeights(x, z, 0, chunkprimer);
         this.prepareHeights(x + 500, z + 500, 100, chunkprimer);
-        //this.genNetherCaves.generate(this.world, x, z, chunkprimer);
+        // this.genNetherCaves.generate(this.world, x, z, chunkprimer);
 
         Chunk chunk = new Chunk(this.world, chunkprimer, x, z);
         Biome[] abiome = this.world.getBiomeProvider().getBiomes(null, x * 16, z * 16, 16, 16);
@@ -292,7 +304,7 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
      */
     @Override
     public List<SpawnListEntry> getPossibleCreatures(
-            EnumCreatureType creatureType, BlockPos pos) {
+                                                     EnumCreatureType creatureType, BlockPos pos) {
         Biome biome = this.world.getBiome(pos);
 
         return biome.getSpawnableList(creatureType);
@@ -304,12 +316,11 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
     }
 
     @Override
-    public void recreateStructures(Chunk chunkIn, int x, int z) {
-
-    }
+    public void recreateStructures(Chunk chunkIn, int x, int z) {}
 
     @Override
-    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position, boolean findUnexplored) {
+    public BlockPos getNearestStructurePos(World worldIn, String structureName, BlockPos position,
+                                           boolean findUnexplored) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -324,7 +335,8 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
     public void populate(int x, int z) {
         net.minecraftforge.event.ForgeEventFactory.onChunkPopulate(false, this, this.world, this.rand, x, z, false);
 
-        OreGenProperties oreGenProperties = DimensionManager.getInstance().getDimensionProperties(this.world.provider.getDimension()).getOreGenProperties(this.world);
+        OreGenProperties oreGenProperties = DimensionManager.getInstance()
+                .getDimensionProperties(this.world.provider.getDimension()).getOreGenProperties(this.world);
 
         if (oreGenProperties != null) {
             for (OreEntry entry : oreGenProperties.getOreEntries()) {
@@ -333,6 +345,5 @@ public class ChunkProviderAsteroids extends ChunkProviderPlanet {
         }
 
         BlockFalling.fallInstantly = false;
-
     }
 }

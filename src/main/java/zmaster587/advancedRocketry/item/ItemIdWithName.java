@@ -1,6 +1,9 @@
 package zmaster587.advancedRocketry.item;
 
-import com.mojang.realmsclient.gui.ChatFormatting;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -9,13 +12,11 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nonnull;
-import java.util.List;
+import com.mojang.realmsclient.gui.ChatFormatting;
 
 public class ItemIdWithName extends Item {
 
     public void setName(@Nonnull ItemStack stack, String name) {
-
         if (stack.hasTagCompound()) {
             NBTTagCompound nbt = stack.getTagCompound();
             nbt.setString("name", name);
@@ -31,7 +32,6 @@ public class ItemIdWithName extends Item {
 
         return "";
     }
-
 
     @Override
     @SideOnly(Side.CLIENT)

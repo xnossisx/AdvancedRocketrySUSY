@@ -7,6 +7,7 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
@@ -17,6 +18,7 @@ import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
 public abstract class SpaceObjectBase implements ISpaceObject {
+
     private int posX, posY;
     private int altitude;
     private HashedBlockPosition spawnLocation;
@@ -26,7 +28,8 @@ public abstract class SpaceObjectBase implements ISpaceObject {
     private DimensionProperties properties;
 
     public SpaceObjectBase() {
-        properties = (DimensionProperties) zmaster587.advancedRocketry.dimension.DimensionManager.defaultSpaceDimensionProperties.clone();
+        properties = (DimensionProperties) zmaster587.advancedRocketry.dimension.DimensionManager.defaultSpaceDimensionProperties
+                .clone();
         angularVelocity = new double[3];
         rotation = new double[3];
     }
@@ -35,8 +38,7 @@ public abstract class SpaceObjectBase implements ISpaceObject {
         return Long.MAX_VALUE;
     }
 
-    public void beginTransition(long time) {
-    }
+    public void beginTransition(long time) {}
 
     public long getTransitionTime() {
         return 0;
@@ -80,7 +82,7 @@ public abstract class SpaceObjectBase implements ISpaceObject {
     }
 
     /**
-     * Gets the forward facing direction of the ship.  Direction is not garunteed to be set
+     * Gets the forward facing direction of the ship. Direction is not garunteed to be set
      *
      * @return direction of the ship, or UNKNOWN if none exists
      */
@@ -89,13 +91,11 @@ public abstract class SpaceObjectBase implements ISpaceObject {
     }
 
     /**
-     * Sets the forward Facing direction of the object.  Mostly used for warpships
+     * Sets the forward Facing direction of the object. Mostly used for warpships
      *
      * @param direction
      */
-    public void setForwardDirection(EnumFacing direction) {
-
-    }
+    public void setForwardDirection(EnumFacing direction) {}
 
     /**
      * @return if the object is anchored in place by anything
@@ -109,8 +109,7 @@ public abstract class SpaceObjectBase implements ISpaceObject {
      * Sets if the object is anchored or not
      */
     @Override
-    public void setIsAnchored(boolean anchored) {
-    }
+    public void setIsAnchored(boolean anchored) {}
 
     /**
      * @return the altitude above the parent DIM the object currently is
@@ -222,7 +221,8 @@ public abstract class SpaceObjectBase implements ISpaceObject {
         if (id == this.getOrbitingPlanetId())
             return;
 
-        properties.setParentPlanet(zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getDimensionProperties(id), false);
+        properties.setParentPlanet(
+                zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getDimensionProperties(id), false);
     }
 
     @Override
@@ -244,8 +244,8 @@ public abstract class SpaceObjectBase implements ISpaceObject {
      */
     public void onModuleUnpack(IStorageChunk chunk) {
         World worldObj = DimensionManager.getWorld(ARConfiguration.getCurrentConfig().spaceDimId);
-        chunk.pasteInWorld(worldObj, spawnLocation.x - chunk.getSizeX() / 2, spawnLocation.y - chunk.getSizeY() / 2, spawnLocation.z - chunk.getSizeZ() / 2);
-
+        chunk.pasteInWorld(worldObj, spawnLocation.x - chunk.getSizeX() / 2, spawnLocation.y - chunk.getSizeY() / 2,
+                spawnLocation.z - chunk.getSizeZ() / 2);
     }
 
     @Override
@@ -273,7 +273,8 @@ public abstract class SpaceObjectBase implements ISpaceObject {
         posX = nbt.getInteger("posX");
         posY = nbt.getInteger("posY");
         altitude = nbt.getInteger("altitude");
-        spawnLocation = new HashedBlockPosition(nbt.getInteger("spawnX"), nbt.getInteger("spawnY"), nbt.getInteger("spawnZ"));
+        spawnLocation = new HashedBlockPosition(nbt.getInteger("spawnX"), nbt.getInteger("spawnY"),
+                nbt.getInteger("spawnZ"));
         properties.setId(nbt.getInteger("id"));
         rotation[0] = nbt.getDouble("rotationX");
         rotation[1] = nbt.getDouble("rotationY");
@@ -304,19 +305,11 @@ public abstract class SpaceObjectBase implements ISpaceObject {
     }
 
     @Override
-    public void addLandingPad(int x, int z, String name) {
-
-    }
+    public void addLandingPad(int x, int z, String name) {}
 
     @Override
-    public void removeLandingPad(int x, int z) {
-
-    }
+    public void removeLandingPad(int x, int z) {}
 
     @Override
-    public void setPadStatus(int posX, int posZ, boolean full) {
-
-    }
-
-
+    public void setPadStatus(int posX, int posZ, boolean full) {}
 }

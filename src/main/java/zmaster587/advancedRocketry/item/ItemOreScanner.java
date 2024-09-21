@@ -1,5 +1,11 @@
 package zmaster587.advancedRocketry.item;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -11,6 +17,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
@@ -20,17 +27,10 @@ import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.modules.IModularInventory;
 import zmaster587.libVulpes.inventory.modules.ModuleBase;
 
-import javax.annotation.Nonnull;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.LinkedList;
-import java.util.List;
-
 public class ItemOreScanner extends Item implements IModularInventory {
-
 
     @Override
     public void addInformation(@Nonnull ItemStack stack, World player, List<String> list, ITooltipFlag arg5) {
-
         SatelliteBase sat = DimensionManager.getInstance().getSatellite(this.getSatelliteID(stack));
 
         SatelliteOreMapping mapping = null;
@@ -82,8 +82,10 @@ public class ItemOreScanner extends Item implements IModularInventory {
 
             SatelliteBase satellite = DimensionManager.getInstance().getSatellite(satelliteId);
 
-            if (satellite instanceof SatelliteOreMapping && satellite.getDimensionId() == worldIn.provider.getDimension())
-                playerIn.openGui(AdvancedRocketry.instance, GuiHandler.guiId.OreMappingSatellite.ordinal(), worldIn, playerIn.getPosition().getX(), (int) getSatelliteID(stack), playerIn.getPosition().getZ());
+            if (satellite instanceof SatelliteOreMapping &&
+                    satellite.getDimensionId() == worldIn.provider.getDimension())
+                playerIn.openGui(AdvancedRocketry.instance, GuiHandler.guiId.OreMappingSatellite.ordinal(), worldIn,
+                        playerIn.getPosition().getX(), (int) getSatelliteID(stack), playerIn.getPosition().getZ());
 
         }
 
@@ -102,14 +104,15 @@ public class ItemOreScanner extends Item implements IModularInventory {
 
                 SatelliteBase satellite = DimensionManager.getInstance().getSatellite(satelliteId);
 
-                if (satellite instanceof SatelliteOreMapping && satellite.getDimensionId() == worldIn.provider.getDimension())
-                    playerIn.openGui(AdvancedRocketry.instance, GuiHandler.guiId.OreMappingSatellite.ordinal(), worldIn, playerIn.getPosition().getX(), (int) getSatelliteID(stack), playerIn.getPosition().getZ());
+                if (satellite instanceof SatelliteOreMapping &&
+                        satellite.getDimensionId() == worldIn.provider.getDimension())
+                    playerIn.openGui(AdvancedRocketry.instance, GuiHandler.guiId.OreMappingSatellite.ordinal(), worldIn,
+                            playerIn.getPosition().getX(), (int) getSatelliteID(stack), playerIn.getPosition().getZ());
 
             }
         }
         return super.onItemUse(playerIn, worldIn, pos, hand, facing, hitX, hitY, hitZ);
     }
-
 
     public void interactSatellite(SatelliteBase satellite, EntityPlayer player, World world, BlockPos pos) {
         satellite.performAction(player, world, pos);
@@ -118,7 +121,7 @@ public class ItemOreScanner extends Item implements IModularInventory {
     @Override
     public List<ModuleBase> getModules(int id, EntityPlayer player) {
         List<ModuleBase> modules = new LinkedList<>();
-        //modules.add(new ModuleOreMapper(0, 0));
+        // modules.add(new ModuleOreMapper(0, 0));
         return modules;
     }
 
@@ -131,5 +134,4 @@ public class ItemOreScanner extends Item implements IModularInventory {
     public boolean canInteractWithContainer(EntityPlayer entity) {
         return true;
     }
-
 }

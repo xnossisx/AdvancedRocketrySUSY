@@ -8,6 +8,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+
 import org.lwjgl.opengl.GL11;
 
 public class FxLaserSpark extends Particle {
@@ -32,7 +33,7 @@ public class FxLaserSpark extends Particle {
     public void renderParticle(BufferBuilder worldRendererIn, Entity entityIn,
                                float partialTicks, float rotationX, float rotationZ,
                                float rotationYZ, float rotationXY, float rotationXZ) {
-        //worldRendererIn.finishDrawing();
+        // worldRendererIn.finishDrawing();
 
         float x = (float) (this.prevPosX + (this.posX - this.prevPosX) * (double) partialTicks - interpPosX);
         float y = (float) (this.prevPosY + (this.posY - this.prevPosY) * (double) partialTicks - interpPosY);
@@ -60,7 +61,6 @@ public class FxLaserSpark extends Particle {
         buffer.pos(x, y, z).endVertex();
         buffer.pos(x + motionX * length, y + motionY * length, z + motionZ * length).endVertex();
 
-
         Tessellator.getInstance().draw();
 
         GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -70,16 +70,13 @@ public class FxLaserSpark extends Particle {
         GL11.glLineWidth(1);
     }
 
-
     @Override
     public int getFXLayer() {
         return 3;
     }
 
-
     @Override
     public void onUpdate() {
-
         this.particleAlpha = 1 - (particleAge / (float) particleMaxAge);
 
         if (this.particleAge++ >= this.particleMaxAge) {

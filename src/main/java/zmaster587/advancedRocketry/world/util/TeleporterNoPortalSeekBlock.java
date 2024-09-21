@@ -13,9 +13,9 @@ public class TeleporterNoPortalSeekBlock extends Teleporter {
     }
 
     public void teleport(Entity entity, WorldServer world) {
-
         if (entity.isEntityAlive()) {
-            entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw, entity.rotationPitch);
+            entity.setLocationAndAngles(entity.posX, entity.posY, entity.posZ, entity.rotationYaw,
+                    entity.rotationPitch);
             world.spawnEntity(entity);
             world.updateEntityWithOptionalForce(entity, false);
         }
@@ -24,7 +24,6 @@ public class TeleporterNoPortalSeekBlock extends Teleporter {
 
     @Override
     public boolean placeInExistingPortal(Entity entityIn, float rotationYaw) {
-
         double x, y, z;
         x = entityIn.posX;
         y = entityIn.posY;
@@ -40,7 +39,8 @@ public class TeleporterNoPortalSeekBlock extends Teleporter {
         }
 
         if (entityIn instanceof EntityPlayerMP) {
-            ((EntityPlayerMP) entityIn).connection.setPlayerLocation(x, y, z, entityIn.rotationYaw, entityIn.rotationPitch);
+            ((EntityPlayerMP) entityIn).connection.setPlayerLocation(x, y, z, entityIn.rotationYaw,
+                    entityIn.rotationPitch);
         } else {
             entityIn.setLocationAndAngles(x, y, z, entityIn.rotationYaw, entityIn.rotationPitch);
         }
@@ -49,9 +49,7 @@ public class TeleporterNoPortalSeekBlock extends Teleporter {
     }
 
     @Override
-    public void removeStalePortalLocations(long par1) {
-    }
-
+    public void removeStalePortalLocations(long par1) {}
 
     @Override
     public boolean makePortal(Entity p_85188_1_) {

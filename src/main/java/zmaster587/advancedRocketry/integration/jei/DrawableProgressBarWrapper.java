@@ -1,11 +1,11 @@
 package zmaster587.advancedRocketry.integration.jei;
 
-import mezz.jei.api.gui.IDrawableAnimated;
 import net.minecraft.client.Minecraft;
+
+import mezz.jei.api.gui.IDrawableAnimated;
 import zmaster587.libVulpes.client.util.ProgressBarImage;
 
 public class DrawableProgressBarWrapper implements IDrawableAnimated {
-
 
     ProgressBarImage bar;
 
@@ -32,5 +32,4 @@ public class DrawableProgressBarWrapper implements IDrawableAnimated {
     public void draw(Minecraft minecraft, int xOffset, int yOffset) {
         bar.renderProgressBar(xOffset, 0, yOffset, 100);
     }
-
 }

@@ -5,6 +5,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.tile.TileForceFieldProjector;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
 
@@ -33,5 +34,4 @@ public class BlockForceFieldProjector extends BlockFullyRotatable {
     public TileEntity createTileEntity(World world, IBlockState state) {
         return new TileForceFieldProjector();
     }
-
 }

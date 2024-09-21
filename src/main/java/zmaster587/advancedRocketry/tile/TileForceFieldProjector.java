@@ -6,6 +6,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
+
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
@@ -18,7 +19,6 @@ public class TileForceFieldProjector extends TileEntity implements ITickable {
     public TileForceFieldProjector() {
         extensionRange = 0;
     }
-
 
     public void destroyField(EnumFacing facing) {
         while (extensionRange > 0) {
@@ -60,13 +60,15 @@ public class TileForceFieldProjector extends TileEntity implements ITickable {
                     EnumFacing facing = BlockFullyRotatable.getFront(state);
                     BlockPos nextPos;
 
-                    //check to make sure the force field that was deleted last time stayed deleted
+                    // check to make sure the force field that was deleted last time stayed deleted
                     if (extensionRange < MAX_RANGE) {
                         nextPos = pos.offset(facing, extensionRange + 1);
 
                         if (world.getBlockState(nextPos).getBlock() == AdvancedRocketryBlocks.blockForceField) {
                             world.setBlockToAir(nextPos);
-                            AdvancedRocketry.logger.warn("Force field projector at " + pos + " found a force field block at " + nextPos + " that didn't stay deleted on retraction! Attempting deletion again.");
+                            AdvancedRocketry.logger.warn(
+                                    "Force field projector at " + pos + " found a force field block at " + nextPos +
+                                            " that didn't stay deleted on retraction! Attempting deletion again.");
                             return;
                         }
                     } else if (extensionRange > MAX_RANGE)
@@ -95,5 +97,4 @@ public class TileForceFieldProjector extends TileEntity implements ITickable {
         extensionRange = nbt.getShort("ext");
         super.readFromNBT(nbt);
     }
-
 }

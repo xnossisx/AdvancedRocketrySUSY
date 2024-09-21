@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.block;
 
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -13,10 +17,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 
-import javax.annotation.Nonnull;
-import java.util.Random;
+import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 
 public class BlockDoor2 extends BlockDoor {
 
@@ -31,16 +33,17 @@ public class BlockDoor2 extends BlockDoor {
         return new ItemStack(AdvancedRocketryItems.itemSmallAirlockDoor);
     }
 
-
     @Override
     @Nonnull
     public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-        return state.getValue(HALF) == BlockDoor.EnumDoorHalf.UPPER ? Items.AIR : AdvancedRocketryItems.itemSmallAirlockDoor;
+        return state.getValue(HALF) == BlockDoor.EnumDoorHalf.UPPER ? Items.AIR :
+                AdvancedRocketryItems.itemSmallAirlockDoor;
     }
 
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos,
-                                    IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side, float hitX, float hitY,
+                                    IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing side,
+                                    float hitX, float hitY,
                                     float hitZ) {
         return false;
     }

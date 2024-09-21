@@ -9,7 +9,7 @@ import net.minecraft.world.World;
  */
 public interface IFuelTank {
 
-    //Returns
+    // Returns
 
     /**
      * @param world

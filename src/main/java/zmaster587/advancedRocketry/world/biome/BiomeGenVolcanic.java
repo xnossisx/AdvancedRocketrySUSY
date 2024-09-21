@@ -1,15 +1,16 @@
 package zmaster587.advancedRocketry.world.biome;
 
+import java.util.Random;
+
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.MapGenBase;
 import net.minecraft.world.gen.feature.WorldGenAbstractTree;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.world.decoration.MapGenVolcano;
 import zmaster587.advancedRocketry.world.gen.WorldGenCharredTree;
-
-import java.util.Random;
 
 public class BiomeGenVolcanic extends Biome {
 
@@ -17,7 +18,6 @@ public class BiomeGenVolcanic extends Biome {
     WorldGenAbstractTree charTree = new WorldGenCharredTree(false, 6);
 
     public BiomeGenVolcanic(BiomeProperties properties) {
-
         super(properties);
 
         spawnableMonsterList.clear();
@@ -46,5 +46,4 @@ public class BiomeGenVolcanic extends Biome {
     public WorldGenAbstractTree getRandomTreeFeature(Random rand) {
         return charTree;
     }
-
 }

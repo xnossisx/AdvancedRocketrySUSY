@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.world.biome;
 
 import net.minecraft.world.biome.Biome;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 
 public class BiomeGenHotDryRock extends Biome {
@@ -8,7 +9,7 @@ public class BiomeGenHotDryRock extends Biome {
     public BiomeGenHotDryRock(BiomeProperties properties) {
         super(properties);
 
-        //hot and stinks
+        // hot and stinks
         this.decorator.generateFalls = false;
         this.decorator.flowersPerChunk = 0;
         this.decorator.grassPerChunk = 0;
@@ -19,7 +20,7 @@ public class BiomeGenHotDryRock extends Biome {
 
     @Override
     public float getSpawningChance() {
-        return 0f; //Nothing spawns
+        return 0f; // Nothing spawns
     }
 
     @Override

@@ -1,17 +1,18 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.SatelliteRegistry;
 import zmaster587.advancedRocketry.api.satellite.SatelliteBase;
 import zmaster587.libVulpes.network.BasePacket;
-
-import java.io.IOException;
 
 public class PacketSatellite extends BasePacket {
 
@@ -30,7 +31,6 @@ public class PacketSatellite extends BasePacket {
         this.machine = machine;
     }
 
-
     @Override
     public void write(ByteBuf outline) {
         PacketBuffer packetBuffer = new PacketBuffer(outline);
@@ -46,12 +46,13 @@ public class PacketSatellite extends BasePacket {
         PacketBuffer packetBuffer = new PacketBuffer(in);
         NBTTagCompound nbt;
 
-        //TODO: error handling
+        // TODO: error handling
         try {
             nbt = packetBuffer.readCompoundTag();
             SatelliteBase satellite = SatelliteRegistry.createFromNBT(nbt);
 
-            zmaster587.advancedRocketry.dimension.DimensionManager.getInstance().getDimensionProperties(satellite.getDimensionId()).addSatellite(satellite);
+            zmaster587.advancedRocketry.dimension.DimensionManager.getInstance()
+                    .getDimensionProperties(satellite.getDimensionId()).addSatellite(satellite);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -59,17 +60,12 @@ public class PacketSatellite extends BasePacket {
 
     @Override
     public void read(ByteBuf in) {
-        //Should never happen
-
+        // Should never happen
     }
 
-    public void executeClient(EntityPlayer player) {
-    }
+    public void executeClient(EntityPlayer player) {}
 
-    public void executeServer(EntityPlayerMP player) {
-    }
+    public void executeServer(EntityPlayerMP player) {}
 
-    public void execute(EntityPlayer player, Side side) {
-    }
-
+    public void execute(EntityPlayer player, Side side) {}
 }

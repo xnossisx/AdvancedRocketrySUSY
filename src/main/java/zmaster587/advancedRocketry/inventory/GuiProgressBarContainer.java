@@ -6,7 +6,9 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.EnumFacing;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.libVulpes.render.RenderHelper;
 
 public abstract class GuiProgressBarContainer extends GuiContainer {
@@ -15,7 +17,8 @@ public abstract class GuiProgressBarContainer extends GuiContainer {
         super(container);
     }
 
-    public void drawProgressBar(int xLoc, int yLoc, int textureOffsetX, int textureOffsetY, int xSize, int ySize, float percent, EnumFacing direction) {
+    public void drawProgressBar(int xLoc, int yLoc, int textureOffsetX, int textureOffsetY, int xSize, int ySize,
+                                float percent, EnumFacing direction) {
         if (EnumFacing.WEST == direction) {
             drawProgressBarHorizontal(xLoc, yLoc, textureOffsetX, textureOffsetY, xSize, ySize, percent);
         } else if (EnumFacing.UP == direction) {
@@ -27,16 +30,22 @@ public abstract class GuiProgressBarContainer extends GuiContainer {
         }
     }
 
-    public void drawProgressBarVertical(int xLoc, int yLoc, int textureOffsetX, int textureOffsetY, int xSize, int ySize, float percent) {
-        this.drawTexturedModalRect(xLoc, yLoc + (ySize - (int) (percent * ySize)), textureOffsetX, ySize - (int) (percent * ySize) + textureOffsetY, xSize, (int) (percent * ySize));
+    public void drawProgressBarVertical(int xLoc, int yLoc, int textureOffsetX, int textureOffsetY, int xSize,
+                                        int ySize, float percent) {
+        this.drawTexturedModalRect(xLoc, yLoc + (ySize - (int) (percent * ySize)), textureOffsetX,
+                ySize - (int) (percent * ySize) + textureOffsetY, xSize, (int) (percent * ySize));
     }
 
-    public void drawProgressBarHorizontal(int xLoc, int yLoc, int textureOffsetX, int textureOffsetY, int xSize, int ySize, float percent) {
-        this.drawTexturedModalRect(xLoc + (xSize - (int) (percent * xSize)), yLoc, xSize - (int) (percent * xSize) + textureOffsetX, textureOffsetY, (int) (percent * xSize), ySize);
+    public void drawProgressBarHorizontal(int xLoc, int yLoc, int textureOffsetX, int textureOffsetY, int xSize,
+                                          int ySize, float percent) {
+        this.drawTexturedModalRect(xLoc + (xSize - (int) (percent * xSize)), yLoc,
+                xSize - (int) (percent * xSize) + textureOffsetX, textureOffsetY, (int) (percent * xSize), ySize);
     }
 
-    public void drawProgressBarIconVertical(int xLoc, int yLoc, TextureAtlasSprite icon, int xSize, int ySize, float percent) {
-        this.drawTexturedModalRect(xLoc, yLoc + (ySize - (int) (percent * ySize)), icon, xSize, (int) (percent * ySize));
+    public void drawProgressBarIconVertical(int xLoc, int yLoc, TextureAtlasSprite icon, int xSize, int ySize,
+                                            float percent) {
+        this.drawTexturedModalRect(xLoc, yLoc + (ySize - (int) (percent * ySize)), icon, xSize,
+                (int) (percent * ySize));
     }
 
     /**
@@ -47,7 +56,8 @@ public abstract class GuiProgressBarContainer extends GuiContainer {
         float f = 0.00390625F;
         float f1 = 0.00390625F;
         buffer.begin(GL11.GL_QUADS, buffer.getVertexFormat());
-        RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel, x, y, x + width, y + height, u * f, (u + width) * f, v * f1, (v + height) * f1);
+        RenderHelper.renderNorthFaceWithUV(buffer, this.zLevel, x, y, x + width, y + height, u * f, (u + width) * f,
+                v * f1, (v + height) * f1);
         buffer.finishDrawing();
     }
 

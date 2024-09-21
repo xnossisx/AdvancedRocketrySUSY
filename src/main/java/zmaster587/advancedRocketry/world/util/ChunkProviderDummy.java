@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.world.util;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.IChunkProvider;
+
 import zmaster587.advancedRocketry.util.StorageChunk;
 
 public class ChunkProviderDummy implements IChunkProvider {
@@ -41,5 +42,4 @@ public class ChunkProviderDummy implements IChunkProvider {
     public boolean isChunkGeneratedAt(int x, int z) {
         return false;
     }
-
 }

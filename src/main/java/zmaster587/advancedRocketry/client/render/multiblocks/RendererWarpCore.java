@@ -10,7 +10,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.api.stations.ISpaceObject;
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
@@ -33,7 +35,6 @@ public class RendererWarpCore extends TileEntitySpecialRenderer {
         } catch (ModelFormatException e) {
             e.printStackTrace();
         }
-
     }
 
     @Override
@@ -46,10 +47,12 @@ public class RendererWarpCore extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         GL11.glTranslated(x + 0.5, y, z + 0.5);
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
+        GL11.glRotatef((front.getXOffset() == 1 ? 180 : 0) + front.getZOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(1f, 0, 0f);
 
         bindTexture(texture);
@@ -75,13 +78,14 @@ public class RendererWarpCore extends TileEntitySpecialRenderer {
 
         if (tile.getWorld().provider instanceof WorldProviderSpace) {
 
-            ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager().getSpaceStationFromBlockCoords(tile.getPos());
+            ISpaceObject spaceObject = SpaceObjectManager.getSpaceManager()
+                    .getSpaceStationFromBlockCoords(tile.getPos());
             if (spaceObject instanceof SpaceStationObject && ((SpaceStationObject) spaceObject).getFuelAmount() > 50) {
 
-                double speedMult = 1.5;//((DimensionProperties)spaceObject.getProperties()).getParentPlanet() == SpaceObjectManager.WARPDIMID ? 1.5d : 0.1d;
+                double speedMult = 1.5;// ((DimensionProperties)spaceObject.getProperties()).getParentPlanet() ==
+                                       // SpaceObjectManager.WARPDIMID ? 1.5d : 0.1d;
 
                 double speedRotate = speedMult * 0.25d;
-
 
                 GlStateManager.color(0.4f, 0.4f, 1f, 0.6f);
                 GL11.glPushMatrix();
@@ -112,9 +116,13 @@ public class RendererWarpCore extends TileEntitySpecialRenderer {
                 for (int j = 0; j < 5; j++) {
                     for (int i = 0; i < amt; i++) {
                         GL11.glPushMatrix();
-                        GL11.glRotated(((j + 1) * speedRotate * System.currentTimeMillis() % 360) + (i + j / 5f) * offset, 0f, 1f, 0f);
-                        GL11.glTranslatef(0, 0.1f * j - .2f + (5 - j) * 0.02f * (float) Math.sin(0.001d * System.currentTimeMillis()), 0.2f);
-                        //GL11.glTranslatef(0f, 0.1f*(0.5f - MathHelper.sin((float)(0.001*System.currentTimeMillis() % 100))), 0f);
+                        GL11.glRotated(
+                                ((j + 1) * speedRotate * System.currentTimeMillis() % 360) + (i + j / 5f) * offset, 0f,
+                                1f, 0f);
+                        GL11.glTranslatef(0, 0.1f * j - .2f +
+                                (5 - j) * 0.02f * (float) Math.sin(0.001d * System.currentTimeMillis()), 0.2f);
+                        // GL11.glTranslatef(0f, 0.1f*(0.5f - MathHelper.sin((float)(0.001*System.currentTimeMillis() %
+                        // 100))), 0f);
                         model.renderOnly("Ball");
                         GL11.glPopMatrix();
                     }

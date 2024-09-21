@@ -2,12 +2,13 @@ package zmaster587.advancedRocketry.client.render.multiblocks;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.inventory.TextureResources;
@@ -19,7 +20,6 @@ public class RenderTerraformerAtm extends TileEntitySpecialRenderer {
     WavefrontObject model;
 
     ResourceLocation tubeTexture = new ResourceLocation("advancedRocketry:textures/models/tubes.png");
-
 
     public RenderTerraformerAtm() {
         try {
@@ -33,6 +33,7 @@ public class RenderTerraformerAtm extends TileEntitySpecialRenderer {
     public boolean isGlobalRenderer(TileEntity te) {
         return true;
     }
+
     @Override
     public void render(TileEntity tile, double x,
                        double y, double z, float f, int damage, float a) {
@@ -43,12 +44,14 @@ public class RenderTerraformerAtm extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Initial setup
+        // Initial setup
 
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         GL11.glTranslated(x + 0.5, y, z + 0.5);
-        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); //tile.getWorldObj().getBlockMetadata(tile.xCoord, tile.yCoord, tile.zCoord));
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos())); // tile.getWorldObj().getBlockMetadata(tile.xCoord,
+                                                                                                  // tile.yCoord,
+                                                                                                  // tile.zCoord));
+        GL11.glRotatef((front.getXOffset() == 1 ? 180 : 0) + front.getZOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(1f, 0, 0f);
         bindTexture(TextureResources.fan);
         model.renderOnly("Fan");
@@ -64,8 +67,7 @@ public class RenderTerraformerAtm extends TileEntitySpecialRenderer {
         bindTexture(TextureResources.diamondMetal);
         model.renderOnly("Floor");
 
-
-        //Baked a light map, make tubes smooth
+        // Baked a light map, make tubes smooth
         GlStateManager.disableLighting();
         bindTexture(tubeTexture);
         model.renderOnly("Tubes");

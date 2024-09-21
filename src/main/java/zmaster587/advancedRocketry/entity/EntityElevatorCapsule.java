@@ -1,6 +1,9 @@
 package zmaster587.advancedRocketry.entity;
 
-import io.netty.buffer.ByteBuf;
+import java.util.List;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MoverType;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,6 +22,8 @@ import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.Constants;
@@ -34,15 +39,14 @@ import zmaster587.libVulpes.network.PacketEntity;
 import zmaster587.libVulpes.network.PacketHandler;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
-import javax.annotation.Nullable;
-import java.util.List;
-
 public class EntityElevatorCapsule extends Entity implements INetworkEntity {
 
     public static final double MAX_HEIGHT = ARConfiguration.getCurrentConfig().orbit;
     public static final double MAX_STANDTIME = 200;
-    protected static final DataParameter<Byte> motionDir = EntityDataManager.createKey(EntityElevatorCapsule.class, DataSerializers.BYTE);
-    protected static final DataParameter<Integer> standTimeCounter = EntityDataManager.createKey(EntityElevatorCapsule.class, DataSerializers.VARINT);
+    protected static final DataParameter<Byte> motionDir = EntityDataManager.createKey(EntityElevatorCapsule.class,
+            DataSerializers.BYTE);
+    protected static final DataParameter<Integer> standTimeCounter = EntityDataManager
+            .createKey(EntityElevatorCapsule.class, DataSerializers.VARINT);
     private static final byte PACKET_WRITE_DST_INFO = 0;
     private static final byte PACKET_RECIEVE_NBT = 1;
     private static final byte PACKET_LAUNCH_EVENT = 2;
@@ -85,7 +89,6 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
     }
 
     public int decrStandTime() {
-
         this.dataManager.set(standTimeCounter, (standTime = getStandTime() - 1));
         return standTime;
     }
@@ -120,7 +123,7 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
     @Override
     public void setEntityId(int id) {
         super.setEntityId(id);
-        //Ask server for nbt data
+        // Ask server for nbt data
         if (world.isRemote) {
             PacketHandler.sendToServer(new PacketEntity(this, PACKET_RECIEVE_NBT));
         }
@@ -131,12 +134,12 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
         nbt.setByte("motionDir", motion);
         if (dstTilePos != null) {
             nbt.setInteger("dstDimid", dstTilePos.dimid);
-            nbt.setIntArray("dstLoc", new int[]{dstTilePos.pos.x, dstTilePos.pos.y, dstTilePos.pos.z});
+            nbt.setIntArray("dstLoc", new int[] { dstTilePos.pos.x, dstTilePos.pos.y, dstTilePos.pos.z });
         }
 
         if (srcTilePos != null) {
             nbt.setInteger("srcDimid", srcTilePos.dimid);
-            nbt.setIntArray("srcLoc", new int[]{srcTilePos.pos.x, srcTilePos.pos.y, srcTilePos.pos.z});
+            nbt.setIntArray("srcLoc", new int[] { srcTilePos.pos.x, srcTilePos.pos.y, srcTilePos.pos.z });
         }
     }
 
@@ -194,7 +197,9 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
 
             int timeOffset = 1;
             for (Entity e : passengers) {
-                PlanetEventHandler.addDelayedTransition(new TransitionEntity(worldserver.getTotalWorldTime() + ++timeOffset, e, dimensionIn, new BlockPos(posX, y, posZ), entity));
+                PlanetEventHandler
+                        .addDelayedTransition(new TransitionEntity(worldserver.getTotalWorldTime() + ++timeOffset, e,
+                                dimensionIn, new BlockPos(posX, y, posZ), entity));
             }
             return entity;
         }
@@ -210,7 +215,7 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
     public void onEntityUpdate() {
         super.onEntityUpdate();
 
-        //Make sure to update client
+        // Make sure to update client
         if (!world.isRemote && this.ticksExisted == 5) {
             if (dstTilePos != null)
                 setDst(dstTilePos);
@@ -274,9 +279,9 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                 }
             }
 
-            if (dstTilePos != null && dstTilePos.pos != null && this.posY >= dstTilePos.pos.y - 4 && world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) {
+            if (dstTilePos != null && dstTilePos.pos != null && this.posY >= dstTilePos.pos.y - 4 &&
+                    world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) {
                 setCapsuleMotion(0);
-
 
                 setPosition(dstTilePos.pos.x, dstTilePos.pos.y - 5, dstTilePos.pos.z);
 
@@ -288,7 +293,7 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                 } else
                     this.setDead();
 
-                //Dismount rider after being put in final place
+                // Dismount rider after being put in final place
                 for (Entity ent : this.getPassengers()) {
                     ent.dismountRidingEntity();
                 }
@@ -306,7 +311,7 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
 
             if (!world.isRemote) {
 
-                //Send packet to player for deorbit a bit delayed
+                // Send packet to player for deorbit a bit delayed
                 if (this.ticksExisted == 20)
                     PacketHandler.sendToPlayersTrackingEntity(new PacketEntity(this, PACKET_DEORBIT), this);
 
@@ -318,9 +323,9 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                     ent.fallDistance = 0;   // entityRocket.java to prevent fall damage
                 }
 
-                if (this.posY <= dstTilePos.pos.y + 1 && world.provider.getDimension() != ARConfiguration.getCurrentConfig().spaceDimId) {
+                if (this.posY <= dstTilePos.pos.y + 1 &&
+                        world.provider.getDimension() != ARConfiguration.getCurrentConfig().spaceDimId) {
                     setCapsuleMotion(0);
-
 
                     setPosition(dstTilePos.pos.x, dstTilePos.pos.y + 1, dstTilePos.pos.z);
 
@@ -332,49 +337,51 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                     } else
                         this.setDead();
 
-                    //Dismount rider after being put in final place
+                    // Dismount rider after being put in final place
                     for (Entity ent : this.getPassengers()) {
                         ent.dismountRidingEntity();
                     }
-                } else if (this.posY <= 15 && world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) {
-                    setCapsuleMotion(-1);
-                    double landingLocX, landingLocZ;
-                    World world;
+                } else if (this.posY <= 15 &&
+                        world.provider.getDimension() == ARConfiguration.getCurrentConfig().spaceDimId) {
+                            setCapsuleMotion(-1);
+                            double landingLocX, landingLocZ;
+                            World world;
 
-                    if ((world = DimensionManager.getWorld(dstTilePos.dimid)) == null) {
-                        DimensionManager.initDimension(dstTilePos.dimid);
-                        world = DimensionManager.getWorld(dstTilePos.dimid);
-                    }
+                            if ((world = DimensionManager.getWorld(dstTilePos.dimid)) == null) {
+                                DimensionManager.initDimension(dstTilePos.dimid);
+                                world = DimensionManager.getWorld(dstTilePos.dimid);
+                            }
 
-                    if (world != null) {
-                        TileEntity tile = world.getTileEntity(dstTilePos.pos.getBlockPos());
+                            if (world != null) {
+                                TileEntity tile = world.getTileEntity(dstTilePos.pos.getBlockPos());
 
-                        if (tile instanceof TileSpaceElevator) {
-                            landingLocX = ((TileSpaceElevator) tile).getLandingLocationX();
-                            landingLocZ = ((TileSpaceElevator) tile).getLandingLocationZ();
-                        } else {
-                            setDead();
-                            return;
-                        }
-                    } else {
-                        dstTilePos = srcTilePos;
-                        world = this.getEntityWorld();
+                                if (tile instanceof TileSpaceElevator) {
+                                    landingLocX = ((TileSpaceElevator) tile).getLandingLocationX();
+                                    landingLocZ = ((TileSpaceElevator) tile).getLandingLocationZ();
+                                } else {
+                                    setDead();
+                                    return;
+                                }
+                            } else {
+                                dstTilePos = srcTilePos;
+                                world = this.getEntityWorld();
 
-                        TileEntity tile = world.getTileEntity(dstTilePos.pos.getBlockPos());
+                                TileEntity tile = world.getTileEntity(dstTilePos.pos.getBlockPos());
 
-                        if (tile instanceof TileSpaceElevator) {
-                            landingLocX = ((TileSpaceElevator) tile).getLandingLocationX();
-                            landingLocZ = ((TileSpaceElevator) tile).getLandingLocationZ();
-                        } else {
-                            setDead();
-                            return;
-                        }
-                    }
+                                if (tile instanceof TileSpaceElevator) {
+                                    landingLocX = ((TileSpaceElevator) tile).getLandingLocationX();
+                                    landingLocZ = ((TileSpaceElevator) tile).getLandingLocationZ();
+                                } else {
+                                    setDead();
+                                    return;
+                                }
+                            }
 
-                    changeDimension(dstTilePos.dimid, landingLocX, ARConfiguration.getCurrentConfig().orbit, landingLocZ);
+                            changeDimension(dstTilePos.dimid, landingLocX, ARConfiguration.getCurrentConfig().orbit,
+                                    landingLocZ);
 
-                    MinecraftForge.EVENT_BUS.post(new RocketEvent.RocketDeOrbitingEvent(this));
-                } else
+                            MinecraftForge.EVENT_BUS.post(new RocketEvent.RocketDeOrbitingEvent(this));
+                        } else
                     this.move(MoverType.SELF, 0, this.motionY, 0);
             } else
                 this.move(MoverType.SELF, 0, this.motionY, 0);
@@ -386,19 +393,19 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                 TileEntity srcTile = null;
                 if (list.isEmpty())
                     standTime = 0;
-                else if (dstTilePos != null && TileSpaceElevator.isDestinationValid(dstTilePos.dimid, dstTilePos, new HashedBlockPosition(getPosition()), world.provider.getDimension()))
+                else if (dstTilePos != null && TileSpaceElevator.isDestinationValid(dstTilePos.dimid, dstTilePos,
+                        new HashedBlockPosition(getPosition()), world.provider.getDimension()))
                     standTime++;
 
                 if (srcTilePos != null && srcTilePos.pos != null)
                     srcTile = world.getTileEntity(srcTilePos.pos.getBlockPos());
-
 
                 if (srcTile instanceof TileSpaceElevator && !((TileSpaceElevator) srcTile).getMachineEnabled())
                     standTime = 0;
 
                 setStandTime(standTime);
 
-                //Begin ascending
+                // Begin ascending
                 if (standTime > MAX_STANDTIME) {
 
                     if (srcTilePos != null && srcTilePos.pos != null) {
@@ -411,15 +418,17 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                             } else {
                                 setCapsuleMotion(1);
                             }
-                            //Make sure we mount player before takeoff
-                            List<EntityPlayer> list2 = world.getEntitiesWithinAABB(EntityPlayer.class, getEntityBoundingBox());
+                            // Make sure we mount player before takeoff
+                            List<EntityPlayer> list2 = world.getEntitiesWithinAABB(EntityPlayer.class,
+                                    getEntityBoundingBox());
 
                             for (Entity ent : list2) {
                                 if (this.getRidingEntity() == null)
                                     ent.startRiding(this);
                             }
                             MinecraftForge.EVENT_BUS.post(new RocketEvent.RocketLaunchEvent(this));
-                            PacketHandler.sendToPlayersTrackingEntity(new PacketEntity(this, PACKET_LAUNCH_EVENT), this);
+                            PacketHandler.sendToPlayersTrackingEntity(new PacketEntity(this, PACKET_LAUNCH_EVENT),
+                                    this);
                         }
                     }
                 }
@@ -428,17 +437,20 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                 if (srcTilePos != null && srcTilePos.pos != null)
                     srcTile = world.getTileEntity(srcTilePos.pos.getBlockPos());
 
-
                 if (srcTile instanceof TileSpaceElevator && !((TileSpaceElevator) srcTile).getMachineEnabled())
-                    AdvancedRocketry.proxy.displayMessage(LibVulpes.proxy.getLocalizedString("msg.spaceElevator.turnedOff"), 5);
+                    AdvancedRocketry.proxy
+                            .displayMessage(LibVulpes.proxy.getLocalizedString("msg.spaceElevator.turnedOff"), 5);
                 else if (dstTilePos != null)
-                    AdvancedRocketry.proxy.displayMessage(LibVulpes.proxy.getLocalizedString("msg.spaceElevator.ascentReady") + ": " + (int) ((MAX_STANDTIME - getStandTime()) / 20) + "\nDST " + dstTilePos, 5);
+                    AdvancedRocketry.proxy
+                            .displayMessage(LibVulpes.proxy.getLocalizedString("msg.spaceElevator.ascentReady") + ": " +
+                                    (int) ((MAX_STANDTIME - getStandTime()) / 20) + "\nDST " + dstTilePos, 5);
                 else
-                    AdvancedRocketry.proxy.displayMessage(LibVulpes.proxy.getLocalizedString("msg.label.noneSelected"), 5);
+                    AdvancedRocketry.proxy.displayMessage(LibVulpes.proxy.getLocalizedString("msg.label.noneSelected"),
+                            5);
             }
         }
 
-        //setDead();
+        // setDead();
     }
 
     @Override
@@ -448,14 +460,16 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
 
     @Override
     public AxisAlignedBB getCollisionBoundingBox() {
-        AxisAlignedBB aabb = new AxisAlignedBB(getEntityBoundingBox().minX, getEntityBoundingBox().minY, getEntityBoundingBox().minZ, getEntityBoundingBox().maxX, getEntityBoundingBox().maxY - 3, getEntityBoundingBox().maxZ);
+        AxisAlignedBB aabb = new AxisAlignedBB(getEntityBoundingBox().minX, getEntityBoundingBox().minY,
+                getEntityBoundingBox().minZ, getEntityBoundingBox().maxX, getEntityBoundingBox().maxY - 3,
+                getEntityBoundingBox().maxZ);
         return isAscending() || isDescending() ? null : aabb;
     }
 
     @SideOnly(Side.CLIENT)
     public boolean isInRangeToRenderDist(double par1) {
-        //double d1 = this.boundingBox.getAverageEdgeLength();
-        //d1 *= 4096.0D * this.renderDistanceWeight;
+        // double d1 = this.boundingBox.getAverageEdgeLength();
+        // d1 *= 4096.0D * this.renderDistanceWeight;
         return par1 < 16777216D;
     }
 
@@ -485,7 +499,6 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
     @Override
     public void readDataFromNetwork(ByteBuf in, byte packetId,
                                     NBTTagCompound nbt) {
-
         if (packetId == PACKET_WRITE_DST_INFO || packetId == PACKET_WRITE_SRC_INFO) {
             if (in.readBoolean()) {
                 nbt.setInteger("dimid", in.readInt());
@@ -501,11 +514,13 @@ public class EntityElevatorCapsule extends Entity implements INetworkEntity {
                                NBTTagCompound nbt) {
         if (id == PACKET_WRITE_DST_INFO && world.isRemote) {
             if (nbt.hasKey("dimid")) {
-                dstTilePos = new DimensionBlockPosition(nbt.getInteger("dimid"), new HashedBlockPosition(nbt.getInteger("x"), nbt.getInteger("y"), nbt.getInteger("z")));
+                dstTilePos = new DimensionBlockPosition(nbt.getInteger("dimid"),
+                        new HashedBlockPosition(nbt.getInteger("x"), nbt.getInteger("y"), nbt.getInteger("z")));
             } else dstTilePos = null;
         } else if (id == PACKET_WRITE_SRC_INFO && world.isRemote) {
             if (nbt.hasKey("dimid")) {
-                srcTilePos = new DimensionBlockPosition(nbt.getInteger("dimid"), new HashedBlockPosition(nbt.getInteger("x"), nbt.getInteger("y"), nbt.getInteger("z")));
+                srcTilePos = new DimensionBlockPosition(nbt.getInteger("dimid"),
+                        new HashedBlockPosition(nbt.getInteger("x"), nbt.getInteger("y"), nbt.getInteger("z")));
             } else srcTilePos = null;
         } else if (id == PACKET_RECIEVE_NBT) {
             PacketHandler.sendToPlayersTrackingEntity(new PacketEntity(this, PACKET_WRITE_DST_INFO), this);

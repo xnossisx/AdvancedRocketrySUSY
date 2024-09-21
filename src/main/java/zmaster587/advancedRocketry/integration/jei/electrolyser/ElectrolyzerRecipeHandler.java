@@ -25,5 +25,4 @@ public class ElectrolyzerRecipeHandler implements IRecipeHandler<ElectrolyzerWra
     public boolean isRecipeValid(ElectrolyzerWrapper recipe) {
         return true;
     }
-
 }

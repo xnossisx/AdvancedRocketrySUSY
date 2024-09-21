@@ -4,7 +4,9 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.backwardCompat.ModelFormatException;
 import zmaster587.advancedRocketry.backwardCompat.WavefrontObject;
 import zmaster587.advancedRocketry.tile.multiblock.TileRailgun;
@@ -28,6 +30,7 @@ public class RendererRailgun extends TileEntitySpecialRenderer {
     public boolean isGlobalRenderer(TileEntity te) {
         return true;
     }
+
     @Override
     public void render(TileEntity tile, double x,
                        double y, double z, float f, int damage, float a) {
@@ -38,15 +41,14 @@ public class RendererRailgun extends TileEntitySpecialRenderer {
 
         GL11.glPushMatrix();
 
-        //Initial setup
+        // Initial setup
 
         GL11.glTranslated(x + 0.5, y, z + .5);
-        //Rotate and move the model into position
+        // Rotate and move the model into position
         EnumFacing front = RotatableBlock.getFront(tile.getWorld().getBlockState(tile.getPos()));
-        GL11.glRotatef((front.getFrontOffsetX() == 1 ? 180 : 0) + front.getFrontOffsetZ() * 90f, 0, 1, 0);
+        GL11.glRotatef((front.getXOffset() == 1 ? 180 : 0) + front.getZOffset() * 90f, 0, 1, 0);
         GL11.glTranslated(3f, 0, 0f);
         bindTexture(texture);
-
 
         if (tile.getWorld().getTotalWorldTime() - multiBlockTile.recoil - 20 <= 0) {
             model.renderOnly("Base");

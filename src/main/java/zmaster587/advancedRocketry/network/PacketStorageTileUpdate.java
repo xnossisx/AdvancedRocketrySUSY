@@ -1,6 +1,7 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
+import java.io.IOException;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -14,15 +15,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.interfaces.INetworkEntity;
 import zmaster587.libVulpes.network.BasePacket;
 
-import java.io.IOException;
-
 public class PacketStorageTileUpdate extends BasePacket {
-
 
     EntityRocket entity;
     StorageChunk chunk;
@@ -30,9 +30,7 @@ public class PacketStorageTileUpdate extends BasePacket {
     TileEntity tile;
     NBTTagCompound nbt;
 
-    public PacketStorageTileUpdate() {
-
-    }
+    public PacketStorageTileUpdate() {}
 
     public PacketStorageTileUpdate(Entity entity, StorageChunk chunk, TileEntity tile) {
         this.entity = (EntityRocket) entity;
@@ -45,8 +43,8 @@ public class PacketStorageTileUpdate extends BasePacket {
 
     @Override
     public void write(ByteBuf out) {
-        NBTTagCompound nbt = ReflectionHelper.getPrivateValue(SPacketUpdateTileEntity.class, tile.getUpdatePacket(), "field_148860_e");
-
+        NBTTagCompound nbt = ReflectionHelper.getPrivateValue(SPacketUpdateTileEntity.class, tile.getUpdatePacket(),
+                "field_148860_e");
 
         out.writeInt(entity.world.provider.getDimension());
         out.writeInt(entity.getEntityId());
@@ -61,12 +59,11 @@ public class PacketStorageTileUpdate extends BasePacket {
     @Override
     @SideOnly(Side.CLIENT)
     public void readClient(ByteBuf in) {
-        //DEBUG:
+        // DEBUG:
         World world;
-        //world = DimensionManager.getWorld(in.readInt());
+        // world = DimensionManager.getWorld(in.readInt());
         in.readInt();
         world = Minecraft.getMinecraft().world;
-
 
         int entityId = in.readInt();
         x = in.readInt();
@@ -84,34 +81,29 @@ public class PacketStorageTileUpdate extends BasePacket {
 
         this.nbt = nbt;
 
-
         if (ent instanceof INetworkEntity) {
             entity = (EntityRocket) ent;
             this.chunk = entity.storage;
         } else {
-            //Error
+            // Error
         }
     }
 
     @Override
-    public void read(ByteBuf in) {
-
-    }
+    public void read(ByteBuf in) {}
 
     @SideOnly(Side.CLIENT)
     @Override
     public void executeClient(EntityPlayer thePlayer) {
-        //Make sure the chunk is initialized before using it
-        //sanity check
+        // Make sure the chunk is initialized before using it
+        // sanity check
         if (this.chunk != null) {
             TileEntity tile = this.chunk.getTileEntity(new BlockPos(x, y, z));
-            tile.onDataPacket(Minecraft.getMinecraft().getConnection().getNetworkManager(), new SPacketUpdateTileEntity(new BlockPos(x, y, z), 0, nbt));
+            tile.onDataPacket(Minecraft.getMinecraft().getConnection().getNetworkManager(),
+                    new SPacketUpdateTileEntity(new BlockPos(x, y, z), 0, nbt));
         }
     }
 
     @Override
-    public void executeServer(EntityPlayerMP player) {
-
-    }
-
+    public void executeServer(EntityPlayerMP player) {}
 }

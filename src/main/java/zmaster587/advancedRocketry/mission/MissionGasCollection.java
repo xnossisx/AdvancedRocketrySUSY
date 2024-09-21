@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.mission;
 
+import java.util.LinkedList;
+
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -10,6 +12,7 @@ import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.CapabilityFluidHandler;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.IInfrastructure;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
@@ -18,10 +21,7 @@ import zmaster587.advancedRocketry.entity.EntityStationDeployedRocket;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
-import java.util.LinkedList;
-
 public class MissionGasCollection extends MissionResourceCollection {
-
 
     private Fluid gasFluid;
 
@@ -29,7 +29,8 @@ public class MissionGasCollection extends MissionResourceCollection {
         super();
     }
 
-    public MissionGasCollection(long l, EntityRocket entityRocket, LinkedList<IInfrastructure> connectedInfrastructure, Fluid gasFluid) {
+    public MissionGasCollection(long l, EntityRocket entityRocket, LinkedList<IInfrastructure> connectedInfrastructure,
+                                Fluid gasFluid) {
         super((long) (l * ARConfiguration.getCurrentConfig().gasCollectionMult), entityRocket, connectedInfrastructure);
         this.gasFluid = gasFluid;
     }
@@ -41,13 +42,12 @@ public class MissionGasCollection extends MissionResourceCollection {
 
     @Override
     public void onMissionComplete() {
-
-
         if ((int) rocketStats.getStatTag("intakePower") > 0 && gasFluid != null) {
-            Fluid type = gasFluid;//FluidRegistry.getFluid("hydrogen");
-            //Fill gas tanks
+            Fluid type = gasFluid;// FluidRegistry.getFluid("hydrogen");
+            // Fill gas tanks
             for (TileEntity tile : this.rocketStorage.getFluidTiles()) {
-                tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null).fill(new FluidStack(type, 64000), true);
+                tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, null)
+                        .fill(new FluidStack(type, 64000), true);
             }
         }
 
@@ -57,25 +57,29 @@ public class MissionGasCollection extends MissionResourceCollection {
             world = DimensionManager.getWorld(launchDimension);
         }
 
-        EntityStationDeployedRocket rocket = new EntityStationDeployedRocket(world, rocketStorage, rocketStats, x, y, z);
+        EntityStationDeployedRocket rocket = new EntityStationDeployedRocket(world, rocketStorage, rocketStats, x, y,
+                z);
 
         FuelRegistry.FuelType fuelType = rocket.getRocketFuelType();
-        //System.out.println("Fuel:"+ rocketStats.getFuelAmount(fuelType));
+        // System.out.println("Fuel:"+ rocketStats.getFuelAmount(fuelType));
         if (fuelType != null) {
-            rocket.setFuelAmount(fuelType, Math.max(rocketStats.getFuelAmount(fuelType)-1000,0));
+            rocket.setFuelAmount(fuelType, Math.max(rocketStats.getFuelAmount(fuelType) - 1000, 0));
             if (fuelType == FuelRegistry.FuelType.LIQUID_BIPROPELLANT)
-                rocket.setFuelAmount(FuelRegistry.FuelType.LIQUID_OXIDIZER, Math.max(rocketStats.getFuelAmount(FuelRegistry.FuelType.LIQUID_OXIDIZER)-1000,0));
+                rocket.setFuelAmount(FuelRegistry.FuelType.LIQUID_OXIDIZER,
+                        Math.max(rocketStats.getFuelAmount(FuelRegistry.FuelType.LIQUID_OXIDIZER) - 1000, 0));
         }
         rocket.readMissionPersistentNBT(missionPersistantNBT);
 
         EnumFacing dir = rocket.forwardDirection;
         rocket.forceSpawn = true;
 
-        rocket.setPosition(dir.getFrontOffsetX() * 64d + rocket.launchLocation.x + (rocketStorage.getSizeX() % 2 == 0 ? 0 : 0.5d), y, dir.getFrontOffsetZ() * 64d + rocket.launchLocation.z + (rocketStorage.getSizeZ() % 2 == 0 ? 0 : 0.5d));
+        rocket.setPosition(
+                dir.getXOffset() * 64d + rocket.launchLocation.x + (rocketStorage.getSizeX() % 2 == 0 ? 0 : 0.5d), y,
+                dir.getZOffset() * 64d + rocket.launchLocation.z + (rocketStorage.getSizeZ() % 2 == 0 ? 0 : 0.5d));
         world.spawnEntity(rocket);
         rocket.setInOrbit(true);
         rocket.setInFlight(true);
-        //rocket.motionY = -1.0;
+        // rocket.motionY = -1.0;
 
         for (HashedBlockPosition i : infrastructureCoords) {
             TileEntity tile = world.getTileEntity(new BlockPos(i.x, i.y, i.z));

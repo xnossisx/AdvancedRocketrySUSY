@@ -1,6 +1,11 @@
 package zmaster587.advancedRocketry.tile.multiblock;
 
-import io.netty.buffer.ByteBuf;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -14,6 +19,8 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.DataStorage;
@@ -35,19 +42,14 @@ import zmaster587.libVulpes.tile.multiblock.hatch.TileInventoryHatch;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileOutputHatch;
 import zmaster587.libVulpes.util.EmbeddedInventory;
 
-import javax.annotation.Nonnull;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implements IModularInventory, IInventory {
 
-    private static final Object[][][] structure = new Object[][][]{
-            {{"slab", 'c', "slab"},
-                    {"slab", "slab", "slab"}},
+    private static final Object[][][] structure = new Object[][][] {
+            { { "slab", 'c', "slab" },
+                    { "slab", "slab", "slab" } },
 
-            {{'P', 'I', 'O'},
-                    {'D', 'D', 'D'}}
+            { { 'P', 'I', 'O' },
+                    { 'D', 'D', 'D' } }
     };
     private static final int maxResearchTime = 10;
     private TileDataBus[] dataCables;
@@ -108,8 +110,7 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
 
     @Override
     public void deconstructMultiBlock(World world, BlockPos destroyedPos, boolean blockBroken, IBlockState state) {
-
-        //Make sure to unlock the data cables
+        // Make sure to unlock the data cables
         for (TileDataBus dataCable : dataCables) {
             if (dataCable != null)
                 dataCable.lockData(null);
@@ -140,13 +141,11 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
     @Override
     @Nonnull
     public AxisAlignedBB getRenderBoundingBox() {
-
         return new AxisAlignedBB(pos.add(-2, -2, -2), pos.add(2, 2, 2));
     }
 
     @Override
     public void onInventoryUpdated() {
-
         super.onInventoryUpdated();
         if (inputHatch == null)
             return;
@@ -154,7 +153,8 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
         if (getStackInSlot(0) == ItemStack.EMPTY) {
             for (int j = 0; j < inputHatch.getSizeInventory(); j++) {
                 ItemStack stack2 = inputHatch.getStackInSlot(j);
-                if (!stack2.isEmpty() && stack2.getItem() instanceof ItemAsteroidChip && ((ItemAsteroidChip) stack2.getItem()).getUUID(stack2) != null) {
+                if (!stack2.isEmpty() && stack2.getItem() instanceof ItemAsteroidChip &&
+                        ((ItemAsteroidChip) stack2.getItem()).getUUID(stack2) != null) {
                     setInventorySlotContents(0, inputHatch.decrStackSize(j, 1));
                     break;
                 }
@@ -166,7 +166,7 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
     @Override
     protected void processComplete() {
         if (!world.isRemote) {
-            //Move chip to output
+            // Move chip to output
             for (int i = 0; i < outputHatch.getSizeInventory(); i++) {
                 if (outputHatch.getStackInSlot(i) == ItemStack.EMPTY) {
                     outputHatch.setInventorySlotContents(i, this.decrStackSize(0, 1));
@@ -179,7 +179,8 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
     @Override
     public boolean completeStructure(IBlockState state) {
         boolean result = super.completeStructure(state);
-        ((BlockMultiblockMachine) world.getBlockState(pos).getBlock()).setBlockState(world, world.getBlockState(pos), pos, result);
+        ((BlockMultiblockMachine) world.getBlockState(pos).getBlock()).setBlockState(world, world.getBlockState(pos),
+                pos, result);
         return result;
     }
 
@@ -190,7 +191,9 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
             item.addData(stack, amount, dataType);
             int maxData = item.getMaxData(stack);
 
-            if (item.getData(stack, DataType.COMPOSITION) == maxData && item.getData(stack, DataType.DISTANCE) == maxData && item.getData(stack, DataType.MASS) == maxData) {
+            if (item.getData(stack, DataType.COMPOSITION) == maxData &&
+                    item.getData(stack, DataType.DISTANCE) == maxData &&
+                    item.getData(stack, DataType.MASS) == maxData) {
                 processComplete();
             }
         }
@@ -203,13 +206,17 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
 
         ItemAsteroidChip item = (ItemAsteroidChip) stack.getItem();
 
-        if (researchingAtmosphere && atmosphereProgress < 0 && extractData(1, DataStorage.DataType.COMPOSITION, false) > 0 && !item.isFull(stack, DataStorage.DataType.COMPOSITION))
+        if (researchingAtmosphere && atmosphereProgress < 0 &&
+                extractData(1, DataStorage.DataType.COMPOSITION, false) > 0 &&
+                !item.isFull(stack, DataStorage.DataType.COMPOSITION))
             atmosphereProgress = 0;
 
-        if (researchingDistance && distanceProgress < 0 && extractData(1, DataStorage.DataType.DISTANCE, false) > 0 && !item.isFull(stack, DataStorage.DataType.DISTANCE))
+        if (researchingDistance && distanceProgress < 0 && extractData(1, DataStorage.DataType.DISTANCE, false) > 0 &&
+                !item.isFull(stack, DataStorage.DataType.DISTANCE))
             distanceProgress = 0;
 
-        if (researchingMass && massProgress < 0 && extractData(1, DataStorage.DataType.MASS, false) > 0 && !item.isFull(stack, DataStorage.DataType.MASS))
+        if (researchingMass && massProgress < 0 && extractData(1, DataStorage.DataType.MASS, false) > 0 &&
+                !item.isFull(stack, DataStorage.DataType.MASS))
             massProgress = 0;
 
         this.markDirty();
@@ -232,14 +239,13 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
         }
     }
 
-
     @Override
     public void update() {
-
         if (this.timeAlive == 0) {
             if (!this.world.isRemote) {
                 if (this.isComplete()) {
-                    this.canRender = this.completeStructure = this.completeStructure(this.world.getBlockState(this.pos));
+                    this.canRender = this.completeStructure = this
+                            .completeStructure(this.world.getBlockState(this.pos));
                 }
             } else {
                 SoundEvent str;
@@ -254,18 +260,25 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
         if (!this.world.isRemote && this.world.getTotalWorldTime() % 1000L == 0L && !this.isComplete()) {
             this.attemptCompleteStructure(this.world.getBlockState(this.pos));
             this.markDirty();
-            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+            this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                    this.world.getBlockState(this.pos), 3);
         }
 
         if (this.isRunning()) {
-            if ((this.hasEnergy(this.requiredPowerPerTick()) && !this.world.isRemote) || (this.world.isRemote && this.waspoweredlasttick)) {
+            if ((this.hasEnergy(this.requiredPowerPerTick()) && !this.world.isRemote) ||
+                    (this.world.isRemote && this.waspoweredlasttick)) {
                 this.onRunningPoweredTick();
                 if (!this.world.isRemote) {
                     if (!this.waspoweredlasttick) {
                         this.waspoweredlasttick = true;
                         this.markDirty();
-                        PacketHandler.sendToNearby(new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.POWERERROR.ordinal()), this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
-                        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+                        PacketHandler.sendToNearby(
+                                new PacketMachine(this,
+                                        (byte) TileMultiblockMachine.NetworkPackets.POWERERROR.ordinal()),
+                                this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(),
+                                256.0);
+                        this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                                this.world.getBlockState(this.pos), 3);
                     }
 
                     this.useEnergy(this.usedPowerPerTick());
@@ -273,13 +286,15 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
             } else if (!this.world.isRemote && this.waspoweredlasttick) {
                 this.waspoweredlasttick = false;
                 this.markDirty();
-                PacketHandler.sendToNearby(new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.POWERERROR.ordinal()), this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
-                this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+                PacketHandler.sendToNearby(
+                        new PacketMachine(this, (byte) TileMultiblockMachine.NetworkPackets.POWERERROR.ordinal()),
+                        this.world.provider.getDimension(), this.pos.getX(), this.pos.getY(), this.pos.getZ(), 256.0);
+                this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos),
+                        this.world.getBlockState(this.pos), 3);
             }
         }
-
     }
-    
+
     @Override
     protected void onRunningPoweredTick() {
         if (completionTime > 0)
@@ -290,20 +305,22 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
         if (!stack.isEmpty() && stack.getItem().equals(AdvancedRocketryItems.itemAsteroidChip)) {
             ItemAsteroidChip item = (ItemAsteroidChip) stack.getItem();
 
-            if (researchingAtmosphere && extractData(1, DataStorage.DataType.COMPOSITION, true) > 0 && !item.isFull(stack, DataStorage.DataType.COMPOSITION)) {
+            if (researchingAtmosphere && extractData(1, DataStorage.DataType.COMPOSITION, true) > 0 &&
+                    !item.isFull(stack, DataStorage.DataType.COMPOSITION)) {
                 if (atmosphereProgress == maxResearchTime) {
                     atmosphereProgress = -1;
 
                     if (!world.isRemote) {
                         incrementDataOnChip(1, DataType.COMPOSITION);
                         extractData(1, DataStorage.DataType.COMPOSITION, false);
-                        //attemptAllResearchStart();
+                        // attemptAllResearchStart();
                     }
                 } else
                     atmosphereProgress++;
             }
 
-            if (researchingMass && extractData(1, DataStorage.DataType.MASS, true) > 0 && !item.isFull(stack, DataStorage.DataType.MASS)) {
+            if (researchingMass && extractData(1, DataStorage.DataType.MASS, true) > 0 &&
+                    !item.isFull(stack, DataStorage.DataType.MASS)) {
                 if (massProgress == maxResearchTime) {
 
                     massProgress = -1;
@@ -311,19 +328,20 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
                     if (!world.isRemote) {
                         incrementDataOnChip(1, DataType.MASS);
                         extractData(1, DataStorage.DataType.MASS, false);
-                        //attemptAllResearchStart();
+                        // attemptAllResearchStart();
                     }
                 } else
                     massProgress++;
             }
 
-            if (researchingDistance && extractData(1, DataStorage.DataType.DISTANCE, true) > 0 && !item.isFull(stack, DataStorage.DataType.DISTANCE)) {
+            if (researchingDistance && extractData(1, DataStorage.DataType.DISTANCE, true) > 0 &&
+                    !item.isFull(stack, DataStorage.DataType.DISTANCE)) {
                 if (distanceProgress == maxResearchTime) {
                     distanceProgress = -1;
                     if (!world.isRemote) {
                         incrementDataOnChip(1, DataType.DISTANCE);
                         extractData(1, DataStorage.DataType.DISTANCE, false);
-                        //attemptAllResearchStart();
+                        // attemptAllResearchStart();
                     }
                 } else
                     distanceProgress++;
@@ -333,19 +351,21 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
 
     @Override
     public boolean isRunning() {
-        return (!getStackInSlot(0).isEmpty() && getStackInSlot(0).getItem().equals(AdvancedRocketryItems.itemAsteroidChip) && (researchingAtmosphere || researchingDistance || researchingMass));
+        return (!getStackInSlot(0).isEmpty() &&
+                getStackInSlot(0).getItem().equals(AdvancedRocketryItems.itemAsteroidChip) &&
+                (researchingAtmosphere || researchingDistance || researchingMass));
     }
 
     @Override
     public void onInventoryButtonPressed(int buttonId) {
         if (buttonId == 0)
             super.onInventoryButtonPressed(buttonId);
-        else if (buttonId == 1) { //Process button is pressed
+        else if (buttonId == 1) { // Process button is pressed
             PacketHandler.sendToServer(new PacketMachine(this, (byte) 2));
         } else if (buttonId == 2) {
-            //densitySetting = densityButton.getOptionSelected();
-            //distanceSetting = distanceButton.getOptionSelected();
-            //PacketHandler.sendToServer(new PacketMachine(this,(byte)101));
+            // densitySetting = densityButton.getOptionSelected();
+            // distanceSetting = distanceButton.getOptionSelected();
+            // PacketHandler.sendToServer(new PacketMachine(this,(byte)101));
         } else if (buttonId == 4) {
             researchingAtmosphere = !researchingAtmosphere;
             PacketHandler.sendToServer(new PacketMachine(this, (byte) 4));
@@ -364,7 +384,6 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
         if (id == 4) {
             out.writeInt((researchingAtmosphere ? 1 : 0) | (researchingDistance ? 2 : 0) | (researchingMass ? 4 : 0));
         }
-
     }
 
     @Override
@@ -375,7 +394,6 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
         if (packetId == 3 || packetId == 4 || packetId > 100) {
             nbt.setInteger("state", in.readInt());
         }
-
     }
 
     @Override
@@ -398,11 +416,10 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
 
     @Override
     public List<ModuleBase> getModules(int ID, EntityPlayer player) {
-
         LinkedList<ModuleBase> modules = new LinkedList<>();
         modules.add(new ModulePower(18, 20, getBatteries()));
 
-        //TODO: write NBT
+        // TODO: write NBT
         for (int i = 0; i < 3; i++) {
             if (dataCables[i] != null)
                 modules.add(new ModuleData(32 + (i * 50), 20, 0, dataCables[i], dataCables[i].getDataObject()));
@@ -413,37 +430,51 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
 
         modules.add(new ModuleText(15, 76, "Research", 0x404040));
 
-        modules.add(new ModuleToggleSwitch(15, 86, 4, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage, LibVulpes.proxy.getLocalizedString("msg.abdp.compositionresearch"), 11, 26, researchingAtmosphere));
-        modules.add(new ModuleToggleSwitch(65, 86, 5, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage, LibVulpes.proxy.getLocalizedString("msg.abdp.distanceresearch"), 11, 26, researchingDistance));
-        modules.add(new ModuleToggleSwitch(125, 86, 6, "", this, zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage, LibVulpes.proxy.getLocalizedString("msg.abdp.massresearch"), 11, 26, researchingMass));
+        modules.add(new ModuleToggleSwitch(15, 86, 4, "", this,
+                zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage,
+                LibVulpes.proxy.getLocalizedString("msg.abdp.compositionresearch"), 11, 26, researchingAtmosphere));
+        modules.add(new ModuleToggleSwitch(65, 86, 5, "", this,
+                zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage,
+                LibVulpes.proxy.getLocalizedString("msg.abdp.distanceresearch"), 11, 26, researchingDistance));
+        modules.add(new ModuleToggleSwitch(125, 86, 6, "", this,
+                zmaster587.libVulpes.inventory.TextureResources.buttonToggleImage,
+                LibVulpes.proxy.getLocalizedString("msg.abdp.massresearch"), 11, 26, researchingMass));
 
-        //Research indicators
+        // Research indicators
         modules.add(new ModuleProgress(26, 86, 1, TextureResources.progressScience, this));
         modules.add(new ModuleProgress(76, 86, 2, TextureResources.progressScience, this));
         modules.add(new ModuleProgress(136, 86, 3, TextureResources.progressScience, this));
 
         modules.add(new ModuleSlotArray(76, 120, this, 0, 1));
 
-		/*modules.add(new ModuleText(15, 76, "Atmos",0x404040));
-		modules.add(new ModuleText(65, 76, "Distance",0x404040));
-		modules.add(new ModuleText(125, 76, "Mass",0x404040));*/
+        /*
+         * modules.add(new ModuleText(15, 76, "Atmos",0x404040));
+         * modules.add(new ModuleText(65, 76, "Distance",0x404040));
+         * modules.add(new ModuleText(125, 76, "Mass",0x404040));
+         */
 
-		/*List<ModuleBase> subModule = new LinkedList<ModuleBase>();
-		int solarRadius = 100;
-		int center = 1000/2;
-
-		subModule.add(new ModuleButton(center-solarRadius/2, center-solarRadius/2, 99, "", this, new ResourceLocation[] { TextureResources.locationSunPng}, solarRadius, solarRadius));
-		DimensionProperties properties = DimensionManager.getSol().getPlanets().get(0);
-
-		subModule.add(new ModuleButton(center + properties.getMapDisplayPositionX() , center + properties.getMapDisplayPositionY(), 99, "", this, new ResourceLocation[] { properties.getPlanetIcon() }, properties.getName(), properties.getMapDisplayeSize(), properties.getMapDisplayeSize()));
-
-		properties = DimensionManager.getInstance().getDimensionProperties(2);
-
-		subModule.add(new ModuleButton(center + properties.getMapDisplayPositionX() , center + properties.getMapDisplayPositionY(), 99, "", this, new ResourceLocation[] { properties.getPlanetIcon() }, properties.getName(), properties.getMapDisplayeSize(), properties.getMapDisplayeSize()));*/
+        /*
+         * List<ModuleBase> subModule = new LinkedList<ModuleBase>();
+         * int solarRadius = 100;
+         * int center = 1000/2;
+         * 
+         * subModule.add(new ModuleButton(center-solarRadius/2, center-solarRadius/2, 99, "", this, new
+         * ResourceLocation[] { TextureResources.locationSunPng}, solarRadius, solarRadius));
+         * DimensionProperties properties = DimensionManager.getSol().getPlanets().get(0);
+         * 
+         * subModule.add(new ModuleButton(center + properties.getMapDisplayPositionX() , center +
+         * properties.getMapDisplayPositionY(), 99, "", this, new ResourceLocation[] { properties.getPlanetIcon() },
+         * properties.getName(), properties.getMapDisplayeSize(), properties.getMapDisplayeSize()));
+         * 
+         * properties = DimensionManager.getInstance().getDimensionProperties(2);
+         * 
+         * subModule.add(new ModuleButton(center + properties.getMapDisplayPositionX() , center +
+         * properties.getMapDisplayPositionY(), 99, "", this, new ResourceLocation[] { properties.getPlanetIcon() },
+         * properties.getName(), properties.getMapDisplayeSize(), properties.getMapDisplayeSize()));
+         */
 
         return modules;
     }
-
 
     @Override
     public int getProgress(int id) {
@@ -578,18 +609,14 @@ public class TileAstrobodyDataProcessor extends TileMultiPowerConsumer implement
     }
 
     @Override
-    public void openInventory(EntityPlayer player) {
-
-    }
+    public void openInventory(EntityPlayer player) {}
 
     @Override
-    public void closeInventory(EntityPlayer player) {
-
-    }
+    public void closeInventory(EntityPlayer player) {}
 
     @Override
     public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {
-        return false;//inventory.isItemValidForSlot(slot, stack);
+        return false;// inventory.isItemValidForSlot(slot, stack);
     }
 
     @Override

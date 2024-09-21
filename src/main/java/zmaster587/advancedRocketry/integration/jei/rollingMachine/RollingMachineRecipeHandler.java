@@ -11,7 +11,6 @@ public class RollingMachineRecipeHandler implements IRecipeHandler<RollingMachin
         return RollingMachineWrapper.class;
     }
 
-
     @Override
     public String getRecipeCategoryUid(RollingMachineWrapper recipe) {
         return ARPlugin.rollingMachineUUID;
@@ -26,5 +25,4 @@ public class RollingMachineRecipeHandler implements IRecipeHandler<RollingMachin
     public boolean isRecipeValid(RollingMachineWrapper recipe) {
         return true;
     }
-
 }

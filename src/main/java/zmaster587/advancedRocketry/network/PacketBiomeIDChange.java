@@ -1,12 +1,13 @@
 package zmaster587.advancedRocketry.network;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.AdvancedRocketry;
 import zmaster587.libVulpes.network.BasePacket;
 import zmaster587.libVulpes.util.HashedBlockPosition;
@@ -61,7 +62,7 @@ public class PacketBiomeIDChange extends BasePacket {
     @Override
     public void executeClient(EntityPlayer thePlayer) {
         if (thePlayer.world.provider.getDimension() == worldId) {
-            chunk = thePlayer.world.getChunkFromChunkCoords(xPos, zPos);
+            chunk = thePlayer.world.getChunk(xPos, zPos);
             if (chunk.isLoaded()) {
                 chunk.setBiomeArray(array);
                 BlockPos pos2 = pos.getBlockPos();// new BlockPos(chunk.xPosition << 4, 48, chunk.zPosition << 4);
@@ -75,7 +76,5 @@ public class PacketBiomeIDChange extends BasePacket {
     @Override
     public void executeServer(EntityPlayerMP player) {
         // How about no
-
     }
-
 }

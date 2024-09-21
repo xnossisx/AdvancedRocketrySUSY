@@ -25,5 +25,4 @@ public class PlatePressRecipeHandler implements IRecipeHandler<PlatePressWrapper
     public boolean isRecipeValid(PlatePressWrapper recipe) {
         return true;
     }
-
 }

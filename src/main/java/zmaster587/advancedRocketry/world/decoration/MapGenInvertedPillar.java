@@ -6,7 +6,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.ChunkPrimer;
 import net.minecraft.world.gen.MapGenBase;
 
-//TODO: finish
+// TODO: finish
 public class MapGenInvertedPillar extends MapGenBase {
 
     int chancePerChunk;
@@ -25,7 +25,8 @@ public class MapGenInvertedPillar extends MapGenBase {
     @Override
     protected void recursiveGenerate(World worldIn, int rangeX,
                                      int rangeZ, int chunkX, int chunkZ, ChunkPrimer chunkPrimerIn) {
-        if (rand.nextInt(chancePerChunk) == Math.abs(rangeX) % chancePerChunk || rand.nextInt(chancePerChunk) == Math.abs(rangeZ) % chancePerChunk) {
+        if (rand.nextInt(chancePerChunk) == Math.abs(rangeX) % chancePerChunk ||
+                rand.nextInt(chancePerChunk) == Math.abs(rangeZ) % chancePerChunk) {
 
             int x = (rangeX - chunkX) * 16 + rand.nextInt(15);
             int z = (rangeZ - chunkZ) * 16 + rand.nextInt(15);
@@ -45,9 +46,10 @@ public class MapGenInvertedPillar extends MapGenBase {
 
             for (int yOff = -20; yOff < treeHeight; yOff++) {
                 IBlockState actualBlock;// = yOff > (2*(treeHeight+rand.nextInt(4))/3f) ? topBlock : block;
-                currentEdgeRadius = (int) ((SHAPE * (edgeRadius * Math.pow(treeHeight - yOff, 2))) + ((1f - SHAPE) * edgeRadius));
+                currentEdgeRadius = (int) ((SHAPE * (edgeRadius * Math.pow(treeHeight - yOff, 2))) +
+                        ((1f - SHAPE) * edgeRadius));
 
-                //Generate the top trapezoid
+                // Generate the top trapezoid
                 for (int zOff = -numDiag - currentEdgeRadius / 2; zOff <= -currentEdgeRadius / 2; zOff++) {
 
                     for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
@@ -57,7 +59,7 @@ public class MapGenInvertedPillar extends MapGenBase {
                     currentEdgeRadius++;
                 }
 
-                //Generate square segment
+                // Generate square segment
                 for (int zOff = -currentEdgeRadius / 2; zOff <= currentEdgeRadius / 2; zOff++) {
                     for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
                         actualBlock = getBlockAtPercentHeight(yOff / (float) (treeHeight + rand.nextInt(4)));
@@ -65,7 +67,7 @@ public class MapGenInvertedPillar extends MapGenBase {
                     }
                 }
 
-                //Generate the bottom trapezoid
+                // Generate the bottom trapezoid
                 for (int zOff = currentEdgeRadius / 2; zOff <= numDiag + currentEdgeRadius / 2; zOff++) {
                     currentEdgeRadius--;
                     for (int xOff = -numDiag - currentEdgeRadius / 2; xOff <= numDiag + currentEdgeRadius / 2; xOff++) {
@@ -79,11 +81,11 @@ public class MapGenInvertedPillar extends MapGenBase {
     }
 
     protected IBlockState getBlockAtPercentHeight(float percent) {
-        return percent > 0.95f && topBlock == Blocks.DIRT.getDefaultState() ? Blocks.GRASS.getDefaultState() : percent > 0.66f ? topBlock : percent < 0.33f ? bottomBlock : block;
+        return percent > 0.95f && topBlock == Blocks.DIRT.getDefaultState() ? Blocks.GRASS.getDefaultState() :
+                percent > 0.66f ? topBlock : percent < 0.33f ? bottomBlock : block;
     }
 
     private void setBlock(int x, int y, int z, IBlockState block, ChunkPrimer primer) {
-
         if (x > 15 || x < 0 || z > 15 || z < 0 || y < 0 || y > 255)
             return;
 

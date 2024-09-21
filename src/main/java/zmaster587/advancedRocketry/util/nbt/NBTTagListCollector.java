@@ -1,8 +1,5 @@
 package zmaster587.advancedRocketry.util.nbt;
 
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagList;
-
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -12,11 +9,14 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTTagList;
+
 public class NBTTagListCollector implements Collector<NBTBase, NBTTagList, NBTTagList> {
 
-    static final Set<Characteristics> CH_UNORDERED_ID
-            = Collections.unmodifiableSet(EnumSet.of(Characteristics.UNORDERED,
-            Characteristics.IDENTITY_FINISH));
+    static final Set<Characteristics> CH_UNORDERED_ID = Collections
+            .unmodifiableSet(EnumSet.of(Characteristics.UNORDERED,
+                    Characteristics.IDENTITY_FINISH));
 
     @Override
     public Supplier<NBTTagList> supplier() {

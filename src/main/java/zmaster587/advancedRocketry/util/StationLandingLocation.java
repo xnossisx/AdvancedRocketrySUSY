@@ -3,6 +3,7 @@ package zmaster587.advancedRocketry.util;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 
 public class StationLandingLocation {
+
     private HashedBlockPosition pos;
     private String name;
     private boolean occupied;

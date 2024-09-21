@@ -9,12 +9,13 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
+
 import org.lwjgl.opengl.GL11;
+
 import zmaster587.advancedRocketry.tile.TileRocketAssemblingMachine;
 import zmaster587.libVulpes.render.RenderHelper;
 
 public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
-
 
     private ResourceLocation grid = new ResourceLocation("advancedrocketry:textures/models/grid.png");
     private ResourceLocation girder = new ResourceLocation("advancedrocketry:textures/models/girder.png");
@@ -23,19 +24,17 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
     @Override
     public void render(TileEntity tile, double x,
                        double y, double z, float f, int dist, float a) {
-
-
         TileRocketAssemblingMachine renderTile = (TileRocketAssemblingMachine) tile;
         AxisAlignedBB bb;
 
-        //If the rocketbuilder is scanning and a valid bounding box for the rocket exists
+        // If the rocketbuilder is scanning and a valid bounding box for the rocket exists
         if (renderTile.isScanning() && (bb = renderTile.getBBCache()) != null) {
 
             double xOffset = bb.minX - tile.getPos().getX();
             double yOffset = bb.maxY - tile.getPos().getY() + 1;
             double zOffset = bb.minZ - tile.getPos().getZ();
 
-            //Get size of the BB
+            // Get size of the BB
             double xSize = bb.maxX - bb.minX + 1;
             double zSize = bb.maxZ - bb.minZ + 1;
 
@@ -56,8 +55,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             GL11.glPushMatrix();
             GL11.glTranslated(x, y, z);
 
-
-            //Draw scanning grid
+            // Draw scanning grid
             GlStateManager.disableLighting();
             GlStateManager.disableFog();
             GlStateManager.enableBlend();
@@ -78,12 +76,14 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             GlStateManager.enableDepth();
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             for (int i = 0; i < 20; i++) {
-                //BOTTOM
+                // BOTTOM
                 double offset = i / 80d;
-                RenderHelper.renderBottomFaceWithUV(buffer, yOffset + yLocation + offset, xOffset, zOffset, xOffset + xSize, zOffset + zSize, min, maxU, min, maxV);
-                RenderHelper.renderTopFaceWithUV(buffer, yOffset + yLocation + offset, xOffset, zOffset, xOffset + xSize, zOffset + zSize, min, maxU, min, maxV);
+                RenderHelper.renderBottomFaceWithUV(buffer, yOffset + yLocation + offset, xOffset, zOffset,
+                        xOffset + xSize, zOffset + zSize, min, maxU, min, maxV);
+                RenderHelper.renderTopFaceWithUV(buffer, yOffset + yLocation + offset, xOffset, zOffset,
+                        xOffset + xSize, zOffset + zSize, min, maxU, min, maxV);
 
-                //TOP
+                // TOP
             }
             Tessellator.getInstance().draw();
 
@@ -91,14 +91,12 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             GlStateManager.enableLighting();
             GlStateManager.enableFog();
 
-
             GlStateManager.color(1f, 1f, 1f, 1f);
             bindTexture(round_h);
             uMax = 1f;
             vMax = 1f;
-            //Draw "beam emitters"
-            //West block
-
+            // Draw "beam emitters"
+            // West block
 
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
             RenderHelper.renderBottomFaceWithUV(buffer, yMin, xMin, zMin, xMax, zMax, uMin, uMax, vMin, vMax);
@@ -109,8 +107,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             Tessellator.getInstance().draw();
 
             GlStateManager.disableTexture2D();
-            //Set ignore light then draw the glowy bits
-
+            // Set ignore light then draw the glowy bits
 
             buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_NORMAL);
             if (renderTile.isBuilding())
@@ -120,7 +117,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
 
             RenderHelper.renderEastFace(buffer, xMax, yMin, zMin, yMax, zMax);
 
-            //Change mins/maxes then render east block
+            // Change mins/maxes then render east block
             xMin = xOffset + xSize - 0.5;
             xMax = xOffset + xSize;
 
@@ -138,7 +135,7 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             RenderHelper.renderTopFaceWithUV(buffer, yMax, xMin, zMin, xMax, zMax, uMin, uMax, vMin, vMax);
             Tessellator.getInstance().draw();
 
-            //Draw Supports
+            // Draw Supports
             GlStateManager.color(0.78f, 0.5f, 0.34f, 1f);
             bindTexture(girder);
             GlStateManager.enableDepth();
@@ -149,12 +146,15 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
 
             vMax = yMin / size;
 
-            RenderHelper.renderCubeWithUV(buffer, xOffset, 0d, zOffset, xOffset + size, yOffset + yLocation, zOffset + size, uMin, uMax, 0d, vMax);
-            RenderHelper.renderCubeWithUV(buffer, xOffset + xSize - size, 0d, zOffset, xOffset + xSize, yOffset + yLocation, zOffset + size, uMin, uMax, vMin, vMax);
-            RenderHelper.renderCubeWithUV(buffer, xOffset + xSize - size, 0d, zOffset + zSize - size, xOffset + xSize, yOffset + yLocation, zOffset + zSize, uMin, uMax, vMin, vMax);
-            RenderHelper.renderCubeWithUV(buffer, xOffset, 0d, zOffset + zSize - size, xOffset + size, yOffset + yLocation, zOffset + zSize, uMin, uMax, vMin, vMax);
+            RenderHelper.renderCubeWithUV(buffer, xOffset, 0d, zOffset, xOffset + size, yOffset + yLocation,
+                    zOffset + size, uMin, uMax, 0d, vMax);
+            RenderHelper.renderCubeWithUV(buffer, xOffset + xSize - size, 0d, zOffset, xOffset + xSize,
+                    yOffset + yLocation, zOffset + size, uMin, uMax, vMin, vMax);
+            RenderHelper.renderCubeWithUV(buffer, xOffset + xSize - size, 0d, zOffset + zSize - size, xOffset + xSize,
+                    yOffset + yLocation, zOffset + zSize, uMin, uMax, vMin, vMax);
+            RenderHelper.renderCubeWithUV(buffer, xOffset, 0d, zOffset + zSize - size, xOffset + size,
+                    yOffset + yLocation, zOffset + zSize, uMin, uMax, vMin, vMax);
             Tessellator.getInstance().draw();
-
 
             GlStateManager.alphaFunc(GL11.GL_GEQUAL, 0.1f);
             GlStateManager.enableDepth();
@@ -163,5 +163,4 @@ public class RendererRocketAssemblingMachine extends TileEntitySpecialRenderer {
             GL11.glPopMatrix();
         }
     }
-
 }

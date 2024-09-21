@@ -9,14 +9,13 @@ public class BlockFluid extends BlockFluidClassic {// implements IBlockColor {
     public BlockFluid(Fluid fluid, Material material) {
         super(fluid, material);
     }
-	
 
-	/*@Override
-	public int colorMultiplier(IBlockState state, IBlockAccess worldIn,
-			BlockPos pos, int tintIndex) {
-		
-		return ((BlockFluid)state.getBlock()).getFluid().getColor();
-	}*/
-
-
+    /*
+     * @Override
+     * public int colorMultiplier(IBlockState state, IBlockAccess worldIn,
+     * BlockPos pos, int tintIndex) {
+     * 
+     * return ((BlockFluid)state.getBlock()).getFluid().getColor();
+     * }
+     */
 }

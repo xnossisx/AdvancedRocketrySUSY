@@ -1,5 +1,10 @@
 package zmaster587.advancedRocketry.tile;
 
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -8,6 +13,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.api.AdvancedRocketryItems;
 import zmaster587.advancedRocketry.api.Constants;
@@ -20,10 +26,6 @@ import zmaster587.advancedRocketry.util.StorageChunk;
 import zmaster587.libVulpes.LibVulpes;
 import zmaster587.libVulpes.inventory.modules.*;
 import zmaster587.libVulpes.util.EmbeddedInventory;
-
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
 
 public class TileStationAssembler extends TileRocketAssemblingMachine implements IInventory {
 
@@ -47,7 +49,8 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
             return false;
         }
 
-        if (inventory.getStackInSlot(1).isEmpty() || AdvancedRocketryItems.itemSpaceStationChip != inventory.getStackInSlot(1).getItem()) {
+        if (inventory.getStackInSlot(1).isEmpty() ||
+                AdvancedRocketryItems.itemSpaceStationChip != inventory.getStackInSlot(1).getItem()) {
             status = ErrorCodes.NOSATELLITECHIP;
             return false;
         }
@@ -61,7 +64,6 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
 
     @Override
     public AxisAlignedBB scanRocket(World world, BlockPos pos2, AxisAlignedBB bb) {
-
         int actualMinX = (int) bb.maxX,
                 actualMinY = (int) bb.maxY,
                 actualMinZ = (int) bb.maxZ,
@@ -98,13 +100,12 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
         return new AxisAlignedBB(actualMinX, actualMinY, actualMinZ, actualMaxX, actualMaxY, actualMaxZ);
     }
 
-
     @Override
     public void assembleRocket() {
         if (!world.isRemote) {
             if (bbCache == null)
                 return;
-            //Need to scan again b/c something may have changed
+            // Need to scan again b/c something may have changed
             scanRocket(world, pos, bbCache);
 
             if (status != ErrorCodes.SUCCESS_STATION)
@@ -140,7 +141,6 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
                 inventory.setInventorySlotContents(3, stack);
             }
 
-
             this.status = ErrorCodes.FINISHED;
             storedId = null;
             inventory.decrStackSize(0, 1);
@@ -170,10 +170,13 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
 
         modules.add(new ModuleProgress(149, 30, 2, verticalProgressBar, this));
 
-        modules.add(new ModuleButton(5, 34, 0, LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.scan"), this, zmaster587.libVulpes.inventory.TextureResources.buttonScan));
+        modules.add(new ModuleButton(5, 34, 0, LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.scan"), this,
+                zmaster587.libVulpes.inventory.TextureResources.buttonScan));
 
         ModuleButton buttonBuild;
-        modules.add(buttonBuild = new ModuleButton(5, 60, 1, LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.build"), this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild));
+        modules.add(
+                buttonBuild = new ModuleButton(5, 60, 1, LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.build"),
+                        this, zmaster587.libVulpes.inventory.TextureResources.buttonBuild));
         buttonBuild.setColor(0xFFFF2222);
         modules.add(errorText = new ModuleText(5, 22, "", 0xFFFFFF22));
         modules.add(new ModuleSync(4, this));
@@ -188,11 +191,9 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
         return modules;
     }
 
-
     @Override
     public void useNetworkData(EntityPlayer player, Side side, byte id,
                                NBTTagCompound nbt) {
-
         boolean isScanningFlag = !isScanning() && canScan();
 
         super.useNetworkData(player, side, id, nbt);
@@ -226,13 +227,11 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
         return inventory.getSizeInventory();
     }
 
-
     @Override
     @Nonnull
     public ItemStack getStackInSlot(int slot) {
         return inventory.getStackInSlot(slot);
     }
-
 
     @Override
     @Nonnull
@@ -240,30 +239,25 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
         return inventory.decrStackSize(slot, amt);
     }
 
-
     @Override
     public void setInventorySlotContents(int slot, @Nonnull ItemStack stack) {
         inventory.setInventorySlotContents(slot, stack);
     }
-
 
     @Override
     public String getName() {
         return "tile.stationBuilder.name";
     }
 
-
     @Override
     public boolean hasCustomName() {
         return false;
     }
 
-
     @Override
     public int getInventoryStackLimit() {
         return inventory.getInventoryStackLimit();
     }
-
 
     @Override
     public boolean isUsableByPlayer(@Nonnull EntityPlayer player) {
@@ -276,16 +270,10 @@ public class TileStationAssembler extends TileRocketAssemblingMachine implements
     }
 
     @Override
-    public void openInventory(EntityPlayer pos) {
-
-    }
-
+    public void openInventory(EntityPlayer pos) {}
 
     @Override
-    public void closeInventory(EntityPlayer pos) {
-
-    }
-
+    public void closeInventory(EntityPlayer pos) {}
 
     @Override
     public boolean isItemValidForSlot(int slot, @Nonnull ItemStack stack) {

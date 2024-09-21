@@ -1,15 +1,16 @@
 package zmaster587.advancedRocketry.inventory.modules;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import net.minecraft.client.gui.GuiButton;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import zmaster587.advancedRocketry.dimension.DimensionProperties;
 import zmaster587.advancedRocketry.inventory.GuiPlanetButton;
 import zmaster587.libVulpes.inventory.modules.IButtonInventory;
 import zmaster587.libVulpes.inventory.modules.ModuleButton;
-
-import java.util.LinkedList;
-import java.util.List;
 
 public class ModuleButtonPlanet extends ModuleButton {
 
@@ -26,7 +27,6 @@ public class ModuleButtonPlanet extends ModuleButton {
 
     @SideOnly(Side.CLIENT)
     public List<GuiButton> addButtons(int x, int y) {
-
         List<GuiButton> list = new LinkedList<>();
 
         button = new GuiPlanetButton(buttonId, x + offsetX, y + offsetY, sizeX, sizeY, properties);
@@ -43,5 +43,4 @@ public class ModuleButtonPlanet extends ModuleButton {
 
         return list;
     }
-
 }

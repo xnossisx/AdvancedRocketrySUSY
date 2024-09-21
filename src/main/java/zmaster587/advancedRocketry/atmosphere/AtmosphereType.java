@@ -2,26 +2,31 @@ package zmaster587.advancedRocketry.atmosphere;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+
 import zmaster587.advancedRocketry.api.ARConfiguration;
 import zmaster587.advancedRocketry.api.IAtmosphere;
 import zmaster587.advancedRocketry.api.atmosphere.AtmosphereRegister;
 
 public class AtmosphereType implements IAtmosphere {
 
-    //We're probably not getting a polluted atmosphere type
+    // We're probably not getting a polluted atmosphere type
     public static final AtmosphereType AIR = new AtmosphereType(false, true, "air");
     public static final AtmosphereType PRESSURIZEDAIR = new AtmosphereType(false, true, true, "PressurizedAir");
     public static final AtmosphereType LOWOXYGEN = new AtmosphereLowOxygen(true, false, true, "lowO2");
     public static final AtmosphereType VACUUM = new AtmosphereVacuum();
     public static final AtmosphereType HIGHPRESSURE = new AtmosphereHighPressure(true, false, true, "HighPressure");
-    public static final AtmosphereType SUPERHIGHPRESSURE = new AtmosphereSuperHighPressure(true, false, true, "SuperHighPressure");
+    public static final AtmosphereType SUPERHIGHPRESSURE = new AtmosphereSuperHighPressure(true, false, true,
+            "SuperHighPressure");
     public static final AtmosphereType VERYHOT = new AtmosphereVeryHot(true, false, true, "VeryHot");
     public static final AtmosphereType SUPERHEATED = new AtmosphereSuperheated(true, false, true, "Superheated");
     public static final AtmosphereType NOO2 = new AtmosphereNoOxygen(true, false, false, "NoO2");
-    public static final AtmosphereType HIGHPRESSURENOO2 = new AtmosphereHighPressureNoOxygen(true, false, false, "HighPressureNoO2");
-    public static final AtmosphereType SUPERHIGHPRESSURENOO2 = new AtmosphereSuperHighPressureNoOxygen(true, false, false, "SuperHighPressureNoO2");
+    public static final AtmosphereType HIGHPRESSURENOO2 = new AtmosphereHighPressureNoOxygen(true, false, false,
+            "HighPressureNoO2");
+    public static final AtmosphereType SUPERHIGHPRESSURENOO2 = new AtmosphereSuperHighPressureNoOxygen(true, false,
+            false, "SuperHighPressureNoO2");
     public static final AtmosphereType VERYHOTNOO2 = new AtmosphereVeryHotNoOxygen(true, false, false, "VeryHotNoO2");
-    public static final AtmosphereType SUPERHEATEDNOO2 = new AtmosphereSuperheatedNoOxygen(true, false, false, "SuperheatedNoOxygen");
+    public static final AtmosphereType SUPERHEATEDNOO2 = new AtmosphereSuperheatedNoOxygen(true, false, false,
+            "SuperheatedNoOxygen");
 
     static {
         AtmosphereRegister.getInstance().registerAtmosphere(AIR);
@@ -57,7 +62,7 @@ public class AtmosphereType implements IAtmosphere {
     }
 
     /**
-     * Should the gas run a tick on every player in it?  Calls onTick(EntityLiving base)
+     * Should the gas run a tick on every player in it? Calls onTick(EntityLiving base)
      *
      * @return true if the atmosphere performs an action every tick
      */
@@ -65,7 +70,7 @@ public class AtmosphereType implements IAtmosphere {
         return canTick;
     }
 
-    //TODO: check for all entities
+    // TODO: check for all entities
 
     /**
      * @param player living entity inside this atmosphere we are ticking
@@ -85,7 +90,8 @@ public class AtmosphereType implements IAtmosphere {
     }
 
     /**
-     * To be used to check if combustion can occur in this atmosphere, furnaces, torches, engines, etc could run this check
+     * To be used to check if combustion can occur in this atmosphere, furnaces, torches, engines, etc could run this
+     * check
      *
      * @return true if the atmosphere is combustable
      */
@@ -118,18 +124,18 @@ public class AtmosphereType implements IAtmosphere {
         return "";
     }
 
-    //TODO: tick for all entities
+    // TODO: tick for all entities
 
     /**
-     * If the canTick() returns true then then this is called every tick on EntityLivingBase objects located inside this atmosphere
+     * If the canTick() returns true then then this is called every tick on EntityLivingBase objects located inside this
+     * atmosphere
      *
      * @param player entity being ticked
      */
-    public void onTick(EntityLivingBase player) {
-    }
+    public void onTick(EntityLivingBase player) {}
 
     @Override
-    public String getUnlocalizedName() {
+    public String getTranslationKey() {
         return name;
     }
 }

@@ -1,5 +1,7 @@
 package zmaster587.advancedRocketry.tile.multiblock.machine;
 
+import java.util.List;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
@@ -9,6 +11,7 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+
 import zmaster587.advancedRocketry.api.AdvancedRocketryBlocks;
 import zmaster587.advancedRocketry.inventory.TextureResources;
 import zmaster587.advancedRocketry.util.AudioRegistry;
@@ -20,21 +23,25 @@ import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
 import zmaster587.libVulpes.tile.multiblock.TileMultiblockMachine;
 import zmaster587.libVulpes.util.IconResource;
 
-import java.util.List;
-
 public class TilePrecisionAssembler extends TileMultiblockMachine implements IModularInventory, IProgressBar {
 
-    public static final Object[][][] structure = new Object[][][]{{{LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock},
-            {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock},
-            {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock}},
+    public static final Object[][][] structure = new Object[][][] {
+            { { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                    LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock } },
 
-            {{LibVulpesBlocks.blockStructureBlock, Blocks.GLASS, Blocks.GLASS, LibVulpesBlocks.blockStructureBlock},
-                    {LibVulpesBlocks.blockStructureBlock, Blocks.AIR, Blocks.AIR, LibVulpesBlocks.blockStructureBlock},
-                    {LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock}},
+            { { LibVulpesBlocks.blockStructureBlock, Blocks.GLASS, Blocks.GLASS, LibVulpesBlocks.blockStructureBlock },
+                    { LibVulpesBlocks.blockStructureBlock, Blocks.AIR, Blocks.AIR,
+                            LibVulpesBlocks.blockStructureBlock },
+                    { LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock,
+                            LibVulpesBlocks.blockStructureBlock, LibVulpesBlocks.blockStructureBlock } },
 
-            {{'c', '*', '*', '*'},
-                    {'*', "blockCoil", "blockCoil", '*'},
-                    {'*', LibVulpesBlocks.motors, LibVulpesBlocks.motors, '*'}}};
+            { { 'c', '*', '*', '*' },
+                    { '*', "blockCoil", "blockCoil", '*' },
+                    { '*', LibVulpesBlocks.motors, LibVulpesBlocks.motors, '*' } } };
 
     @Override
     public Object[][][] getStructure() {
@@ -57,7 +64,6 @@ public class TilePrecisionAssembler extends TileMultiblockMachine implements IMo
 
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-
         return new AxisAlignedBB(pos.add(-4, -4, -4), pos.add(4, 4, 4));
     }
 
@@ -69,10 +75,17 @@ public class TilePrecisionAssembler extends TileMultiblockMachine implements IMo
         int xOffset = 65;
 
         if (world.isRemote)
-            modules.add(new ModuleImage(xOffset, yOffset, new IconResource(132, 0, 53, 66, TextureResources.progressBars)));
-        modules.add(new ModuleProgress(xOffset + 35, yOffset + 22, 1, new ProgressBarImage(167, 22, 13, 15, 54, 42, 13, 15, EnumFacing.DOWN, TextureResources.progressBars), this));
-        modules.add(new ModuleProgress(xOffset + 36, yOffset + 41, 2, new ProgressBarImage(168, 41, 11, 15, 67, 42, 11, 15, EnumFacing.DOWN, TextureResources.progressBars), this));
-        modules.add(new ModuleProgress(xOffset + 31, yOffset + 62, 3, new ProgressBarImage(163, 62, 21, 3, 90, 42, 21, 3, EnumFacing.EAST, TextureResources.progressBars), this));
+            modules.add(
+                    new ModuleImage(xOffset, yOffset, new IconResource(132, 0, 53, 66, TextureResources.progressBars)));
+        modules.add(new ModuleProgress(xOffset + 35, yOffset + 22, 1,
+                new ProgressBarImage(167, 22, 13, 15, 54, 42, 13, 15, EnumFacing.DOWN, TextureResources.progressBars),
+                this));
+        modules.add(new ModuleProgress(xOffset + 36, yOffset + 41, 2,
+                new ProgressBarImage(168, 41, 11, 15, 67, 42, 11, 15, EnumFacing.DOWN, TextureResources.progressBars),
+                this));
+        modules.add(new ModuleProgress(xOffset + 31, yOffset + 62, 3,
+                new ProgressBarImage(163, 62, 21, 3, 90, 42, 21, 3, EnumFacing.EAST, TextureResources.progressBars),
+                this));
 
         return modules;
     }

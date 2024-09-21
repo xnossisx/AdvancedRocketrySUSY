@@ -25,5 +25,4 @@ public class ChemicalReactorRecipeHandler implements IRecipeHandler<ChemicalReac
     public boolean isRecipeValid(ChemicalReactorlWrapper recipe) {
         return true;
     }
-
 }

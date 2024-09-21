@@ -1,5 +1,9 @@
 package zmaster587.advancedRocketry.block;
 
+import java.util.Random;
+
+import javax.annotation.Nullable;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFire;
 import net.minecraft.block.BlockTNT;
@@ -21,16 +25,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-import javax.annotation.Nullable;
-import java.util.Random;
-
 /**
  * This entire block class is simply a copy of Vanilla fire to make it more volatile and possibly better-behaved
  * It has a special render and lights fires much faster to the sides of it
  */
 public class BlockRocketFire extends Block {
 
-    //Because CCL is a little pain and needs a property named level to exist for all materials of lava
+    // Because CCL is a little pain and needs a property named level to exist for all materials of lava
     public static final PropertyInteger AGE = PropertyInteger.create("level", 0, 15);
 
     public BlockRocketFire() {
@@ -83,10 +84,12 @@ public class BlockRocketFire extends Block {
                         int k1 = this.getNeighborEncouragement(worldIn, blockpos);
 
                         if (k1 > 0) {
-                            int l1 = (k1 + 40 + worldIn.getDifficulty().getDifficultyId() * 7) / (i + 30);
+                            int l1 = (k1 + 40 + worldIn.getDifficulty().getId() * 7) / (i + 30);
 
-                            if (l1 > 0 && rand.nextInt(j1) <= l1 && (!worldIn.isRaining() || !canFireDie(worldIn, blockpos))) {
-                                worldIn.setBlockState(blockpos, Blocks.FIRE.getDefaultState().withProperty(BlockFire.AGE, 2), 3);
+                            if (l1 > 0 && rand.nextInt(j1) <= l1 &&
+                                    (!worldIn.isRaining() || !canFireDie(worldIn, blockpos))) {
+                                worldIn.setBlockState(blockpos,
+                                        Blocks.FIRE.getDefaultState().withProperty(BlockFire.AGE, 2), 3);
                             }
                         }
                     }
@@ -108,7 +111,8 @@ public class BlockRocketFire extends Block {
         } else {
             int i = 0;
             for (EnumFacing enumfacing : EnumFacing.values()) {
-                i = Math.max(worldIn.getBlockState(pos.offset(enumfacing)).getBlock().getFireSpreadSpeed(worldIn, pos.offset(enumfacing), enumfacing.getOpposite()), i);
+                i = Math.max(worldIn.getBlockState(pos.offset(enumfacing)).getBlock().getFireSpreadSpeed(worldIn,
+                        pos.offset(enumfacing), enumfacing.getOpposite()), i);
             }
             return i + 150;
         }
@@ -131,7 +135,7 @@ public class BlockRocketFire extends Block {
             }
 
             if (iblockstate.getBlock() == Blocks.TNT) {
-                Blocks.TNT.onBlockDestroyedByPlayer(worldIn, pos, iblockstate.withProperty(BlockTNT.EXPLODE, true));
+                Blocks.TNT.breakBlock(worldIn, pos, iblockstate.withProperty(BlockTNT.EXPLODE, true));
             }
         }
     }
@@ -139,7 +143,9 @@ public class BlockRocketFire extends Block {
     @SideOnly(Side.CLIENT)
     public void randomDisplayTick(IBlockState stateIn, World worldIn, BlockPos pos, Random rand) {
         if (rand.nextInt(24) == 0) {
-            worldIn.playSound((float) pos.getX() + 0.5F, ((float) pos.getY() + 0.5F), (float) pos.getZ() + 0.5F, SoundEvents.BLOCK_FIRE_AMBIENT, SoundCategory.BLOCKS, 1.0F + rand.nextFloat(), rand.nextFloat() * 0.7F + 0.3F, false);
+            worldIn.playSound((float) pos.getX() + 0.5F, ((float) pos.getY() + 0.5F), (float) pos.getZ() + 0.5F,
+                    SoundEvents.BLOCK_FIRE_AMBIENT, SoundCategory.BLOCKS, 1.0F + rand.nextFloat(),
+                    rand.nextFloat() * 0.7F + 0.3F, false);
         }
 
         for (int i = 0; i < 3; ++i) {
@@ -148,7 +154,6 @@ public class BlockRocketFire extends Block {
             double d2 = (double) pos.getZ() + rand.nextDouble();
             worldIn.spawnParticle(EnumParticleTypes.SMOKE_LARGE, d0, d1, d2, 0.0D, 0.0D, 0.0D);
         }
-
     }
 
     @Nullable
@@ -192,6 +197,7 @@ public class BlockRocketFire extends Block {
     }
 
     protected boolean canFireDie(World worldIn, BlockPos pos) {
-        return worldIn.isRainingAt(pos) || worldIn.isRainingAt(pos.west()) || worldIn.isRainingAt(pos.east()) || worldIn.isRainingAt(pos.north()) || worldIn.isRainingAt(pos.south());
+        return worldIn.isRainingAt(pos) || worldIn.isRainingAt(pos.west()) || worldIn.isRainingAt(pos.east()) ||
+                worldIn.isRainingAt(pos.north()) || worldIn.isRainingAt(pos.south());
     }
 }

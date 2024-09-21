@@ -1,11 +1,17 @@
 package zmaster587.advancedRocketry.tile.hatch;
 
-import io.netty.buffer.ByteBuf;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
+
+import io.netty.buffer.ByteBuf;
 import zmaster587.advancedRocketry.api.DataStorage;
 import zmaster587.advancedRocketry.api.DataStorage.DataType;
 import zmaster587.advancedRocketry.inventory.modules.ModuleAutoData;
@@ -15,10 +21,6 @@ import zmaster587.libVulpes.inventory.modules.ModuleBase;
 import zmaster587.libVulpes.tile.multiblock.TileMultiBlock;
 import zmaster587.libVulpes.tile.multiblock.hatch.TileInventoryHatch;
 import zmaster587.libVulpes.util.INetworkMachine;
-
-import javax.annotation.Nonnull;
-import java.util.LinkedList;
-import java.util.List;
 
 public class TileDataBus extends TileInventoryHatch implements IDataInventory, INetworkMachine {
 
@@ -42,12 +44,13 @@ public class TileDataBus extends TileInventoryHatch implements IDataInventory, I
 
     @Override
     public void loadData(int id) {
-
         ItemStack itemStack = inventory.getStackInSlot(0);
 
         if (itemStack != ItemStack.EMPTY && itemStack.getItem() instanceof ItemData) {
             ItemData itemData = (ItemData) itemStack.getItem();
-            itemData.removeData(itemStack, this.data.addData(itemData.getData(itemStack), itemData.getDataType(itemStack), true), DataStorage.DataType.UNDEFINED);
+            itemData.removeData(itemStack,
+                    this.data.addData(itemData.getData(itemStack), itemData.getDataType(itemStack), true),
+                    DataStorage.DataType.UNDEFINED);
 
             inventory.setInventorySlotContents(1, decrStackSize(0, 1));
         }
@@ -62,14 +65,14 @@ public class TileDataBus extends TileInventoryHatch implements IDataInventory, I
     public void storeData(int id) {
         ItemStack itemStack = inventory.getStackInSlot(0);
 
-        if (!itemStack.isEmpty() && itemStack.getItem() instanceof ItemData && inventory.getStackInSlot(1) == ItemStack.EMPTY) {
+        if (!itemStack.isEmpty() && itemStack.getItem() instanceof ItemData &&
+                inventory.getStackInSlot(1) == ItemStack.EMPTY) {
             ItemData itemData = (ItemData) itemStack.getItem();
             this.data.removeData(itemData.addData(itemStack, this.data.getData(), this.data.getDataType()), true);
 
             inventory.setInventorySlotContents(1, decrStackSize(0, 1));
         }
     }
-
 
     public void setData(int data, DataStorage.DataType dataType) {
         this.data.setData(data, dataType);
@@ -128,7 +131,8 @@ public class TileDataBus extends TileInventoryHatch implements IDataInventory, I
         inventory.setInventorySlotContents(slot, stack);
         ItemStack itemStack = inventory.getStackInSlot(0);
 
-        if (itemStack != ItemStack.EMPTY && itemStack.getItem() instanceof ItemData && inventory.getStackInSlot(1) == ItemStack.EMPTY) {
+        if (itemStack != ItemStack.EMPTY && itemStack.getItem() instanceof ItemData &&
+                inventory.getStackInSlot(1) == ItemStack.EMPTY) {
             ItemData itemData = (ItemData) itemStack.getItem();
             if (itemData.getData(itemStack) > 0 && data.getData() != data.getMaxData()) {
                 loadData(0);
@@ -168,16 +172,13 @@ public class TileDataBus extends TileInventoryHatch implements IDataInventory, I
     }
 
     @Override
-    public void writeDataToNetwork(ByteBuf out, byte id) {
-    }
+    public void writeDataToNetwork(ByteBuf out, byte id) {}
 
     @Override
-    public void readDataFromNetwork(ByteBuf in, byte packetId, NBTTagCompound nbt) {
-    }
+    public void readDataFromNetwork(ByteBuf in, byte packetId, NBTTagCompound nbt) {}
 
     @Override
-    public void useNetworkData(EntityPlayer player, Side side, byte id, NBTTagCompound nbt) {
-    }
+    public void useNetworkData(EntityPlayer player, Side side, byte id, NBTTagCompound nbt) {}
 
     @Override
     public int extractData(int maxAmount, DataType type, EnumFacing dir, boolean commit) {

@@ -1,5 +1,12 @@
 package zmaster587.advancedRocketry.block.plant;
 
+import java.util.List;
+import java.util.Random;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import net.minecraft.block.BlockBush;
 import net.minecraft.block.IGrowable;
 import net.minecraft.block.properties.PropertyInteger;
@@ -13,18 +20,13 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenerator;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import zmaster587.advancedRocketry.world.gen.WorldGenAlienTree;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
-import java.util.Random;
+import zmaster587.advancedRocketry.world.gen.WorldGenAlienTree;
 
 public class BlockLightwoodSapling extends BlockBush implements IGrowable {
 
     public static final PropertyInteger STAGE = PropertyInteger.create("stage", 0, 1);
-    public String[] names = new String[]{"blueTree"};
+    public String[] names = new String[] { "blueTree" };
 
     public BlockLightwoodSapling() {
         this.setDefaultState(this.blockState.getBaseState().withProperty(STAGE, 0));
@@ -35,13 +37,12 @@ public class BlockLightwoodSapling extends BlockBush implements IGrowable {
         list.add(new ItemStack(item, 1, 0));
     }
 
-
     public void generateTree(World world, BlockPos pos, IBlockState state,
                              Random random) {
         if (!net.minecraftforge.event.terraingen.TerrainGen.saplingGrowTree(world, random, pos))
             return;
 
-        IBlockState l = this.getDefaultState();//world.getBlockState(pos);//world.getBlockMetadata(x, y, z) & 7;
+        IBlockState l = this.getDefaultState();// world.getBlockState(pos);//world.getBlockMetadata(x, y, z) & 7;
         WorldGenerator object = new WorldGenAlienTree(true);
         int i1 = 0;
         int j1 = 0;
@@ -57,7 +58,8 @@ public class BlockLightwoodSapling extends BlockBush implements IGrowable {
         return true;
     }
 
-    public boolean canUseBonemeal(World worldIn, @Nonnull Random rand, @Nullable BlockPos pos, @Nullable IBlockState state) {
+    public boolean canUseBonemeal(World worldIn, @Nonnull Random rand, @Nullable BlockPos pos,
+                                  @Nullable IBlockState state) {
         return (double) worldIn.rand.nextFloat() < 0.45D;
     }
 
