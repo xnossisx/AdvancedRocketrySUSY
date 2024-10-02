@@ -8,7 +8,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.List;
 
+import gregtech.api.pattern.TraceabilityPredicate;
+import gregtech.common.blocks.BlockMetalCasing;
+import gregtech.common.blocks.MetaBlocks;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
@@ -32,6 +36,8 @@ import zmaster587.advancedRocketry.atmosphere.AtmosphereVacuum;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.util.Asteroid;
 import zmaster587.advancedRocketry.util.SealableBlockHandler;
+
+import static gregtech.api.metatileentity.multiblock.MultiblockControllerBase.states;
 
 /**
  * Stores config variables
@@ -204,6 +210,11 @@ public class ARConfiguration {
     public LinkedList<Block> torchBlocks = new LinkedList<>();
     @ConfigProperty
     public LinkedList<Block> blackListRocketBlocks = new LinkedList<>();
+    @ConfigProperty
+    public TraceabilityPredicate rocketHullBlocks = new TraceabilityPredicate();
+    @ConfigProperty
+    // referring to heat shields
+    public TraceabilityPredicate rocketShieldBlocks = new TraceabilityPredicate();
     @ConfigProperty
     public LinkedList<String> standardGeodeOres = new LinkedList<>();
     @ConfigProperty(needsSync = true, internalType = Integer.class)
@@ -584,7 +595,7 @@ public class ARConfiguration {
         arConfig.stationClearanceHeight = config.getInt("stationClearance", ROCKET, 1000, 255, Integer.MAX_VALUE,
                 "How high the rocket has to go before it clears a space station and can enter its own orbit - WARNING: This property is not synced with orbitHeight and so will be displayed incorrectly on monitors if not equal to it. Burn length here is used by itself when launching from a station to either another station or the same station, or to the planet it is orbiting. it is used in conjunction with the TBI burn when launching to a moon or asteroid");
         arConfig.transBodyInjection = config.getInt("transBodyInjection", ROCKET, 0, 0, Integer.MAX_VALUE,
-                "How long the burn for trans-body injection is - this is performed soley after entering orbit and is in blocks - WARNING: This property is not taken into account by any machines when determining whether the rocket is fit to fly or not - Rockets that can reach LEO and so are flightworthy may not make TBI and will fall back to the parent planet. When enabled, the burn sequence is [Burn to LEO], [TBI Burn] when launching from a planet to moons or asteroids; and the sequence is [Station clearance burn], [TBI Burn] when launching from a station to a moon or asteroid. This distance varies by object distance");
+                "How long the burn for trans-body injection is - this is performed solely after entering orbit and is in blocks - WARNING: This property is not taken into account by any machines when determining whether the rocket is fit to fly or not - Rockets that can reach LEO and so are flightworthy may not make TBI and will fall back to the parent planet. When enabled, the burn sequence is [Burn to LEO], [TBI Burn] when launching from a planet to moons or asteroids; and the sequence is [Station clearance burn], [TBI Burn] when launching from a station to a moon or asteroid. This distance varies by object distance");
         arConfig.asteroidTBIBurnMult = (float) config.get(ROCKET, "asteroidTBIBurnMult", 1.0,
                 "The multiplier that asteroids should be considered as for TBI distance").getDouble();
         arConfig.warpTBIBurnMult = (float) config.get(ROCKET, "warpTBIBurnMult", 10.0,
@@ -679,6 +690,9 @@ public class ARConfiguration {
 
     public static void loadPostInit() {
         ARConfiguration arConfig = getCurrentConfig();
+        // timed best here
+        arConfig.rocketHullBlocks = states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF));
+        arConfig.rocketShieldBlocks = states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF));
 
         // Register fuels
         logger.info("Start registering liquid rocket fuels");

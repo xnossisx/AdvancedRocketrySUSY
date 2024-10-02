@@ -1,12 +1,16 @@
 package zmaster587.advancedRocketry.tile;
 
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import gregtech.api.pattern.BlockWorldState;
+import gregtech.api.pattern.PatternMatchContext;
+import gregtech.api.pattern.TraceabilityPredicate;
+import ibxm.Pattern;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,9 +21,7 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.*;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
@@ -298,140 +300,168 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                 actualMaxY = (int) bb.minY,
                 actualMaxZ = (int) bb.minZ;
 
+        boolean hasGuidance = false;
+        BlockPos corePos = null;
+        boolean invalidBlock = false;
+        int blockCount = 0;
         for (int xCurr = (int) bb.minX; xCurr <= bb.maxX; xCurr++) {
             for (int zCurr = (int) bb.minZ; zCurr <= bb.maxZ; zCurr++) {
                 for (int yCurr = (int) bb.minY; yCurr <= bb.maxY; yCurr++) {
 
                     BlockPos currBlockPos = new BlockPos(xCurr, yCurr, zCurr);
-                    IBlockState state = world.getBlockState(currBlockPos);
-                    Block block = state.getBlock();
 
                     if (!world.isAirBlock(currBlockPos)) {
-                        if (xCurr < actualMinX)
+                        if (xCurr < actualMinX) {
                             actualMinX = xCurr;
-                        if (yCurr < actualMinY)
-                            actualMinY = yCurr;
-                        if (zCurr < actualMinZ)
-                            actualMinZ = zCurr;
-                        if (xCurr > actualMaxX)
+                        }
+                        if (xCurr > actualMaxX) {
                             actualMaxX = xCurr;
-                        if (yCurr > actualMaxY)
+                        }
+                        if (yCurr < actualMinY) {
+                            actualMinY = yCurr;
+                        }
+                        if (yCurr > actualMaxY) {
                             actualMaxY = yCurr;
-                        if (zCurr > actualMaxZ)
+                        }
+                        if (zCurr < actualMinZ) {
+                            actualMinZ = zCurr;
+                        }
+                        if (zCurr > actualMaxZ) {
                             actualMaxZ = zCurr;
+                        }
+                        blockCount++;
+                        TileEntity tile = world.getTileEntity(currBlockPos);
+                        if (tile instanceof TileGuidanceComputer) {
+                            if (!hasGuidance) {
+                                hasGuidance = true;
+                                corePos = currBlockPos;
+                            } else {
+                                invalidBlock = true;
+                            }
+                        }
                     }
                 }
             }
         }
 
+        if (!hasGuidance) {
+            status = ErrorCodes.NOGUIDANCE;
+            return null;
+        }
+        AxisAlignedBB realAABB = new AxisAlignedBB(actualMinX, actualMinY, actualMinZ, actualMaxX, actualMaxY, actualMaxZ);
+        Set<BlockPos> actualBlocks = getBlockSet(world, realAABB, corePos);
+        if (actualBlocks.size() < blockCount) {
+            status = ErrorCodes.DISCONNECTED_STRUCT;
+            return null;
+        }
+
+        Set<BlockPos> hull  = checkHull(world, realAABB, actualBlocks);
+
+        if (hull == null) {
+            return null;
+        }
+
         boolean hasSatellite = false;
-        boolean hasGuidance = false;
-        boolean invalidBlock = false;
         float weight = 0;
 
         if (verifyScan(bb, world)) {
-            for (int yCurr = (int) bb.minY; yCurr <= bb.maxY; yCurr++) {
-                for (int xCurr = (int) bb.minX; xCurr <= bb.maxX; xCurr++) {
-                    for (int zCurr = (int) bb.minZ; zCurr <= bb.maxZ; zCurr++) {
+            for (BlockPos currBlockPos : actualBlocks) {
+                int xCurr = currBlockPos.getX();
+                int yCurr = currBlockPos.getY();
+                int zCurr = currBlockPos.getZ();
+                BlockPos abovePos = new BlockPos(xCurr, yCurr + 1, zCurr);
+                BlockPos belowPos = new BlockPos(xCurr, yCurr - 1, zCurr);
 
-                        BlockPos currBlockPos = new BlockPos(xCurr, yCurr, zCurr);
-                        BlockPos abovePos = new BlockPos(xCurr, yCurr + 1, zCurr);
-                        BlockPos belowPos = new BlockPos(xCurr, yCurr - 1, zCurr);
+                if (!world.isAirBlock(currBlockPos)) {
+                    IBlockState state = world.getBlockState(currBlockPos);
+                    Block block = state.getBlock();
 
-                        if (!world.isAirBlock(currBlockPos)) {
-                            IBlockState state = world.getBlockState(currBlockPos);
-                            Block block = state.getBlock();
+                    if (ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block)) {
+                        if (!block.isReplaceable(world, currBlockPos)) {
+                            invalidBlock = true;
+                            if (!world.isRemote)
+                                PacketHandler.sendToNearby(
+                                        new PacketInvalidLocationNotify(
+                                                new HashedBlockPosition(xCurr, yCurr, zCurr)),
+                                        world.provider.getDimension(), getPos(), 64);
+                        }
+                        continue;
+                    }
 
-                            if (ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block)) {
-                                if (!block.isReplaceable(world, currBlockPos)) {
-                                    invalidBlock = true;
-                                    if (!world.isRemote)
-                                        PacketHandler.sendToNearby(
-                                                new PacketInvalidLocationNotify(
-                                                        new HashedBlockPosition(xCurr, yCurr, zCurr)),
-                                                world.provider.getDimension(), getPos(), 64);
-                                }
-                                continue;
-                            }
+                    if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                        weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
+                    } else {
+                        weight += 1;
+                    }
 
-                            if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-                                weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
-                            } else {
-                                weight += 1;
-                            }
+                    // If rocketEngine increaseThrust
+                    final float x = xCurr - actualMinX - ((actualMaxX - actualMinX) / 2f);
+                    final float z = zCurr - actualMinZ - ((actualMaxZ - actualMinZ) / 2f);
+                    if (block instanceof IRocketEngine && (world.getBlockState(belowPos).getBlock()
+                            .isAir(world.getBlockState(belowPos), world, belowPos) ||
+                            world.getBlockState(belowPos).getBlock() instanceof BlockLandingPad ||
+                            world.getBlockState(belowPos).getBlock() ==
+                                    AdvancedRocketryBlocks.blockLaunchpad)) {
+                        if (block instanceof BlockNuclearRocketMotor) {
+                            nuclearWorkingFluidUseMax += ((IRocketEngine) block).getFuelConsumptionRate(world,
+                                    xCurr, yCurr, zCurr);
+                            thrustNuclearNozzleLimit += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                        } else if (block instanceof BlockBipropellantRocketMotor) {
+                            bipropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr,
+                                    yCurr, zCurr);
+                            thrustBipropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                        } else if (block instanceof BlockRocketMotor) {
+                            monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world,
+                                    xCurr, yCurr, zCurr);
+                            thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                        }
+                        stats.addEngineLocation(x + 0.5f, yCurr - actualMinY + 0.5f, z + 0.5f);
+                    }
 
-                            // If rocketEngine increaseThrust
-                            final float x = xCurr - actualMinX - ((actualMaxX - actualMinX) / 2f);
-                            final float z = zCurr - actualMinZ - ((actualMaxZ - actualMinZ) / 2f);
-                            if (block instanceof IRocketEngine && (world.getBlockState(belowPos).getBlock()
-                                    .isAir(world.getBlockState(belowPos), world, belowPos) ||
-                                    world.getBlockState(belowPos).getBlock() instanceof BlockLandingPad ||
-                                    world.getBlockState(belowPos).getBlock() ==
-                                            AdvancedRocketryBlocks.blockLaunchpad)) {
-                                if (block instanceof BlockNuclearRocketMotor) {
-                                    nuclearWorkingFluidUseMax += ((IRocketEngine) block).getFuelConsumptionRate(world,
-                                            xCurr, yCurr, zCurr);
-                                    thrustNuclearNozzleLimit += ((IRocketEngine) block).getThrust(world, currBlockPos);
-                                } else if (block instanceof BlockBipropellantRocketMotor) {
-                                    bipropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr,
-                                            yCurr, zCurr);
-                                    thrustBipropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
-                                } else if (block instanceof BlockRocketMotor) {
-                                    monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world,
-                                            xCurr, yCurr, zCurr);
-                                    thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
-                                }
-                                stats.addEngineLocation(x + 0.5f, yCurr - actualMinY + 0.5f, z + 0.5f);
-                            }
+                    if (block instanceof IFuelTank) {
+                        if (block instanceof BlockBipropellantFuelTank) {
+                            fuelCapacityBipropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos,
+                                    state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                        } else if (block instanceof BlockOxidizerFuelTank) {
+                            fuelCapacityOxidizer += (((IFuelTank) block).getMaxFill(world, currBlockPos,
+                                    state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                        } else if (block instanceof BlockNuclearFuelTank) {
+                            fuelCapacityNuclearWorkingFluid += (((IFuelTank) block).getMaxFill(world,
+                                    currBlockPos, state) *
+                                    ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                        } else if (block instanceof BlockFuelTank) {
+                            fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos,
+                                    state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                        }
+                    }
 
-                            if (block instanceof IFuelTank) {
-                                if (block instanceof BlockBipropellantFuelTank) {
-                                    fuelCapacityBipropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos,
-                                            state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                                } else if (block instanceof BlockOxidizerFuelTank) {
-                                    fuelCapacityOxidizer += (((IFuelTank) block).getMaxFill(world, currBlockPos,
-                                            state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                                } else if (block instanceof BlockNuclearFuelTank) {
-                                    fuelCapacityNuclearWorkingFluid += (((IFuelTank) block).getMaxFill(world,
-                                            currBlockPos, state) *
-                                            ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                                } else if (block instanceof BlockFuelTank) {
-                                    fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos,
-                                            state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                                }
-                            }
+                    if (block instanceof IRocketNuclearCore &&
+                            ((world.getBlockState(belowPos).getBlock() instanceof IRocketNuclearCore) ||
+                                    (world.getBlockState(belowPos).getBlock() instanceof IRocketEngine))) {
+                        thrustNuclearReactorLimit += ((IRocketNuclearCore) block).getMaxThrust(world,
+                                currBlockPos);
+                    }
 
-                            if (block instanceof IRocketNuclearCore &&
-                                    ((world.getBlockState(belowPos).getBlock() instanceof IRocketNuclearCore) ||
-                                            (world.getBlockState(belowPos).getBlock() instanceof IRocketEngine))) {
-                                thrustNuclearReactorLimit += ((IRocketNuclearCore) block).getMaxThrust(world,
-                                        currBlockPos);
-                            }
+                    if (block instanceof BlockSeat &&
+                            world.getBlockState(abovePos).getBlock().isPassable(world, abovePos)) {
+                        stats.addPassengerSeat((int) Math.floor(x), yCurr - actualMinY, (int) Math.floor(z));
+                    }
 
-                            if (block instanceof BlockSeat &&
-                                    world.getBlockState(abovePos).getBlock().isPassable(world, abovePos)) {
-                                stats.addPassengerSeat((int) Math.floor(x), yCurr - actualMinY, (int) Math.floor(z));
-                            }
+                    if (block instanceof IMiningDrill) {
+                        drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
+                    }
 
-                            if (block instanceof IMiningDrill) {
-                                drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
-                            }
-
-                            TileEntity tile = world.getTileEntity(currBlockPos);
-                            if (tile instanceof TileSatelliteHatch) {
-                                hasSatellite = true;
-                                if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-                                    TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
-                                    if (hatch.getSatellite() != null) {
-                                        weight += hatch.getSatellite().getProperties().getWeight();
-                                    } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
-                                        ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0)
-                                                .getItem();
-                                        weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
-                                    }
-                                }
-                            } else if (tile instanceof TileGuidanceComputer) {
-                                hasGuidance = true;
+                    TileEntity tile = world.getTileEntity(currBlockPos);
+                    if (tile instanceof TileSatelliteHatch) {
+                        hasSatellite = true;
+                        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                            TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
+                            if (hatch.getSatellite() != null) {
+                                weight += hatch.getSatellite().getProperties().getWeight();
+                            } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
+                                ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0)
+                                        .getItem();
+                                weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
                             }
                         }
                     }
@@ -494,6 +524,76 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         }
 
         return new AxisAlignedBB(actualMinX, actualMinY, actualMinZ, actualMaxX, actualMaxY, actualMaxZ);
+    }
+
+    private Set<BlockPos> checkHull(World world, AxisAlignedBB aaBB, Set<BlockPos> actualBlocks) {
+        AxisAlignedBB floodBB = aaBB.grow(1);                               // initializes flood fill box
+        BlockPos bottom = new BlockPos(floodBB.minX, floodBB.minY, floodBB.minZ); // initializes flood fill start
+        Queue<BlockPos> uncheckedBlocks = new ArrayDeque<>();
+        Set<BlockPos> airBlocks = new HashSet<>();
+        Set<BlockPos> hullBlocks = new HashSet<>();
+        PatternMatchContext pmc = new PatternMatchContext();
+        BlockWorldState bws = new BlockWorldState();
+        BlockPos.MutableBlockPos mbPos = new BlockPos.MutableBlockPos();
+        bws.update(world, mbPos,pmc,null,null,ARConfiguration.getCurrentConfig().rocketHullBlocks);
+        uncheckedBlocks.add(bottom);
+        for (BlockPos pos; !uncheckedBlocks.isEmpty();) {
+            pos = uncheckedBlocks.remove();
+            if (actualBlocks.contains(pos)) {
+                mbPos.setPos(pos);
+                if (!ARConfiguration.getCurrentConfig().rocketHullBlocks.test(bws)) {
+                    status = ErrorCodes.HULL_IMPROPER;
+                    return null;
+                }
+                hullBlocks.add(pos);
+            } else {
+                airBlocks.add(pos);
+                uncheckedBlocks.addAll(getBlockNeighbors(world, floodBB, pos).stream().filter(p -> !airBlocks.contains(p) || !aaBB.contains(new Vec3d(p))).collect(Collectors.toSet()));
+            }
+        }
+        long volume = Math.round((floodBB.maxX - floodBB.minX)) * Math.round((floodBB.maxY - floodBB.minY)) * Math.round((floodBB.maxZ - floodBB.minZ));
+        long remainingAir = volume - airBlocks.size() - actualBlocks.size(); // the .grow() is factored in with airBlocks.size()
+        if (remainingAir < 2) { // considering you need a seat and an air block above it
+            status = ErrorCodes.HULL_FULL;
+            return null;
+        }
+        return hullBlocks;
+    }
+
+    private Set<BlockPos> getBlockSet(World world, AxisAlignedBB aaBB, BlockPos beg) {
+        if (!aaBB.contains(new Vec3d(beg))) {
+            AdvancedRocketry.logger.debug("Guidance computer somehow not inside of rocket bounding box...likely a bug. Contact Epix7");
+            return new HashSet<BlockPos>(); //wtf moment
+        }
+        Set<BlockPos> blocksCollected = new HashSet<BlockPos>();
+        blocksCollected.add(beg);
+        Queue<BlockPos> uncheckedBlocks = new ArrayDeque<>(getBlockNeighbors(world, aaBB, beg));
+
+
+        while (!uncheckedBlocks.isEmpty()) {
+            BlockPos bp = uncheckedBlocks.remove();
+            blocksCollected.add(bp);
+            uncheckedBlocks.addAll(getBlockNeighbors(world, aaBB, bp).stream()
+                    .filter(p -> !world.isAirBlock(p) && !blocksCollected.contains(bp)).collect(Collectors.toSet()));
+        }
+        return blocksCollected;
+    }
+
+    // only accepting those in the bounding box
+    private ArrayList<BlockPos> getBlockNeighbors(World world, AxisAlignedBB aaBB, BlockPos beg) {
+        ArrayList<BlockPos> neighbors = new ArrayList<>();
+        for (int dx = -1; dx < 2; dx++) {
+            for (int dy = -1; dy < 2; dy++) {
+                for (int dz = -1; dz < 2; dz++) {
+                    if (!(dx==0 && dy==0 && dz==0)) {
+                        BlockPos newPos = beg.add(new Vec3i(dx,dy,dz));
+                        if (aaBB.contains(new Vec3d(newPos)))
+                            neighbors.add(beg.add(newPos));
+                    }
+                }
+            }
+        }
+        return neighbors;
     }
 
     private void removeReplaceableBlocks(AxisAlignedBB bb) {
@@ -1174,6 +1274,9 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         NOGUIDANCE(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.noguidance")),
         UNSCANNED(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.unscanned")),
         SUCCESS_STATION(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.success_station")),
+        DISCONNECTED_STRUCT(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.structure_disconnected")),
+        HULL_FULL(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.nosealedair")),
+        HULL_IMPROPER(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.hullimproper")),
         EMPTY(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.empty")),
         FINISHED(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.finished")),
         INCOMPLETESTRCUTURE(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.incompletestructure")),
