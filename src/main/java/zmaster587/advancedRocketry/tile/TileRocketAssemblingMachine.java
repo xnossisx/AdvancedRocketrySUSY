@@ -343,11 +343,11 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                 }
             }
         }
-
+        /* may or may not require this
         if (!hasGuidance) {
             status = ErrorCodes.NOGUIDANCE;
             return null;
-        }
+        }*/
         AxisAlignedBB realAABB = new AxisAlignedBB(actualMinX, actualMinY, actualMinZ, actualMaxX, actualMaxY, actualMaxZ);
         Set<BlockPos> actualBlocks = getBlockSet(world, realAABB, corePos);
         if (actualBlocks.size() < blockCount) {
@@ -372,100 +372,97 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                 BlockPos abovePos = new BlockPos(xCurr, yCurr + 1, zCurr);
                 BlockPos belowPos = new BlockPos(xCurr, yCurr - 1, zCurr);
 
-                if (!world.isAirBlock(currBlockPos)) {
-                    IBlockState state = world.getBlockState(currBlockPos);
-                    Block block = state.getBlock();
+                IBlockState state = world.getBlockState(currBlockPos);
+                Block block = state.getBlock();
 
-                    if (ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block)) {
-                        if (!block.isReplaceable(world, currBlockPos)) {
-                            invalidBlock = true;
-                            if (!world.isRemote)
-                                PacketHandler.sendToNearby(
-                                        new PacketInvalidLocationNotify(
-                                                new HashedBlockPosition(xCurr, yCurr, zCurr)),
-                                        world.provider.getDimension(), getPos(), 64);
-                        }
-                        continue;
+                if (ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block)) {
+                    if (!block.isReplaceable(world, currBlockPos)) {
+                        invalidBlock = true;
+                        if (!world.isRemote)
+                            PacketHandler.sendToNearby(
+                                    new PacketInvalidLocationNotify(
+                                            new HashedBlockPosition(xCurr, yCurr, zCurr)),
+                                    world.provider.getDimension(), getPos(), 64);
                     }
+                    continue;
+                }
 
-                    if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-                        weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
-                    } else {
-                        weight += 1;
+                if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                    weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
+                } else {
+                    weight += 1;
+                }
+
+                // If rocketEngine increaseThrust
+                final float x = xCurr - actualMinX - ((actualMaxX - actualMinX) / 2f);
+                final float z = zCurr - actualMinZ - ((actualMaxZ - actualMinZ) / 2f);
+                if (block instanceof IRocketEngine && (world.isAirBlock(belowPos) ||
+                        world.getBlockState(belowPos).getBlock() instanceof BlockLandingPad ||
+                        world.getBlockState(belowPos).getBlock() ==
+                                AdvancedRocketryBlocks.blockLaunchpad)) {
+                    if (block instanceof BlockNuclearRocketMotor) {
+                        nuclearWorkingFluidUseMax += ((IRocketEngine) block).getFuelConsumptionRate(world,
+                                xCurr, yCurr, zCurr);
+                        thrustNuclearNozzleLimit += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                    } else if (block instanceof BlockBipropellantRocketMotor) {
+                        bipropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr,
+                                yCurr, zCurr);
+                        thrustBipropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
+                    } else if (block instanceof BlockRocketMotor) {
+                        monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world,
+                                xCurr, yCurr, zCurr);
+                        thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
                     }
+                    stats.addEngineLocation(x + 0.5f, yCurr - actualMinY + 0.5f, z + 0.5f);
+                }
 
-                    // If rocketEngine increaseThrust
-                    final float x = xCurr - actualMinX - ((actualMaxX - actualMinX) / 2f);
-                    final float z = zCurr - actualMinZ - ((actualMaxZ - actualMinZ) / 2f);
-                    if (block instanceof IRocketEngine && (world.getBlockState(belowPos).getBlock()
-                            .isAir(world.getBlockState(belowPos), world, belowPos) ||
-                            world.getBlockState(belowPos).getBlock() instanceof BlockLandingPad ||
-                            world.getBlockState(belowPos).getBlock() ==
-                                    AdvancedRocketryBlocks.blockLaunchpad)) {
-                        if (block instanceof BlockNuclearRocketMotor) {
-                            nuclearWorkingFluidUseMax += ((IRocketEngine) block).getFuelConsumptionRate(world,
-                                    xCurr, yCurr, zCurr);
-                            thrustNuclearNozzleLimit += ((IRocketEngine) block).getThrust(world, currBlockPos);
-                        } else if (block instanceof BlockBipropellantRocketMotor) {
-                            bipropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world, xCurr,
-                                    yCurr, zCurr);
-                            thrustBipropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
-                        } else if (block instanceof BlockRocketMotor) {
-                            monopropellantfuelUse += ((IRocketEngine) block).getFuelConsumptionRate(world,
-                                    xCurr, yCurr, zCurr);
-                            thrustMonopropellant += ((IRocketEngine) block).getThrust(world, currBlockPos);
-                        }
-                        stats.addEngineLocation(x + 0.5f, yCurr - actualMinY + 0.5f, z + 0.5f);
-                    }
-
-                    if (block instanceof IFuelTank) {
-                        if (block instanceof BlockBipropellantFuelTank) {
-                            fuelCapacityBipropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos,
-                                    state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                        } else if (block instanceof BlockOxidizerFuelTank) {
-                            fuelCapacityOxidizer += (((IFuelTank) block).getMaxFill(world, currBlockPos,
-                                    state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                        } else if (block instanceof BlockNuclearFuelTank) {
-                            fuelCapacityNuclearWorkingFluid += (((IFuelTank) block).getMaxFill(world,
-                                    currBlockPos, state) *
-                                    ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                        } else if (block instanceof BlockFuelTank) {
-                            fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos,
-                                    state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
-                        }
-                    }
-
-                    if (block instanceof IRocketNuclearCore &&
-                            ((world.getBlockState(belowPos).getBlock() instanceof IRocketNuclearCore) ||
-                                    (world.getBlockState(belowPos).getBlock() instanceof IRocketEngine))) {
-                        thrustNuclearReactorLimit += ((IRocketNuclearCore) block).getMaxThrust(world,
-                                currBlockPos);
-                    }
-
-                    if (block instanceof BlockSeat &&
-                            world.getBlockState(abovePos).getBlock().isPassable(world, abovePos)) {
-                        stats.addPassengerSeat((int) Math.floor(x), yCurr - actualMinY, (int) Math.floor(z));
-                    }
-
-                    if (block instanceof IMiningDrill) {
-                        drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
-                    }
-
-                    TileEntity tile = world.getTileEntity(currBlockPos);
-                    if (tile instanceof TileSatelliteHatch) {
-                        hasSatellite = true;
-                        if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
-                            TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
-                            if (hatch.getSatellite() != null) {
-                                weight += hatch.getSatellite().getProperties().getWeight();
-                            } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
-                                ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0)
-                                        .getItem();
-                                weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
-                            }
-                        }
+                if (block instanceof IFuelTank) {
+                    if (block instanceof BlockBipropellantFuelTank) {
+                        fuelCapacityBipropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos,
+                                state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                    } else if (block instanceof BlockOxidizerFuelTank) {
+                        fuelCapacityOxidizer += (((IFuelTank) block).getMaxFill(world, currBlockPos,
+                                state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                    } else if (block instanceof BlockNuclearFuelTank) {
+                        fuelCapacityNuclearWorkingFluid += (((IFuelTank) block).getMaxFill(world,
+                                currBlockPos, state) *
+                                ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
+                    } else if (block instanceof BlockFuelTank) {
+                        fuelCapacityMonopropellant += (((IFuelTank) block).getMaxFill(world, currBlockPos,
+                                state) * ARConfiguration.getCurrentConfig().fuelCapacityMultiplier);
                     }
                 }
+
+                if (block instanceof IRocketNuclearCore &&
+                        ((world.getBlockState(belowPos).getBlock() instanceof IRocketNuclearCore) ||
+                                (world.getBlockState(belowPos).getBlock() instanceof IRocketEngine))) {
+                    thrustNuclearReactorLimit += ((IRocketNuclearCore) block).getMaxThrust(world,
+                            currBlockPos);
+                }
+
+                if (block instanceof BlockSeat &&
+                        world.getBlockState(abovePos).getBlock().isPassable(world, abovePos)) {
+                    stats.addPassengerSeat((int) Math.floor(x), yCurr - actualMinY, (int) Math.floor(z));
+                }
+
+                if (block instanceof IMiningDrill) {
+                    drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
+                }
+
+                TileEntity tile = world.getTileEntity(currBlockPos);
+                if (tile instanceof TileSatelliteHatch) {
+                    hasSatellite = true;
+                    if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
+                        TileSatelliteHatch hatch = (TileSatelliteHatch) tile;
+                        if (hatch.getSatellite() != null) {
+                            weight += hatch.getSatellite().getProperties().getWeight();
+                        } else if (hatch.getStackInSlot(0).getItem() instanceof ItemPackedStructure) {
+                            ItemPackedStructure struct = (ItemPackedStructure) hatch.getStackInSlot(0)
+                                    .getItem();
+                            weight += struct.getStructure(hatch.getStackInSlot(0)).getWeight();
+                        }
+                    }
+                    }
             }
 
             int nuclearWorkingFluidUse = 0;
@@ -527,20 +524,18 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
     }
 
     private Set<BlockPos> checkHull(World world, AxisAlignedBB aaBB, Set<BlockPos> actualBlocks) {
-        AxisAlignedBB floodBB = aaBB.grow(1);                               // initializes flood fill box
+        AxisAlignedBB floodBB = aaBB.grow(1);// initializes flood fill box
         BlockPos bottom = new BlockPos(floodBB.minX, floodBB.minY, floodBB.minZ); // initializes flood fill start
         Queue<BlockPos> uncheckedBlocks = new ArrayDeque<>();
         Set<BlockPos> airBlocks = new HashSet<>();
         Set<BlockPos> hullBlocks = new HashSet<>();
         PatternMatchContext pmc = new PatternMatchContext();
-        BlockWorldState bws = new BlockWorldState();
-        BlockPos.MutableBlockPos mbPos = new BlockPos.MutableBlockPos();
-        bws.update(world, mbPos,pmc,null,null,ARConfiguration.getCurrentConfig().rocketHullBlocks);
         uncheckedBlocks.add(bottom);
         for (BlockPos pos; !uncheckedBlocks.isEmpty();) {
             pos = uncheckedBlocks.remove();
             if (actualBlocks.contains(pos)) {
-                mbPos.setPos(pos);
+                BlockWorldState bws = new BlockWorldState(); // this is awful but I guess it works?
+                bws.update(world, pos,pmc,null,null,ARConfiguration.getCurrentConfig().rocketHullBlocks);
                 if (!ARConfiguration.getCurrentConfig().rocketHullBlocks.test(bws)) {
                     status = ErrorCodes.HULL_IMPROPER;
                     return null;
@@ -548,10 +543,12 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                 hullBlocks.add(pos);
             } else {
                 airBlocks.add(pos);
-                uncheckedBlocks.addAll(getBlockNeighbors(world, floodBB, pos).stream().filter(p -> !airBlocks.contains(p) || !aaBB.contains(new Vec3d(p))).collect(Collectors.toSet()));
+                uncheckedBlocks.addAll(getBlockDirNeighbors(world, floodBB, pos).stream().filter(
+                                p -> actualContains(floodBB, p) && !(airBlocks.contains(p) || uncheckedBlocks.contains(p)))
+                        .collect(Collectors.toSet()));
             }
         }
-        long volume = Math.round((floodBB.maxX - floodBB.minX)) * Math.round((floodBB.maxY - floodBB.minY)) * Math.round((floodBB.maxZ - floodBB.minZ));
+        long volume = Math.round((floodBB.maxX - floodBB.minX + 1)) * Math.round((floodBB.maxY - floodBB.minY + 1)) * Math.round((floodBB.maxZ - floodBB.minZ + 1));
         long remainingAir = volume - airBlocks.size() - actualBlocks.size(); // the .grow() is factored in with airBlocks.size()
         if (remainingAir < 2) { // considering you need a seat and an air block above it
             status = ErrorCodes.HULL_FULL;
@@ -567,28 +564,45 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         }
         Set<BlockPos> blocksCollected = new HashSet<BlockPos>();
         blocksCollected.add(beg);
-        Queue<BlockPos> uncheckedBlocks = new ArrayDeque<>(getBlockNeighbors(world, aaBB, beg));
+        Queue<BlockPos> uncheckedBlocks = new ArrayDeque<>(Arrays.asList(beg));
 
 
         while (!uncheckedBlocks.isEmpty()) {
             BlockPos bp = uncheckedBlocks.remove();
             blocksCollected.add(bp);
             uncheckedBlocks.addAll(getBlockNeighbors(world, aaBB, bp).stream()
-                    .filter(p -> !world.isAirBlock(p) && !blocksCollected.contains(bp)).collect(Collectors.toSet()));
+                    .filter(p -> !world.isAirBlock(p) && !blocksCollected.contains(p) && !uncheckedBlocks.contains(p)).collect(Collectors.toSet()));
         }
         return blocksCollected;
     }
 
+    private boolean actualContains(AxisAlignedBB aaBB, BlockPos bp) {
+        return aaBB.grow(1).contains(new Vec3d(bp));
+    }
+
+    private static Vec3i neighborVecs[] = new Vec3i[] {new Vec3i(1,0,0), new Vec3i(0,1,0), new Vec3i(0, -1, 0)};
     // only accepting those in the bounding box
+    private ArrayList<BlockPos> getBlockDirNeighbors(World world, AxisAlignedBB aaBB, BlockPos beg) {
+        ArrayList<BlockPos> neighbors = new ArrayList<>();
+        for (int dir = -1; dir < 2; dir += 2) {
+            for (int i = 0; i < 3; i++) {
+                BlockPos newPos = beg.add(new Vec3i(neighborVecs[i].getX()*dir, neighborVecs[i].getY()*dir, neighborVecs[i].getZ()*dir));
+                if (actualContains(aaBB, newPos))
+                    neighbors.add(newPos);
+            }
+        }
+        return neighbors;
+    }
+
     private ArrayList<BlockPos> getBlockNeighbors(World world, AxisAlignedBB aaBB, BlockPos beg) {
         ArrayList<BlockPos> neighbors = new ArrayList<>();
-        for (int dx = -1; dx < 2; dx++) {
-            for (int dy = -1; dy < 2; dy++) {
-                for (int dz = -1; dz < 2; dz++) {
-                    if (!(dx==0 && dy==0 && dz==0)) {
-                        BlockPos newPos = beg.add(new Vec3i(dx,dy,dz));
-                        if (aaBB.contains(new Vec3d(newPos)))
-                            neighbors.add(beg.add(newPos));
+        for (int dirX = -1; dirX < 2; dirX++) {
+            for (int dirY = -1; dirY < 2; dirY++) {
+                for (int dirZ = -1; dirZ < 2; dirZ++) {
+                    if (!(dirX == 0 && dirY == 0 && dirZ == 0)) {
+                        BlockPos newPos = beg.add(new Vec3i(dirX, dirY, dirZ));
+                        if (actualContains(aaBB, newPos))
+                            neighbors.add(newPos);
                     }
                 }
             }
@@ -1274,7 +1288,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         NOGUIDANCE(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.noguidance")),
         UNSCANNED(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.unscanned")),
         SUCCESS_STATION(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.success_station")),
-        DISCONNECTED_STRUCT(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.structure_disconnected")),
+        DISCONNECTED_STRUCT(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.structuredisconnected")),
         HULL_FULL(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.nosealedair")),
         HULL_IMPROPER(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.hullimproper")),
         EMPTY(LibVulpes.proxy.getLocalizedString("msg.rocketbuilder.empty")),

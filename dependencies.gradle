@@ -40,10 +40,12 @@
 dependencies {
 
     runtimeOnly(rfg.deobf("com.cleanroommc:strip-latest-forge-requirements:1.0"))
+
 //    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
     //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
     implementation(rfg.deobf("curse.maven:library-for-ar-reworked-1038780:5732205"))
 
+    compileOnly(fileTree(Map.of("dir", "libs/compileOnly", "include", Arrays.asList("*.jar"))))
     compileOnly(rfg.deobf("curse.maven:galacticraft-legacy-564236:4671122"))
     //compileOnly(fg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}:api"))
     implementation(rfg.deobf("mezz.jei:jei_${mcVersion}:${jeiVersion}")) // Sorry but it won't start wihout jei...

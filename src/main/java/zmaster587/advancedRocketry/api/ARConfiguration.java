@@ -9,7 +9,9 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Field;
 import java.util.*;
 import java.util.List;
+import java.util.function.Predicate;
 
+import gregtech.api.pattern.BlockWorldState;
 import gregtech.api.pattern.TraceabilityPredicate;
 import gregtech.common.blocks.BlockMetalCasing;
 import gregtech.common.blocks.MetaBlocks;
@@ -33,6 +35,7 @@ import zmaster587.advancedRocketry.api.atmosphere.AtmosphereRegister;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereVacuum;
+import zmaster587.advancedRocketry.block.BlockFuelTank;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.util.Asteroid;
 import zmaster587.advancedRocketry.util.SealableBlockHandler;
@@ -691,7 +694,12 @@ public class ARConfiguration {
     public static void loadPostInit() {
         ARConfiguration arConfig = getCurrentConfig();
         // timed best here
-        arConfig.rocketHullBlocks = states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF));
+        arConfig.rocketHullBlocks = states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF)).or(new TraceabilityPredicate(new Predicate<BlockWorldState>() {
+            @Override
+            public boolean test(BlockWorldState blockWorldState) {
+                return blockWorldState.getBlockState().getBlock() instanceof BlockFuelTank;
+            }
+        }));
         arConfig.rocketShieldBlocks = states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF));
 
         // Register fuels
