@@ -1,0 +1,11 @@
+{
+	"variants": {
+		"normal": { "model": "advancedrocketry:rocketpayloadfairing" },
+		"facing=north": { "model": "advancedrocketry:rocketpayloadfairing", "x": 90 },
+		"facing=south": {  "model": "advancedrocketry:rocketpayloadfairing", "x": 90, "y": 180 },
+		"facing=west":  { "model": "advancedrocketry:rocketpayloadfairing", "x": 90, "y": 270 },
+		"facing=east":  { "model": "advancedrocketry:rocketpayloadfairing", "x": 90, "y": 90 },
+		"facing=up":  { "model": "advancedrocketry:rocketpayloadfairing" },
+		"facing=down":  { "model": "advancedrocketry:rocketpayloadfairing", "x": 180  }
+	}
+}

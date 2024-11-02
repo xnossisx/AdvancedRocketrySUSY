@@ -580,7 +580,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         return aaBB.grow(1).contains(new Vec3d(bp));
     }
 
-    private static Vec3i neighborVecs[] = new Vec3i[] {new Vec3i(1,0,0), new Vec3i(0,1,0), new Vec3i(0, -1, 0)};
+    private static Vec3i neighborVecs[] = new Vec3i[] {new Vec3i(1,0,0), new Vec3i(0,1,0), new Vec3i(0, 0, 1)};
     // only accepting those in the bounding box
     private ArrayList<BlockPos> getBlockDirNeighbors(World world, AxisAlignedBB aaBB, BlockPos beg) {
         ArrayList<BlockPos> neighbors = new ArrayList<>();

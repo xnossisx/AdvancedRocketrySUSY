@@ -22,6 +22,7 @@ import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fluids.Fluid;
@@ -36,11 +37,14 @@ import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereVacuum;
 import zmaster587.advancedRocketry.block.BlockFuelTank;
+import zmaster587.advancedRocketry.block.susy.ARSuSyBlocks;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.util.Asteroid;
 import zmaster587.advancedRocketry.util.SealableBlockHandler;
+import zmaster587.libVulpes.block.BlockFullyRotatable;
 
 import static gregtech.api.metatileentity.multiblock.MultiblockControllerBase.states;
+import static zmaster587.libVulpes.block.BlockFullyRotatable.FACING;
 
 /**
  * Stores config variables
@@ -694,13 +698,19 @@ public class ARConfiguration {
     public static void loadPostInit() {
         ARConfiguration arConfig = getCurrentConfig();
         // timed best here
-        arConfig.rocketHullBlocks = states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF)).or(new TraceabilityPredicate(new Predicate<BlockWorldState>() {
-            @Override
-            public boolean test(BlockWorldState blockWorldState) {
-                return blockWorldState.getBlockState().getBlock() instanceof BlockFuelTank;
-            }
-        }));
-        arConfig.rocketShieldBlocks = states(MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF));
+        arConfig.rocketHullBlocks = states(
+                MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF))
+                .or(new TraceabilityPredicate(bws -> {
+                    Block blocks[] = new Block[]{ARSuSyBlocks.blockHullTile, ARSuSyBlocks.blockFairingHull, ARSuSyBlocks.blockRocketHatch};
+                    for (Block b: blocks) {
+                        if (bws.getBlockState().withProperty(FACING, EnumFacing.DOWN) == b.getDefaultState()) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }) )
+                .or(new TraceabilityPredicate(blockWorldState -> blockWorldState.getBlockState().getBlock() instanceof BlockFuelTank));
+        arConfig.rocketShieldBlocks = states(ARSuSyBlocks.blockFairingHull.getDefaultState(), MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF));
 
         // Register fuels
         logger.info("Start registering liquid rocket fuels");

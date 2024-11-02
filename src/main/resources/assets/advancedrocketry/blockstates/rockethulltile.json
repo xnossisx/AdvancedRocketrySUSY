@@ -1,0 +1,11 @@
+{
+	"variants": {
+		"normal": { "model": "advancedrocketry:rockethulltile" },
+		"facing=north": { "model": "advancedrocketry:rockethulltile", "x": 90 },
+		"facing=south": {  "model": "advancedrocketry:rockethulltile", "x": 90, "y": 180 },
+		"facing=west":  { "model": "advancedrocketry:rockethulltile", "x": 90, "y": 270 },
+		"facing=east":  { "model": "advancedrocketry:rockethulltile", "x": 90, "y": 90 },
+		"facing=up":  { "model": "advancedrocketry:rockethulltile" },
+		"facing=down":  { "model": "advancedrocketry:rockethulltile", "x": 180  }
+	}
+}

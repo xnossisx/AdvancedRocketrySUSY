@@ -1,0 +1,12 @@
+{
+
+	"variants": {
+		"normal": { "model": "advancedrocketry:rockethatch" },
+		"facing=north": { "model": "advancedrocketry:rockethatch", "x": 90 },
+		"facing=south": {  "model": "advancedrocketry:rockethatch", "x": 90, "y": 180 },
+		"facing=west":  { "model": "advancedrocketry:rockethatch", "x": 90, "y": 270 },
+		"facing=east":  { "model": "advancedrocketry:rockethatch", "x": 90, "y": 90 },
+		"facing=up":  { "model": "advancedrocketry:rockethatch" },
+		"facing=down":  { "model": "advancedrocketry:rockethatch", "x": 180  }
+	}
+}

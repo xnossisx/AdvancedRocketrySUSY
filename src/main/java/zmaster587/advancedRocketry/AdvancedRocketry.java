@@ -9,6 +9,8 @@ import java.util.Map.Entry;
 
 import javax.annotation.Nonnull;
 
+import com.alcatrazescapee.notreepunching.common.blocks.BlockRock;
+import gregtech.api.unification.material.Materials;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -70,6 +72,10 @@ import zmaster587.advancedRocketry.block.plant.BlockLightwoodLeaves;
 import zmaster587.advancedRocketry.block.plant.BlockLightwoodPlanks;
 import zmaster587.advancedRocketry.block.plant.BlockLightwoodSapling;
 import zmaster587.advancedRocketry.block.plant.BlockLightwoodWood;
+import zmaster587.advancedRocketry.block.susy.ARSuSyBlocks;
+import zmaster587.advancedRocketry.block.susy.BlockFairingHull;
+import zmaster587.advancedRocketry.block.susy.BlockHullTile;
+import zmaster587.advancedRocketry.block.susy.BlockRocketHatch;
 import zmaster587.advancedRocketry.capability.CapabilityProtectiveArmor;
 import zmaster587.advancedRocketry.command.WorldCommand;
 import zmaster587.advancedRocketry.common.CommonProxy;
@@ -700,6 +706,7 @@ public class AdvancedRocketry {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void registerBlocks(RegistryEvent.Register<Block> evt) {
+        registerSUSYBlocks();
         // Blocks -------------------------------------------------------------------------------------
         // Machines
         // Machine parts
@@ -1223,6 +1230,19 @@ public class AdvancedRocketry {
         OreDictionary.registerOre("treeSapling", new ItemStack(AdvancedRocketryBlocks.blockLightwoodSapling));
         OreDictionary.registerOre("concrete", new ItemStack(AdvancedRocketryBlocks.blockConcrete));
         OreDictionary.registerOre("casingCentrifuge", new ItemStack(LibVulpesBlocks.blockAdvStructureBlock));
+    }
+
+    private void registerSUSYBlocks() {
+        ARSuSyBlocks.blockHullTile = new BlockHullTile(Material.IRON).setTranslationKey("rocketHullTile")
+                .setCreativeTab(tabAdvRocketry).setHardness(3f).setResistance(18f);
+        ARSuSyBlocks.blockFairingHull = new BlockFairingHull(Material.IRON).setTranslationKey("rocketPayloadFairing")
+                        .setCreativeTab(tabAdvRocketry).setHardness(3f).setResistance(30f);
+        ARSuSyBlocks.blockRocketHatch = new BlockRocketHatch(Material.IRON).setTranslationKey("rocketHatch")
+                        .setCreativeTab(tabAdvRocketry).setHardness(3f).setResistance(20f);
+        LibVulpesBlocks.registerBlock(ARSuSyBlocks.blockHullTile.setRegistryName("rocketHullTile"));
+        LibVulpesBlocks.registerBlock(ARSuSyBlocks.blockFairingHull.setRegistryName("rocketPayloadFairing"));
+        LibVulpesBlocks.registerBlock(ARSuSyBlocks.blockRocketHatch.setRegistryName("rocketHatch"));
+
     }
 
     @SideOnly(Side.CLIENT)
