@@ -41,7 +41,7 @@ dependencies {
 
     runtimeOnly(rfg.deobf("com.cleanroommc:strip-latest-forge-requirements:1.0"))
 
-//    implementation(fg.deobf("curse.maven:industrial-craft-242638:2746892"))
+    implementation(rfg.deobf("curse.maven:industrial-craft-242638:2746892"))
     //compileOnly("net.industrial-craft:industrialcraft-2:$icVersion:dev")
     implementation(rfg.deobf("curse.maven:library-for-ar-reworked-1038780:5732205"))
 
@@ -67,8 +67,9 @@ dependencies {
     // GCYM 1.2.10
     implementation (rfg.deobf("curse.maven:gregicality-multiblocks-564858:5508050"))
     // AE2UEL 0.55.6 (transitive gt dep)
-    //compileOnly (fg.deobf("curse.maven:ae2-extended-life-570458:4402048"))
+    compileOnly (rfg.deobf("curse.maven:ae2-extended-life-570458:4402048"))
 
+    //SuSy-Core
     implementation (rfg.deobf("curse.maven:susycore-846224:5732887"))
 
     //GeckoLib

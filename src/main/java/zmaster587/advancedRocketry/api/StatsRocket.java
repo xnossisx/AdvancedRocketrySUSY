@@ -11,8 +11,12 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagFloat;
 import net.minecraft.nbt.NBTTagInt;
 
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.util.Constants;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
+import zmaster587.advancedRocketry.block.susy.MTETankFluidHatch;
 import zmaster587.libVulpes.util.HashedBlockPosition;
 import zmaster587.libVulpes.util.Vector3F;
 
@@ -60,6 +64,8 @@ public class StatsRocket {
     private int fuelBaseRateWarp;
     private int fuelBaseRateImpulse;
     private List<Vector3F<Float>> engineLoc;
+    private List<Integer> fuelQuantities;
+    private List<BlockPos> fuelPorts;
     private HashMap<String, Object> statTags;
 
     public StatsRocket() {
@@ -81,6 +87,7 @@ public class StatsRocket {
         pilotSeatPos.x = INVALID_SEAT;
         engineLoc = new ArrayList<>();
         statTags = new HashMap<>();
+        fuelPorts = new ArrayList<BlockPos>();
     }
 
     /*
@@ -102,6 +109,10 @@ public class StatsRocket {
         }
 
         return new StatsRocket();
+    }
+
+    public List<BlockPos> getFuelPorts() {
+        return fuelPorts;
     }
 
     public int getSeatX() {
@@ -670,6 +681,17 @@ public class StatsRocket {
             stats.setIntArray("passengerSeats", locs);
         }
 
+        if (stats.hasKey("fuelQuantities")) {
+            int fuelQVs[] = stats.getIntArray("fuelQuantities");
+            for (int i : fuelQVs) {
+                fuelQuantities.add(i);
+            }
+            int ports[] = stats.getIntArray("fuelPos");
+            for (int i = 0; i < ports.length; i += 3) {
+                fuelPorts.add(new BlockPos(ports[i], ports[i+1], ports[i+2]));
+            }
+        }
+
         nbt.setTag(TAGNAME, stats);
     }
 
@@ -743,6 +765,20 @@ public class StatsRocket {
                 }
             }
 
+            if (stats.hasKey("fuelQuantities")) {
+                NBTTagList nbList = stats.getTagList("fuelQuantities", Constants.NBT.TAG_INT_ARRAY);
+                for (int i = 0; i < nbList.tagCount(); i++) {
+                    fuelQuantities.add(nbList.getIntAt(i));
+                }
+            }
+
+            if (stats.hasKey("fuelPos")) {
+                NBTTagList nbList = stats.getTagList("fuelPos", Constants.NBT.TAG_INT_ARRAY);
+                for (int i = 0; i< nbList.tagCount(); i += 3) {
+                    fuelPorts.add(new BlockPos(nbList.getIntAt(i), nbList.getIntAt(i+1), nbList.getIntAt(i+2)));
+                }
+            }
+
             if (stats.hasKey("passengerSeats")) {
                 int[] locations = stats.getIntArray("passengerSeats");
 
@@ -752,5 +788,9 @@ public class StatsRocket {
                 }
             }
         }
+    }
+
+    public void addFuelHatch(MTETankFluidHatch hatch) {
+        fuelPorts.add(hatch.getPos());
     }
 }

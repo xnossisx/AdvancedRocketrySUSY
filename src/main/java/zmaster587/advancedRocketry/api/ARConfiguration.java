@@ -38,12 +38,14 @@ import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.atmosphere.AtmosphereVacuum;
 import zmaster587.advancedRocketry.block.BlockFuelTank;
 import zmaster587.advancedRocketry.block.susy.ARSuSyBlocks;
+import zmaster587.advancedRocketry.block.susy.MTETankFluidHatch;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
+import zmaster587.advancedRocketry.tile.ARMetaTileEntities;
 import zmaster587.advancedRocketry.util.Asteroid;
 import zmaster587.advancedRocketry.util.SealableBlockHandler;
 import zmaster587.libVulpes.block.BlockFullyRotatable;
 
-import static gregtech.api.metatileentity.multiblock.MultiblockControllerBase.states;
+import static gregtech.api.metatileentity.multiblock.MultiblockControllerBase.*;
 import static zmaster587.libVulpes.block.BlockFullyRotatable.FACING;
 
 /**
@@ -222,6 +224,8 @@ public class ARConfiguration {
     @ConfigProperty
     // referring to heat shields
     public TraceabilityPredicate rocketShieldBlocks = new TraceabilityPredicate();
+    @ConfigProperty
+    public TraceabilityPredicate rocketTankBlocks = new TraceabilityPredicate();
     @ConfigProperty
     public LinkedList<String> standardGeodeOres = new LinkedList<>();
     @ConfigProperty(needsSync = true, internalType = Integer.class)
@@ -700,18 +704,10 @@ public class ARConfiguration {
         // timed best here
         arConfig.rocketHullBlocks = states(
                 MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF))
-                .or(new TraceabilityPredicate(bws -> {
-                    Block blocks[] = new Block[]{ARSuSyBlocks.blockHullTile, ARSuSyBlocks.blockFairingHull, ARSuSyBlocks.blockRocketHatch};
-                    for (Block b: blocks) {
-                        if (bws.getBlockState().withProperty(FACING, EnumFacing.DOWN) == b.getDefaultState()) {
-                            return true;
-                        }
-                    }
-                    return false;
-                }) )
+                .or(blocks(ARSuSyBlocks.blockHullTile, ARSuSyBlocks.blockFairingHull, ARSuSyBlocks.blockRocketHatch)).or(metaTileEntities(ARMetaTileEntities.TANK_FLUID_HATCH))
                 .or(new TraceabilityPredicate(blockWorldState -> blockWorldState.getBlockState().getBlock() instanceof BlockFuelTank));
         arConfig.rocketShieldBlocks = states(ARSuSyBlocks.blockFairingHull.getDefaultState(), MetaBlocks.METAL_CASING.getState(BlockMetalCasing.MetalCasingType.ALUMINIUM_FROSTPROOF));
-
+        arConfig.rocketTankBlocks = arConfig.rocketHullBlocks;
         // Register fuels
         logger.info("Start registering liquid rocket fuels");
         for (String str : liquidMonopropellant) {

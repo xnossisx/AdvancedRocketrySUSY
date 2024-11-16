@@ -72,10 +72,7 @@ import zmaster587.advancedRocketry.block.plant.BlockLightwoodLeaves;
 import zmaster587.advancedRocketry.block.plant.BlockLightwoodPlanks;
 import zmaster587.advancedRocketry.block.plant.BlockLightwoodSapling;
 import zmaster587.advancedRocketry.block.plant.BlockLightwoodWood;
-import zmaster587.advancedRocketry.block.susy.ARSuSyBlocks;
-import zmaster587.advancedRocketry.block.susy.BlockFairingHull;
-import zmaster587.advancedRocketry.block.susy.BlockHullTile;
-import zmaster587.advancedRocketry.block.susy.BlockRocketHatch;
+import zmaster587.advancedRocketry.block.susy.*;
 import zmaster587.advancedRocketry.capability.CapabilityProtectiveArmor;
 import zmaster587.advancedRocketry.command.WorldCommand;
 import zmaster587.advancedRocketry.common.CommonProxy;
@@ -378,6 +375,7 @@ public class AdvancedRocketry {
 
         // TileEntity Registration
         // ---------------------------------------------------------------------------------------------
+        ARMetaTileEntities.init();
         GameRegistry.registerTileEntity(TileBrokenPart.class, "ARbrokenPart");
         GameRegistry.registerTileEntity(TileRocketServiceStation.class, "ARserviceStation");
         GameRegistry.registerTileEntity(TileRocketAssemblingMachine.class, "ARrocketBuilder");
@@ -504,6 +502,7 @@ public class AdvancedRocketry {
         machineRecipes.registerMachine(TileCentrifuge.class);
         machineRecipes.registerMachine(TilePrecisionLaserEtcher.class);
     }
+
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public void registerEnchants(RegistryEvent.Register<Enchantment> evt) {
@@ -1239,6 +1238,7 @@ public class AdvancedRocketry {
                         .setCreativeTab(tabAdvRocketry).setHardness(3f).setResistance(30f);
         ARSuSyBlocks.blockRocketHatch = new BlockRocketHatch(Material.IRON).setTranslationKey("rocketHatch")
                         .setCreativeTab(tabAdvRocketry).setHardness(3f).setResistance(20f);
+
         LibVulpesBlocks.registerBlock(ARSuSyBlocks.blockHullTile.setRegistryName("rocketHullTile"));
         LibVulpesBlocks.registerBlock(ARSuSyBlocks.blockFairingHull.setRegistryName("rocketPayloadFairing"));
         LibVulpesBlocks.registerBlock(ARSuSyBlocks.blockRocketHatch.setRegistryName("rocketHatch"));

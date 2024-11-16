@@ -7,9 +7,13 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import gregtech.api.metatileentity.MetaTileEntity;
+import gregtech.api.metatileentity.MetaTileEntityHolder;
+import gregtech.api.metatileentity.interfaces.IGregTechTileEntity;
 import gregtech.api.pattern.BlockWorldState;
 import gregtech.api.pattern.PatternMatchContext;
 import gregtech.api.pattern.TraceabilityPredicate;
+import gregtech.common.metatileentities.multi.multiblockpart.MetaTileEntityFluidHatch;
 import ibxm.Pattern;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -34,6 +38,7 @@ import zmaster587.advancedRocketry.api.*;
 import zmaster587.advancedRocketry.api.RocketEvent.RocketLandedEvent;
 import zmaster587.advancedRocketry.api.fuel.FuelRegistry.FuelType;
 import zmaster587.advancedRocketry.block.*;
+import zmaster587.advancedRocketry.block.susy.MTETankFluidHatch;
 import zmaster587.advancedRocketry.dimension.DimensionManager;
 import zmaster587.advancedRocketry.entity.EntityRocket;
 import zmaster587.advancedRocketry.item.ItemPackedStructure;
@@ -79,6 +84,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             2, EnumFacing.EAST, backdrop);
     private static final Block[] viableBlocks = { AdvancedRocketryBlocks.blockLaunchpad,
             AdvancedRocketryBlocks.blockLandingPad };
+
     protected ModuleText errorText;
     protected StatsRocket stats;
     protected AxisAlignedBB bbCache;
@@ -304,6 +310,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         BlockPos corePos = null;
         boolean invalidBlock = false;
         int blockCount = 0;
+        int solidBlockCount = 0;
         for (int xCurr = (int) bb.minX; xCurr <= bb.maxX; xCurr++) {
             for (int zCurr = (int) bb.minZ; zCurr <= bb.maxZ; zCurr++) {
                 for (int yCurr = (int) bb.minY; yCurr <= bb.maxY; yCurr++) {
@@ -311,6 +318,9 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                     BlockPos currBlockPos = new BlockPos(xCurr, yCurr, zCurr);
 
                     if (!world.isAirBlock(currBlockPos)) {
+                        if (world.getBlockState(currBlockPos).getCollisionBoundingBox(world,currBlockPos) != null) {
+                            solidBlockCount++;
+                        }
                         if (xCurr < actualMinX) {
                             actualMinX = xCurr;
                         }
@@ -355,7 +365,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             return null;
         }
 
-        Set<BlockPos> hull  = checkHull(world, realAABB, actualBlocks);
+        Set<BlockPos> hull  = checkHull(world, realAABB, actualBlocks, solidBlockCount);
 
         if (hull == null) {
             return null;
@@ -374,6 +384,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
 
                 IBlockState state = world.getBlockState(currBlockPos);
                 Block block = state.getBlock();
+                TileEntity tile = world.getTileEntity(currBlockPos);
 
                 if (ARConfiguration.getCurrentConfig().blackListRocketBlocks.contains(block)) {
                     if (!block.isReplaceable(world, currBlockPos)) {
@@ -391,6 +402,14 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                     weight += WeightEngine.INSTANCE.getWeight(world, currBlockPos);
                 } else {
                     weight += 1;
+                }
+
+                // If fuel hatch, setup capacity
+                if (tile instanceof MetaTileEntityHolder) {
+                    MetaTileEntity mte = ((MetaTileEntityHolder) tile).getMetaTileEntity();
+                    if (mte instanceof MTETankFluidHatch) {
+                        stats.addFuelHatch((MTETankFluidHatch)mte);
+                    }
                 }
 
                 // If rocketEngine increaseThrust
@@ -449,7 +468,6 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
                     drillPower += ((IMiningDrill) block).getMiningSpeed(world, currBlockPos);
                 }
 
-                TileEntity tile = world.getTileEntity(currBlockPos);
                 if (tile instanceof TileSatelliteHatch) {
                     hasSatellite = true;
                     if (ARConfiguration.getCurrentConfig().advancedWeightSystem) {
@@ -523,7 +541,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
         return new AxisAlignedBB(actualMinX, actualMinY, actualMinZ, actualMaxX, actualMaxY, actualMaxZ);
     }
 
-    private Set<BlockPos> checkHull(World world, AxisAlignedBB aaBB, Set<BlockPos> actualBlocks) {
+    private Set<BlockPos> checkHull(World world, AxisAlignedBB aaBB, Set<BlockPos> actualBlocks, int solidBlocks) {
         AxisAlignedBB floodBB = aaBB.grow(1);// initializes flood fill box
         BlockPos bottom = new BlockPos(floodBB.minX, floodBB.minY, floodBB.minZ); // initializes flood fill start
         Queue<BlockPos> uncheckedBlocks = new ArrayDeque<>();
@@ -549,7 +567,7 @@ public class TileRocketAssemblingMachine extends TileEntityRFConsumer implements
             }
         }
         long volume = Math.round((floodBB.maxX - floodBB.minX + 1)) * Math.round((floodBB.maxY - floodBB.minY + 1)) * Math.round((floodBB.maxZ - floodBB.minZ + 1));
-        long remainingAir = volume - airBlocks.size() - actualBlocks.size(); // the .grow() is factored in with airBlocks.size()
+        long remainingAir = volume - airBlocks.size() - solidBlocks; // the .grow() is factored in with airBlocks.size()
         if (remainingAir < 2) { // considering you need a seat and an air block above it
             status = ErrorCodes.HULL_FULL;
             return null;
